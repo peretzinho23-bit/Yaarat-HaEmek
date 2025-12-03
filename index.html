@@ -2,7 +2,34 @@
 <html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <title>יערת העמק – דף הבית</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- SEO בסיסי -->
+  <title>בית ספר יערת העמק - האתר הרשמי</title>
+  <meta name="description" content="האתר הרשמי של בית הספר יערת העמק במגדל העמק. מידע על מגמות, חדשות, לוח מבחנים, מערכת שעות וחיי בית הספר עבור תלמידים והורים." />
+  <meta name="keywords" content="יערת העמק, בית ספר יערת העמק, מגדל העמק, חטיבת ביניים, שכבת ז, שכבת ח, שכבת ט, לוח מבחנים, חדשות בית ספר" />
+  <meta name="author" content="יערת העמק - האתר הרשמי" />
+  <meta name="robots" content="index, follow" />
+  <meta http-equiv="Content-Language" content="he" />
+
+  <!-- Open Graph / Social -->
+  <meta property="og:title" content="בית ספר יערת העמק - האתר הרשמי" />
+  <meta property="og:description" content="ברוכים הבאים לאתר הרשמי של בית ספר יערת העמק במגדל העמק. חדשות, מבחנים, לוח מודעות ומידע חשוב לתלמידים ולהורים." />
+  <meta property="og:image" content="https://yaarat.vercel.app/logo.png" />
+  <meta property="og:url" content="https://yaarat.vercel.app/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="he_IL" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="בית ספר יערת העמק - אתר רשמי" />
+  <meta name="twitter:description" content="כל המידע על יערת העמק במקום אחד: חדשות, מבחנים, לוח מודעות, שכבות ועוד." />
+  <meta name="twitter:image" content="https://yaarat.vercel.app/logo.png" />
+
+  <!-- צבע לדפדפנים -->
+  <meta name="theme-color" content="#0b1120" />
+
+  <link rel="icon" href="logo.png" />
   <link rel="stylesheet" href="style.css" />
 </head>
 
@@ -22,7 +49,7 @@
         </div>
 
         <div>
-          <!-- הכותרת הראשית בדסקטופ – טקסט ברירת מחדל, מתעדכן מהאדמין דרך siteContent -->
+          <!-- הכותרת הראשית בדסקטופ – מתעדכנת מהאדמין דרך siteContent -->
           <div class="school-title-main" id="home-hero-title">
             ברוכים הבאים ליערת העמק
           </div>
@@ -39,7 +66,6 @@
         <a href="#grades">השכבות</a>
         <a href="#contact">יצירת קשר</a>
         <a href="https://my.edu.gov.il/home" class="personal-btn">למרחב האישי</a>
-
         <a href="admin.html" class="btn-outline">Admin</a>
       </div>
     </nav>
@@ -51,8 +77,8 @@
   <div class="hero-overlay"></div>
   <div class="container hero-content">
     <div class="hero-text">
-      <h1>יחד צומחים ביערת העמק</h1>
-      <p>
+      <h1 id="hero-main-title">יחד צומחים ביערת העמק</h1>
+      <p id="hero-main-body">
         סביבה חינוכית בטוחה, תומכת ומובילה. כל תלמיד ותלמידה – עולם ומלואו.
       </p>
       <div class="hero-actions">
@@ -61,8 +87,8 @@
       </div>
     </div>
     <div class="hero-side-card">
-      <h3>מידע מהיר</h3>
-      <ul>
+      <h3 id="hero-side-title">מידע מהיר</h3>
+      <ul id="hero-side-list">
         <li>📍 מגדל העמק</li>
         <li>🧑‍🎓 שכבות ז'–ט'</li>
         <li>👩‍🏫 צוות חינוכי מסור</li>
@@ -72,7 +98,7 @@
   </div>
 </section>
 
-<!-- ABOUT – מיד אחרי ההירו -->
+<!-- ABOUT -->
 <section id="about">
   <div class="container">
     <div class="section-header">
@@ -84,7 +110,7 @@
   </div>
 </section>
 
-<!-- 🔹 פס "חשוב לדעת" – כרטיסים מהירים לתלמידים -->
+<!-- חשוב לדעת -->
 <section class="section-dark-strong">
   <div class="container">
     <div class="section-header">
@@ -112,12 +138,12 @@
   </div>
 </section>
 
-<!-- ⭐ חדשות אחרונות לפי שכבות -->
+<!-- חדשות אחרונות -->
 <section id="home-news" class="section-light">
   <div class="container">
     <div class="section-header">
-      <h2 class="section-title">חדשות אחרונות</h2>
-      <p class="section-subtitle">
+      <h2 class="section-title" id="home-news-title">חדשות אחרונות</h2>
+      <p class="section-subtitle" id="home-news-subtitle">
         שלושת העדכונים האחרונים מכל שכבה – ישר מול העיניים של התלמידים.
       </p>
     </div>
@@ -150,12 +176,12 @@
   </div>
 </section>
 
-<!-- ⭐ לוח מודעות -->
+<!-- לוח מודעות -->
 <section id="board" class="section-dark-strong">
   <div class="container">
     <div class="section-header">
-      <h2 class="section-title">לוח מודעות</h2>
-      <p class="section-subtitle">הודעות חשובות, פעילויות ואירועים לבית הספר.</p>
+      <h2 class="section-title" id="board-title">לוח מודעות</h2>
+      <p class="section-subtitle" id="board-subtitle">הודעות חשובות, פעילויות ואירועים לבית הספר.</p>
     </div>
 
     <div id="home-board" class="home-board-list">
@@ -164,12 +190,12 @@
   </div>
 </section>
 
-<!-- ⭐ מבחנים קרובים לפי שכבות -->
+<!-- מבחנים קרובים -->
 <section id="home-exams" class="section-light">
   <div class="container">
     <div class="section-header">
-      <h2 class="section-title">מבחנים קרובים</h2>
-      <p class="section-subtitle">
+      <h2 class="section-title" id="home-exams-title">מבחנים קרובים</h2>
+      <p class="section-subtitle" id="home-exams-subtitle">
         תאריכים, מקצועות ונושאים – כדי שאף אחד לא יפספס.
       </p>
     </div>
@@ -215,7 +241,6 @@
       <a href="t.html" class="grade-btn">שכבת ט'</a>
     </div>
 
-    <!-- כרטיסי תיאור שכבות – הטקסטים מתעדכנים מהאדמין דרך siteContent -->
     <div class="home-grid" style="margin-top:20px;">
       <div class="grade-card">
         <h3>על שכבת ז'</h3>
@@ -248,7 +273,7 @@
     </div>
 
     <div class="card request-box">
-      <h3>שליחת בקשה</h3>
+      <h3 id="requests-box-title">שליחת בקשה</h3>
       <p id="requests-body">למילוי טופס הבקשות – לחצו כאן:</p>
       <a
         href="https://docs.google.com/forms/d/e/1FAIpQLScisdjJ5h9t7VgSOa8hmnmrJh6H5VSy84uyE32hhOgDQEU05w/viewform?usp=sharing&ouid=106991680453150303010"
@@ -261,7 +286,7 @@
   </div>
 </section>
 
-<<!-- CONTACT -->
+<!-- CONTACT -->
 <section id="contact" class="section-light">
   <div class="container">
     <div class="section-header">
@@ -281,14 +306,13 @@
   </div>
 </section>
 
-
 <footer>
   <div class="container">
     <p id="footer-text">© כל הזכויות שמורות לבית ספר יערת העמק</p>
   </div>
 </footer>
 
-<!-- כפתור חזרה לראש הדף – עובד עם setupToTop ב-app.js -->
+<!-- כפתור חזרה לראש הדף -->
 <button
   id="to-top"
   style="
@@ -309,6 +333,7 @@
   ↑ למעלה
 </button>
 
+<!-- כל הלוגיקה של טעינת תוכן מה-Firebase והאדמין -->
 <script type="module" src="app.js"></script>
 </body>
 </html>
