@@ -1,0 +1,178 @@
+/* ===== ADMIN PANEL – עיצוב נפרד לאדמין ===== */
+
+/* רק בעמוד האדמין – הגוף */
+body {
+  background: #040814;
+  color: #e3f2fd;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* הסקשן המרכזי */
+section {
+  padding: 32px 0 40px;
+}
+
+/* טקסט סטטוס למעלה (בודק התחברות / מחובר כ...) */
+#auth-status {
+  text-align: center;
+  font-size: 0.9rem;
+  opacity: 0.8;
+  margin-top: 8px;
+}
+
+/* === טופס התחברות === */
+
+#login-section {
+  max-width: 420px;
+  margin: 40px auto 10px;
+  background: rgba(3, 11, 25, 0.96);
+  padding: 22px 24px;
+  border-radius: 20px;
+  border: 1px solid rgba(129, 212, 250, 0.4);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+}
+
+#login-section .section-title {
+  text-align: center;
+}
+
+#login-section label {
+  display: block;
+  font-size: 0.85rem;
+  margin-top: 10px;
+  margin-bottom: 4px;
+}
+
+#login-section input {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(129, 212, 250, 0.55);
+  background: rgba(1, 6, 18, 0.95);
+  color: #e3f2fd;
+  font-size: 0.9rem;
+}
+
+#login-section input::placeholder {
+  color: rgba(179, 229, 252, 0.7);
+}
+
+#login-section button[type="submit"] {
+  margin-top: 14px;
+  width: 100%;
+}
+
+/* === לייאאאוט אחרי התחברות === */
+
+.admin-layout {
+  margin-top: 30px;
+}
+
+/* כפתור יציאה */
+#logout-btn {
+  float: left;
+  margin-bottom: 10px;
+}
+
+/* כותרות משנה (חדשות / מבחנים / לוח מודעות) */
+.admin-layout h3.section-title {
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+/* רשת עמודות של הקלפים */
+.admin-columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+  margin-top: 10px;
+}
+
+/* כרטיס ניהול */
+.card {
+  background: rgba(3, 10, 26, 0.98);
+  border-radius: 18px;
+  padding: 14px 16px;
+  border: 1px solid rgba(129, 212, 250, 0.4);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.65);
+  font-size: 0.9rem;
+}
+
+.card h3 {
+  margin-bottom: 8px;
+  font-size: 1rem;
+}
+
+/* רשימות של חדשות / מבחנים קיימים */
+.admin-list,
+#admin-news-z,
+#admin-news-h,
+#admin-news-t,
+#admin-exams-z,
+#admin-exams-h,
+#admin-exams-t,
+#admin-board {
+  max-height: 180px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+  padding-right: 4px;
+  font-size: 0.85rem;
+}
+
+/* פריטים בתוך הרשימות – אם אתה מוסיף div/item מה־JS */
+.admin-item {
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 10px;
+  padding: 6px 8px;
+  margin-bottom: 6px;
+}
+
+/* טפסים בתוך כרטיסי האדמין */
+
+.admin-layout form label {
+  display: block;
+  font-size: 0.8rem;
+  margin-top: 8px;
+  margin-bottom: 3px;
+}
+
+.admin-layout form input,
+.admin-layout form textarea {
+  width: 100%;
+  padding: 7px 9px;
+  border-radius: 10px;
+  border: 1px solid rgba(129, 212, 250, 0.4);
+  background: rgba(4, 10, 24, 0.95);
+  color: #e3f2fd;
+  font-size: 0.85rem;
+}
+
+.admin-layout form textarea {
+  min-height: 70px;
+  resize: vertical;
+}
+
+.admin-layout form button[type="submit"] {
+  margin-top: 10px;
+  width: 100%;
+}
+
+/* הודעות ריקות */
+.admin-empty {
+  font-size: 0.8rem;
+  opacity: 0.75;
+}
+
+/* התאמה למסכים קטנים */
+@media (max-width: 768px) {
+  #login-section {
+    margin-top: 24px;
+    padding: 18px 16px;
+  }
+
+  #logout-btn {
+    float: none;
+    display: inline-block;
+    margin-bottom: 12px;
+  }
+}

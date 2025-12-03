@@ -1,0 +1,777 @@
+/* בסיס */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #040814;
+  color: #e3f2fd;
+  direction: rtl;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* לא מסגרת כחולה מכוערת */
+a:focus,
+a:focus-visible,
+button:focus,
+button:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.container {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* HEADER + NAV */
+
+.header-main {
+  background: #020816;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: radial-gradient(circle at top, #29b6f6, #01579b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.1;
+  overflow: hidden;
+}
+
+.logo-circle .logo-img {
+  width: 120%;
+  height: 120%;
+  object-fit: cover;
+  object-position: 50% 60%;
+  display: block;
+}
+
+.logo-square {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+}
+
+.school-title-main {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.school-title-sub {
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+.school-title-sub a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-size: 0.78rem;
+}
+
+.nav-right {
+  display: flex;
+  gap: 10px;
+  font-size: 0.9rem;
+}
+
+.nav-right a {
+  padding: 6px 10px;
+  border-radius: 999px;
+  transition: background 0.15s;
+}
+
+.nav-right a:hover {
+  background: rgba(40, 150, 220, 0.2);
+}
+
+.btn-outline {
+  border: 1px solid rgba(129, 212, 250, 0.7);
+}
+
+/* HERO – דף הבית */
+
+.hero {
+  position: relative;
+  background: radial-gradient(circle at top, #0288d1, #020818 55%);
+  color: #fff;
+  padding: 60px 0 80px;
+  overflow: hidden;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.15), transparent 40%, #040814 90%);
+}
+
+.hero-content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+}
+
+.hero-text {
+  flex: 1.6;
+}
+
+.hero-text h1 {
+  font-size: 2.4rem;
+  margin-bottom: 10px;
+}
+
+.hero-text p {
+  font-size: 1rem;
+  max-width: 520px;
+  margin-bottom: 16px;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn,
+.btn-outline {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn {
+  background: linear-gradient(90deg, #29b6f6, #00e5ff);
+  color: #01253b;
+}
+
+.btn:hover {
+  filter: brightness(1.05);
+}
+
+.btn-outline {
+  background: transparent;
+  color: #e3f2fd;
+}
+
+.btn-outline:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.hero-side-card {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 18px;
+  padding: 16px 18px;
+  border: 1px solid rgba(129, 212, 250, 0.5);
+  font-size: 0.9rem;
+}
+
+.hero-side-card h3 {
+  margin-bottom: 8px;
+}
+
+/* SECTIONS GENERIC */
+
+section {
+  padding: 40px 0;
+}
+
+.section-light {
+  background: #050a18;
+}
+
+.section-dark-strong {
+  background: #020814;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-size: 1.6rem;
+  margin-bottom: 8px;
+}
+
+.section-subtitle {
+  font-size: 0.95rem;
+  opacity: 0.8;
+}
+
+/* HOME NEWS + EXAMS */
+
+.home-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.grade-card {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 16px;
+  padding: 14px 16px;
+  border: 1px solid rgba(129, 212, 250, 0.25);
+}
+
+.grade-card h3 {
+  margin-bottom: 10px;
+}
+
+.home-news-list,
+.home-exams-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+/* --- כרטיס חדשות אחד – שכל חדשות תיראה מופרדת --- */
+.home-news-item {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 14px;
+  border: 1px solid rgba(129, 212, 250, 0.35);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+}
+
+/* חדשות עם תמונה (אם משתמשים בזה) */
+.home-news-item-with-image {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.home-news-image-wrap img {
+  width: 70px;
+  height: 70px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid rgba(129, 212, 250, 0.6);
+}
+
+.home-news-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* כותרת, מטה, גוף – גם ל-news וגם ל-classes של app.js */
+.home-news-title,
+.home-item-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 4px;
+}
+
+.home-news-meta,
+.home-item-meta {
+  color: #9cd2ff;
+  font-size: 0.85rem;
+  opacity: 0.9;
+  margin-bottom: 4px;
+}
+
+.home-news-body,
+.home-item-body {
+  color: #d9e8ff;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  white-space: pre-line; /* אם תעשה אנטרים בטקסט – זה יישמר */
+}
+
+/* מבחנים */
+
+.home-exam-top {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.home-exam-date {
+  color: #4fc3f7;
+}
+
+.home-exam-subject {
+  color: #ffd54f;
+}
+
+.home-exam-topic {
+  font-size: 0.85rem;
+}
+
+.empty-msg {
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+/* GRADES BUTTONS */
+
+.grades-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.grade-btn {
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(129, 212, 250, 0.7);
+  background: rgba(2, 20, 40, 0.9);
+  color: #e3f2fd;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+/* ABOUT */
+
+.about-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 2fr);
+  gap: 18px;
+  margin-top: 10px;
+}
+
+.about-text p + p {
+  margin-top: 5px;
+}
+
+.about-image-card {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 16px;
+  padding: 14px 16px;
+  border: 1px solid rgba(129, 212, 250, 0.25);
+}
+
+.about-image-placeholder {
+  height: 120px;
+  border-radius: 12px;
+  background: radial-gradient(circle at top, #29b6f6, #01579b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+
+.about-list {
+  list-style: none;
+  font-size: 0.9rem;
+}
+
+.about-list li + li {
+  margin-top: 4px;
+}
+
+/* CONTACT */
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 2fr);
+  gap: 20px;
+}
+
+.contact-box {
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 16px;
+  padding: 14px 16px;
+  border: 1px solid rgba(129, 212, 250, 0.25);
+  font-size: 0.9rem;
+}
+
+.contact-box p + p {
+  margin-top: 6px;
+}
+
+.contact-note {
+  align-self: center;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+/* FOOTER */
+
+footer {
+  padding: 18px 0 24px;
+  text-align: center;
+  font-size: 0.85rem;
+  background: #020816;
+  margin-top: 16px;
+}
+
+/* מרחק גלילה לעוגנים (שהכותרת לא תסתיר) */
+#about,
+#home-news,
+#home-exams,
+#grades,
+#contact {
+  scroll-margin-top: 120px;
+}
+
+/* ===== דפי שכבות (ז / ח' / ט') ===== */
+
+.grade-hero {
+  background: linear-gradient(135deg, #0b1324, #020816);
+  border-bottom: 1px solid rgba(129, 212, 250, 0.25);
+  padding: 40px 0 32px;
+}
+
+.grade-hero h1 {
+  font-size: 2rem;
+  margin-bottom: 6px;
+}
+
+.grade-hero p {
+  font-size: 0.95rem;
+  opacity: 0.85;
+}
+
+.grade-news {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#grade-exams {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* נשתמש באותם כרטיסים של חדשות/מבחנים גם בדפי השכבה */
+
+/* לוח מודעות בדפי שכבה */
+.board-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* כפתור חזרה למעלה */
+
+#to-top {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: rgba(2, 136, 209, 0.9);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.1rem;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.7);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 30;
+}
+
+/* ===== BOARD / לוח מודעות ===== */
+
+.home-board-list,
+.board-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* כל מודעה ככרטיס נפרד */
+.board-item {
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 14px;
+  padding: 12px 14px;
+  border: 1px solid rgba(129, 212, 250, 0.4);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+  font-size: 0.9rem;
+}
+
+/* כותרת המודעה */
+.board-item-title {
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+/* מטה – תאריך / קהל יעד */
+.board-item-meta {
+  font-size: 0.8rem;
+  opacity: 0.85;
+  margin-bottom: 4px;
+  color: #9cd2ff;
+}
+
+/* טקסט גוף המודעה */
+.board-item-body {
+  font-size: 0.9rem;
+  line-height: 1.4;
+  white-space: pre-line; /* שומר אנטרים שהקלדת באדמין */
+}
+
+/* ===== ADMIN PANEL (בסיס) ===== */
+
+#auth-status {
+  text-align: center;
+  font-size: 0.9rem;
+  opacity: 0.8;
+  margin-top: 8px;
+}
+
+/* אזור התחברות */
+
+#login-section {
+  max-width: 420px;
+  margin: 40px auto;
+  background: rgba(0, 0, 0, 0.45);
+  padding: 20px 22px;
+  border-radius: 18px;
+  border: 1px solid rgba(129, 212, 250, 0.25);
+}
+
+#login-section label {
+  display: block;
+  font-size: 0.85rem;
+  margin-top: 8px;
+  margin-bottom: 4px;
+}
+
+#login-section input {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(129, 212, 250, 0.45);
+  background: rgba(3, 11, 25, 0.95);
+  color: #e3f2fd;
+}
+
+/* לייאאאאאאוט של פאנל אדמין */
+
+.admin-layout {
+  margin-top: 30px;
+}
+
+.admin-layout .section-header {
+  text-align: center;
+}
+
+.admin-columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+/* כרטיסים בפאנל אדמין */
+
+.card {
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 16px;
+  padding: 14px 16px;
+  border: 1px solid rgba(129, 212, 250, 0.25);
+  font-size: 0.9rem;
+}
+
+.card h3 {
+  margin-bottom: 8px;
+}
+
+/* רשימות בתוך האדמין */
+
+.admin-list {
+  margin-bottom: 10px;
+  max-height: 200px;
+  overflow-y: auto;
+  font-size: 0.85rem;
+}
+
+/* פריטים שמוצגים מה־JS באדמין (חדשות/מבחנים/מודעות) */
+
+.admin-item {
+  background: rgba(0, 0, 0, 0.55);
+  border-radius: 10px;
+  padding: 6px 8px;
+  margin-bottom: 6px;
+}
+
+.admin-item-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.admin-item-meta {
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+.admin-item-body {
+  font-size: 0.85rem;
+  line-height: 1.3;
+  white-space: pre-line;
+  margin-bottom: 4px;
+}
+
+.admin-remove {
+  margin-top: 4px;
+  font-size: 0.78rem;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(239, 83, 80, 0.8);
+  background: transparent;
+  color: #ff8a80;
+  cursor: pointer;
+}
+
+/* טפסים בפאנל אדמין */
+
+.admin-layout form label {
+  display: block;
+  font-size: 0.8rem;
+  margin-top: 8px;
+  margin-bottom: 4px;
+}
+
+.admin-layout input,
+.admin-layout textarea {
+  width: 100%;
+  padding: 7px 9px;
+  border-radius: 10px;
+  border: 1px solid rgba(129, 212, 250, 0.35);
+  background: rgba(4, 10, 24, 0.95);
+  color: #e3f2fd;
+  font-size: 0.85rem;
+}
+
+.admin-layout textarea {
+  min-height: 70px;
+  resize: vertical;
+}
+
+.admin-layout button[type="submit"] {
+  margin-top: 10px;
+  width: 100%;
+}
+
+/* כפתור התנתקות */
+
+#logout-btn {
+  float: left;
+  margin-bottom: 10px;
+}
+
+/* כרטיסים של תכני אתר (אודות, טלפון וכו') */
+
+.content-edit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.content-edit-card {
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 16px;
+  padding: 14px 16px;
+  border: 1px solid rgba(129, 212, 250, 0.25);
+  font-size: 0.9rem;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 768px) {
+  .hero-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .hero-text p {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero-side-card {
+    width: 100%;
+  }
+
+  .about-grid,
+  .contact-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nav-right {
+    display: none; /* אחר כך אפשר לעשות תפריט מובייל */
+  }
+
+  .grade-hero {
+    text-align: center;
+  }
+.personal-btn {
+  background: #1d4ed8;      /* כחול */
+  color: #ffffff;           /* לבן */
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-weight: 600;
+  transition: 0.2s;
+  display: inline-block;
+}
+
+.personal-btn:hover {
+  background: #2563eb;      /* כחול בהיר */
+  transform: translateY(-2px);
+}
+
+}

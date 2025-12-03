@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>לוח ניהול – יערת העמק</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+
+<body>
+  <!-- HEADER -->
+  <header class="header-main">
+    <div class="container">
+      <nav class="nav">
+        <div class="nav-left">
+          <div class="logo-circle">
+            <span>יערת<br>העמק</span>
+          </div>
+
+          <div>
+            <div class="school-title-main">לוח ניהול · יערת העמק</div>
+            <div class="school-title-sub">
+              <a href="index.html">חזרה לאתר התלמידים</a>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <section>
+    <div class="container">
+
+      <p id="auth-status" class="section-subtitle">בודק התחברות...</p>
+
+      <!-- LOGIN -->
+      <div id="login-section">
+        <div class="section-header">
+          <h2 class="section-title">התחברות אדמין</h2>
+          <p class="section-subtitle">כניסה למנהלי המערכת בלבד</p>
+        </div>
+
+        <form id="login-form" style="max-width:360px;margin:0 auto;">
+          <label>אימייל</label>
+          <input type="email" name="email" required />
+
+          <label>סיסמה</label>
+          <input type="password" name="password" required />
+
+          <button type="submit" style="width:100%;margin-top:10px;">כניסה</button>
+        </form>
+      </div>
+
+      <!-- ADMIN PANEL -->
+      <div id="admin-section" class="admin-layout" style="display:none;">
+        <button id="logout-btn" class="btn-outline">התנתקות</button>
+
+        <div class="section-header">
+          <h2 class="section-title">ניהול חדשות, מבחנים, מודעות ותוכן האתר</h2>
+          <p class="section-subtitle">
+            כל שינוי נשמר אוטומטית ונראה באתר התלמידים.
+          </p>
+        </div>
+
+        <!-- NEWS -->
+        <h3 class="section-title" style="font-size:1.2rem;margin-bottom:10px;">חדשות לפי שכבות</h3>
+        <p class="section-subtitle">ניתן להוסיף קישור לתמונה ולצבע טקסט (אופציונלי).</p>
+
+        <div class="admin-columns">
+          <!-- NEWS Z -->
+          <div class="card">
+            <h3>שכבת ז'</h3>
+            <div id="admin-news-z" class="admin-list"></div>
+
+            <form id="news-form-z">
+              <label>כותרת</label>
+              <input name="title" />
+
+              <label>מידע קצר (תאריך/אירוע)</label>
+              <input name="meta" />
+
+              <label>קישור לתמונה (אופציונלי)</label>
+              <input name="imageUrl" placeholder="https://..." />
+
+              <label>צבע הטקסט (אופציונלי)</label>
+              <input type="color" name="color" value="#ffffff" />
+
+              <label>תוכן הידיעה</label>
+              <textarea name="body"></textarea>
+
+              <button type="submit">הוסף חדשות לז'</button>
+            </form>
+          </div>
+
+          <!-- NEWS H -->
+          <div class="card">
+            <h3>שכבת ח'</h3>
+            <div id="admin-news-h" class="admin-list"></div>
+
+            <form id="news-form-h">
+              <label>כותרת</label>
+              <input name="title" />
+
+              <label>מידע קצר (תאריך/אירוע)</label>
+              <input name="meta" />
+
+              <label>קישור לתמונה (אופציונלי)</label>
+              <input name="imageUrl" placeholder="https://..." />
+
+              <label>צבע הטקסט (אופציונלי)</label>
+              <input type="color" name="color" value="#ffffff" />
+
+              <label>תוכן הידיעה</label>
+              <textarea name="body"></textarea>
+
+              <button type="submit">הוסף חדשות לח'</button>
+            </form>
+          </div>
+
+          <!-- NEWS T -->
+          <div class="card">
+            <h3>שכבת ט'</h3>
+            <div id="admin-news-t" class="admin-list"></div>
+
+            <form id="news-form-t">
+              <label>כותרת</label>
+              <input name="title" />
+
+              <label>מידע קצר (תאריך/אירוע)</label>
+              <input name="meta" />
+
+              <label>קישור לתמונה (אופציונלי)</label>
+              <input name="imageUrl" placeholder="https://..." />
+
+              <label>צבע הטקסט (אופציונלי)</label>
+              <input type="color" name="color" value="#ffffff" />
+
+              <label>תוכן הידיעה</label>
+              <textarea name="body"></textarea>
+
+              <button type="submit">הוסף חדשות לט'</button>
+            </form>
+          </div>
+        </div>
+
+        <br><br>
+
+        <!-- EXAMS -->
+        <h3 class="section-title" style="font-size:1.2rem;margin-bottom:10px;">לוח מבחנים</h3>
+
+        <div class="admin-columns">
+          <!-- Z EXAMS -->
+          <div class="card">
+            <h3>מבחנים · ז'</h3>
+            <div id="admin-exams-z" class="admin-list"></div>
+
+            <form id="exams-form-z" class="admin-form">
+              <label>תאריך</label>
+              <input name="date" placeholder="לדוגמה: 12.12.2025" />
+
+              <label>מקצוע</label>
+              <input name="subject" />
+
+              <label>נושא המבחן</label>
+              <textarea name="topic"></textarea>
+
+              <label>קישור לתמונה (אופציונלי)</label>
+              <input name="imageUrl" placeholder="https://..." />
+
+              <button type="submit">הוסף מבחן לז'</button>
+            </form>
+          </div>
+
+          <!-- H EXAMS -->
+          <div class="card">
+            <h3>מבחנים · ח'</h3>
+            <div id="admin-exams-h" class="admin-list"></div>
+
+            <form id="exams-form-h" class="admin-form">
+              <label>תאריך</label>
+              <input name="date" placeholder="לדוגמה: 12.12.2025" />
+
+              <label>מקצוע</label>
+              <input name="subject" />
+
+              <label>נושא המבחן</label>
+              <textarea name="topic"></textarea>
+
+              <label>קישור לתמונה (אופציונלי)</label>
+              <input name="imageUrl" placeholder="https://..." />
+
+              <button type="submit">הוסף מבחן לח'</button>
+            </form>
+          </div>
+
+          <!-- T EXAMS -->
+          <div class="card">
+            <h3>מבחנים · ט'</h3>
+            <div id="admin-exams-t" class="admin-list"></div>
+
+            <form id="exams-form-t" class="admin-form">
+              <label>תאריך</label>
+              <input name="date" placeholder="לדוגמה: 12.12.2025" />
+
+              <label>מקצוע</label>
+              <input name="subject" />
+
+              <label>נושא המבחן</label>
+              <textarea name="topic"></textarea>
+
+              <label>קישור לתמונה (אופציונלי)</label>
+              <input name="imageUrl" placeholder="https://..." />
+
+              <button type="submit">הוסף מבחן לט'</button>
+            </form>
+          </div>
+        </div>
+
+        <br><br>
+
+        <!-- BOARD -->
+        <h3 class="section-title" style="font-size:1.2rem;margin-bottom:10px;">לוח מודעות</h3>
+
+        <div class="admin-columns">
+          <div class="card">
+            <h3>מודעות כלליות</h3>
+            <div id="admin-board" class="admin-list"></div>
+
+            <form id="board-form">
+              <label>כותרת</label>
+              <input name="title" />
+
+              <label>מידע קצר (מי קהל היעד, תאריך וכו')</label>
+              <input name="meta" />
+
+              <label>צבע הטקסט (אופציונלי)</label>
+              <input type="color" name="color" value="#ffffff" />
+
+              <label>קישור לתמונה (אופציונלי)</label>
+              <input name="imageUrl" placeholder="https://..." />
+
+              <label>תוכן המודעה</label>
+              <textarea name="body"></textarea>
+
+              <button type="submit">הוסף מודעה</button>
+            </form>
+          </div>
+        </div>
+
+        <br><br>
+
+        <!-- SITE CONTENT -->
+        <h3 class="section-title" style="font-size:1.2rem;margin-bottom:10px;">ניהול תוכן האתר</h3>
+        <p class="section-subtitle">
+          כאן ניתן לעדכן את כל הטקסטים הראשיים באתר – דף בית, אודות, "חשוב לדעת", שכבות, בקשות, יצירת קשר ופוטר.
+        </p>
+
+        <div class="admin-columns">
+          <div class="card">
+            <h3>טקסטים כלליים</h3>
+
+            <form id="site-content-form" class="admin-form">
+              <!-- HERO -->
+              <h4>דף בית – אזור הירו</h4>
+              <label>כותרת ראשית בהירו</label>
+              <input name="homeHeroTitle" placeholder="ברוכים הבאים ליערת העמק" />
+
+              <label>תת־כותרת בהירו</label>
+              <input name="homeHeroSubtitle" placeholder="סביבת למידה בטוחה, תומכת ומובילה..." />
+
+              <!-- ABOUT -->
+              <h4 style="margin-top:16px;">אודות בית הספר</h4>
+              <label>כותרת אודות</label>
+              <input name="aboutTitle" placeholder="אודות בית הספר יערת העמק" />
+
+              <label>טקסט אודות</label>
+              <textarea name="aboutBody" rows="4" placeholder="כמה משפטים על בית הספר, הערכים, האווירה..."></textarea>
+
+              <!-- IMPORTANT SECTION -->
+              <h4 style="margin-top:16px;">מדור "חשוב לדעת"</h4>
+              <label>כותרת המדור</label>
+              <input name="importantTitle" placeholder="חשוב לדעת" />
+
+              <label>תת־כותרת המדור</label>
+              <input name="importantSubtitle" placeholder="כמה דברים שימושיים לתלמידים – לפני שממשיכים לגלול." />
+
+              <h5 style="margin-top:10px;">כרטיס 1</h5>
+              <label>כותרת כרטיס 1</label>
+              <input name="importantCard1Title" placeholder="לדוגמה: 💻 סביבת למידה דיגיטלית" />
+
+              <label>טקסט כרטיס 1</label>
+              <textarea name="importantCard1Body" rows="2"></textarea>
+
+              <h5 style="margin-top:10px;">כרטיס 2</h5>
+              <label>כותרת כרטיס 2</label>
+              <input name="importantCard2Title" placeholder="לדוגמה: 🤝 עם מי מדברים?" />
+
+              <label>טקסט כרטיס 2</label>
+              <textarea name="importantCard2Body" rows="2"></textarea>
+
+              <h5 style="margin-top:10px;">כרטיס 3</h5>
+              <label>כותרת כרטיס 3</label>
+              <input name="importantCard3Title" placeholder="לדוגמה: 📌 טיפ נוסף" />
+
+              <label>טקסט כרטיס 3</label>
+              <textarea name="importantCard3Body" rows="2"></textarea>
+
+              <!-- GRADES SECTION -->
+              <h4 style="margin-top:16px;">מדור "היכרות עם השכבות"</h4>
+              <label>כותרת המדור</label>
+              <input name="gradesSectionTitle" placeholder="היכרות עם השכבות" />
+
+              <label>תת־כותרת המדור</label>
+              <input name="gradesSectionSubtitle" placeholder="בחר שכבה כדי לראות חדשות, מבחנים ועדכונים שמתאימים אליך." />
+
+              <h5 style="margin-top:10px;">תיאור שכבות</h5>
+              <label>תיאור שכבת ז'</label>
+              <textarea name="zDescription" rows="2" placeholder="משפט על שכבת ז'..."></textarea>
+
+              <label>תיאור שכבת ח'</label>
+              <textarea name="hDescription" rows="2" placeholder="משפט על שכבת ח'..."></textarea>
+
+              <label>תיאור שכבת ט'</label>
+              <textarea name="tDescription" rows="2" placeholder="משפט על שכבת ט'..."></textarea>
+
+              <!-- REQUESTS -->
+              <h4 style="margin-top:16px;">תיבת בקשות</h4>
+              <label>כותרת המדור</label>
+              <input name="requestsTitle" placeholder="תיבת בקשות" />
+
+              <label>תת־כותרת</label>
+              <input name="requestsSubtitle" placeholder="רוצים לבקש משהו? יש רעיון?" />
+
+              <label>טקסט מעל הכפתור</label>
+              <textarea name="requestsBody" rows="2" placeholder="למילוי טופס הבקשות – לחצו כאן:"></textarea>
+
+              <!-- CONTACT -->
+              <h4 style="margin-top:16px;">יצירת קשר</h4>
+              <label>כותרת המדור</label>
+              <input name="contactSectionTitle" placeholder="יצירת קשר" />
+
+              <label>תת־כותרת המדור</label>
+              <input name="contactSectionSubtitle" placeholder="ניתן לפנות אלינו בכל שאלה, בקשה או התייעצות." />
+
+              <label>טלפון</label>
+              <input name="contactPhone" placeholder="04-XXXXXXX" />
+
+              <label>אימייל</label>
+              <input name="contactEmail" placeholder="school@example.com" />
+
+              <label>כתובת</label>
+              <input name="contactAddress" placeholder="רחוב..., מגדל העמק" />
+
+              <!-- FOOTER -->
+              <h4 style="margin-top:16px;">פוטר</h4>
+              <label>טקסט תחתון (פוטר)</label>
+              <input name="footerText" placeholder="© כל הזכויות שמורות לבית ספר יערת העמק" />
+
+              <button type="submit" style="margin-top:16px;">שמור תוכן אתר</button>
+            </form>
+          </div>
+        </div>
+
+      </div> <!-- /#admin-section -->
+    </div> <!-- /.container -->
+  </section>
+
+  <script type="module" src="admin.js"></script>
+</body>
+</html>
