@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>בקשת הרשמה לאדמין – יערת העמק</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+  <header class="header-main">
+    <div class="container">
+      <nav class="nav">
+        <div class="nav-left">
+          <div class="logo-circle">
+            <span>יערת<br>העמק</span>
+          </div>
+          <div>
+            <div class="school-title-main">בקשת הרשמה · לוח ניהול</div>
+            <div class="school-title-sub">
+              <a href="admin.html">חזרה למסך התחברות</a>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <section>
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">בקשת הרשמה לאדמין</h2>
+        <p class="section-subtitle">
+          הטופס מיועד למורות וצוות בית הספר שמעוניינים לקבל גישה ללוח הניהול.
+          לאחר מילוי הטופס הבקשה תישמר ותיבדק ידנית.
+        </p>
+      </div>
+
+      <form id="register-form" class="admin-form" style="max-width:480px;margin:0 auto;">
+        <label>שם מלא</label>
+        <input type="text" name="fullName" required placeholder="לדוגמה: רים כהן" />
+
+        <label>אימייל</label>
+        <input type="email" name="email" required placeholder="example@school.org.il" />
+
+        <label>סיסמה מוצעת</label>
+        <input type="password" name="password" required placeholder="סיסמה שתרצו להשתמש בה" />
+
+        <label>תפקיד קודם / תפקיד בבית הספר</label>
+        <input type="text" name="role" required placeholder="לדוגמה: מחנכת ז'2, מורה למתמטיקה, מזכירות..." />
+
+        <label>הודעה (אופציונלי)</label>
+        <textarea name="message" rows="3" placeholder="כל מידע נוסף שחשוב לך לציין..."></textarea>
+
+        <button type="submit" style="margin-top:16px;width:100%;">
+          שליחת בקשה
+        </button>
+
+        <p id="register-status" class="section-subtitle" style="text-align:center;margin-top:10px;"></p>
+      </form>
+    </div>
+  </section>
+
+  <script type="module" src="register.js"></script>
+</body>
+</html>

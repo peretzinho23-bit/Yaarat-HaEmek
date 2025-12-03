@@ -42,7 +42,7 @@
 
       <p id="auth-status" class="section-subtitle">בודק התחברות...</p>
 
-           <!-- LOGIN -->
+             <!-- LOGIN -->
       <div id="login-section">
         <div class="section-header">
           <h2 class="section-title">התחברות אדמין</h2>
@@ -59,33 +59,16 @@
           <button type="submit" style="width:100%;margin-top:10px;">כניסה</button>
         </form>
 
-        <!-- בקשת הרשמה לאדמין -->
-        <hr style="margin:20px auto;max-width:360px;border-color:rgba(148,163,184,0.3);" />
-
-        <p class="section-subtitle" style="text-align:center;">
-          אין לך משתמש אדמין? אפשר לשלוח בקשת הרשמה:
-        </p>
-
-        <form id="register-request-form" style="max-width:360px;margin:0 auto 10px;">
-          <label>שם מלא</label>
-          <input type="text" name="fullName" required />
-
-          <label>אימייל עבודה</label>
-          <input type="email" name="email" required />
-
-          <label>תפקיד / כיתה</label>
-          <input type="text" name="role" placeholder="לדוגמה: מחנכת ז'2, מזכירות..." />
-
-          <label>הודעה (אופציונלי)</label>
-          <textarea name="message" rows="3" placeholder="כל מידע נוסף שחשוב לדעת..."></textarea>
-
-          <button type="submit" style="width:100%;margin-top:10px;">
-            שליחת בקשת הרשמה
-          </button>
-        </form>
-
-        <p id="register-status" class="section-subtitle" style="text-align:center;"></p>
+        <div style="max-width:360px;margin:15px auto 0;text-align:center;">
+          <p class="section-subtitle" style="margin-bottom:8px;">
+            אין לך משתמש אדמין?
+          </p>
+          <a href="register.html" class="btn-outline" style="display:inline-block;padding:8px 16px;border-radius:999px;">
+            בקשת הרשמה
+          </a>
+        </div>
       </div>
+
 
 
       <!-- ADMIN PANEL -->
