@@ -175,4 +175,94 @@ section {
     display: inline-block;
     margin-bottom: 12px;
   }
+/* ===== רספונסיבי לאדמין – לניידים ===== */
+@media (max-width: 768px) {
+  body {
+    margin: 0;
+    padding: 8px;
+    background: #020617;
+  }
+
+  .admin-container,
+  .admin-wrapper,
+  .admin-main {
+    max-width: 100%;
+    padding: 8px;
+    margin: 0 auto;
+  }
+
+  /* כל כרטיס/קופסה באדמין */
+  .card,
+  .admin-card,
+  .panel-section,
+  .section-box {
+    padding: 12px;
+    margin-bottom: 12px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.45);
+  }
+
+  /* טפסים – יותר נוח לנגיעה */
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  label {
+    font-size: 0.9rem;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  textarea,
+  select {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 0.95rem;
+    border-radius: 10px;
+    border: 1px solid rgba(148, 163, 184, 0.6);
+    background: #0b1120;
+    color: #e5e7eb;
+    box-sizing: border-box;
+  }
+
+  textarea {
+    min-height: 80px;
+  }
+
+  button,
+  .btn,
+  .btn-primary,
+  .btn-outline {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 1rem;
+    border-radius: 999px;
+    margin-top: 4px;
+    box-sizing: border-box;
+  }
+
+  /* כותרות בתוך האדמין */
+  h1, h2, h3 {
+    font-size: 1.1rem;
+    margin-bottom: 6px;
+  }
+
+  /* אם יש sidebar באדמין – שיהיה מעל, לא בצד */
+  .admin-layout,
+  .admin-grid,
+  .admin-two-columns {
+    display: block;
+  }
+
+  .sidebar,
+  .admin-sidebar {
+    width: 100%;
+    margin-bottom: 12px;
+  }
+}
+
 }
