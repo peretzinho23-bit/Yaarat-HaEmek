@@ -773,5 +773,95 @@ footer {
   background: #2563eb;      /* כחול בהיר */
   transform: translateY(-2px);
 }
+/* ===== תפריט מובייל ===== */
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* כפתור המבורגר – דסקטופ: מוסתר */
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  background: rgba(15, 23, 42, 0.9);
+  cursor: pointer;
+}
+
+.nav-toggle span {
+  width: 18px;
+  height: 2px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+/* מצב פתוח – אנימציה להמבורגר */
+.nav-toggle.open span:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+.nav-toggle.open span:nth-child(2) {
+  opacity: 0;
+}
+.nav-toggle.open span:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+/* מובייל */
+@media (max-width: 768px) {
+  .nav {
+    position: relative;
+  }
+
+  .nav-right {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 75%;
+    max-width: 280px;
+    background: #020617;
+    box-shadow: -12px 0 30px rgba(15, 23, 42, 0.9);
+    padding: 80px 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transform: translateX(100%);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+    z-index: 1000;
+  }
+
+  .nav-right a {
+    font-size: 0.98rem;
+    padding: 8px 0;
+  }
+
+  .nav-right.open {
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .nav-toggle {
+    display: flex;
+    z-index: 1100;
+  }
+
+  /* כשפתוח – לא לגלול את הדף מתחת */
+  body.nav-open {
+    overflow: hidden;
+  }
+}
 
 }

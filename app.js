@@ -472,4 +472,38 @@ document.addEventListener("DOMContentLoaded", () => {
   // שנה בפוטר וכפתור לראש הדף
   setYear();
   setupToTop();
+// ===== תפריט מובייל (המבורגר) =====
+function setupMobileNav() {
+  const navToggle = document.querySelector(".nav-toggle");
+  const navRight = document.querySelector(".nav-right");
+
+  if (!navToggle || !navRight) return;
+
+  navToggle.addEventListener("click", () => {
+    const isOpen = navRight.classList.toggle("open");
+    navToggle.classList.toggle("open", isOpen);
+    navToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    document.body.classList.toggle("nav-open", isOpen);
+  });
+
+  // סגירה אוטומטית כשבוחרים קישור
+  navRight.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", () => {
+      navRight.classList.remove("open");
+      navToggle.classList.remove("open");
+      navToggle.setAttribute("aria-expanded", "false");
+      document.body.classList.remove("nav-open");
+    });
+  });
+}
+
+// לוודא שהפונקציה רצה אחרי טעינת הדף
+document.addEventListener("DOMContentLoaded", () => {
+  try {
+    setupMobileNav();
+  } catch (e) {
+    console.error("Mobile nav error:", e);
+  }
+});
+
 });
