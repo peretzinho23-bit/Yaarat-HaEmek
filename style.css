@@ -848,12 +848,10 @@ footer {
   }
 
   
-  .nav-right a.btn-outline,
-  .nav-right a.personal-btn {
-    display: block;
-    width: 100%;
-    text-align: center;
-    margin-top: 8px;
+  .nav-right.open {
+    transform: translateX(0);       /* נכנס משמאל */
+    opacity: 1;
+    pointer-events: auto;
   }
 
   .nav-toggle {
