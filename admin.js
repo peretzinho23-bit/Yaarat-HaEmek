@@ -442,6 +442,50 @@ function setupDeleteHandler() {
   });
 }
 
+/* ------------ GRADE FILTER (ז / ח / ט) ------------ */
+
+function setupGradeFilter() {
+  const buttons = document.querySelectorAll(".grade-filter-btn");
+  const sections = document.querySelectorAll(".admin-grade-section");
+
+  if (!buttons.length || !sections.length) {
+    // אם לא הוספת עדיין מחלקות admin-grade-section, פשוט לא נעשה כלום
+    return;
+  }
+
+  function setActiveGrade(grade) {
+    // כפתורים – סימון אקטיבי
+    buttons.forEach((btn) => {
+      const btnGrade = btn.getAttribute("data-grade") || "all";
+      btn.classList.toggle("active", btnGrade === grade);
+      if (grade === "all" && btnGrade === "all") {
+        btn.classList.add("active");
+      }
+    });
+
+    // אזורים – הצגה / הסתרה
+    sections.forEach((sec) => {
+      const secGrade = sec.getAttribute("data-grade");
+      if (grade === "all" || secGrade === grade) {
+        sec.style.display = "";
+      } else {
+        sec.style.display = "none";
+      }
+    });
+  }
+
+  // האזנה ללחיצה על כפתורים
+  buttons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const grade = btn.getAttribute("data-grade") || "all";
+      setActiveGrade(grade);
+    });
+  });
+
+  // ברירת מחדל – להציג הכל
+  setActiveGrade("all");
+}
+
 /* ------------ MAIN ------------ */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -451,4 +495,5 @@ document.addEventListener("DOMContentLoaded", () => {
   setupBoardForm();
   setupDeleteHandler();
   setupSiteContentForm();
+  setupGradeFilter(); // סינון לפי שכבות באדמין
 });

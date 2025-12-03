@@ -265,4 +265,55 @@ section {
   }
 }
 
+/* ===== סיידבר שכבות לאדמין ===== */
+.admin-grade-switcher {
+  position: fixed;
+  top: 80px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 1500;
+}
+
+.admin-grade-switcher .grade-filter-btn {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  background: rgba(15, 23, 42, 0.92);
+  color: #e5e7eb;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+.admin-grade-switcher .grade-filter-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.7);
+}
+
+.admin-grade-switcher .grade-filter-btn.active {
+  background: linear-gradient(135deg, #38bdf8, #4ade80);
+  color: #020617;
+  border-color: transparent;
+}
+
+/* מובייל – שיהיה למעלה, לרוחב */
+@media (max-width: 768px) {
+  .admin-grade-switcher {
+    position: static;
+    margin: 8px auto 12px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .admin-grade-switcher .grade-filter-btn {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+}
+
 }

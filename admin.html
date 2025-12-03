@@ -29,6 +29,14 @@
     </div>
   </header>
 
+  <!-- סיידבר שכבות לאדמין (מחוץ ל-header) -->
+  <div class="admin-grade-switcher">
+    <button class="grade-filter-btn active" data-grade="all">כל השכבות</button>
+    <button class="grade-filter-btn" data-grade="z">שכבת ז'</button>
+    <button class="grade-filter-btn" data-grade="h">שכבת ח'</button>
+    <button class="grade-filter-btn" data-grade="t">שכבת ט'</button>
+  </div>
+
   <section>
     <div class="container">
 
@@ -69,79 +77,85 @@
 
         <div class="admin-columns">
           <!-- NEWS Z -->
-          <div class="card">
-            <h3>שכבת ז'</h3>
-            <div id="admin-news-z" class="admin-list"></div>
+          <section class="admin-grade-section" data-grade="z">
+            <div class="card">
+              <h3>שכבת ז'</h3>
+              <div id="admin-news-z" class="admin-list"></div>
 
-            <form id="news-form-z">
-              <label>כותרת</label>
-              <input name="title" />
+              <form id="news-form-z">
+                <label>כותרת</label>
+                <input name="title" />
 
-              <label>מידע קצר (תאריך/אירוע)</label>
-              <input name="meta" />
+                <label>מידע קצר (תאריך/אירוע)</label>
+                <input name="meta" />
 
-              <label>קישור לתמונה (אופציונלי)</label>
-              <input name="imageUrl" placeholder="https://..." />
+                <label>קישור לתמונה (אופציונלי)</label>
+                <input name="imageUrl" placeholder="https://..." />
 
-              <label>צבע הטקסט (אופציונלי)</label>
-              <input type="color" name="color" value="#ffffff" />
+                <label>צבע הטקסט (אופציונלי)</label>
+                <input type="color" name="color" value="#ffffff" />
 
-              <label>תוכן הידיעה</label>
-              <textarea name="body"></textarea>
+                <label>תוכן הידיעה</label>
+                <textarea name="body"></textarea>
 
-              <button type="submit">הוסף חדשות לז'</button>
-            </form>
-          </div>
+                <button type="submit">הוסף חדשות לז'</button>
+              </form>
+            </div>
+          </section>
 
           <!-- NEWS H -->
-          <div class="card">
-            <h3>שכבת ח'</h3>
-            <div id="admin-news-h" class="admin-list"></div>
+          <section class="admin-grade-section" data-grade="h">
+            <div class="card">
+              <h3>שכבת ח'</h3>
+              <div id="admin-news-h" class="admin-list"></div>
 
-            <form id="news-form-h">
-              <label>כותרת</label>
-              <input name="title" />
+              <form id="news-form-h">
+                <label>כותרת</label>
+                <input name="title" />
 
-              <label>מידע קצר (תאריך/אירוע)</label>
-              <input name="meta" />
+                <label>מידע קצר (תאריך/אירוע)</label>
+                <input name="meta" />
 
-              <label>קישור לתמונה (אופציונלי)</label>
-              <input name="imageUrl" placeholder="https://..." />
+                <label>קישור לתמונה (אופציונלי)</label>
+                <input name="imageUrl" placeholder="https://..." />
 
-              <label>צבע הטקסט (אופציונלי)</label>
-              <input type="color" name="color" value="#ffffff" />
+                <label>צבע הטקסט (אופציונלי)</label>
+                <input type="color" name="color" value="#ffffff" />
 
-              <label>תוכן הידיעה</label>
-              <textarea name="body"></textarea>
+                <label>תוכן הידיעה</label>
+                <textarea name="body"></textarea>
 
-              <button type="submit">הוסף חדשות לח'</button>
-            </form>
-          </div>
+                <button type="submit">הוסף חדשות לח'</button>
+              </form>
+            </div>
+          </section>
 
           <!-- NEWS T -->
-          <div class="card">
-            <h3>שכבת ט'</h3>
-            <div id="admin-news-t" class="admin-list"></div>
+          <section class="admin-grade-section" data-grade="t">
+            <div class="card">
+              <h3>שכבת ט'</h3>
+              <div id="admin-news-t" class="admin-list"></div>
 
-            <form id="news-form-t">
-              <label>כותרת</label>
-              <input name="title" />
+              <form id="news-form-t">
+                <label>כותרת</label>
+                <input name="title" />
 
-              <label>מידע קצר (תאריך/אירוע)</label>
-              <input name="meta" />
+                <label>מידע קצר (תאריך/אירוע)</label>
+                <input name="meta" />
 
-              <label>קישור לתמונה (אופציונלי)</label>
-              <input name="imageUrl" placeholder="https://..." />
+                <label>קישור לתמונה (אופציונלי)</label>
+                <input name="imageUrl" placeholder="https://..." />
 
-              <label>צבע הטקסט (אופציונלי)</label>
-              <input type="color" name="color" value="#ffffff" />
+                <label>צבע הטקסט (אופציונלי)</label>
+                <input type="color" name="color" value="#ffffff" />
 
-              <label>תוכן הידיעה</label>
-              <textarea name="body"></textarea>
+                <label>תוכן הידיעה</label>
+                <textarea name="body"></textarea>
 
-              <button type="submit">הוסף חדשות לט'</button>
-            </form>
-          </div>
+                <button type="submit">הוסף חדשות לט'</button>
+              </form>
+            </div>
+          </section>
         </div>
 
         <br><br>
@@ -151,70 +165,76 @@
 
         <div class="admin-columns">
           <!-- Z EXAMS -->
-          <div class="card">
-            <h3>מבחנים · ז'</h3>
-            <div id="admin-exams-z" class="admin-list"></div>
+          <section class="admin-grade-section" data-grade="z">
+            <div class="card">
+              <h3>מבחנים · ז'</h3>
+              <div id="admin-exams-z" class="admin-list"></div>
 
-            <form id="exams-form-z" class="admin-form">
-              <label>תאריך</label>
-              <input name="date" placeholder="לדוגמה: 12.12.2025" />
+              <form id="exams-form-z" class="admin-form">
+                <label>תאריך</label>
+                <input name="date" placeholder="לדוגמה: 12.12.2025" />
 
-              <label>מקצוע</label>
-              <input name="subject" />
+                <label>מקצוע</label>
+                <input name="subject" />
 
-              <label>נושא המבחן</label>
-              <textarea name="topic"></textarea>
+                <label>נושא המבחן</label>
+                <textarea name="topic"></textarea>
 
-              <label>קישור לתמונה (אופציונלי)</label>
-              <input name="imageUrl" placeholder="https://..." />
+                <label>קישור לתמונה (אופציונלי)</label>
+                <input name="imageUrl" placeholder="https://..." />
 
-              <button type="submit">הוסף מבחן לז'</button>
-            </form>
-          </div>
+                <button type="submit">הוסף מבחן לז'</button>
+              </form>
+            </div>
+          </section>
 
           <!-- H EXAMS -->
-          <div class="card">
-            <h3>מבחנים · ח'</h3>
-            <div id="admin-exams-h" class="admin-list"></div>
+          <section class="admin-grade-section" data-grade="h">
+            <div class="card">
+              <h3>מבחנים · ח'</h3>
+              <div id="admin-exams-h" class="admin-list"></div>
 
-            <form id="exams-form-h" class="admin-form">
-              <label>תאריך</label>
-              <input name="date" placeholder="לדוגמה: 12.12.2025" />
+              <form id="exams-form-h" class="admin-form">
+                <label>תאריך</label>
+                <input name="date" placeholder="לדוגמה: 12.12.2025" />
 
-              <label>מקצוע</label>
-              <input name="subject" />
+                <label>מקצוע</label>
+                <input name="subject" />
 
-              <label>נושא המבחן</label>
-              <textarea name="topic"></textarea>
+                <label>נושא המבחן</label>
+                <textarea name="topic"></textarea>
 
-              <label>קישור לתמונה (אופציונלי)</label>
-              <input name="imageUrl" placeholder="https://..." />
+                <label>קישור לתמונה (אופציונלי)</label>
+                <input name="imageUrl" placeholder="https://..." />
 
-              <button type="submit">הוסף מבחן לח'</button>
-            </form>
-          </div>
+                <button type="submit">הוסף מבחן לח'</button>
+              </form>
+            </div>
+          </section>
 
           <!-- T EXAMS -->
-          <div class="card">
-            <h3>מבחנים · ט'</h3>
-            <div id="admin-exams-t" class="admin-list"></div>
+          <section class="admin-grade-section" data-grade="t">
+            <div class="card">
+              <h3>מבחנים · ט'</h3>
+              <div id="admin-exams-t" class="admin-list"></div>
 
-            <form id="exams-form-t" class="admin-form">
-              <label>תאריך</label>
-              <input name="date" placeholder="לדוגמה: 12.12.2025" />
+              <form id="exams-form-t" class="admin-form">
+                <label>תאריך</label>
+                <input name="date" placeholder="לדוגמה: 12.12.2025" />
 
-              <label>מקצוע</label>
-              <input name="subject" />
+                <label>מקצוע</label>
+                <input name="subject" />
 
-              <label>נושא המבחן</label>
-              <textarea name="topic"></textarea>
+                <label>נושא המבחן</label>
+                <textarea name="topic"></textarea>
 
-              <label>קישור לתמונה (אופציונלי)</label>
-              <input name="imageUrl" placeholder="https://..." />
+                <label>קישור לתמונה (אופציונלי)</label>
+                <input name="imageUrl" placeholder="https://..." />
 
-              <button type="submit">הוסף מבחן לט'</button>
-            </form>
-          </div>
+                <button type="submit">הוסף מבחן לט'</button>
+              </form>
+            </div>
+          </section>
         </div>
 
         <br><br>
