@@ -412,6 +412,54 @@ function setupSiteContentForm() {
     alert("תוכן האתר נשמר בהצלחה.");
   });
 }
+/* ------------ REGISTER REQUESTS (בקשות הרשמת אדמין) ------------ */
+
+function setupRegisterRequestForm() {
+  const form = document.getElementById("register-request-form");
+  const statusEl = document.getElementById("register-status");
+
+  if (!form) return;
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const fullName = form.fullName.value.trim();
+    const email = form.email.value.trim();
+    const role = form.role.value.trim();
+    const message = form.message.value.trim();
+
+    if (!fullName || !email) {
+      alert("חובה למלא שם מלא ואימייל.");
+      return;
+    }
+
+    try {
+      // מזהה ייחודי לבקשה (על בסיס הזמן)
+      const id = Date.now().toString();
+
+      const refDoc = doc(db, "adminRequests", id);
+      await setDoc(refDoc, {
+        fullName,
+        email,
+        role,
+        message,
+        createdAt: new Date().toISOString()
+      });
+
+      form.reset();
+      if (statusEl) {
+        statusEl.textContent = "הבקשה נשלחה. לאחר אישור ידני תקבלו גישה.";
+      }
+      alert("הבקשה נשלחה בהצלחה. לאחר אישור ידני תקבלו גישה.");
+    } catch (err) {
+      console.error(err);
+      alert("הייתה שגיאה בשליחת הבקשה. נסו שוב מאוחר יותר.");
+      if (statusEl) {
+        statusEl.textContent = "שגיאה בשליחה. נסו שוב מאוחר יותר.";
+      }
+    }
+  });
+}
 
 /* ------------ DELETE HANDLER ------------ */
 
@@ -495,5 +543,6 @@ document.addEventListener("DOMContentLoaded", () => {
   setupBoardForm();
   setupDeleteHandler();
   setupSiteContentForm();
-  setupGradeFilter(); // סינון לפי שכבות באדמין
+  setupGradeFilter();       // סינון לפי שכבות באדמין
+  setupRegisterRequestForm(); // בקשות הרשמת אדמין
 });
