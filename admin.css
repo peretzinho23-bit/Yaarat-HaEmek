@@ -315,5 +315,54 @@ section {
     font-size: 0.8rem;
   }
 }
+/* =====  REGISTER PAGE  ===== */
+
+.register-wrapper {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.register-card {
+  margin-top: 10px;
+}
+
+/* שיהיה קצת אוויר בין השדות */
+.register-card .admin-form {
+  gap: 10px;
+}
+
+/* לוודא שכל לייבל מעל השדה */
+.register-card label {
+  display: block;
+  margin-top: 6px;
+  font-weight: 600;
+}
+
+/* אינפוטים וטקסט-אריאה ברוחב מלא */
+.register-card input,
+.register-card textarea {
+  width: 100%;
+  margin-top: 4px;
+}
+
+/* כפתור יפה ורחב */
+.register-submit-btn {
+  margin-top: 16px;
+  width: 100%;
+}
+
+/* סטטוס מתחת לכפתור, מיושר למרכז */
+.register-status {
+  text-align: center;
+  margin-top: 8px;
+}
+
+/* במובייל – קצת פחות רוחב ומרווח צד */
+@media (max-width: 600px) {
+  .register-wrapper {
+    max-width: 100%;
+    padding: 0 12px;
+  }
+}
 
 }

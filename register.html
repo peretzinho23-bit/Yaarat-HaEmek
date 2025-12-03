@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="admin.css" />
 </head>
 <body>
+  <!-- HEADER -->
   <header class="header-main">
     <div class="container">
       <nav class="nav">
@@ -26,8 +27,9 @@
     </div>
   </header>
 
+  <!-- MAIN -->
   <section>
-    <div class="container">
+    <div class="container register-wrapper">
       <div class="section-header">
         <h2 class="section-title">בקשת הרשמה לאדמין</h2>
         <p class="section-subtitle">
@@ -36,28 +38,54 @@
         </p>
       </div>
 
-      <form id="register-form" class="admin-form" style="max-width:480px;margin:0 auto;">
-        <label>שם מלא</label>
-        <input type="text" name="fullName" required placeholder="לדוגמה: רים כהן" />
+      <div class="card register-card">
+        <form id="register-form" class="admin-form">
+          <label>שם מלא</label>
+          <input
+            type="text"
+            name="fullName"
+            required
+            placeholder="לדוגמה: ישראל ישראלי"
+          />
 
-        <label>אימייל</label>
-        <input type="email" name="email" required placeholder="example@school.org.il" />
+          <label>אימייל</label>
+          <input
+            type="email"
+            name="email"
+            required
+            placeholder="example@school.org.il"
+          />
 
-        <label>סיסמה מוצעת</label>
-        <input type="password" name="password" required placeholder="סיסמה שתרצו להשתמש בה" />
+          <label>סיסמה מוצעת</label>
+          <input
+            type="password"
+            name="password"
+            required
+            placeholder="סיסמה שתרצו להשתמש בה"
+          />
 
-        <label>תפקיד קודם / תפקיד בבית הספר</label>
-        <input type="text" name="role" required placeholder="לדוגמה: מחנכת ז'2, מורה למתמטיקה, מזכירות..." />
+          <label> תפקיד בבית הספר</label>
+          <input
+            type="text"
+            name="role"
+            required
+            placeholder="לדוגמה: מחנכת ז'2, מורה למתמטיקה, מזכירות..."
+          />
 
-        <label>הודעה (אופציונלי)</label>
-        <textarea name="message" rows="3" placeholder="כל מידע נוסף שחשוב לך לציין..."></textarea>
+          <label>הודעה (אופציונלי)</label>
+          <textarea
+            name="message"
+            rows="3"
+            placeholder="כל מידע נוסף שחשוב לך לציין..."
+          ></textarea>
 
-        <button type="submit" style="margin-top:16px;width:100%;">
-          שליחת בקשה
-        </button>
+          <button type="submit" class="register-submit-btn">
+            שליחת בקשה
+          </button>
 
-        <p id="register-status" class="section-subtitle" style="text-align:center;margin-top:10px;"></p>
-      </form>
+          <p id="register-status" class="section-subtitle register-status"></p>
+        </form>
+      </div>
     </div>
   </section>
 
