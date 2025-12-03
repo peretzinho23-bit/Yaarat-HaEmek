@@ -847,10 +847,13 @@ footer {
     padding: 8px 0;
   }
 
-  .nav-right.open {
-    transform: translateX(0);       /* נכנס משמאל */
-    opacity: 1;
-    pointer-events: auto;
+  
+  .nav-right a.btn-outline,
+  .nav-right a.personal-btn {
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin-top: 8px;
   }
 
   .nav-toggle {
