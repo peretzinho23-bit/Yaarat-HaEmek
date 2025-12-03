@@ -825,17 +825,17 @@ footer {
   .nav-right {
     position: fixed;
     top: 0;
-    right: 0;
+    left: 0;              /* במקום right: 0 */
     bottom: 0;
     width: 75%;
     max-width: 280px;
     background: #020617;
-    box-shadow: -12px 0 30px rgba(15, 23, 42, 0.9);
+    box-shadow: 12px 0 30px rgba(15, 23, 42, 0.9); /* צל בצד ימין עכשיו */
     padding: 80px 20px 24px;
     display: flex;
     flex-direction: column;
     gap: 12px;
-    transform: translateX(100%);
+    transform: translateX(-100%);   /* מוסתר שמאלה */
     opacity: 0;
     pointer-events: none;
     transition: transform 0.25s ease, opacity 0.25s ease;
@@ -848,7 +848,7 @@ footer {
   }
 
   .nav-right.open {
-    transform: translateX(0);
+    transform: translateX(0);       /* נכנס משמאל */
     opacity: 1;
     pointer-events: auto;
   }
@@ -858,7 +858,6 @@ footer {
     z-index: 1100;
   }
 
-  /* כשפתוח – לא לגלול את הדף מתחת */
   body.nav-open {
     overflow: hidden;
   }
