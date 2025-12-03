@@ -82,23 +82,24 @@
 
       <!-- כפתור תפריט מובייל (המבורגר) -->
       <button class="nav-toggle" aria-label="פתח תפריט" aria-expanded="false">
-  <span></span>
-  <span></span>
-  <span></span>
-</button>
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
 
-<div class="nav-right">
-  <a href="#about">אודות</a>
-  <a href="#home-news">חדשות</a>
-  <a href="#home-exams">מבחנים</a>
-  <a href="#grades">השכבות</a>
-  <a href="#contact">יצירת קשר</a>
-  <a href="https://my.edu.gov.il/home" class="personal-btn">למרחב האישי</a>
-  <a href="admin.html" class="btn-outline">Admin</a>
-</div>
-
+      <!-- תפריט קישורים -->
+      <div class="nav-right">
+        <a href="#about">אודות</a>
+        <a href="#home-news">חדשות</a>
+        <a href="#home-exams">מבחנים</a>
+        <a href="#grades">השכבות</a>
+        <a href="#contact">יצירת קשר</a>
+        <a href="https://my.edu.gov.il/home" class="personal-btn">למרחב האישי</a>
+        <a href="admin.html" class="btn-outline">Admin</a>
+      </div>
+    </nav>
+  </div>
 </header>
-
 
 <!-- HERO -->
 <section class="hero hero-home">
@@ -361,10 +362,10 @@
   ↑ למעלה
 </button>
 
-<!-- כל הלוגיקה של טעינת תוכן מה-Firebase והאדמין -->
+<!-- לוגיקת Firebase / אתר -->
 <script type="module" src="app.js"></script>
-</body>
-</html>
+
+<!-- תפריט מובייל -->
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const navToggle = document.querySelector(".nav-toggle");
@@ -390,3 +391,5 @@
     });
   });
 </script>
+</body>
+</html>
