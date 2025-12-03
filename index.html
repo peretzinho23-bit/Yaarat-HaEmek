@@ -1,29 +1,36 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
+  <!-- בסיס חובה -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- SEO בסיסי -->
-  <title>בית ספר יערת העמק - האתר הרשמי</title>
-  <meta name="description" content="האתר הרשמי של בית הספר יערת העמק במגדל העמק. מידע על מגמות, חדשות, לוח מבחנים, מערכת שעות וחיי בית הספר עבור תלמידים והורים." />
-  <meta name="keywords" content="יערת העמק, בית ספר יערת העמק, מגדל העמק, חטיבת ביניים, שכבת ז, שכבת ח, שכבת ט, לוח מבחנים, חדשות בית ספר" />
-  <meta name="author" content="יערת העמק - האתר הרשמי" />
-  <meta name="robots" content="index, follow" />
+  <!-- SEO חזק -->
+  <title>בית ספר יערת העמק – האתר הרשמי | מגדל העמק</title>
+  <meta name="description" content="האתר הרשמי של בית ספר יערת העמק במגדל העמק. חדשות, לוח מבחנים, לוח מודעות, מידע לשכבות ז'-ט' ויצירת קשר עם צוות בית הספר – הכל במקום אחד עבור תלמידים והורים." />
+  <meta name="keywords" content="יערת העמק, בית ספר יערת העמק, מגדל העמק, חטיבת ביניים, חטיבת הביניים יערת העמק, שכבת ז, שכבת ח, שכבת ט, לוח מבחנים, חדשות בית ספר, לוח מודעות" />
+  <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1" />
   <meta http-equiv="Content-Language" content="he" />
 
+  <!-- אימות לגוגל (לא חובה אבל עוזר; אם תקבל ערך אחר מ-GSC תחליף את ה-content) -->
+  <meta name="google-site-verification" content="014e0d8fdc8f329c" />
+
+  <!-- כתובת קנונית -->
+  <link rel="canonical" href="https://yaarat.vercel.app/" />
+
   <!-- Open Graph / Social -->
-  <meta property="og:title" content="בית ספר יערת העמק - האתר הרשמי" />
+  <meta property="og:title" content="בית ספר יערת העמק – האתר הרשמי" />
   <meta property="og:description" content="ברוכים הבאים לאתר הרשמי של בית ספר יערת העמק במגדל העמק. חדשות, מבחנים, לוח מודעות ומידע חשוב לתלמידים ולהורים." />
   <meta property="og:image" content="https://yaarat.vercel.app/logo.png" />
   <meta property="og:url" content="https://yaarat.vercel.app/" />
   <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="בית ספר יערת העמק" />
   <meta property="og:locale" content="he_IL" />
 
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="בית ספר יערת העמק - אתר רשמי" />
-  <meta name="twitter:description" content="כל המידע על יערת העמק במקום אחד: חדשות, מבחנים, לוח מודעות, שכבות ועוד." />
+  <meta name="twitter:title" content="בית ספר יערת העמק – האתר הרשמי" />
+  <meta name="twitter:description" content="כל המידע על יערת העמק במקום אחד: חדשות, מבחנים, לוח מודעות, שכבות ז'-ט' ועוד." />
   <meta name="twitter:image" content="https://yaarat.vercel.app/logo.png" />
 
   <!-- צבע לדפדפנים -->
@@ -31,10 +38,24 @@
 
   <link rel="icon" href="logo.png" />
   <link rel="stylesheet" href="style.css" />
+
+  <!-- Structured Data – עוזר לגוגל להבין שזה אתר של בית ספר -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "School",
+    "name": "בית ספר יערת העמק",
+    "url": "https://yaarat.vercel.app/",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "מגדל העמק",
+      "addressCountry": "IL"
+    }
+  }
+  </script>
 </head>
 
 <body>
-
 <!-- HEADER -->
 <header class="header-main">
   <div class="container">
