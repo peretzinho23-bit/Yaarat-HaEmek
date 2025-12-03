@@ -1,18 +1,17 @@
-/* ===== ADMIN PANEL – עיצוב נפרד לאדמין ===== */
+/* ===== ADMIN PANEL – בסיס כללי ===== */
 
-/* רק בעמוד האדמין – הגוף */
+/* עובד רק בעמודי האדמין כי רק שם נטען admin.css */
 body {
   background: #040814;
   color: #e3f2fd;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-/* הסקשן המרכזי */
 section {
   padding: 32px 0 40px;
 }
 
-/* טקסט סטטוס למעלה (בודק התחברות / מחובר כ...) */
+/* טקסט סטטוס התחברות */
 #auth-status {
   text-align: center;
   font-size: 0.9rem;
@@ -20,7 +19,7 @@ section {
   margin-top: 8px;
 }
 
-/* === טופס התחברות === */
+/* ===== טופס התחברות ===== */
 
 #login-section {
   max-width: 420px;
@@ -62,7 +61,7 @@ section {
   width: 100%;
 }
 
-/* === לייאאאוט אחרי התחברות === */
+/* ===== לייאאוט אחרי התחברות ===== */
 
 .admin-layout {
   margin-top: 30px;
@@ -74,13 +73,13 @@ section {
   margin-bottom: 10px;
 }
 
-/* כותרות משנה (חדשות / מבחנים / לוח מודעות) */
+/* כותרות משנה */
 .admin-layout h3.section-title {
   font-size: 1.1rem;
   margin-bottom: 8px;
 }
 
-/* רשת עמודות של הקלפים */
+/* גריד של כרטיסים */
 .admin-columns {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -103,7 +102,7 @@ section {
   font-size: 1rem;
 }
 
-/* רשימות של חדשות / מבחנים קיימים */
+/* רשימות (חדשות / מבחנים / מודעות) */
 .admin-list,
 #admin-news-z,
 #admin-news-h,
@@ -119,7 +118,7 @@ section {
   font-size: 0.85rem;
 }
 
-/* פריטים בתוך הרשימות – אם אתה מוסיף div/item מה־JS */
+/* פריט ברשימת אדמין */
 .admin-item {
   background: rgba(0, 0, 0, 0.5);
   border-radius: 10px;
@@ -127,8 +126,7 @@ section {
   margin-bottom: 6px;
 }
 
-/* טפסים בתוך כרטיסי האדמין */
-
+/* טפסים בתוך אזור האדמין הראשי */
 .admin-layout form label {
   display: block;
   font-size: 0.8rem;
@@ -157,115 +155,14 @@ section {
   width: 100%;
 }
 
-/* הודעות ריקות */
+/* טקסט ריק */
 .admin-empty {
   font-size: 0.8rem;
   opacity: 0.75;
 }
 
-/* התאמה למסכים קטנים */
-@media (max-width: 768px) {
-  #login-section {
-    margin-top: 24px;
-    padding: 18px 16px;
-  }
-
-  #logout-btn {
-    float: none;
-    display: inline-block;
-    margin-bottom: 12px;
-  }
-/* ===== רספונסיבי לאדמין – לניידים ===== */
-@media (max-width: 768px) {
-  body {
-    margin: 0;
-    padding: 8px;
-    background: #020617;
-  }
-
-  .admin-container,
-  .admin-wrapper,
-  .admin-main {
-    max-width: 100%;
-    padding: 8px;
-    margin: 0 auto;
-  }
-
-  /* כל כרטיס/קופסה באדמין */
-  .card,
-  .admin-card,
-  .panel-section,
-  .section-box {
-    padding: 12px;
-    margin-bottom: 12px;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.45);
-  }
-
-  /* טפסים – יותר נוח לנגיעה */
-  form {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  label {
-    font-size: 0.9rem;
-  }
-
-  input[type="text"],
-  input[type="email"],
-  input[type="password"],
-  input[type="number"],
-  textarea,
-  select {
-    width: 100%;
-    padding: 10px 12px;
-    font-size: 0.95rem;
-    border-radius: 10px;
-    border: 1px solid rgba(148, 163, 184, 0.6);
-    background: #0b1120;
-    color: #e5e7eb;
-    box-sizing: border-box;
-  }
-
-  textarea {
-    min-height: 80px;
-  }
-
-  button,
-  .btn,
-  .btn-primary,
-  .btn-outline {
-    width: 100%;
-    padding: 10px 14px;
-    font-size: 1rem;
-    border-radius: 999px;
-    margin-top: 4px;
-    box-sizing: border-box;
-  }
-
-  /* כותרות בתוך האדמין */
-  h1, h2, h3 {
-    font-size: 1.1rem;
-    margin-bottom: 6px;
-  }
-
-  /* אם יש sidebar באדמין – שיהיה מעל, לא בצד */
-  .admin-layout,
-  .admin-grid,
-  .admin-two-columns {
-    display: block;
-  }
-
-  .sidebar,
-  .admin-sidebar {
-    width: 100%;
-    margin-bottom: 12px;
-  }
-}
-
 /* ===== סיידבר שכבות לאדמין ===== */
+
 .admin-grade-switcher {
   position: fixed;
   top: 80px;
@@ -298,16 +195,31 @@ section {
   border-color: transparent;
 }
 
-/* מובייל – שיהיה למעלה, לרוחב */
+/* ===== רספונסיבי כללי לאדמין (נייד) ===== */
+
 @media (max-width: 768px) {
+  #login-section {
+    margin-top: 24px;
+    padding: 18px 16px;
+  }
+
+  #logout-btn {
+    float: none;
+    display: inline-block;
+    margin-bottom: 12px;
+  }
+
+  .admin-columns {
+    grid-template-columns: 1fr;
+  }
+
+  /* סיידבר שכבות – מלמעלה לרוחב */
   .admin-grade-switcher {
     position: static;
     margin: 8px auto 12px;
-    display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 6px;
   }
 
   .admin-grade-switcher .grade-filter-btn {
@@ -315,107 +227,76 @@ section {
     font-size: 0.8rem;
   }
 }
-/* =====  REGISTER PAGE  ===== */
 
+/* ===== עמוד בקשת הרשמה לאדמין ===== */
+
+/* עוטף כל הדף – רק בעמוד register.html */
 .register-wrapper {
   max-width: 720px;
   margin: 0 auto;
 }
 
-.register-card {
-  margin-top: 10px;
-}
-
-/* שיהיה קצת אוויר בין השדות */
-.register-card .admin-form {
-  gap: 10px;
-}
-
-/* לוודא שכל לייבל מעל השדה */
-.register-card label {
-  display: block;
-  margin-top: 6px;
-  font-weight: 600;
-}
-
-/* אינפוטים וטקסט-אריאה ברוחב מלא */
-.register-card input,
-.register-card textarea {
-  width: 100%;
-  margin-top: 4px;
-}
-
-/* כפתור יפה ורחב */
-.register-submit-btn {
-  margin-top: 16px;
-  width: 100%;
-}
-
-/* סטטוס מתחת לכפתור, מיושר למרכז */
-.register-status {
-  text-align: center;
-  margin-top: 8px;
-}
-
-/* במובייל – קצת פחות רוחב ומרווח צד */
-@media (max-width: 600px) {
-  .register-wrapper {
-    max-width: 100%;
-    padding: 0 12px;
-  }
-}
-/* ===== REGISTER PAGE – FIX LAYOUT ON DESKTOP ===== */
-
-.register-wrapper {
-  max-width: 720px;
-  margin: 0 auto;
-}
-
-/* הכרטיס עצמו */
+/* הקלף של הטופס */
 .register-card {
   max-width: 520px;
   margin: 16px auto;
 }
 
-/* הטופס – טור אחד, לא שורה */
+/* כאן הבעיה שלך – טופס שמסתדר בשורה.
+   אנחנו מבטלים כל flex/grid ומחזירים אותו לטור אחד. */
 .register-card .admin-form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  display: block;          /* מיישר הכל אחד מתחת לשני */
 }
 
-/* לייבל מעל כל שדה */
+/* מרווח בין שדות */
+.register-card .admin-form > * + * {
+  margin-top: 10px;
+}
+
+/* לייבלים */
 .register-card label {
   display: block;
   margin-top: 6px;
+  margin-bottom: 4px;
   font-weight: 600;
 }
 
-/* אינפוטים וטקסט־אריאה ברוחב מלא */
+/* אינפוטים וטקסט־אריאה */
 .register-card input,
 .register-card textarea {
   width: 100%;
-  margin-top: 4px;
+  margin-top: 2px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(129, 212, 250, 0.4);
+  background: rgba(4, 10, 24, 0.95);
+  color: #e3f2fd;
+  font-size: 0.9rem;
+  box-sizing: border-box;
 }
 
-/* כפתור מלא רוחב */
+/* כפתור שליחת בקשה */
 .register-submit-btn {
   margin-top: 16px;
   width: 100%;
 }
 
-/* סטטוס מתחת לכפתור */
+/* טקסט סטטוס */
 .register-status {
   text-align: center;
   margin-top: 8px;
+  font-size: 0.85rem;
+  opacity: 0.9;
 }
 
-/* במובייל – קצת מרווח צדדים */
+/* מובייל לעמוד הרשמה */
 @media (max-width: 600px) {
   .register-wrapper {
     max-width: 100%;
     padding: 0 12px;
   }
-}
 
+  .register-card {
+    margin: 12px auto;
+  }
 }
