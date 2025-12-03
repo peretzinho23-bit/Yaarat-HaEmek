@@ -364,5 +364,58 @@ section {
     padding: 0 12px;
   }
 }
+/* ===== REGISTER PAGE – FIX LAYOUT ON DESKTOP ===== */
+
+.register-wrapper {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* הכרטיס עצמו */
+.register-card {
+  max-width: 520px;
+  margin: 16px auto;
+}
+
+/* הטופס – טור אחד, לא שורה */
+.register-card .admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* לייבל מעל כל שדה */
+.register-card label {
+  display: block;
+  margin-top: 6px;
+  font-weight: 600;
+}
+
+/* אינפוטים וטקסט־אריאה ברוחב מלא */
+.register-card input,
+.register-card textarea {
+  width: 100%;
+  margin-top: 4px;
+}
+
+/* כפתור מלא רוחב */
+.register-submit-btn {
+  margin-top: 16px;
+  width: 100%;
+}
+
+/* סטטוס מתחת לכפתור */
+.register-status {
+  text-align: center;
+  margin-top: 8px;
+}
+
+/* במובייל – קצת מרווח צדדים */
+@media (max-width: 600px) {
+  .register-wrapper {
+    max-width: 100%;
+    padding: 0 12px;
+  }
+}
 
 }
