@@ -863,5 +863,40 @@ footer {
     overflow: hidden;
   }
 }
+/* כפתור החלפת מצב */
+.theme-btn {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 10px 14px;
+  margin-top: 10px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.3);
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+/* מצב בהיר */
+.light-mode {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+.light-mode header,
+.light-mode .hero,
+.light-mode section,
+.light-mode footer {
+  background: #ffffff !important;
+  color: #000 !important;
+}
+
+/* אלמנטים כהים שיהפכו לבהירים */
+.light-mode .card,
+.light-mode .grade-card {
+  background: #f1f5f9 !important;
+  color: #000 !important;
+}
 
 }
