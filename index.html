@@ -43,427 +43,311 @@
 
   <link rel="icon" href="logo.png" />
   <link rel="stylesheet" href="style.css" />
-
-  <!-- Structured Data – עוזר לגוגל להבין שזה אתר של בית ספר -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "School",
-    "name": "בית ספר יערת העמק",
-    "alternateName": "יערת העמק מגדל העמק",
-    "url": "https://yaarathaemek.online/",
-    "address": {
-      "@type": "PostalAddress",
-      "addressLocality": "מגדל העמק",
-      "addressCountry": "IL"
-    }
-  }
-  </script>
 </head>
 
 <body>
-<!-- HEADER -->
-<header class="header-main">
-  <div class="container">
-    <nav class="nav">
-      <div class="nav-left">
-        <div class="logo-circle">
-          <img
-            src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png"
-            alt="סמל בית הספר יערת העמק"
-            class="logo-img"
-          >
+  <!-- HEADER -->
+  <header class="header-main">
+    <div class="container">
+      <nav class="nav">
+        <div class="nav-left">
+          <div class="logo-circle">
+            <img
+              src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png"
+              alt="סמל בית הספר יערת העמק"
+              class="logo-img"
+            >
+          </div>
+
+          <div>
+            <!-- כותרת ראשית – מתעדכנת מהאדמין דרך siteContent -->
+            <div class="school-title-main" id="home-hero-title">
+              ברוכים הבאים ליערת העמק
+            </div>
+            <div class="school-title-sub" id="home-hero-subtitle">
+              סביבת למידה בטוחה, תומכת ומובילה – כל תלמיד ותלמידה עולם ומלואו.
+            </div>
+          </div>
         </div>
 
-        <div>
-          <!-- כותרת ראשית – מתעדכנת מהאדמין דרך siteContent -->
-          <div class="school-title-main" id="home-hero-title">
-            ברוכים הבאים ליערת העמק
-          </div>
-          <div class="school-title-sub" id="home-hero-subtitle">
-            סביבת למידה בטוחה, תומכת ומובילה – כל תלמיד ותלמידה עולם ומלואו.
-          </div>
+        <!-- תפריט קישורים (גם לדסקטופ וגם לפאנל צד במובייל) -->
+        <div class="nav-right">
+          <a href="#about">אודות</a>
+          <a href="#home-news">חדשות</a>
+          <a href="#home-exams">מבחנים</a>
+          <a href="#grades">השכבות</a>
+          <a href="#contact">יצירת קשר</a>
+          <a href="https://my.edu.gov.il/home" class="personal-btn">למרחב האישי</a>
+          <a href="admin.html" class="btn-outline">Admin</a>
         </div>
-      </div>
 
-      <!-- כפתור תפריט מובייל (המבורגר) -->
-      <button class="nav-toggle" aria-label="פתח תפריט" aria-expanded="false">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
-
-      <!-- תפריט קישורים -->
-      <div class="nav-right">
-        <a href="#about">אודות</a>
-        <a href="#home-news">חדשות</a>
-        <a href="#home-exams">מבחנים</a>
-        <a href="#grades">השכבות</a>
-        <a href="#contact">יצירת קשר</a>
-        <a href="https://my.edu.gov.il/home" class="personal-btn">למרחב האישי</a>
-        <a href="admin.html" class="btn-outline">Admin</a>
-
-        <!-- כפתור מצב כהה/בהיר – אייקון בלבד -->
-        <button id="theme-toggle"
-                class="theme-toggle-btn"
-                type="button"
-                aria-label="החלפת מצב תצוגה">
-          <span class="theme-icon" aria-hidden="true">🌙</span>
+        <!-- כפתור מצב כהה/בהיר – עובד עם app.js (initTheme) -->
+        <button
+          id="theme-toggle"
+          class="theme-toggle"
+          type="button"
+          aria-label="החלפת מצב תצוגה">
+          🌙
         </button>
-      </div>
-    </nav>
-  </div>
-</header>
 
-<!-- HERO -->
-<section class="hero hero-home">
-  <div class="hero-overlay"></div>
-  <div class="container hero-content">
-    <div class="hero-text">
-      <h1 id="hero-main-title">יחד צומחים ביערת העמק</h1>
-      <p id="hero-main-body">
-        סביבה חינוכית בטוחה, תומכת ומובילה. כל תלמיד ותלמידה – עולם ומלואו.
-      </p>
-      <div class="hero-actions">
-        <a href="#home-news" class="btn">חדשות ועדכונים</a>
-        <a href="#home-exams" class="btn-outline">מבחנים קרובים</a>
-      </div>
+        <!-- כפתור תפריט מובייל (המבורגר) – עובד עם setupMobileNav ב-app.js -->
+        <button
+          class="nav-toggle"
+          type="button"
+          aria-label="פתח תפריט"
+          aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </nav>
     </div>
-    <div class="hero-side-card">
-      <h3 id="hero-side-title">מידע מהיר</h3>
-      <ul id="hero-side-list">
-        <li>📍 מגדל העמק</li>
-        <li>🧑‍🎓 שכבות ז'–ט'</li>
-        <li>👩‍🏫 צוות חינוכי מסור</li>
-        <li>🤝 שיתופי פעולה קהילתיים</li>
-      </ul>
-    </div>
-  </div>
-</section>
+  </header>
 
-<!-- ABOUT -->
-<section id="about">
-  <div class="container">
-    <div class="section-header">
-      <h2 class="section-title" id="about-title">אודות בית הספר</h2>
-      <p class="section-subtitle" id="about-text">
-        כאן יהיה טקסט האודות. האדמין יכול לשנות את זה דרך לוח הניהול.
-      </p>
-    </div>
-  </div>
-</section>
-
-<!-- חשוב לדעת -->
-<section class="section-dark-strong">
-  <div class="container">
-    <div class="section-header">
-      <h2 class="section-title" id="important-title">חשוב לדעת</h2>
-      <p class="section-subtitle" id="important-subtitle">
-        כמה דברים שימושיים לתלמידים – לפני שממשיכים לגלול.
-      </p>
-    </div>
-
-    <div class="home-grid">
-      <div class="grade-card">
-        <h3 id="important-card-1-title">💻 סביבת למידה דיגיטלית</h3>
-        <p id="important-card-1-body" style="font-size:0.9rem;">
-          חלק גדול מהמידע והקבצים נמצא באתר – חדשות, מבחנים, וטפסים חשובים. שווה לבדוק כאן לפני ששואלים.
+  <!-- HERO -->
+  <section class="hero hero-home">
+    <div class="hero-overlay"></div>
+    <div class="container hero-content">
+      <div class="hero-text">
+        <h1 id="hero-main-title">יחד צומחים ביערת העמק</h1>
+        <p id="hero-main-body">
+          סביבה חינוכית בטוחה, תומכת ומובילה. כל תלמיד ותלמידה – עולם ומלואו.
         </p>
+        <div class="hero-actions">
+          <a href="#home-news" class="btn">חדשות ועדכונים</a>
+          <a href="#home-exams" class="btn-outline">מבחנים קרובים</a>
+        </div>
       </div>
+      <div class="hero-side-card">
+        <h3 id="hero-side-title">מידע מהיר</h3>
+        <ul id="hero-side-list">
+          <li>📍 מגדל העמק</li>
+          <li>🧑‍🎓 שכבות ז'–ט'</li>
+          <li>👩‍🏫 צוות חינוכי מסור</li>
+          <li>🤝 שיתופי פעולה קהילתיים</li>
+        </ul>
+      </div>
+    </div>
+  </section>
 
-      <div class="grade-card">
-        <h3 id="important-card-2-title">🤝 עם מי מדברים?</h3>
-        <p id="important-card-2-body" style="font-size:0.9rem;">
-          יש קושי? מורה, מחנכת, יועצת או צוות הנהלה – כולם כאן כדי לעזור. לא נשארים עם בעיה לבד.
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title" id="about-title">אודות בית הספר</h2>
+        <p class="section-subtitle" id="about-text">
+          כאן יהיה טקסט האודות. האדמין יכול לשנות את זה דרך לוח הניהול.
         </p>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- חדשות אחרונות -->
-<section id="home-news" class="section-light">
-  <div class="container">
-    <div class="section-header">
-      <h2 class="section-title" id="home-news-title">חדשות אחרונות</h2>
-      <p class="section-subtitle" id="home-news-subtitle">
-        שלושת העדכונים האחרונים מכל שכבה – ישר מול העיניים של התלמידים.
-      </p>
-    </div>
-
-    <div class="home-grid">
-      <div class="grade-card">
-        <h3>שכבת ז'</h3>
-        <div id="home-news-z" class="home-news-list">
-          <p class="empty-msg">אין עדיין חדשות לשכבת ז'.</p>
-        </div>
-        <a href="z.html" class="mini-link">לכל החדשות של ז'</a>
-      </div>
-
-      <div class="grade-card">
-        <h3>שכבת ח'</h3>
-        <div id="home-news-h" class="home-news-list">
-          <p class="empty-msg">אין עדיין חדשות לשכבת ח'.</p>
-        </div>
-        <a href="h.html" class="mini-link">לכל החדשות של ח'</a>
-      </div>
-
-      <div class="grade-card">
-        <h3>שכבת ט'</h3>
-        <div id="home-news-t" class="home-news-list">
-          <p class="empty-msg">אין עדיין חדשות לשכבת ט'.</p>
-        </div>
-        <a href="t.html" class="mini-link">לכל החדשות של ט'</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- לוח מודעות -->
-<section id="board" class="section-dark-strong">
-  <div class="container">
-    <div class="section-header">
-      <h2 class="section-title" id="board-title">לוח מודעות</h2>
-      <p class="section-subtitle" id="board-subtitle">הודעות חשובות, פעילויות ואירועים לבית הספר.</p>
-    </div>
-
-    <div id="home-board" class="home-board-list">
-      <p class="empty-msg">אין מודעות כרגע.</p>
-    </div>
-  </div>
-</section>
-
-<!-- מבחנים קרובים -->
-<section id="home-exams" class="section-light">
-  <div class="container">
-    <div class="section-header">
-      <h2 class="section-title" id="home-exams-title">מבחנים קרובים</h2>
-      <p class="section-subtitle" id="home-exams-subtitle">
-        תאריכים, מקצועות ונושאים – כדי שאף אחד לא יפספס.
-      </p>
-    </div>
-
-    <div class="home-grid">
-      <div class="grade-card">
-        <h3>מבחנים · ז'</h3>
-        <div id="home-exams-z" class="home-exams-list">
-          <p class="empty-msg">אין עדיין מבחנים לשכבת ז'.</p>
-        </div>
-      </div>
-
-      <div class="grade-card">
-        <h3>מבחנים · ח'</h3>
-        <div id="home-exams-h" class="home-exams-list">
-          <p class="empty-msg">אין עדיין מבחנים לשכבת ח'.</p>
-        </div>
-      </div>
-
-      <div class="grade-card">
-        <h3>מבחנים · ט'</h3>
-        <div id="home-exams-t" class="home-exams-list">
-          <p class="empty-msg">אין עדיין מבחנים לשכבת ט'.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- GRADES -->
-<section id="grades">
-  <div class="container">
-    <div class="section-header">
-      <h2 class="section-title" id="grades-section-title">היכרות עם השכבות</h2>
-      <p class="section-subtitle" id="grades-section-subtitle">
-        בחר שכבה כדי לראות חדשות, מבחנים ועדכונים שמתאימים אליך.
-      </p>
-    </div>
-
-    <div class="grades-buttons">
-      <a href="z.html" class="grade-btn">שכבת ז'</a>
-      <a href="h.html" class="grade-btn">שכבת ח'</a>
-      <a href="t.html" class="grade-btn">שכבת ט'</a>
-    </div>
-
-    <div class="home-grid" style="margin-top:20px;">
-      <div class="grade-card">
-        <h3>על שכבת ז'</h3>
-        <p id="grade-z-text" style="font-size:0.9rem;">
-          תיאור שכבת ז' יתעדכן כאן דרך לוח הניהול.
+  <!-- חשוב לדעת -->
+  <section class="section-dark-strong">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title" id="important-title">חשוב לדעת</h2>
+        <p class="section-subtitle" id="important-subtitle">
+          כמה דברים שימושיים לתלמידים – לפני שממשיכים לגלול.
         </p>
       </div>
-      <div class="grade-card">
-        <h3>על שכבת ח'</h3>
-        <p id="grade-h-text" style="font-size:0.9rem;">
-          תיאור שכבת ח' יתעדכן כאן דרך לוח הניהול.
+
+      <div class="home-grid">
+        <div class="grade-card">
+          <h3 id="important-card-1-title">💻 סביבת למידה דיגיטלית</h3>
+          <p id="important-card-1-body" style="font-size:0.9rem;">
+            חלק גדול מהמידע והקבצים נמצא באתר – חדשות, מבחנים, וטפסים חשובים. שווה לבדוק כאן לפני ששואלים.
+          </p>
+        </div>
+
+        <div class="grade-card">
+          <h3 id="important-card-2-title">🤝 עם מי מדברים?</h3>
+          <p id="important-card-2-body" style="font-size:0.9rem;">
+            יש קושי? מורה, מחנכת, יועצת או צוות הנהלה – כולם כאן כדי לעזור. לא נשארים עם בעיה לבד.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- חדשות אחרונות -->
+  <section id="home-news" class="section-light">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title" id="home-news-title">חדשות אחרונות</h2>
+        <p class="section-subtitle" id="home-news-subtitle">
+          שלושת העדכונים האחרונים מכל שכבה – ישר מול העיניים של התלמידים.
         </p>
       </div>
-      <div class="grade-card">
-        <h3>על שכבת ט'</h3>
-        <p id="grade-t-text" style="font-size:0.9rem;">
-          תיאור שכבת ט' יתעדכן כאן דרך לוח הניהול.
+
+      <div class="home-grid">
+        <div class="grade-card">
+          <h3>שכבת ז'</h3>
+          <div id="home-news-z" class="home-news-list">
+            <p class="empty-msg">אין עדיין חדשות לשכבת ז'.</p>
+          </div>
+          <a href="z.html" class="mini-link">לכל החדשות של ז'</a>
+        </div>
+
+        <div class="grade-card">
+          <h3>שכבת ח'</h3>
+          <div id="home-news-h" class="home-news-list">
+            <p class="empty-msg">אין עדיין חדשות לשכבת ח'.</p>
+          </div>
+          <a href="h.html" class="mini-link">לכל החדשות של ח'</a>
+        </div>
+
+        <div class="grade-card">
+          <h3>שכבת ט'</h3>
+          <div id="home-news-t" class="home-news-list">
+            <p class="empty-msg">אין עדיין חדשות לשכבת ט'.</p>
+          </div>
+          <a href="t.html" class="mini-link">לכל החדשות של ט'</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- לוח מודעות -->
+  <section id="board" class="section-dark-strong">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title" id="board-title">לוח מודעות</h2>
+        <p class="section-subtitle" id="board-subtitle">הודעות חשובות, פעילויות ואירועים לבית הספר.</p>
+      </div>
+
+      <div id="home-board" class="home-board-list">
+        <p class="empty-msg">אין מודעות כרגע.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- מבחנים קרובים -->
+  <section id="home-exams" class="section-light">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title" id="home-exams-title">מבחנים קרובים</h2>
+        <p class="section-subtitle" id="home-exams-subtitle">
+          תאריכים, מקצועות ונושאים – כדי שאף אחד לא יפספס.
         </p>
       </div>
-    </div>
-  </div>
-</section>
 
-<!-- REQUEST BOX -->
-<section id="requests" class="section-light">
-  <div class="container">
-    <div class="section-header">
-      <h2 class="section-title" id="requests-title">תיבת בקשות</h2>
-      <p class="section-subtitle" id="requests-subtitle">רוצים לבקש משהו? יש רעיון?</p>
-    </div>
+      <div class="home-grid">
+        <div class="grade-card">
+          <h3>מבחנים · ז'</h3>
+          <div id="home-exams-z" class="home-exams-list">
+            <p class="empty-msg">אין עדיין מבחנים לשכבת ז'.</p>
+          </div>
+        </div>
 
-    <div class="card request-box">
-      <h3 id="requests-box-title">שליחת בקשה</h3>
-      <p id="requests-body">למילוי טופס הבקשות – לחצו כאן:</p>
-      <a
-        href="https://docs.google.com/forms/d/e/1FAIpQLScisdjJ5h9t7VgSOa8hmnmrJh6H5VSy84uyE32hhOgDQEU05w/viewform?usp=sharing&ouid=106991680453150303010"
-        target="_blank"
-        class="btn"
-      >
-        לחצו כאן
-      </a>
-    </div>
-  </div>
-</section>
+        <div class="grade-card">
+          <h3>מבחנים · ח'</h3>
+          <div id="home-exams-h" class="home-exams-list">
+            <p class="empty-msg">אין עדיין מבחנים לשכבת ח'.</p>
+          </div>
+        </div>
 
-<!-- CONTACT -->
-<section id="contact" class="section-light">
-  <div class="container">
-    <div class="section-header">
-      <h2 class="section-title" id="contact-section-title">יצירת קשר</h2>
-      <p class="section-subtitle" id="contact-section-subtitle">
-        ניתן לפנות אלינו בכל שאלה, בקשה או התייעצות.
-      </p>
-    </div>
-
-    <div class="contact-grid">
-      <div class="contact-box">
-        <p>📞 טלפון: <span id="contact-phone">04-0000000</span></p>
-        <p>✉️ אימייל: <span id="contact-email">school@example.com</span></p>
-        <p>📍 כתובת: <span id="contact-address">רחוב לדוגמה 10, מגדל העמק</span></p>
+        <div class="grade-card">
+          <h3>מבחנים · ט'</h3>
+          <div id="home-exams-t" class="home-exams-list">
+            <p class="empty-msg">אין עדיין מבחנים לשכבת ט'.</p>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<footer>
-  <div class="container">
-    <p id="footer-text">© כל הזכויות שמורות לבית ספר יערת העמק</p>
-  </div>
-</footer>
+  <!-- GRADES -->
+  <section id="grades">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title" id="grades-section-title">היכרות עם השכבות</h2>
+        <p class="section-subtitle" id="grades-section-subtitle">
+          בחר שכבה כדי לראות חדשות, מבחנים ועדכונים שמתאימים אליך.
+        </p>
+      </div>
 
-<!-- כפתור חזרה לראש הדף -->
-<button
-  id="to-top"
-  style="
-    position:fixed;
-    bottom:20px;
-    left:20px;
-    padding:8px 14px;
-    border-radius:999px;
-    border:1px solid rgba(129,212,250,0.7);
-    background:#020816;
-    color:#e3f2fd;
-    font-size:0.9rem;
-    cursor:pointer;
-    opacity:0;
-    pointer-events:none;
-  "
->
-  ↑ למעלה
-</button>
+      <div class="grades-buttons">
+        <a href="z.html" class="grade-btn">שכבת ז'</a>
+        <a href="h.html" class="grade-btn">שכבת ח'</a>
+        <a href="t.html" class="grade-btn">שכבת ט'</a>
+      </div>
 
-<!-- לוגיקת Firebase / אתר -->
-<script type="module" src="app.js"></script>
+      <div class="home-grid" style="margin-top:20px;">
+        <div class="grade-card">
+          <h3>על שכבת ז'</h3>
+          <p id="grade-z-text" style="font-size:0.9rem;">
+            תיאור שכבת ז' יתעדכן כאן דרך לוח הניהול.
+          </p>
+        </div>
+        <div class="grade-card">
+          <h3>על שכבת ח'</h3>
+          <p id="grade-h-text" style="font-size:0.9rem;">
+            תיאור שכבת ח' יתעדכן כאן דרך לוח הניהול.
+          </p>
+        </div>
+        <div class="grade-card">
+          <h3>על שכבת ט'</h3>
+          <p id="grade-t-text" style="font-size:0.9rem;">
+            תיאור שכבת ט' יתעדכן כאן דרך לוח הניהול.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<!-- תפריט מובייל + מצב כהה/בהיר -->
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const navToggle = document.querySelector(".nav-toggle");
-    const navRight  = document.querySelector(".nav-right");
-    const themeBtn  = document.getElementById("theme-toggle");
-    const themeIcon = themeBtn ? themeBtn.querySelector(".theme-icon") : null;
-    const themeMeta = document.querySelector('meta[name="theme-color"]');
+  <!-- REQUEST BOX -->
+  <section id="requests" class="section-light">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title" id="requests-title">תיבת בקשות</h2>
+        <p class="section-subtitle" id="requests-subtitle">רוצים לבקש משהו? יש רעיון?</p>
+      </div>
 
-    /* ===== תפריט מובייל ===== */
-    if (navToggle && navRight) {
-      // פתיחה/סגירה בכפתור
-      navToggle.addEventListener("click", function (e) {
-        e.stopPropagation();
-        const isOpen = navRight.classList.toggle("open");
-        navToggle.classList.toggle("open", isOpen);
-        navToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
-        document.body.classList.toggle("nav-open", isOpen);
-      });
+      <div class="card request-box">
+        <h3 id="requests-box-title">שליחת בקשה</h3>
+        <p id="requests-body">למילוי טופס הבקשות – לחצו כאן:</p>
+        <a
+          href="https://docs.google.com/forms/d/e/1FAIpQLScisdjJ5h9t7VgSOa8hmnmrJh6H5VSy84uyE32hhOgDQEU05w/viewform?usp=sharing&ouid=106991680453150303010"
+          target="_blank"
+          class="btn"
+        >
+          לחצו כאן
+        </a>
+      </div>
+    </div>
+  </section>
 
-      // סגירה בלחיצה על קישור
-      navRight.querySelectorAll("a").forEach(function (link) {
-        link.addEventListener("click", function () {
-          navRight.classList.remove("open");
-          navToggle.classList.remove("open");
-          navToggle.setAttribute("aria-expanded", "false");
-          document.body.classList.remove("nav-open");
-        });
-      });
+  <!-- CONTACT -->
+  <section id="contact" class="section-light">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title" id="contact-section-title">יצירת קשר</h2>
+        <p class="section-subtitle" id="contact-section-subtitle">
+          ניתן לפנות אלינו בכל שאלה, בקשה או התייעצות.
+        </p>
+      </div>
 
-      // סגירה בלחיצה בחוץ
-      document.addEventListener("click", function (e) {
-        if (!navRight.classList.contains("open")) return;
-        if (navRight.contains(e.target) || navToggle.contains(e.target)) return;
-        navRight.classList.remove("open");
-        navToggle.classList.remove("open");
-        navToggle.setAttribute("aria-expanded", "false");
-        document.body.classList.remove("nav-open");
-      });
-    }
+      <div class="contact-grid">
+        <div class="contact-box">
+          <p>📞 טלפון: <span id="contact-phone">04-0000000</span></p>
+          <p>✉️ אימייל: <span id="contact-email">school@example.com</span></p>
+          <p>📍 כתובת: <span id="contact-address">רחוב לדוגמה 10, מגדל העמק</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    /* ===== מצב כהה/בהיר ===== */
-    if (themeBtn && themeIcon) {
-      const saved = localStorage.getItem("theme");
+  <footer>
+    <div class="container">
+      <p id="footer-text">© כל הזכויות שמורות לבית ספר יערת העמק</p>
+    </div>
+  </footer>
 
-      if (saved === "light") {
-        document.body.classList.add("light-mode");
-        themeIcon.textContent = "🌙"; // במצב בהיר – מראים ירח
-        if (themeMeta) themeMeta.setAttribute("content", "#e2e8f0");
-      } else {
-        document.body.classList.remove("light-mode");
-        themeIcon.textContent = "☀️"; // במצב כהה – מראים שמש
-        if (themeMeta) themeMeta.setAttribute("content", "#020617");
-      }
+  <!-- כפתור חזרה לראש הדף – הסטייל מגיע מ-style.css -->
+  <div id="to-top">↑</div>
 
-      function toggleTheme() {
-        const isLight = document.body.classList.contains("light-mode");
-        document.body.classList.add("theme-fade");
-
-        if (isLight) {
-          // חוזרים לכהה
-          document.body.classList.remove("light-mode");
-          themeIcon.textContent = "☀️";
-          localStorage.setItem("theme", "dark");
-          if (themeMeta) themeMeta.setAttribute("content", "#020617");
-        } else {
-          // עוברים לבהיר
-          document.body.classList.add("light-mode");
-          themeIcon.textContent = "🌙";
-          localStorage.setItem("theme", "light");
-          if (themeMeta) themeMeta.setAttribute("content", "#e2e8f0");
-        }
-
-        setTimeout(function () {
-          document.body.classList.remove("theme-fade");
-        }, 350);
-      }
-
-      themeBtn.addEventListener("click", function (e) {
-        e.stopPropagation();
-        toggleTheme();
-      });
-    }
-  });
-</script>
-
+  <!-- לוגיקת Firebase / אתר (כולל initTheme + setupMobileNav + הכל) -->
+  <script type="module" src="app.js"></script>
 </body>
 </html>
