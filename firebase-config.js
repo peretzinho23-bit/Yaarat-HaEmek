@@ -7,14 +7,15 @@ import { getAuth } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth
 import { getStorage } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-storage.js";
 
 // ===== הגדרות הפרויקט שלך בפיירבייס =====
+c// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyApQJiqGAjb6Rz9wkf2vgWWM96I3zKaNYI",
   authDomain: "yaarat-haemek.firebaseapp.com",
   projectId: "yaarat-haemek",
   storageBucket: "yaarat-haemek.firebasestorage.app",
   messagingSenderId: "202134140284",
-  appId: "1:202134140284:web:e66c683edd7091bfb2e0f9",
-  measurementId: "G-K0BSXBWE1S"
+  appId: "1:202134140284:web:e6d2fa02b2906d50b2e0f9",
+  measurementId: "G-20XXKFF4WV"
 };
 
 // ===== חיבור פיירבייס =====
