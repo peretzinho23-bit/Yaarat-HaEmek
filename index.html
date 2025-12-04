@@ -98,7 +98,10 @@
         <a href="#contact">יצירת קשר</a>
         <a href="https://my.edu.gov.il/home" class="personal-btn">למרחב האישי</a>
         <a href="admin.html" class="btn-outline">Admin</a>
-        <button id="theme-toggle" class="theme-btn">🌙 מצב כהה</button>
+<button id="theme-toggle" class="theme-toggle-btn">
+  <span class="theme-icon">🌙</span>
+</button>
+
       </div>
     </nav>
   </div>
@@ -391,8 +394,55 @@
         navToggle.setAttribute("aria-expanded", "false");
         document.body.classList.remove("nav-open");
       });
+    
     });
+    
   });
+  
 </script>
 </body>
 </html>
+<script>
+  const themeBtn = document.getElementById("theme-toggle");
+  const icon = themeBtn.querySelector(".theme-icon");
+
+  // טעינה ראשונית
+  if (localStorage.getItem("theme") === "light") {
+    document.body.classList.add("light-mode");
+    icon.textContent = "☀️";
+  }
+
+  themeBtn.addEventListener("click", () => {
+    document.body.classList.add("theme-fade");
+
+    const isLight = document.body.classList.toggle("light-mode");
+
+    if (isLight) {
+      icon.style.transform = "rotate(180deg)";
+      icon.style.opacity = "0";
+
+      setTimeout(() => {
+        icon.textContent = "☀️";
+        icon.style.opacity = "1";
+        icon.style.transform = "rotate(0deg)";
+      }, 200);
+
+      localStorage.setItem("theme", "light");
+    } else {
+      icon.style.transform = "rotate(180deg)";
+      icon.style.opacity = "0";
+
+      setTimeout(() => {
+        icon.textContent = "🌙";
+        icon.style.opacity = "1";
+        icon.style.transform = "rotate(0deg)";
+      }, 200);
+
+      localStorage.setItem("theme", "dark");
+    }
+
+    setTimeout(() => {
+      document.body.classList.remove("theme-fade");
+    }, 350);
+  });
+</script>

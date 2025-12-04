@@ -15,6 +15,32 @@ body {
   color: #e3f2fd;
   direction: rtl;
 }
+/* מעבר חלק בין מצבים */
+body,
+header,
+section,
+.hero,
+footer,
+.card,
+.grade-card,
+.nav,
+.hero-side-card {
+  transition:
+    background-color 0.35s ease,
+    color 0.35s ease,
+    border-color 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+/* מחלקת פייד בזמן החלפת מצב */
+body.theme-fade {
+  animation: themeFade 0.35s ease;
+}
+
+@keyframes themeFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
 
 a {
   color: inherit;
@@ -862,41 +888,57 @@ footer {
   body.nav-open {
     overflow: hidden;
   }
-}
-/* כפתור החלפת מצב */
-.theme-btn {
-  display: block;
-  width: 100%;
-  text-align: center;
-  padding: 10px 14px;
-  margin-top: 10px;
-  border-radius: 12px;
-  background: rgba(255,255,255,0.1);
-  color: #fff;
-  border: 1px solid rgba(255,255,255,0.3);
+}/* כפתור מצב כהה/בהיר */
+.theme-toggle-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  font-size: 1rem;
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
-/* מצב בהיר */
-.light-mode {
-  background: #ffffff !important;
-  color: #000000 !important;
+.theme-toggle-btn:hover {
+  background: rgba(255,255,255,0.15);
+  border-color: rgba(255,255,255,0.45);
 }
 
-.light-mode header,
-.light-mode .hero,
-.light-mode section,
-.light-mode footer {
-  background: #ffffff !important;
-  color: #000 !important;
+.theme-toggle-btn .theme-icon {
+  font-size: 1.3rem;
+  transition: transform 0.35s ease, opacity 0.35s ease;
 }
 
-/* אלמנטים כהים שיהפכו לבהירים */
-.light-mode .card,
-.light-mode .grade-card {
-  background: #f1f5f9 !important;
-  color: #000 !important;
+/* אנימציית פייד למצב בהיר/כהה */
+body.theme-fade {
+  animation: themeFade 0.35s ease;
 }
 
+@keyframes themeFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
+
+/* מצב בהיר – כל האתר */
+body.light-mode {
+  background: #f7f9fc;
+  color: #0a0a0a;
+}
+
+body.light-mode header,
+body.light-mode section,
+body.light-mode footer {
+  background-color: #ffffff !important;
+  color: #0a0a0a !important;
+}
+
+body.light-mode .theme-toggle-btn {
+  background: rgba(0,0,0,0.05);
+  border-color: rgba(0,0,0,0.2);
+}
+}
+
+
