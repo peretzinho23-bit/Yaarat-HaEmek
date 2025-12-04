@@ -210,24 +210,54 @@ button:focus-visible {
 
 /* ========== כפתור מצב כהה/בהיר ========== */
 
-#theme-toggle.theme-toggle {
-  width: 40px;
-  height: 40px;
+#theme-toggle/* ===== כפתור מצב כהה/בהיר — מותאם מובייל ומחשב ===== */
+
+.theme-toggle {
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.55);
+  background: transparent;           /* בלי רקע לבן בדארק מוד */
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  padding: 0;
+  margin-right: 6px;
+  font-size: 1.6rem;                 /* האייקון יהיה גדול */
+  line-height: 1;
+  color: #e5e7eb;                    /* צבע האייקון */
   transition:
-    background 0.3s ease,
-    border-color 0.3s ease,
-    transform 0.2s ease;
-  font-size: 1.3rem;
-  position: relative;
-  z-index: 1201; /* תמיד מעל ה־nav-right במובייל */
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
 }
+
+/* רחף */
+.theme-toggle:hover {
+  background: rgba(148, 163, 184, 0.15);
+  border-color: rgba(148, 163, 184, 0.9);
+  transform: translateY(-1px);
+}
+
+/* מצב בהיר */
+body.light-mode .theme-toggle {
+  background: #f1f5f9;               /* רקע בהיר נעים */
+  border-color: #cbd5e1;
+  color: #0f172a;                    /* אייקון כהה */
+}
+
+body.light-mode .theme-toggle:hover {
+  background: #e2e8f0;
+}
+
+/* אייקון פנימי אם יש span */
+.theme-toggle .theme-icon {
+  font-size: 1.7rem;
+  display: block;
+}
+
 
 #theme-toggle.theme-toggle:hover {
   background: rgba(255, 255, 255, 0.15);
