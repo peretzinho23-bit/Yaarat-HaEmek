@@ -210,20 +210,26 @@ button:focus-visible {
 
 /* ========== כפתור מצב כהה/בהיר ========== */
 
-.theme-toggle-btn {
+#theme-toggle.theme-toggle {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.25);
-  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.3s ease, border-color 0.3s ease;
+  transition:
+    background 0.3s ease,
+    border-color 0.3s ease,
+    transform 0.2s ease;
+  font-size: 1.3rem;
+  position: relative;
+  z-index: 1201; /* תמיד מעל ה־nav-right במובייל */
 }
 
-.theme-toggle:hover {
+#theme-toggle.theme-toggle:hover {
   background: rgba(255, 255, 255, 0.15);
   border-color: rgba(255, 255, 255, 0.45);
   transform: translateY(-1px);
@@ -381,11 +387,6 @@ section {
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
 }
 
-.home-news-item-with-image {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
 /* כרטיס חדשות עם תמונה */
 .home-news-item-with-image {
   display: grid;
@@ -417,7 +418,7 @@ section {
   gap: 4px;
 }
 
-/* גודל התמונה בחדשות קטנות */
+/* גודל התמונה (קטנה) */
 .home-news-image-wrap img {
   width: 70px;
   height: 70px;
@@ -425,12 +426,6 @@ section {
   object-fit: cover;
   flex-shrink: 0;
   border: 1px solid rgba(129, 212, 250, 0.6);
-}
-
-.home-news-text {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
 }
 
 .home-news-title,
@@ -920,18 +915,21 @@ body.theme-light {
 
 /* header / footer / hero / sections */
 
-body.light-mode .header-main {
+html[data-theme="light"] .header-main,
+body.theme-light .header-main {
   background: #ffffff;
   box-shadow: 0 1px 6px rgba(15, 23, 42, 0.08);
 }
 
-body.light-mode footer {
+html[data-theme="light"] footer,
+body.theme-light footer {
   background: #ffffff;
   color: #111827;
   border-top: 1px solid #e5e7eb;
 }
 
-body.light-mode .hero {
+html[data-theme="light"] .hero,
+body.theme-light .hero {
   background: radial-gradient(circle at top, #e0f2fe, #f1f5f9 55%);
   color: #0f172a;
 }
@@ -946,32 +944,40 @@ body.theme-light .hero-overlay {
   );
 }
 
-body.light-mode .section-light {
+html[data-theme="light"] .section-light,
+body.theme-light .section-light {
   background: #f3f4f6;
 }
 
-body.light-mode .section-dark-strong {
+html[data-theme="light"] .section-dark-strong,
+body.theme-light .section-dark-strong {
   background: #e5edf7;
 }
 
 /* כרטיסים / בורדרים בלייט */
 
-body.light-mode .grade-card,
-body.light-mode .about-image-card,
-body.light-mode .contact-box,
-body.light-mode .card {
+html[data-theme="light"] .grade-card,
+html[data-theme="light"] .about-image-card,
+html[data-theme="light"] .contact-box,
+html[data-theme="light"] .card,
+body.theme-light .grade-card,
+body.theme-light .about-image-card,
+body.theme-light .contact-box,
+body.theme-light .card {
   background: #ffffff;
   border-color: rgba(148, 163, 184, 0.4);
   box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
 }
 
-body.light-mode .home-news-item {
+html[data-theme="light"] .home-news-item,
+body.theme-light .home-news-item {
   background: #ffffff;
   border-color: #c7d2fe;
   box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
 }
 
-body.light-mode .board-item {
+html[data-theme="light"] .board-item,
+body.theme-light .board-item {
   background: #ffffff;
   border-color: #bfdbfe;
   box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
@@ -979,8 +985,10 @@ body.light-mode .board-item {
 
 /* טקסטים לחדשות / מודעות בלייט */
 
-body.light-mode .home-news-title,
-body.light-mode .home-item-title {
+html[data-theme="light"] .home-news-title,
+html[data-theme="light"] .home-item-title,
+body.theme-light .home-news-title,
+body.theme-light .home-item-title {
   color: #0b1120;
 }
 
@@ -991,19 +999,24 @@ body.theme-light .home-item-body {
   color: #111827;
 }
 
-body.light-mode .home-news-meta,
-body.light-mode .home-item-meta,
-body.light-mode .board-item-meta {
+html[data-theme="light"] .home-news-meta,
+html[data-theme="light"] .home-item-meta,
+html[data-theme="light"] .board-item-meta,
+body.theme-light .home-news-meta,
+body.theme-light .home-item-meta,
+body.theme-light .board-item-meta {
   color: #2563eb;
 }
 
 /* כפתורי ניווט בלייט */
 
-body.light-mode .nav-right a:hover {
+html[data-theme="light"] .nav-right a:hover,
+body.theme-light .nav-right a:hover {
   background: rgba(59, 130, 246, 0.10);
 }
 
-body.light-mode .grade-btn {
+html[data-theme="light"] .grade-btn,
+body.theme-light .grade-btn {
   background: #ffffff;
   color: #111827;
   border-color: #bfdbfe;
@@ -1016,43 +1029,51 @@ body.theme-light .grade-btn:hover {
 
 /* כפתור מצב כהה/בהיר בלייט */
 
-body.light-mode .theme-toggle-btn {
-  background: rgba(15,23,42,0.06);
-  border-color: rgba(15,23,42,0.25);
+html[data-theme="light"] #theme-toggle.theme-toggle,
+body.theme-light #theme-toggle.theme-toggle {
+  background: rgba(15, 23, 42, 0.04);
+  border-color: rgba(15, 23, 42, 0.25);
 }
 
 /* כפתורי outline (Admin, מבחנים קרובים) בלייט – שיהיו ברורים ולא שקופים */
-body.light-mode .btn-outline {
+
+html[data-theme="light"] .btn-outline,
+body.theme-light .btn-outline {
   background: rgba(255, 255, 255, 0.95);
   color: #1d4ed8;
   border-color: #93c5fd;
 }
 
-body.light-mode .btn-outline:hover {
+html[data-theme="light"] .btn-outline:hover,
+body.theme-light .btn-outline:hover {
   background: #e0edff;
 }
 
 /* ADMIN בלייט */
+
 html[data-theme="light"] #login-section,
 body.theme-light #login-section {
   background: #ffffff;
   border-color: #d1d5db;
 }
 
-body.light-mode #login-section input {
+html[data-theme="light"] #login-section input,
+body.theme-light #login-section input {
   background: #f9fafb;
   color: #111827;
   border-color: #cbd5f5;
 }
 
-body.light-mode .admin-item {
+html[data-theme="light"] .admin-item,
+body.theme-light .admin-item {
   background: #f9fafb;
   border-radius: 10px;
 }
 
 /* תפריט מובייל בלייט */
 
-body.light-mode .nav-right {
+html[data-theme="light"] .nav-right,
+body.theme-light .nav-right {
   background: #ffffff;
   box-shadow: 12px 0 30px rgba(148, 163, 184, 0.6);
 }
