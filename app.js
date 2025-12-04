@@ -28,11 +28,12 @@ function applyTheme(theme) {
   // נעדכן data-theme על <html>
   root.setAttribute("data-theme", theme);
 
-  // למקרה שיש לך סטיילים ישנים עם קלאסים:
+  // למקרה שיש סטיילים ישנים עם קלאסים:
   body.classList.toggle("theme-dark", theme === "dark");
   body.classList.toggle("theme-light", theme === "light");
+  body.classList.toggle("light-mode", theme === "light"); // תואם ל־CSS הנוכחי
 
-  // עדכון האייקון והטקסט בכפתור
+  // עדכון האייקון בכפתור
   if (btn) {
     if (theme === "dark") {
       btn.textContent = "🌙";
@@ -45,9 +46,9 @@ function applyTheme(theme) {
 }
 
 function initTheme() {
-  // ערך ברירת מחדל – כהה
   const savedTheme = localStorage.getItem(THEME_KEY);
-  const initialTheme = savedTheme === "light" || savedTheme === "dark" ? savedTheme : "dark";
+  const initialTheme =
+    savedTheme === "light" || savedTheme === "dark" ? savedTheme : "dark";
 
   applyTheme(initialTheme);
 
@@ -190,6 +191,7 @@ function subscribeHomeExams() {
 }
 
 /* ------------ חדשות בדפי שכבות (z/h/t) – Realtime ------------ */
+/*   פה שיניתי: משתמש ב־board-item כדי שייראה כמו לוח מודעות   */
 
 function subscribeGradeNews() {
   if (!currentGrade) return;
@@ -221,34 +223,20 @@ function subscribeGradeNews() {
             ? ` style="color:${escapeHtml(n.color)}"`
             : "";
 
-          if (img) {
-            return `
-              <div class="home-news-item home-news-item-with-image">
-                <div class="home-news-image-wrap">
-                  <img src="${escapeHtml(img)}" alt="תמונה לחדשות" loading="lazy">
-                </div>
-                <div class="home-news-text"${colorStyle}>
-                  <div class="home-news-title">${title}</div>
-                  ${
-                    meta
-                      ? `<div class="home-news-meta">${meta}</div>`
-                      : ""
-                  }
-                  <div class="home-news-body">${body}</div>
-                </div>
+          const imgHtml = img
+            ? `
+              <div class="board-item-image">
+                <img src="${escapeHtml(img)}" alt="${title}" loading="lazy">
               </div>
-            `;
-          }
+            `
+            : "";
 
           return `
-            <div class="home-news-item"${colorStyle}>
-              <div class="home-news-title">${title}</div>
-              ${
-                meta
-                  ? `<div class="home-news-meta">${meta}</div>`
-                  : ""
-              }
-              <div class="home-news-body">${body}</div>
+            <div class="board-item"${colorStyle}>
+              <div class="board-item-title">${title}</div>
+              ${meta ? `<div class="board-item-meta">${meta}</div>` : ""}
+              <div class="board-item-body">${body}</div>
+              ${imgHtml}
             </div>
           `;
         })
@@ -491,7 +479,7 @@ function setYear() {
   }
 }
 
-/* ------------ כפתור חזרה לראש הדף בדפי שכבות ------------ */
+/* ------------ כפתור חזרה לראש הדף ------------ */
 
 function setupToTop() {
   const btn = document.getElementById("to-top");
@@ -521,7 +509,8 @@ function setupMobileNav() {
 
   if (!navToggle || !navRight) return;
 
-  navToggle.addEventListener("click", () => {
+  navToggle.addEventListener("click", (e) => {
+    e.stopPropagation();
     const isOpen = navRight.classList.toggle("open");
     navToggle.classList.toggle("open", isOpen);
     navToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
@@ -536,36 +525,32 @@ function setupMobileNav() {
       document.body.classList.remove("nav-open");
     });
   });
+
+  document.addEventListener("click", (e) => {
+    if (!navRight.classList.contains("open")) return;
+    if (navRight.contains(e.target) || navToggle.contains(e.target)) return;
+    navRight.classList.remove("open");
+    navToggle.classList.remove("open");
+    navToggle.setAttribute("aria-expanded", "false");
+    document.body.classList.remove("nav-open");
+  });
 }
 
 /* ------------ INIT ------------ */
 
 document.addEventListener("DOMContentLoaded", () => {
-  // מצב כהה/בהיר (רלוונטי לכל הדפים)
   initTheme();
-
-  // טקסטים כלליים (Hero, אודות, יצירת קשר, פוטר)
   subscribeSiteContent();
 
-  // דף הבית – חדשות + מבחנים
   subscribeHomeNews();
   subscribeHomeExams();
 
-  // דפי שכבות – חדשות + מבחנים
   subscribeGradeNews();
   subscribeGradeExams();
 
-  // לוח מודעות – גם בית, גם שכבות
   subscribeBoard();
 
-  // שנה בפוטר וכפתור לראש הדף
   setYear();
   setupToTop();
-
-  // תפריט מובייל
-  try {
-    setupMobileNav();
-  } catch (e) {
-    console.error("Mobile nav error:", e);
-  }
+  setupMobileNav();
 });

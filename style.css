@@ -1183,3 +1183,28 @@ body.light-mode .theme-toggle {
     margin-top: 8px;
   }
 }
+/* ===== תמונות בעמודי חדשות של שכבות (Z / H / T) ===== */
+
+.grade-news-item {
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 14px;
+  padding: 14px;
+  border: 1px solid rgba(129, 212, 250, 0.35);
+  box-shadow: 0 0 10px rgba(0,0,0,0.6);
+  font-size: 0.95rem;
+  overflow: hidden;
+}
+
+.grade-news-image {
+  width: 100%;
+  margin-top: 10px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.grade-news-image img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  display: block;
+}
