@@ -56,17 +56,11 @@ function subscribeHomeNews() {
               return `
                 <div class="home-news-item home-news-item-with-image">
                   <div class="home-news-image-wrap">
-                    <img src="${escapeHtml(
-                      img
-                    )}" alt="תמונה לחדשות" loading="lazy">
+                    <img src="${escapeHtml(img)}" alt="תמונה לחדשות" loading="lazy">
                   </div>
                   <div class="home-news-text"${colorStyle}>
                     <div class="home-news-title">${title}</div>
-                    ${
-                      meta
-                        ? `<div class="home-news-meta">${meta}</div>`
-                        : ""
-                    }
+                    ${meta ? `<div class="home-news-meta">${meta}</div>` : ""}
                     <div class="home-news-body">${body}</div>
                   </div>
                 </div>
@@ -77,11 +71,7 @@ function subscribeHomeNews() {
             return `
               <div class="home-news-item"${colorStyle}>
                 <div class="home-news-title">${title}</div>
-                ${
-                  meta
-                    ? `<div class="home-news-meta">${meta}</div>`
-                    : ""
-                }
+                ${meta ? `<div class="home-news-meta">${meta}</div>` : ""}
                 <div class="home-news-body">${body}</div>
               </div>
             `;
@@ -182,17 +172,11 @@ function subscribeGradeNews() {
             return `
               <div class="home-news-item home-news-item-with-image">
                 <div class="home-news-image-wrap">
-                  <img src="${escapeHtml(
-                    img
-                  )}" alt="תמונה לחדשות" loading="lazy">
+                  <img src="${escapeHtml(img)}" alt="תמונה לחדשות" loading="lazy">
                 </div>
                 <div class="home-news-text"${colorStyle}>
                   <div class="home-news-title">${title}</div>
-                  ${
-                    meta
-                      ? `<div class="home-news-meta">${meta}</div>`
-                      : ""
-                  }
+                  ${meta ? `<div class="home-news-meta">${meta}</div>` : ""}
                   <div class="home-news-body">${body}</div>
                 </div>
               </div>
@@ -202,11 +186,7 @@ function subscribeGradeNews() {
           return `
             <div class="home-news-item"${colorStyle}>
               <div class="home-news-title">${title}</div>
-              ${
-                meta
-                  ? `<div class="home-news-meta">${meta}</div>`
-                  : ""
-              }
+              ${meta ? `<div class="home-news-meta">${meta}</div>` : ""}
               <div class="home-news-body">${body}</div>
             </div>
           `;
@@ -332,7 +312,6 @@ function renderBoardList(container, items) {
     .join("");
 }
 
-
 /* ------------ תוכן כללי: אודות, יצירת קשר, תיאור שכבות – Realtime ------------ */
 
 function subscribeSiteContent() {
@@ -344,23 +323,29 @@ function subscribeSiteContent() {
       if (!snap.exists()) return;
       const data = snap.data() || {};
 
-      // HERO (כותרת למעלה + הירו)
+      // HERO
       const heroTitleHeader = document.getElementById("home-hero-title");
       const heroSubHeader = document.getElementById("home-hero-subtitle");
-      if (heroTitleHeader && data.homeHeroTitle) heroTitleHeader.textContent = data.homeHeroTitle;
-      if (heroSubHeader && data.homeHeroSubtitle) heroSubHeader.textContent = data.homeHeroSubtitle;
+      if (heroTitleHeader && data.homeHeroTitle)
+        heroTitleHeader.textContent = data.homeHeroTitle;
+      if (heroSubHeader && data.homeHeroSubtitle)
+        heroSubHeader.textContent = data.homeHeroSubtitle;
 
       // ABOUT
       const aboutTitleEl = document.getElementById("about-title");
       const aboutTextEl = document.getElementById("about-text");
-      if (aboutTitleEl && data.aboutTitle) aboutTitleEl.textContent = data.aboutTitle;
-      if (aboutTextEl && data.aboutBody) aboutTextEl.textContent = data.aboutBody;
+      if (aboutTitleEl && data.aboutTitle)
+        aboutTitleEl.textContent = data.aboutTitle;
+      if (aboutTextEl && data.aboutBody)
+        aboutTextEl.textContent = data.aboutBody;
 
       // IMPORTANT SECTION
       const impTitleEl = document.getElementById("important-title");
       const impSubEl = document.getElementById("important-subtitle");
-      if (impTitleEl && data.importantTitle) impTitleEl.textContent = data.importantTitle;
-      if (impSubEl && data.importantSubtitle) impSubEl.textContent = data.importantSubtitle;
+      if (impTitleEl && data.importantTitle)
+        impTitleEl.textContent = data.importantTitle;
+      if (impSubEl && data.importantSubtitle)
+        impSubEl.textContent = data.importantSubtitle;
 
       const c1Title = document.getElementById("important-card-1-title");
       const c1Body = document.getElementById("important-card-1-body");
@@ -369,18 +354,26 @@ function subscribeSiteContent() {
       const c3Title = document.getElementById("important-card-3-title");
       const c3Body = document.getElementById("important-card-3-body");
 
-      if (c1Title && data.importantCard1Title) c1Title.textContent = data.importantCard1Title;
-      if (c1Body && data.importantCard1Body) c1Body.textContent = data.importantCard1Body;
-      if (c2Title && data.importantCard2Title) c2Title.textContent = data.importantCard2Title;
-      if (c2Body && data.importantCard2Body) c2Body.textContent = data.importantCard2Body;
-      if (c3Title && data.importantCard3Title) c3Title.textContent = data.importantCard3Title;
-      if (c3Body && data.importantCard3Body) c3Body.textContent = data.importantCard3Body;
+      if (c1Title && data.importantCard1Title)
+        c1Title.textContent = data.importantCard1Title;
+      if (c1Body && data.importantCard1Body)
+        c1Body.textContent = data.importantCard1Body;
+      if (c2Title && data.importantCard2Title)
+        c2Title.textContent = data.importantCard2Title;
+      if (c2Body && data.importantCard2Body)
+        c2Body.textContent = data.importantCard2Body;
+      if (c3Title && data.importantCard3Title)
+        c3Title.textContent = data.importantCard3Title;
+      if (c3Body && data.importantCard3Body)
+        c3Body.textContent = data.importantCard3Body;
 
       // GRADES SECTION
       const gradesTitle = document.getElementById("grades-section-title");
       const gradesSub = document.getElementById("grades-section-subtitle");
-      if (gradesTitle && data.gradesSectionTitle) gradesTitle.textContent = data.gradesSectionTitle;
-      if (gradesSub && data.gradesSectionSubtitle) gradesSub.textContent = data.gradesSectionSubtitle;
+      if (gradesTitle && data.gradesSectionTitle)
+        gradesTitle.textContent = data.gradesSectionTitle;
+      if (gradesSub && data.gradesSectionSubtitle)
+        gradesSub.textContent = data.gradesSectionSubtitle;
 
       const zDesc = document.getElementById("grade-z-text");
       const hDesc = document.getElementById("grade-h-text");
@@ -393,9 +386,12 @@ function subscribeSiteContent() {
       const reqTitle = document.getElementById("requests-title");
       const reqSub = document.getElementById("requests-subtitle");
       const reqBody = document.getElementById("requests-body");
-      if (reqTitle && data.requestsTitle) reqTitle.textContent = data.requestsTitle;
-      if (reqSub && data.requestsSubtitle) reqSub.textContent = data.requestsSubtitle;
-      if (reqBody && data.requestsBody) reqBody.textContent = data.requestsBody;
+      if (reqTitle && data.requestsTitle)
+        reqTitle.textContent = data.requestsTitle;
+      if (reqSub && data.requestsSubtitle)
+        reqSub.textContent = data.requestsSubtitle;
+      if (reqBody && data.requestsBody)
+        reqBody.textContent = data.requestsBody;
 
       // CONTACT
       const contactTitle = document.getElementById("contact-section-title");
@@ -404,11 +400,16 @@ function subscribeSiteContent() {
       const emailEl = document.getElementById("contact-email");
       const addrEl = document.getElementById("contact-address");
 
-      if (contactTitle && data.contactSectionTitle) contactTitle.textContent = data.contactSectionTitle;
-      if (contactSub && data.contactSectionSubtitle) contactSub.textContent = data.contactSectionSubtitle;
-      if (phoneEl && data.contactPhone) phoneEl.textContent = data.contactPhone;
-      if (emailEl && data.contactEmail) emailEl.textContent = data.contactEmail;
-      if (addrEl && data.contactAddress) addrEl.textContent = data.contactAddress;
+      if (contactTitle && data.contactSectionTitle)
+        contactTitle.textContent = data.contactSectionTitle;
+      if (contactSub && data.contactSectionSubtitle)
+        contactSub.textContent = data.contactSectionSubtitle;
+      if (phoneEl && data.contactPhone)
+        phoneEl.textContent = data.contactPhone;
+      if (emailEl && data.contactEmail)
+        emailEl.textContent = data.contactEmail;
+      if (addrEl && data.contactAddress)
+        addrEl.textContent = data.contactAddress;
 
       // FOOTER
       const footerEl = document.getElementById("footer-text");
@@ -419,7 +420,6 @@ function subscribeSiteContent() {
     }
   );
 }
-
 
 /* ------------ שנה בפוטר בדפי שכבות ------------ */
 
@@ -452,27 +452,8 @@ function setupToTop() {
   });
 }
 
-/* ------------ INIT ------------ */
+/* ------------ תפריט מובייל (המבורגר) ------------ */
 
-document.addEventListener("DOMContentLoaded", () => {
-  // טקסטים כלליים (Hero, אודות, יצירת קשר, פוטר)
-  subscribeSiteContent();
-
-  // דף הבית – חדשות + מבחנים
-  subscribeHomeNews();
-  subscribeHomeExams();
-
-  // דפי שכבות – חדשות + מבחנים
-  subscribeGradeNews();
-  subscribeGradeExams();
-
-  // לוח מודעות – גם בית, גם שכבות
-  subscribeBoard();
-
-  // שנה בפוטר וכפתור לראש הדף
-  setYear();
-  setupToTop();
-// ===== תפריט מובייל (המבורגר) =====
 function setupMobileNav() {
   const navToggle = document.querySelector(".nav-toggle");
   const navRight = document.querySelector(".nav-right");
@@ -497,13 +478,31 @@ function setupMobileNav() {
   });
 }
 
-// לוודא שהפונקציה רצה אחרי טעינת הדף
+/* ------------ INIT ------------ */
+
 document.addEventListener("DOMContentLoaded", () => {
+  // טקסטים כלליים (Hero, אודות, יצירת קשר, פוטר)
+  subscribeSiteContent();
+
+  // דף הבית – חדשות + מבחנים
+  subscribeHomeNews();
+  subscribeHomeExams();
+
+  // דפי שכבות – חדשות + מבחנים
+  subscribeGradeNews();
+  subscribeGradeExams();
+
+  // לוח מודעות – גם בית, גם שכבות
+  subscribeBoard();
+
+  // שנה בפוטר וכפתור לראש הדף
+  setYear();
+  setupToTop();
+
+  // תפריט מובייל
   try {
     setupMobileNav();
   } catch (e) {
     console.error("Mobile nav error:", e);
   }
-});
-
 });
