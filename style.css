@@ -888,6 +888,21 @@ body.light-mode {
   background: #e5edf7;
   color: #0f172a;
 }
+/* כפתורי פעולה במצב בהיר */
+body.light-mode .btn {
+  background: linear-gradient(90deg, #2563eb, #0ea5e9); /* כחול יפה */
+  color: #ffffff;
+}
+
+body.light-mode .btn-outline {
+  background: transparent;
+  color: #2563eb;              /* טקסט כחול כהה וברור */
+  border-color: #60a5fa;       /* מסגרת כחולה */
+}
+
+body.light-mode .btn-outline:hover {
+  background: #e0f2fe;         /* רקע כחול עדין בהובר */
+}
 
 /* header / footer / hero / sections */
 
