@@ -1004,9 +1004,173 @@ body.light-mode .admin-item {
 
 /* תפריט מובייל בלייט */
 
+a/* ===== רספונסיביות כללית למסכים קטנים ===== */
+/* מצב בהיר כללי */
+body.light-mode {
+  background: #e5edf7;
+  color: #0f172a;
+}
+
+/* כותרת / פוטר */
+body.light-mode .header-main,
+body.light-mode footer {
+  background: #ffffff;
+  color: #0f172a;
+}
+
+/* hero בהיר, אבל לא לבן מסנוור */
+body.light-mode .hero {
+  background: radial-gradient(circle at top, #e0f2fe, #f1f5f9 55%);
+  color: #0f172a;
+}
+
+body.light-mode .hero-side-card {
+  background: rgba(255,255,255,0.85);
+  border-color: rgba(148,163,184,0.5);
+}
+
+/* כרטיסים */
+body.light-mode .section-light {
+  background: #f3f4f6;
+}
+
+body.light-mode .section-dark-strong {
+  background: #e5edf7;
+}
+
+body.light-mode .grade-card,
+body.light-mode .contact-box,
+body.light-mode .card {
+  background: #ffffff;
+  border-color: rgba(148,163,184,0.4);
+}
+
+/* כפתור מצב כהה/בהיר במצב בהיר */
+body.light-mode .theme-toggle-btn {
+  background: rgba(15,23,42,0.06);
+  border-color: rgba(15,23,42,0.25);
+}
+
+
+  .hero-text p {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero-side-card {
+    width: 100%;
+  }
+
+  /* גרידים הופכים לעמודה אחת */
+  .about-grid,
+  .contact-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .grade-hero {
+    text-align: center;
+  }
+
+/* ===== תפריט מובייל מסודר ===== */
+
+/* בסיס – בדסקטופ */
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.nav-right {
+  display: flex;
+  gap: 10px;
+  font-size: 0.9rem;
+  align-items: center;
+}
+
+/* כפתור המבורגר – בדסקטופ מוסתר */
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  background: rgba(15, 23, 42, 0.9);
+  cursor: pointer;
+}
+
+.nav-toggle span {
+  width: 18px;
+  height: 2px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+/* מצב פתוח – אייקון X */
+.nav-toggle.open span:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+.nav-toggle.open span:nth-child(2) {
+  opacity: 0;
+}
+.nav-toggle.open span:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+/* מובייל – כאן מתחיל התפריט הצדדי */
 @media (max-width: 768px) {
-  body.light-mode .nav-right {
-    background: #ffffff;
-    box-shadow: 12px 0 30px rgba(15, 23, 42, 0.18);
+  .nav {
+    position: relative;
+  }
+
+  .nav-right {
+    position: fixed;
+    top: 0;
+    left: 0;              /* נכנס משמאל – כמו שביקשת */
+    bottom: 0;
+    width: 75%;
+    max-width: 280px;
+    background: #020617;
+    box-shadow: 12px 0 30px rgba(15, 23, 42, 0.9);
+    padding: 80px 20px 24px;
+    flex-direction: column;
+    gap: 12px;
+    transform: translateX(-100%);   /* מוסתר שמאלה בהתחלה */
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+    z-index: 1000;
+  }
+
+  .nav-right a {
+    font-size: 0.98rem;
+    padding: 8px 0;
+  }
+
+  .nav-right.open {
+    transform: translateX(0);       /* נכנס למסך */
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .nav-toggle {
+    display: flex;
+    z-index: 1100;
+  }
+
+  body.nav-open {
+    overflow: hidden;
   }
 }
+
+/* מצב בהיר – רקע לבן לתפריט במובייל */
+body.light-mode .nav-right {
+  background: #ffffff;
+}
+
+
