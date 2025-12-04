@@ -101,7 +101,7 @@
         <a href="https://my.edu.gov.il/home" class="personal-btn">למרחב האישי</a>
         <a href="admin.html" class="btn-outline">Admin</a>
 
-        <!-- כפתור מצב כהה/בהיר – נקי, רק אייקון -->
+        <!-- כפתור מצב כהה/בהיר – אייקון בלבד -->
         <button id="theme-toggle"
                 class="theme-toggle-btn"
                 type="button"
@@ -377,60 +377,91 @@
 <!-- לוגיקת Firebase / אתר -->
 <script type="module" src="app.js"></script>
 
-<!-- תפריט מובייל -->
+<!-- תפריט מובייל + מצב כהה/בהיר -->
 <script>
   document.addEventListener("DOMContentLoaded", function () {
+    const navToggle = document.querySelector(".nav-toggle");
+    const navRight  = document.querySelector(".nav-right");
     const themeBtn  = document.getElementById("theme-toggle");
     const themeIcon = themeBtn ? themeBtn.querySelector(".theme-icon") : null;
     const themeMeta = document.querySelector('meta[name="theme-color"]');
 
-    if (!themeBtn || !themeIcon) return;
+    /* ===== תפריט מובייל ===== */
+    if (navToggle && navRight) {
+      // פתיחה/סגירה בכפתור
+      navToggle.addEventListener("click", function (e) {
+        e.stopPropagation();
+        const isOpen = navRight.classList.toggle("open");
+        navToggle.classList.toggle("open", isOpen);
+        navToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+        document.body.classList.toggle("nav-open", isOpen);
+      });
 
-    // טעינת מצב קיים מ-localStorage
-    const saved = localStorage.getItem("theme");
-    if (saved === "light") {
-      document.body.classList.add("light-mode");
-      themeIcon.textContent = "🌙";     // במצב בהיר – מראים ירח
-      themeMeta && themeMeta.setAttribute("content", "#e2e8f0");
-    } else {
-      document.body.classList.remove("light-mode");
-      themeIcon.textContent = "☀️";     // במצב כהה – מראים שמש
-      themeMeta && themeMeta.setAttribute("content", "#020617");
+      // סגירה בלחיצה על קישור
+      navRight.querySelectorAll("a").forEach(function (link) {
+        link.addEventListener("click", function () {
+          navRight.classList.remove("open");
+          navToggle.classList.remove("open");
+          navToggle.setAttribute("aria-expanded", "false");
+          document.body.classList.remove("nav-open");
+        });
+      });
+
+      // סגירה בלחיצה בחוץ
+      document.addEventListener("click", function (e) {
+        if (!navRight.classList.contains("open")) return;
+        if (navRight.contains(e.target) || navToggle.contains(e.target)) return;
+        navRight.classList.remove("open");
+        navToggle.classList.remove("open");
+        navToggle.setAttribute("aria-expanded", "false");
+        document.body.classList.remove("nav-open");
+      });
     }
 
-    function toggleTheme() {
-      const isLight = document.body.classList.contains("light-mode");
+    /* ===== מצב כהה/בהיר ===== */
+    if (themeBtn && themeIcon) {
+      const saved = localStorage.getItem("theme");
 
-      // אנימציית פייד קצרה
-      document.body.classList.add("theme-fade");
-
-      if (isLight) {
-        // חוזרים לכהה
-        document.body.classList.remove("light-mode");
-        themeIcon.textContent = "☀️";
-        localStorage.setItem("theme", "dark");
-        themeMeta && themeMeta.setAttribute("content", "#020617");
-      } else {
-        // עוברים לבהיר
+      if (saved === "light") {
         document.body.classList.add("light-mode");
-        themeIcon.textContent = "🌙";
-        localStorage.setItem("theme", "light");
-        themeMeta && themeMeta.setAttribute("content", "#e2e8f0");
+        themeIcon.textContent = "🌙"; // במצב בהיר – מראים ירח
+        if (themeMeta) themeMeta.setAttribute("content", "#e2e8f0");
+      } else {
+        document.body.classList.remove("light-mode");
+        themeIcon.textContent = "☀️"; // במצב כהה – מראים שמש
+        if (themeMeta) themeMeta.setAttribute("content", "#020617");
       }
 
-      setTimeout(() => {
-        document.body.classList.remove("theme-fade");
-      }, 350);
-    }
+      function toggleTheme() {
+        const isLight = document.body.classList.contains("light-mode");
+        document.body.classList.add("theme-fade");
 
-    themeBtn.addEventListener("click", function (e) {
-      e.stopPropagation();
-      toggleTheme();
-    });
+        if (isLight) {
+          // חוזרים לכהה
+          document.body.classList.remove("light-mode");
+          themeIcon.textContent = "☀️";
+          localStorage.setItem("theme", "dark");
+          if (themeMeta) themeMeta.setAttribute("content", "#020617");
+        } else {
+          // עוברים לבהיר
+          document.body.classList.add("light-mode");
+          themeIcon.textContent = "🌙";
+          localStorage.setItem("theme", "light");
+          if (themeMeta) themeMeta.setAttribute("content", "#e2e8f0");
+        }
+
+        setTimeout(function () {
+          document.body.classList.remove("theme-fade");
+        }, 350);
+      }
+
+      themeBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        toggleTheme();
+      });
+    }
   });
 </script>
-
-
 
 </body>
 </html>
