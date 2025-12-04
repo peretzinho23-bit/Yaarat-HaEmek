@@ -176,6 +176,7 @@ function setupNewsForms() {
       const color =
         (form.color && form.color.value && form.color.value.trim()) ||
         "#ffffff";
+
       const fileInput = form.imageFile;
       const file = fileInput && fileInput.files && fileInput.files[0];
 
@@ -204,7 +205,11 @@ function setupNewsForms() {
         alert("הידיעה נשמרה.");
       } catch (err) {
         console.error("שגיאה בהעלאת תמונה/שמירת חדשות:", err);
-        alert("הייתה שגיאה בשמירת הידיעה. נסה שוב.");
+        alert(
+          "שגיאה בשמירת הידיעה:\n" +
+          (err.code ? err.code + " – " : "") +
+          (err.message || JSON.stringify(err))
+        );
       }
     });
   }
