@@ -326,27 +326,49 @@ function setupBoardForm() {
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
+
     const title = form.title.value.trim();
     const meta = form.meta.value.trim();
     const body = form.body.value.trim();
-    const imageUrl =
+    const manualImageUrl =
       (form.imageUrl && form.imageUrl.value && form.imageUrl.value.trim()) || "";
     const color =
       (form.color && form.color.value && form.color.value.trim()) ||
       "#ffffff";
+
+    const fileInput = form.imageFile;
+    const file = fileInput && fileInput.files && fileInput.files[0];
 
     if (!title || !body) {
       alert("חובה למלא כותרת ותוכן.");
       return;
     }
 
-    boardData.push({ title, meta, body, imageUrl, color });
-    form.reset();
-    renderBoardAdmin();
-    await saveBoard();
-    alert("המודעה נשמרה.");
+    try {
+      let finalImageUrl = manualImageUrl;
+
+      // אם נבחר קובץ – מעלים אותו ל-Firebase Storage
+      if (file) {
+        const filePath = `board/${Date.now()}_${file.name}`;
+        const storageRef = ref(storage, filePath);
+        await uploadBytes(storageRef, file);
+        finalImageUrl = await getDownloadURL(storageRef);
+      }
+
+      boardData.push({ title, meta, body, imageUrl: finalImageUrl, color });
+
+      form.reset();
+      renderBoardAdmin();
+      await saveBoard();
+      alert("המודעה נשמרה.");
+    } catch (err) {
+      console.error("שגיאה בהעלאת תמונה/שמירת מודעה:", err);
+      alert("הייתה שגיאה בשמירת המודעה. נסו שוב.");
+    }
   });
 }
+
+
 
 /* ------------ SITE CONTENT (about / home / contact / important / theming) ------------ */
 
