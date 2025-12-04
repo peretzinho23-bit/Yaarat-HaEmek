@@ -1,4 +1,4 @@
-/* בסיס */
+/* ========== RESET בסיס ========== */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -15,6 +15,7 @@ body {
   color: #e3f2fd;
   direction: rtl;
 }
+
 /* מעבר חלק בין מצבים */
 body,
 header,
@@ -32,7 +33,7 @@ footer,
     box-shadow 0.35s ease;
 }
 
-/* מחלקת פייד בזמן החלפת מצב */
+/* מחלקת פייד בזמן החלפת מצב (אם תחליט להשתמש) */
 body.theme-fade {
   animation: themeFade 0.35s ease;
 }
@@ -47,7 +48,7 @@ a {
   text-decoration: none;
 }
 
-/* לא מסגרת כחולה מכוערת */
+/* בלי מסגרת כחולה מכוערת */
 a:focus,
 a:focus-visible,
 button:focus,
@@ -63,7 +64,7 @@ button:focus-visible {
   padding: 0 16px;
 }
 
-/* HEADER + NAV */
+/* ========== HEADER + NAV ========== */
 
 .header-main {
   background: #020816;
@@ -77,6 +78,7 @@ button:focus-visible {
   align-items: center;
   justify-content: space-between;
   padding: 10px 0;
+  gap: 1rem;
 }
 
 .nav-left {
@@ -138,6 +140,7 @@ button:focus-visible {
   display: flex;
   gap: 10px;
   font-size: 0.9rem;
+  align-items: center;
 }
 
 .nav-right a {
@@ -154,7 +157,83 @@ button:focus-visible {
   border: 1px solid rgba(129, 212, 250, 0.7);
 }
 
-/* HERO – דף הבית */
+/* כפתור למרחב אישי */
+.personal-btn {
+  background: #1d4ed8;
+  color: #ffffff;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-weight: 600;
+  transition: 0.2s;
+  display: inline-block;
+}
+
+.personal-btn:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+}
+
+/* ========== כפתור המבורגר למובייל ========== */
+
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  background: rgba(15, 23, 42, 0.9);
+  cursor: pointer;
+}
+
+.nav-toggle span {
+  width: 18px;
+  height: 2px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+/* מצב פתוח – X */
+.nav-toggle.open span:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+.nav-toggle.open span:nth-child(2) {
+  opacity: 0;
+}
+.nav-toggle.open span:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+/* ========== כפתור מצב כהה/בהיר ========== */
+
+.theme-toggle-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.theme-toggle-btn:hover {
+  background: rgba(255,255,255,0.15);
+  border-color: rgba(255,255,255,0.45);
+}
+
+.theme-toggle-btn .theme-icon {
+  font-size: 1.3rem;
+  transition: transform 0.35s ease, opacity 0.35s ease;
+}
+
+/* ========== HERO ========== */
 
 .hero {
   position: relative;
@@ -240,7 +319,7 @@ button:focus-visible {
   margin-bottom: 8px;
 }
 
-/* SECTIONS GENERIC */
+/* ========== SECTIONS GENERIC ========== */
 
 section {
   padding: 40px 0;
@@ -269,7 +348,7 @@ section {
   opacity: 0.8;
 }
 
-/* HOME NEWS + EXAMS */
+/* ========== HOME NEWS + EXAMS ========== */
 
 .home-grid {
   display: grid;
@@ -296,7 +375,7 @@ section {
   font-size: 0.9rem;
 }
 
-/* --- כרטיס חדשות אחד – שכל חדשות תיראה מופרדת --- */
+/* כרטיס חדשות אחד */
 .home-news-item {
   background: rgba(255, 255, 255, 0.03);
   border-radius: 12px;
@@ -306,7 +385,6 @@ section {
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
 }
 
-/* חדשות עם תמונה (אם משתמשים בזה) */
 .home-news-item-with-image {
   display: flex;
   align-items: flex-start;
@@ -328,7 +406,6 @@ section {
   gap: 4px;
 }
 
-/* כותרת, מטה, גוף – גם ל-news וגם ל-classes של app.js */
 .home-news-title,
 .home-item-title {
   font-size: 1rem;
@@ -350,7 +427,7 @@ section {
   color: #d9e8ff;
   font-size: 0.9rem;
   line-height: 1.4;
-  white-space: pre-line; /* אם תעשה אנטרים בטקסט – זה יישמר */
+  white-space: pre-line;
 }
 
 /* מבחנים */
@@ -379,7 +456,7 @@ section {
   opacity: 0.7;
 }
 
-/* GRADES BUTTONS */
+/* ========== GRADES BUTTONS ========== */
 
 .grades-buttons {
   display: flex;
@@ -400,7 +477,7 @@ section {
   cursor: pointer;
 }
 
-/* ABOUT */
+/* ========== ABOUT ========== */
 
 .about-grid {
   display: grid;
@@ -440,7 +517,7 @@ section {
   margin-top: 4px;
 }
 
-/* CONTACT */
+/* ========== CONTACT ========== */
 
 .contact-grid {
   display: grid;
@@ -466,7 +543,7 @@ section {
   opacity: 0.9;
 }
 
-/* FOOTER */
+/* ========== FOOTER ========== */
 
 footer {
   padding: 18px 0 24px;
@@ -476,7 +553,7 @@ footer {
   margin-top: 16px;
 }
 
-/* מרחק גלילה לעוגנים (שהכותרת לא תסתיר) */
+/* מרחק גלילה לעוגנים */
 #about,
 #home-news,
 #home-exams,
@@ -485,7 +562,7 @@ footer {
   scroll-margin-top: 120px;
 }
 
-/* ===== דפי שכבות (ז / ח' / ט') ===== */
+/* ========== דפי שכבות (ז / ח / ט) ========== */
 
 .grade-hero {
   background: linear-gradient(135deg, #0b1324, #020816);
@@ -514,8 +591,6 @@ footer {
   flex-direction: column;
   gap: 12px;
 }
-
-/* נשתמש באותם כרטיסים של חדשות/מבחנים גם בדפי השכבה */
 
 /* לוח מודעות בדפי שכבה */
 .board-grid {
@@ -546,7 +621,7 @@ footer {
   z-index: 30;
 }
 
-/* ===== BOARD / לוח מודעות ===== */
+/* ========== BOARD / לוח מודעות ========== */
 
 .home-board-list,
 .board-grid {
@@ -555,7 +630,6 @@ footer {
   gap: 10px;
 }
 
-/* כל מודעה ככרטיס נפרד */
 .board-item {
   background: rgba(0, 0, 0, 0.35);
   border-radius: 14px;
@@ -565,13 +639,11 @@ footer {
   font-size: 0.9rem;
 }
 
-/* כותרת המודעה */
 .board-item-title {
   font-weight: 700;
   margin-bottom: 4px;
 }
 
-/* מטה – תאריך / קהל יעד */
 .board-item-meta {
   font-size: 0.8rem;
   opacity: 0.85;
@@ -579,14 +651,13 @@ footer {
   color: #9cd2ff;
 }
 
-/* טקסט גוף המודעה */
 .board-item-body {
   font-size: 0.9rem;
   line-height: 1.4;
-  white-space: pre-line; /* שומר אנטרים שהקלדת באדמין */
+  white-space: pre-line;
 }
 
-/* ===== ADMIN PANEL (בסיס) ===== */
+/* ========== ADMIN PANEL (בסיס) ========== */
 
 #auth-status {
   text-align: center;
@@ -622,7 +693,7 @@ footer {
   color: #e3f2fd;
 }
 
-/* לייאאאאאאוט של פאנל אדמין */
+/* לייאאאוט של פאנל אדמין */
 
 .admin-layout {
   margin-top: 30px;
@@ -662,7 +733,7 @@ footer {
   font-size: 0.85rem;
 }
 
-/* פריטים שמוצגים מה־JS באדמין (חדשות/מבחנים/מודעות) */
+/* פריטים מה־JS באדמין */
 
 .admin-item {
   background: rgba(0, 0, 0, 0.55);
@@ -739,24 +810,7 @@ footer {
   margin-bottom: 10px;
 }
 
-/* כרטיסים של תכני אתר (אודות, טלפון וכו') */
-
-.content-edit-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 16px;
-  margin-top: 16px;
-}
-
-.content-edit-card {
-  background: rgba(0, 0, 0, 0.45);
-  border-radius: 16px;
-  padding: 14px 16px;
-  border: 1px solid rgba(129, 212, 250, 0.25);
-  font-size: 0.9rem;
-}
-
-/* RESPONSIVE */
+/* ========== RESPONSIVE – מובייל ========== */
 
 @media (max-width: 768px) {
   .hero-content {
@@ -778,72 +832,11 @@ footer {
     grid-template-columns: 1fr;
   }
 
-  .nav-right {
-    display: none; /* אחר כך אפשר לעשות תפריט מובייל */
-  }
-
   .grade-hero {
     text-align: center;
   }
-.personal-btn {
-  background: #1d4ed8;      /* כחול */
-  color: #ffffff;           /* לבן */
-  padding: 8px 14px;
-  border-radius: 999px;
-  font-weight: 600;
-  transition: 0.2s;
-  display: inline-block;
-}
 
-.personal-btn:hover {
-  background: #2563eb;      /* כחול בהיר */
-  transform: translateY(-2px);
-}
-/* ===== תפריט מובייל ===== */
-
-.nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-/* כפתור המבורגר – דסקטופ: מוסתר */
-.nav-toggle {
-  display: none;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 4px;
-  width: 40px;
-  height: 40px;
-  border-radius: 999px;
-  border: 1px solid rgba(148, 163, 184, 0.7);
-  background: rgba(15, 23, 42, 0.9);
-  cursor: pointer;
-}
-
-.nav-toggle span {
-  width: 18px;
-  height: 2px;
-  border-radius: 999px;
-  background: #e5e7eb;
-  transition: transform 0.2s ease, opacity 0.2s ease;
-}
-
-/* מצב פתוח – אנימציה להמבורגר */
-.nav-toggle.open span:nth-child(1) {
-  transform: translateY(6px) rotate(45deg);
-}
-.nav-toggle.open span:nth-child(2) {
-  opacity: 0;
-}
-.nav-toggle.open span:nth-child(3) {
-  transform: translateY(-6px) rotate(-45deg);
-}
-
-/* מובייל */
-@media (max-width: 768px) {
+  /* תפריט מובייל – נכנס משמאל */
   .nav {
     position: relative;
   }
@@ -851,17 +844,17 @@ footer {
   .nav-right {
     position: fixed;
     top: 0;
-    left: 0;              /* במקום right: 0 */
+    left: 0;
     bottom: 0;
     width: 75%;
     max-width: 280px;
     background: #020617;
-    box-shadow: 12px 0 30px rgba(15, 23, 42, 0.9); /* צל בצד ימין עכשיו */
+    box-shadow: 12px 0 30px rgba(15, 23, 42, 0.9);
     padding: 80px 20px 24px;
     display: flex;
     flex-direction: column;
     gap: 12px;
-    transform: translateX(-100%);   /* מוסתר שמאלה */
+    transform: translateX(-100%);
     opacity: 0;
     pointer-events: none;
     transition: transform 0.25s ease, opacity 0.25s ease;
@@ -873,9 +866,8 @@ footer {
     padding: 8px 0;
   }
 
-  
   .nav-right.open {
-    transform: translateX(0);       /* נכנס משמאל */
+    transform: translateX(0);
     opacity: 1;
     pointer-events: auto;
   }
@@ -888,57 +880,133 @@ footer {
   body.nav-open {
     overflow: hidden;
   }
-}/* כפתור מצב כהה/בהיר */
-.theme-toggle-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.25);
-  background: rgba(255,255,255,0.08);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
-.theme-toggle-btn:hover {
-  background: rgba(255,255,255,0.15);
-  border-color: rgba(255,255,255,0.45);
-}
+/* ========== LIGHT MODE – מצב בהיר ========== */
 
-.theme-toggle-btn .theme-icon {
-  font-size: 1.3rem;
-  transition: transform 0.35s ease, opacity 0.35s ease;
-}
-
-/* אנימציית פייד למצב בהיר/כהה */
-body.theme-fade {
-  animation: themeFade 0.35s ease;
-}
-
-@keyframes themeFade {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-/* מצב בהיר – כל האתר */
 body.light-mode {
   background: #f7f9fc;
   color: #0a0a0a;
 }
 
-body.light-mode header,
-body.light-mode section,
-body.light-mode footer {
-  background-color: #ffffff !important;
-  color: #0a0a0a !important;
+/* header / footer / hero / sections */
+
+body.light-mode .header-main {
+  background: #ffffff;
+  box-shadow: 0 1px 6px rgba(15, 23, 42, 0.08);
 }
+
+body.light-mode footer {
+  background: #ffffff;
+  color: #111827;
+  border-top: 1px solid #e5e7eb;
+}
+
+body.light-mode .hero {
+  background: radial-gradient(circle at top, #e0f2ff, #ffffff 55%);
+  color: #0b1120;
+}
+
+body.light-mode .hero-overlay {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent 40%, #f3f4f6 90%);
+}
+
+body.light-mode .section-light {
+  background: #f5f7fb;
+}
+
+body.light-mode .section-dark-strong {
+  background: #e4edf8;
+}
+
+/* כרטיסים / בורדרים בלייט */
+
+body.light-mode .grade-card,
+body.light-mode .about-image-card,
+body.light-mode .contact-box,
+body.light-mode .card,
+body.light-mode .content-edit-card {
+  background: #ffffff;
+  border-color: #d0e2ff;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+}
+
+body.light-mode .home-news-item {
+  background: #ffffff;
+  border-color: #c7d2fe;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+}
+
+body.light-mode .board-item {
+  background: #ffffff;
+  border-color: #bfdbfe;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+}
+
+/* טקסטים לחדשות / מודעות בלייט */
+
+body.light-mode .home-news-title,
+body.light-mode .home-item-title {
+  color: #0b1120;
+}
+
+body.light-mode .home-news-body,
+body.light-mode .home-item-body {
+  color: #111827;
+}
+
+body.light-mode .home-news-meta,
+body.light-mode .home-item-meta,
+body.light-mode .board-item-meta {
+  color: #2563eb;
+}
+
+/* כפתורי ניווט בלייט */
+
+body.light-mode .nav-right a:hover {
+  background: rgba(59, 130, 246, 0.10);
+}
+
+body.light-mode .grade-btn {
+  background: #ffffff;
+  color: #111827;
+  border-color: #bfdbfe;
+}
+
+body.light-mode .grade-btn:hover {
+  background: #eff6ff;
+}
+
+/* כפתור מצב כהה/בהיר בלייט */
 
 body.light-mode .theme-toggle-btn {
-  background: rgba(0,0,0,0.05);
-  border-color: rgba(0,0,0,0.2);
-}
+  background: rgba(0,0,0,0.04);
+  border-color: rgba(0,0,0,0.16);
 }
 
+/* ADMIN בלייט */
 
+body.light-mode #login-section {
+  background: #ffffff;
+  border-color: #d1d5db;
+}
+
+body.light-mode #login-section input {
+  background: #f9fafb;
+  color: #111827;
+  border-color: #cbd5f5;
+}
+
+body.light-mode .admin-item {
+  background: #f9fafb;
+  border-radius: 10px;
+}
+
+/* תפריט מובייל בלייט */
+
+@media (max-width: 768px) {
+  body.light-mode .nav-right {
+    background: #ffffff;
+    box-shadow: 12px 0 30px rgba(15, 23, 42, 0.18);
+  }
+}

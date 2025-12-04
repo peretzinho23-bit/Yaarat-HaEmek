@@ -11,10 +11,12 @@
   <meta name="keywords" content="יערת העמק, בית ספר יערת העמק, מגדל העמק, חטיבת ביניים, חטיבת הביניים יערת העמק, שכבת ז, שכבת ח, שכבת ט, לוח מבחנים, חדשות בית ספר, לוח מודעות" />
   <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1" />
   <meta http-equiv="Content-Language" content="he" />
-<meta property="og:image" content="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png" />
-<meta name="twitter:image" content="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png" />
 
-  <!-- אימות לגוגל (לא חובה אבל עוזר; אם תקבל ערך אחר מ-GSC תחליף את ה-content) -->
+  <!-- תמונה לתצוגה בגוגל / שיתוף -->
+  <meta property="og:image" content="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png" />
+  <meta name="twitter:image" content="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png" />
+
+  <!-- אימות לגוגל -->
   <meta name="google-site-verification" content="014e0d8fdc8f329c" />
 
   <!-- כתובת קנונית -->
@@ -35,7 +37,7 @@
   <meta name="twitter:description" content="כל המידע על יערת העמק במקום אחד: חדשות, מבחנים, לוח מודעות, שכבות ז'-ט' ועוד." />
   <meta name="twitter:image" content="https://yaarat.vercel.app/logo.png" />
 
-  <!-- צבע לדפדפנים -->
+  <!-- צבע לדפדפנים (דארק כברירת מחדל) -->
   <meta name="theme-color" content="#0b1120" />
 
   <link rel="icon" href="logo.png" />
@@ -98,10 +100,14 @@
         <a href="#contact">יצירת קשר</a>
         <a href="https://my.edu.gov.il/home" class="personal-btn">למרחב האישי</a>
         <a href="admin.html" class="btn-outline">Admin</a>
-<button id="theme-toggle" class="theme-toggle-btn">
-  <span class="theme-icon">🌙</span>
-</button>
 
+        <!-- כפתור מצב כהה/בהיר – נקי, רק אייקון -->
+        <button id="theme-toggle"
+                class="theme-toggle-btn"
+                type="button"
+                aria-label="החלפת מצב תצוגה">
+          <span class="theme-icon" aria-hidden="true">🌙</span>
+        </button>
       </div>
     </nav>
   </div>
@@ -377,72 +383,54 @@
     const navToggle = document.querySelector(".nav-toggle");
     const navRight = document.querySelector(".nav-right");
 
-    if (!navToggle || !navRight) return;
-
-    navToggle.addEventListener("click", function () {
-      const isOpen = navRight.classList.toggle("open");
-      navToggle.classList.toggle("open", isOpen);
-      navToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
-      document.body.classList.toggle("nav-open", isOpen);
-    });
-
-    // סגירה אוטומטית כשבוחרים קישור
-    navRight.querySelectorAll("a").forEach(function (link) {
-      link.addEventListener("click", function () {
-        navRight.classList.remove("open");
-        navToggle.classList.remove("open");
-        navToggle.setAttribute("aria-expanded", "false");
-        document.body.classList.remove("nav-open");
+    if (navToggle && navRight) {
+      navToggle.addEventListener("click", function () {
+        const isOpen = navRight.classList.toggle("open");
+        navToggle.classList.toggle("open", isOpen);
+        navToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+        document.body.classList.toggle("nav-open", isOpen);
       });
-    
-    });
-    
+
+      // סגירה אוטומטית כשבוחרים קישור
+      navRight.querySelectorAll("a").forEach(function (link) {
+        link.addEventListener("click", function () {
+          navRight.classList.remove("open");
+          navToggle.classList.remove("open");
+          navToggle.setAttribute("aria-expanded", "false");
+          document.body.classList.remove("nav-open");
+        });
+      });
+    }
+
+    // --- מצב כהה/בהיר ---
+    const themeBtn = document.getElementById("theme-toggle");
+    const themeIcon = themeBtn ? themeBtn.querySelector(".theme-icon") : null;
+
+    if (themeBtn && themeIcon) {
+      // ברירת מחדל – דארק, אבל אם שמור לייט או שהמערכת לייט – נעבור ללייט
+      const savedTheme = localStorage.getItem("theme");
+      const prefersLight = window.matchMedia &&
+        window.matchMedia("(prefers-color-scheme: light)").matches;
+
+      if (savedTheme === "light" || (!savedTheme && prefersLight)) {
+        document.body.classList.add("light-mode");
+        themeIcon.textContent = "☀️";
+      } else {
+        themeIcon.textContent = "🌙";
+      }
+
+      themeBtn.addEventListener("click", () => {
+        const nowLight = document.body.classList.toggle("light-mode");
+        if (nowLight) {
+          localStorage.setItem("theme", "light");
+          themeIcon.textContent = "☀️";
+        } else {
+          localStorage.setItem("theme", "dark");
+          themeIcon.textContent = "🌙";
+        }
+      });
+    }
   });
-  
 </script>
 </body>
 </html>
-<script>
-  const themeBtn = document.getElementById("theme-toggle");
-  const icon = themeBtn.querySelector(".theme-icon");
-
-  // טעינה ראשונית
-  if (localStorage.getItem("theme") === "light") {
-    document.body.classList.add("light-mode");
-    icon.textContent = "☀️";
-  }
-
-  themeBtn.addEventListener("click", () => {
-    document.body.classList.add("theme-fade");
-
-    const isLight = document.body.classList.toggle("light-mode");
-
-    if (isLight) {
-      icon.style.transform = "rotate(180deg)";
-      icon.style.opacity = "0";
-
-      setTimeout(() => {
-        icon.textContent = "☀️";
-        icon.style.opacity = "1";
-        icon.style.transform = "rotate(0deg)";
-      }, 200);
-
-      localStorage.setItem("theme", "light");
-    } else {
-      icon.style.transform = "rotate(180deg)";
-      icon.style.opacity = "0";
-
-      setTimeout(() => {
-        icon.textContent = "🌙";
-        icon.style.opacity = "1";
-        icon.style.transform = "rotate(0deg)";
-      }, 200);
-
-      localStorage.setItem("theme", "dark");
-    }
-
-    setTimeout(() => {
-      document.body.classList.remove("theme-fade");
-    }, 350);
-  });
-</script>
