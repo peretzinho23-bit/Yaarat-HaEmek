@@ -1107,3 +1107,36 @@ body.theme-light .nav-right {
   background: #ffffff;
   box-shadow: 12px 0 30px rgba(148, 163, 184, 0.6);
 }
+.theme-toggle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(148, 163, 184, 0.55);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  margin-right: 6px;
+  font-size: 1.6rem;
+  line-height: 1;
+  color: #e5e7eb;
+  transition: background-color 0.25s ease, border-color 0.25s ease, transform 0.15s ease;
+}
+
+.theme-toggle:hover {
+  background: rgba(148, 163, 184, 0.15);
+  border-color: rgba(148, 163, 184, 0.9);
+  transform: translateY(-1px);
+}
+
+body.light-mode .theme-toggle {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
+.theme-toggle .theme-icon {
+  font-size: 1.7rem;
+}
