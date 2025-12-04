@@ -1140,3 +1140,46 @@ body.light-mode .theme-toggle {
 .theme-toggle .theme-icon {
   font-size: 1.7rem;
 }
+/* ===== לוח מודעות – תמונות רספונסיביות ===== */
+
+/* הכרטיס עצמו */
+.board-item {
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 14px;
+  padding: 12px 14px;
+  border: 1px solid rgba(129, 212, 250, 0.4);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+  font-size: 0.9rem;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* עטיפה של התמונה בלוח מודעות */
+.board-item-image {
+  margin-top: 10px;
+  border-radius: 12px;
+  overflow: hidden;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+/* התמונה עצמה – שלא תתפוצץ */
+.board-item-image img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* למובייל – קצת פחות מרווחים */
+@media (max-width: 768px) {
+  .board-item {
+    padding: 10px 10px;
+    border-radius: 12px;
+  }
+
+  .board-item-image {
+    margin-top: 8px;
+  }
+}
