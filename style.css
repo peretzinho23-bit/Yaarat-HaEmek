@@ -138,10 +138,12 @@ button:focus-visible {
 
 .nav-right {
   display: flex;
+  flex-direction: row-reverse; /* הופך את הסדר – הפריטים ה"חשובים" בצד ימין */
   gap: 10px;
   font-size: 0.9rem;
   align-items: center;
 }
+
 
 .nav-right a {
   padding: 6px 10px;
