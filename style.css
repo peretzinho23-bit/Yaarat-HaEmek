@@ -983,6 +983,17 @@ body.light-mode .theme-toggle-btn {
   border-color: rgba(15,23,42,0.25);
 }
 
+/* כפתורי outline (Admin, מבחנים קרובים) בלייט – שיהיו ברורים ולא שקופים */
+body.light-mode .btn-outline {
+  background: rgba(255, 255, 255, 0.95);
+  color: #1d4ed8;
+  border-color: #93c5fd;
+}
+
+body.light-mode .btn-outline:hover {
+  background: #e0edff;
+}
+
 /* ADMIN בלייט */
 
 body.light-mode #login-section {
