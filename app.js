@@ -7,8 +7,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
 const GRADES = ["z", "h", "t"];
-// בדפי שכבות ה־body מקבל data-grade="z" / "h" / "t"
-const currentGrade = document.body?.dataset?.grade || null;
+const currentGrade = document.body?.dataset?.grade || null; // "z" | "h" | "t" או null בדף הבית
 
 function escapeHtml(str) {
   return String(str || "")
@@ -17,20 +16,65 @@ function escapeHtml(str) {
     .replace(/>/g, "&gt;");
 }
 
+/* ------------ מצב כהה / מצב בהיר ------------ */
+
+const THEME_KEY = "yaarat-theme";
+
+function applyTheme(theme) {
+  const root = document.documentElement;
+  const body = document.body;
+  const btn = document.getElementById("theme-toggle");
+
+  // נעדכן data-theme על <html>
+  root.setAttribute("data-theme", theme);
+
+  // למקרה שיש לך סטיילים ישנים עם קלאסים:
+  body.classList.toggle("theme-dark", theme === "dark");
+  body.classList.toggle("theme-light", theme === "light");
+
+  // עדכון האייקון והטקסט בכפתור
+  if (btn) {
+    if (theme === "dark") {
+      btn.textContent = "🌙";
+      btn.title = "מצב כהה (לחץ למצב בהיר)";
+    } else {
+      btn.textContent = "☀️";
+      btn.title = "מצב בהיר (לחץ למצב כהה)";
+    }
+  }
+}
+
+function initTheme() {
+  // ערך ברירת מחדל – כהה
+  const savedTheme = localStorage.getItem(THEME_KEY);
+  const initialTheme = savedTheme === "light" || savedTheme === "dark" ? savedTheme : "dark";
+
+  applyTheme(initialTheme);
+
+  const btn = document.getElementById("theme-toggle");
+  if (!btn) return;
+
+  btn.addEventListener("click", () => {
+    const current = document.documentElement.getAttribute("data-theme") || "dark";
+    const next = current === "dark" ? "light" : "dark";
+    applyTheme(next);
+    localStorage.setItem(THEME_KEY, next);
+  });
+}
+
 /* ------------ חדשות בדף הבית (Realtime) ------------ */
 
 function subscribeHomeNews() {
-  // אם אין את הקופסאות של הבית – לא לעשות כלום
   if (!document.getElementById("home-news-z")) return;
 
   for (const g of GRADES) {
     const box = document.getElementById(`home-news-${g}`);
     if (!box) continue;
 
-    const ref = doc(db, "news", g);
+    const refDoc = doc(db, "news", g);
 
     onSnapshot(
-      ref,
+      refDoc,
       (snap) => {
         const data = snap.exists() ? snap.data() : { items: [] };
         const items = data.items || [];
@@ -40,8 +84,7 @@ function subscribeHomeNews() {
           return;
         }
 
-        // רק 3 חדשות אחרונות לדף הבית
-        const latest = items.slice(-1).reverse();
+        const latest = items.slice(-3).reverse();
 
         box.innerHTML = latest
           .map((n) => {
@@ -53,14 +96,12 @@ function subscribeHomeNews() {
               ? ` style="color:${escapeHtml(n.color)}"`
               : "";
 
-            // יש תמונה – כרטיס עם תמונה בצד
+            // עם תמונה
             if (img) {
               return `
                 <div class="home-news-item home-news-item-with-image">
                   <div class="home-news-image-wrap">
-                    <img src="${escapeHtml(
-                      img
-                    )}" alt="תמונה לחדשות" loading="lazy">
+                    <img src="${escapeHtml(img)}" alt="תמונה לחדשות" loading="lazy">
                   </div>
                   <div class="home-news-text"${colorStyle}>
                     <div class="home-news-title">${title}</div>
@@ -75,7 +116,7 @@ function subscribeHomeNews() {
               `;
             }
 
-            // בלי תמונה – כרטיס רגיל
+            // בלי תמונה
             return `
               <div class="home-news-item"${colorStyle}>
                 <div class="home-news-title">${title}</div>
@@ -107,10 +148,10 @@ function subscribeHomeExams() {
     const box = document.getElementById(`home-exams-${g}`);
     if (!box) continue;
 
-    const ref = doc(db, "exams", g);
+    const refDoc = doc(db, "exams", g);
 
     onSnapshot(
-      ref,
+      refDoc,
       (snap) => {
         const data = snap.exists() ? snap.data() : { items: [] };
         const items = data.items || [];
@@ -120,7 +161,7 @@ function subscribeHomeExams() {
           return;
         }
 
-        const latest = items.slice(-1).reverse();
+        const latest = items.slice(-5).reverse();
 
         box.innerHTML = latest
           .map((ex) => {
@@ -155,10 +196,10 @@ function subscribeGradeNews() {
   const box = document.getElementById("grade-news");
   if (!box) return;
 
-  const ref = doc(db, "news", currentGrade);
+  const refDoc = doc(db, "news", currentGrade);
 
   onSnapshot(
-    ref,
+    refDoc,
     (snap) => {
       const data = snap.exists() ? snap.data() : { items: [] };
       const items = data.items || [];
@@ -184,9 +225,7 @@ function subscribeGradeNews() {
             return `
               <div class="home-news-item home-news-item-with-image">
                 <div class="home-news-image-wrap">
-                  <img src="${escapeHtml(
-                    img
-                  )}" alt="תמונה לחדשות" loading="lazy">
+                  <img src="${escapeHtml(img)}" alt="תמונה לחדשות" loading="lazy">
                 </div>
                 <div class="home-news-text"${colorStyle}>
                   <div class="home-news-title">${title}</div>
@@ -229,10 +268,10 @@ function subscribeGradeExams() {
   const box = document.getElementById("grade-exams");
   if (!box) return;
 
-  const ref = doc(db, "exams", currentGrade);
+  const refDoc = doc(db, "exams", currentGrade);
 
   onSnapshot(
-    ref,
+    refDoc,
     (snap) => {
       const data = snap.exists() ? snap.data() : { items: [] };
       const items = data.items || [];
@@ -277,10 +316,10 @@ function subscribeBoard() {
 
   if (!homeBoard && !gradeBoard) return;
 
-  const ref = doc(db, "board", "general");
+  const refDoc = doc(db, "board", "general");
 
   onSnapshot(
-    ref,
+    refDoc,
     (snap) => {
       const data = snap.exists() ? snap.data() : { items: [] };
       const items = data.items || [];
@@ -337,10 +376,10 @@ function renderBoardList(container, items) {
 /* ------------ תוכן כללי: אודות, יצירת קשר, תיאור שכבות – Realtime ------------ */
 
 function subscribeSiteContent() {
-  const ref = doc(db, "siteContent", "main");
+  const refDoc = doc(db, "siteContent", "main");
 
   onSnapshot(
-    ref,
+    refDoc,
     (snap) => {
       if (!snap.exists()) return;
       const data = snap.data() || {};
@@ -489,7 +528,6 @@ function setupMobileNav() {
     document.body.classList.toggle("nav-open", isOpen);
   });
 
-  // סגירה אוטומטית כשבוחרים קישור
   navRight.querySelectorAll("a").forEach((link) => {
     link.addEventListener("click", () => {
       navRight.classList.remove("open");
@@ -503,6 +541,9 @@ function setupMobileNav() {
 /* ------------ INIT ------------ */
 
 document.addEventListener("DOMContentLoaded", () => {
+  // מצב כהה/בהיר (רלוונטי לכל הדפים)
+  initTheme();
+
   // טקסטים כלליים (Hero, אודות, יצירת קשר, פוטר)
   subscribeSiteContent();
 
