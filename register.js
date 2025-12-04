@@ -22,13 +22,15 @@ document.addEventListener("DOMContentLoaded", () => {
     statusEl.style.color = "#e5e7eb";
 
     const fullName = form.fullName.value.trim();
-    const email = form.email.value.trim();
-    const role = form.role.value.trim();
-    const reason = form.reason.value.trim();
-    const message = form.message.value.trim();
+    const email    = form.email.value.trim();
+    const role     = form.role.value.trim();
+    const reason   = form.reason.value.trim();
+    const message  = form.message.value.trim();
+    const password = form.password.value.trim(); // << סיסמה / קוד
 
-    if (!fullName || !email || !role || !reason) {
-      statusEl.textContent = "יש למלא את כל השדות החובה.";
+    // בדיקת חובה
+    if (!fullName || !email || !role || !reason || !password) {
+      statusEl.textContent = "יש למלא את כל שדות החובה (כולל סיסמה).";
       statusEl.style.color = "#fecaca";
       return;
     }
@@ -37,10 +39,10 @@ document.addEventListener("DOMContentLoaded", () => {
       await addDoc(collection(db, "adminRequests"), {
         fullName,
         email,
-        password,
         role,
         reason,
         message,
+        password,            // << נשמר במסמך
         createdAt: serverTimestamp(),
         handled: false
       });
