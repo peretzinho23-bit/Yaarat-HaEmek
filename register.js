@@ -37,6 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
       await addDoc(collection(db, "adminRequests"), {
         fullName,
         email,
+        password,
         role,
         reason,
         message,
