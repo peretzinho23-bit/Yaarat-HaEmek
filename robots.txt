@@ -1,3 +1,4 @@
 User-agent: *
 Allow: /
-Sitemap: https://yaarat.vercel.app/sitemap.xml
+
+Sitemap: https://yaarathaemek.online/sitemap.xml
