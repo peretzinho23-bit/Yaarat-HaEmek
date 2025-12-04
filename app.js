@@ -7,7 +7,8 @@ import {
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
 const GRADES = ["z", "h", "t"];
-const currentGrade = document.body?.dataset?.grade || null; // "z" | "h" | "t" או null בדף הבית
+// בדפי שכבות ה־body מקבל data-grade="z" / "h" / "t"
+const currentGrade = document.body?.dataset?.grade || null;
 
 function escapeHtml(str) {
   return String(str || "")
@@ -19,7 +20,7 @@ function escapeHtml(str) {
 /* ------------ חדשות בדף הבית (Realtime) ------------ */
 
 function subscribeHomeNews() {
-  // אם אנחנו לא בדף הבית – אין אלמנטים האלה, אז לא לעשות כלום
+  // אם אין את הקופסאות של הבית – לא לעשות כלום
   if (!document.getElementById("home-news-z")) return;
 
   for (const g of GRADES) {
@@ -39,6 +40,7 @@ function subscribeHomeNews() {
           return;
         }
 
+        // רק 3 חדשות אחרונות לדף הבית
         const latest = items.slice(-3).reverse();
 
         box.innerHTML = latest
@@ -51,16 +53,22 @@ function subscribeHomeNews() {
               ? ` style="color:${escapeHtml(n.color)}"`
               : "";
 
-            // אם יש תמונה – כרטיס עם תמונה בצד
+            // יש תמונה – כרטיס עם תמונה בצד
             if (img) {
               return `
                 <div class="home-news-item home-news-item-with-image">
                   <div class="home-news-image-wrap">
-                    <img src="${escapeHtml(img)}" alt="תמונה לחדשות" loading="lazy">
+                    <img src="${escapeHtml(
+                      img
+                    )}" alt="תמונה לחדשות" loading="lazy">
                   </div>
                   <div class="home-news-text"${colorStyle}>
                     <div class="home-news-title">${title}</div>
-                    ${meta ? `<div class="home-news-meta">${meta}</div>` : ""}
+                    ${
+                      meta
+                        ? `<div class="home-news-meta">${meta}</div>`
+                        : ""
+                    }
                     <div class="home-news-body">${body}</div>
                   </div>
                 </div>
@@ -71,7 +79,11 @@ function subscribeHomeNews() {
             return `
               <div class="home-news-item"${colorStyle}>
                 <div class="home-news-title">${title}</div>
-                ${meta ? `<div class="home-news-meta">${meta}</div>` : ""}
+                ${
+                  meta
+                    ? `<div class="home-news-meta">${meta}</div>`
+                    : ""
+                }
                 <div class="home-news-body">${body}</div>
               </div>
             `;
@@ -172,11 +184,17 @@ function subscribeGradeNews() {
             return `
               <div class="home-news-item home-news-item-with-image">
                 <div class="home-news-image-wrap">
-                  <img src="${escapeHtml(img)}" alt="תמונה לחדשות" loading="lazy">
+                  <img src="${escapeHtml(
+                    img
+                  )}" alt="תמונה לחדשות" loading="lazy">
                 </div>
                 <div class="home-news-text"${colorStyle}>
                   <div class="home-news-title">${title}</div>
-                  ${meta ? `<div class="home-news-meta">${meta}</div>` : ""}
+                  ${
+                    meta
+                      ? `<div class="home-news-meta">${meta}</div>`
+                      : ""
+                  }
                   <div class="home-news-body">${body}</div>
                 </div>
               </div>
@@ -186,7 +204,11 @@ function subscribeGradeNews() {
           return `
             <div class="home-news-item"${colorStyle}>
               <div class="home-news-title">${title}</div>
-              ${meta ? `<div class="home-news-meta">${meta}</div>` : ""}
+              ${
+                meta
+                  ? `<div class="home-news-meta">${meta}</div>`
+                  : ""
+              }
               <div class="home-news-body">${body}</div>
             </div>
           `;

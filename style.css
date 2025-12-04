@@ -390,6 +390,36 @@ section {
   align-items: flex-start;
   gap: 12px;
 }
+/* כרטיס חדשות עם תמונה */
+.home-news-item-with-image {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+/* העטיפה של התמונה */
+.home-news-image-wrap {
+  width: 100%;
+  max-width: 140px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* התמונה עצמה */
+.home-news-image-wrap img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* טקסט ליד התמונה */
+.home-news-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
 
 .home-news-image-wrap img {
   width: 70px;
