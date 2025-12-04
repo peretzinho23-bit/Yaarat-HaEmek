@@ -42,7 +42,7 @@
 
       <p id="auth-status" class="section-subtitle">בודק התחברות...</p>
 
-             <!-- LOGIN -->
+      <!-- LOGIN -->
       <div id="login-section">
         <div class="section-header">
           <h2 class="section-title">התחברות אדמין</h2>
@@ -69,8 +69,6 @@
         </div>
       </div>
 
-
-
       <!-- ADMIN PANEL -->
       <div id="admin-section" class="admin-layout" style="display:none;">
         <button id="logout-btn" class="btn-outline">התנתקות</button>
@@ -84,7 +82,7 @@
 
         <!-- NEWS -->
         <h3 class="section-title" style="font-size:1.2rem;margin-bottom:10px;">חדשות לפי שכבות</h3>
-        <p class="section-subtitle">ניתן להוסיף קישור לתמונה ולצבע טקסט (אופציונלי).</p>
+        <p class="section-subtitle">ניתן להוסיף קישור לתמונה, להעלות תמונה ולצבע טקסט (אופציונלי).</p>
 
         <div class="admin-columns">
           <!-- NEWS Z -->
@@ -102,6 +100,10 @@
 
                 <label>קישור לתמונה (אופציונלי)</label>
                 <input name="imageUrl" placeholder="https://..." />
+
+                <!-- חדש: העלאת תמונה מקובץ -->
+                <label>תמונה מקובץ (אופציונלי)</label>
+                <input type="file" name="imageFile" accept="image/*" />
 
                 <label>צבע הטקסט (אופציונלי)</label>
                 <input type="color" name="color" value="#ffffff" />
@@ -130,6 +132,10 @@
                 <label>קישור לתמונה (אופציונלי)</label>
                 <input name="imageUrl" placeholder="https://..." />
 
+                <!-- חדש: העלאת תמונה מקובץ -->
+                <label>תמונה מקובץ (אופציונלי)</label>
+                <input type="file" name="imageFile" accept="image/*" />
+
                 <label>צבע הטקסט (אופציונלי)</label>
                 <input type="color" name="color" value="#ffffff" />
 
@@ -156,6 +162,10 @@
 
                 <label>קישור לתמונה (אופציונלי)</label>
                 <input name="imageUrl" placeholder="https://..." />
+
+                <!-- חדש: העלאת תמונה מקובץ -->
+                <label>תמונה מקובץ (אופציונלי)</label>
+                <input type="file" name="imageFile" accept="image/*" />
 
                 <label>צבע הטקסט (אופציונלי)</label>
                 <input type="color" name="color" value="#ffffff" />

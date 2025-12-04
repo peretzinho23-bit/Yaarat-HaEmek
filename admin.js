@@ -1,6 +1,6 @@
 // admin.js – לוח ניהול יערת העמק
 
-import { auth, db } from "./firebase-config.js";
+import { auth, db, storage } from "./firebase-config.js";
 import {
   signInWithEmailAndPassword,
   onAuthStateChanged,
@@ -11,6 +11,11 @@ import {
   getDoc,
   setDoc
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL
+} from "https://www.gstatic.com/firebasejs/11.0.0/firebase-storage.js";
 
 const GRADES = ["z", "h", "t"];
 
@@ -163,24 +168,44 @@ function setupNewsForms() {
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
+
       const title = form.title.value.trim();
       const meta = form.meta.value.trim();
       const body = form.body.value.trim();
-      const imageUrl = (form.imageUrl && form.imageUrl.value.trim()) || "";
+      const manualImageUrl = (form.imageUrl && form.imageUrl.value.trim()) || "";
       const color =
         (form.color && form.color.value && form.color.value.trim()) ||
         "#ffffff";
+      const fileInput = form.imageFile;
+      const file = fileInput && fileInput.files && fileInput.files[0];
 
       if (!title || !body) {
         alert("חובה למלא לפחות כותרת ותוכן.");
         return;
       }
 
-      newsData[g].push({ title, meta, body, imageUrl, color });
-      form.reset();
-      renderNewsAdmin();
-      await saveNewsGrade(g);
-      alert("הידיעה נשמרה.");
+      try {
+        let finalImageUrl = manualImageUrl;
+
+        // אם יש קובץ – מעלים אותו ל-Firebase Storage
+        if (file) {
+          const filePath = `news/${g}/${Date.now()}_${file.name}`;
+          const storageRef = ref(storage, filePath);
+          await uploadBytes(storageRef, file);
+          finalImageUrl = await getDownloadURL(storageRef);
+        }
+
+        newsData[g].push({ title, meta, body, imageUrl: finalImageUrl, color });
+
+        // ניקוי הטופס
+        form.reset();
+        renderNewsAdmin();
+        await saveNewsGrade(g);
+        alert("הידיעה נשמרה.");
+      } catch (err) {
+        console.error("שגיאה בהעלאת תמונה/שמירת חדשות:", err);
+        alert("הייתה שגיאה בשמירת הידיעה. נסה שוב.");
+      }
     });
   }
 }
@@ -412,6 +437,7 @@ function setupSiteContentForm() {
     alert("תוכן האתר נשמר בהצלחה.");
   });
 }
+
 /* ------------ REGISTER REQUESTS (בקשות הרשמת אדמין) ------------ */
 
 function setupRegisterRequestForm() {
@@ -434,7 +460,6 @@ function setupRegisterRequestForm() {
     }
 
     try {
-      // מזהה ייחודי לבקשה (על בסיס הזמן)
       const id = Date.now().toString();
 
       const refDoc = doc(db, "adminRequests", id);
@@ -497,12 +522,10 @@ function setupGradeFilter() {
   const sections = document.querySelectorAll(".admin-grade-section");
 
   if (!buttons.length || !sections.length) {
-    // אם לא הוספת עדיין מחלקות admin-grade-section, פשוט לא נעשה כלום
     return;
   }
 
   function setActiveGrade(grade) {
-    // כפתורים – סימון אקטיבי
     buttons.forEach((btn) => {
       const btnGrade = btn.getAttribute("data-grade") || "all";
       btn.classList.toggle("active", btnGrade === grade);
@@ -511,7 +534,6 @@ function setupGradeFilter() {
       }
     });
 
-    // אזורים – הצגה / הסתרה
     sections.forEach((sec) => {
       const secGrade = sec.getAttribute("data-grade");
       if (grade === "all" || secGrade === grade) {
@@ -522,7 +544,6 @@ function setupGradeFilter() {
     });
   }
 
-  // האזנה ללחיצה על כפתורים
   buttons.forEach((btn) => {
     btn.addEventListener("click", () => {
       const grade = btn.getAttribute("data-grade") || "all";
@@ -530,7 +551,6 @@ function setupGradeFilter() {
     });
   });
 
-  // ברירת מחדל – להציג הכל
   setActiveGrade("all");
 }
 
@@ -543,6 +563,6 @@ document.addEventListener("DOMContentLoaded", () => {
   setupBoardForm();
   setupDeleteHandler();
   setupSiteContentForm();
-  setupGradeFilter();       // סינון לפי שכבות באדמין
-  setupRegisterRequestForm(); // בקשות הרשמת אדמין
+  setupGradeFilter();
+  setupRegisterRequestForm();
 });
