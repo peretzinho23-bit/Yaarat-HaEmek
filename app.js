@@ -41,7 +41,7 @@ function subscribeHomeNews() {
         }
 
         // רק 3 חדשות אחרונות לדף הבית
-        const latest = items.slice(-3).reverse();
+        const latest = items.slice(-1).reverse();
 
         box.innerHTML = latest
           .map((n) => {
