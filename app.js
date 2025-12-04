@@ -120,7 +120,7 @@ function subscribeHomeExams() {
           return;
         }
 
-        const latest = items.slice(-5).reverse();
+        const latest = items.slice(-1).reverse();
 
         box.innerHTML = latest
           .map((ex) => {
