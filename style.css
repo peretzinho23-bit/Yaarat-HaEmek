@@ -223,14 +223,10 @@ button:focus-visible {
   transition: background 0.3s ease, border-color 0.3s ease;
 }
 
-.theme-toggle-btn:hover {
-  background: rgba(255,255,255,0.15);
-  border-color: rgba(255,255,255,0.45);
-}
-
-.theme-toggle-btn .theme-icon {
-  font-size: 1.3rem;
-  transition: transform 0.35s ease, opacity 0.35s ease;
+.theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.45);
+  transform: translateY(-1px);
 }
 
 /* ========== HERO ========== */
@@ -421,6 +417,7 @@ section {
   gap: 4px;
 }
 
+/* גודל התמונה בחדשות קטנות */
 .home-news-image-wrap img {
   width: 70px;
   height: 70px;
@@ -914,7 +911,9 @@ footer {
 
 /* ========== LIGHT MODE – מצב בהיר ========== */
 
-body.light-mode {
+/* גוף בסיסי */
+html[data-theme="light"],
+body.theme-light {
   background: #e5edf7;
   color: #0f172a;
 }
@@ -937,8 +936,14 @@ body.light-mode .hero {
   color: #0f172a;
 }
 
-body.light-mode .hero-overlay {
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent 40%, #f3f4f6 90%);
+html[data-theme="light"] .hero-overlay,
+body.theme-light .hero-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.3),
+    transparent 40%,
+    #f3f4f6 90%
+  );
 }
 
 body.light-mode .section-light {
@@ -956,7 +961,7 @@ body.light-mode .about-image-card,
 body.light-mode .contact-box,
 body.light-mode .card {
   background: #ffffff;
-  border-color: rgba(148,163,184,0.4);
+  border-color: rgba(148, 163, 184, 0.4);
   box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
 }
 
@@ -979,8 +984,10 @@ body.light-mode .home-item-title {
   color: #0b1120;
 }
 
-body.light-mode .home-news-body,
-body.light-mode .home-item-body {
+html[data-theme="light"] .home-news-body,
+html[data-theme="light"] .home-item-body,
+body.theme-light .home-news-body,
+body.theme-light .home-item-body {
   color: #111827;
 }
 
@@ -1002,7 +1009,8 @@ body.light-mode .grade-btn {
   border-color: #bfdbfe;
 }
 
-body.light-mode .grade-btn:hover {
+html[data-theme="light"] .grade-btn:hover,
+body.theme-light .grade-btn:hover {
   background: #eff6ff;
 }
 
@@ -1025,8 +1033,8 @@ body.light-mode .btn-outline:hover {
 }
 
 /* ADMIN בלייט */
-
-body.light-mode #login-section {
+html[data-theme="light"] #login-section,
+body.theme-light #login-section {
   background: #ffffff;
   border-color: #d1d5db;
 }
