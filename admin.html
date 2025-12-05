@@ -402,10 +402,11 @@
 
               <button type="submit" style="margin-top:16px;">שמור תוכן אתר</button>
               <!-- כרטיס: גלריית תמונות -->
+<!-- כרטיס: גלריית תמונות -->
 <div class="card" id="gallery-card">
   <h3>גלריית תמונות</h3>
   <p style="font-size:0.85rem; opacity:0.8; margin-bottom:8px;">
-    הוסף תמונה לגלריה על ידי הדבקת קישור לתמונה (image URL).
+    העלה תמונה מהמחשב, הוסף כותרת ותיאור – והיא תישמר בפיירבייס ותופיע בגלריה.
   </p>
 
   <!-- רשימת תמונות קיימות -->
@@ -418,21 +419,33 @@
   <!-- טופס להוספת תמונה -->
   <form id="gallery-form">
     <label for="galleryTitle">כותרת (לא חובה)</label>
-    <input type="text" id="galleryTitle" name="galleryTitle" placeholder="כותרת לתמונה...">
+    <input
+      type="text"
+      id="galleryTitle"
+      name="galleryTitle"
+      placeholder="כותרת לתמונה...">
 
-    <label for="galleryImageUrl">קישור לתמונה (חובה)</label>
-    <input type="url" id="galleryImageUrl" name="galleryImageUrl" placeholder="https://...">
+    <label for="galleryFile">קובץ תמונה (חובה)</label>
+    <input
+      type="file"
+      id="galleryFile"
+      name="galleryFile"
+      accept="image/*">
 
     <label for="galleryDesc">תיאור (לא חובה)</label>
-    <textarea id="galleryDesc" name="galleryDesc" placeholder="תיאור קצר אם בא לך..."></textarea>
+    <textarea
+      id="galleryDesc"
+      name="galleryDesc"
+      placeholder="תיאור קצר אם בא לך..."></textarea>
 
     <button type="submit" class="btn" style="margin-top:10px;">
-      הוספת תמונה לגלריה
+      העלאת תמונה לגלריה
     </button>
   </form>
 
   <div id="gallery-status" style="margin-top:8px; font-size:0.8rem; opacity:0.9;"></div>
 </div>
+
 
             </form>
           </div>
