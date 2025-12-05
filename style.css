@@ -2377,4 +2377,11 @@ html[data-theme="light"] .header-main > * {
   box-shadow: none !important;
   border-radius: 0 !important;
 }
+/* 🔥 ריסט מלא להדר – מוחק את כל הרקעים / הצללות / רדיוסים */
+.header-main,
+.header-main * {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
 
