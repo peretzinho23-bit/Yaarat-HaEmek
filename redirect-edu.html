@@ -1,114 +1,318 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>מעביר אותך למרחב האישי…</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>מעביר אותך למרחב האישי…</title>
 
-<style>
-  body {
-    margin: 0;
-    padding: 0;
-    background: linear-gradient(135deg, #0b1120, #1e293b);
-    color: #fff;
-    font-family: 'Segoe UI', sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    text-align: center;
-    overflow: hidden;
-  }
+  <style>
+    /* ===== בסיס ===== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-  h1 {
-    font-size: 2rem;
-    margin-bottom: 10px;
-    animation: fadeIn 1.4s ease;
-  }
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #111827, #020617 60%, #000 100%);
+      color: #e5f2ff;
+      overflow: hidden;
+      animation: pageFadeIn 0.8s ease-out;
+    }
 
-  #random-message {
-    font-size: 1.2rem;
-    margin-top: 10px;
-    opacity: 0.9;
-    min-height: 30px;
-    animation: fadeIn 1.4s ease;
-  }
+    @keyframes pageFadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
 
-  /* ספינר */
-  .spinner {
-    margin-top: 35px;
-    width: 70px;
-    height: 70px;
-    border: 6px solid rgba(255,255,255,0.2);
-    border-top-color: #38bdf8;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-  }
+    /* ===== רקע זז יפה ===== */
+    .bg-orbit {
+      position: fixed;
+      inset: -40%;
+      background:
+        radial-gradient(circle at 10% 20%, rgba(56,189,248,0.18), transparent 55%),
+        radial-gradient(circle at 80% 10%, rgba(96,165,250,0.25), transparent 55%),
+        radial-gradient(circle at 10% 90%, rgba(129,230,217,0.18), transparent 55%),
+        radial-gradient(circle at 85% 80%, rgba(248,113,113,0.16), transparent 55%);
+      filter: blur(6px);
+      opacity: 0.9;
+      z-index: -2;
+      animation: bgMove 18s ease-in-out infinite alternate;
+    }
 
-  /* כפתור fallback */
-  #manual-link {
-    margin-top: 25px;
-    display: inline-block;
-    padding: 10px 20px;
-    border-radius: 12px;
-    background: #38bdf8;
-    color: #0b1120;
-    font-weight: bold;
-    text-decoration: none;
-    display: none;
-  }
+    @keyframes bgMove {
+      0%   { transform: translate3d(0,0,0) scale(1); }
+      50%  { transform: translate3d(-20px,10px,0) scale(1.03); }
+      100% { transform: translate3d(10px,-10px,0) scale(1.06); }
+    }
 
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
+    .bg-noise {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='noStitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.16'/%3E%3C/svg%3E");
+      mix-blend-mode: soft-light;
+      z-index: -1;
+      opacity: 0.45;
+      animation: noisePulse 6s ease-in-out infinite alternate;
+    }
 
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-</style>
+    @keyframes noisePulse {
+      from { opacity: 0.28; }
+      to   { opacity: 0.5;  }
+    }
+
+    /* ===== קונטיינר מרכזי (כרטיס) ===== */
+    .card {
+      position: relative;
+      max-width: 520px;
+      width: 90%;
+      padding: 32px 26px 28px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(15,23,42,0.85), rgba(15,23,42,0.97));
+      border: 1px solid rgba(148,163,184,0.5);
+      box-shadow:
+        0 22px 60px rgba(15,23,42,0.95),
+        0 0 0 1px rgba(15,23,42,0.6);
+      text-align: center;
+      backdrop-filter: blur(8px);
+      animation: cardFloat 4s ease-in-out infinite alternate;
+    }
+
+    @keyframes cardFloat {
+      0%   { transform: translateY(0);     box-shadow: 0 22px 60px rgba(15,23,42,0.95); }
+      50%  { transform: translateY(-4px);  box-shadow: 0 28px 70px rgba(15,23,42,0.9);  }
+      100% { transform: translateY(-2px);  box-shadow: 0 24px 64px rgba(15,23,42,0.92); }
+    }
+
+    .badge {
+      position: absolute;
+      top: 16px;
+      left: 18px;
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(15,118,110,0.18);
+      color: #a7f3d0;
+      border: 1px solid rgba(45,212,191,0.4);
+    }
+
+    h1 {
+      font-size: 2.1rem;
+      margin-bottom: 10px;
+      letter-spacing: 0.03em;
+      text-shadow: 0 0 18px rgba(59,130,246,0.55);
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      opacity: 0.88;
+      margin-bottom: 24px;
+    }
+
+    .dynamic-line {
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+      color: #bfdbfe;
+      min-height: 1.4em;
+      transition: opacity 0.25s ease;
+    }
+
+    .countdown {
+      font-size: 0.95rem;
+      color: #9ca3af;
+      margin-bottom: 18px;
+    }
+
+    /* ===== ספינר “רגוע־עצבני” ===== */
+    .spinner-wrap {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 4px;
+    }
+
+    .spinner-orbit {
+      width: 68px;
+      height: 68px;
+      border-radius: 999px;
+      border: 3px solid rgba(15,23,42,0.9);
+      box-shadow: 0 0 0 1px rgba(30,64,175,0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      animation: orbitWobble 1.8s ease-in-out infinite;
+      background: radial-gradient(circle at 30% 20%, rgba(56,189,248,0.35), transparent 60%);
+    }
+
+    @keyframes orbitWobble {
+      0%   { transform: translateY(0) rotate(0deg);   }
+      25%  { transform: translateY(-2px) rotate(3deg); }
+      50%  { transform: translateY(1px) rotate(-3deg); }
+      75%  { transform: translateY(-1px) rotate(2deg); }
+      100% { transform: translateY(0) rotate(0deg);   }
+    }
+
+    .spinner-ring {
+      width: 48px;
+      height: 48px;
+      border-radius: 999px;
+      border: 5px solid transparent;
+      border-top-color: #38bdf8;
+      border-right-color: rgba(129,230,217,0.9);
+      animation: ringSpin 0.9s cubic-bezier(.45,.1,.32,.98) infinite;
+      box-shadow: 0 0 16px rgba(56,189,248,0.8);
+    }
+
+    .spinner-center {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      background: #0f172a;
+      box-shadow: 0 0 10px rgba(15,23,42,0.9);
+    }
+
+    @keyframes ringSpin {
+      0%   { transform: rotate(0deg); }
+      70%  { transform: rotate(300deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* טקסט קטן למקרה של בעיית פופ־אפ */
+    .hint {
+      margin-top: 18px;
+      font-size: 0.8rem;
+      color: #6b7280;
+    }
+
+    .hint a {
+      color: #93c5fd;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    @media (max-width: 480px) {
+      h1 { font-size: 1.7rem; }
+      .card { padding: 26px 18px 22px; }
+    }
+  </style>
 </head>
 <body>
 
-<h1>מעביר אותך למרחב האישי…</h1>
+  <div class="bg-orbit"></div>
+  <div class="bg-noise"></div>
 
-<div id="random-message">טוען…</div>
+  <div class="card">
+    <div class="badge">🔒 חיבור מאובטח · מרחב אישי</div>
 
-<div class="spinner"></div>
+    <h1>מעביר אותך למרחב האישי…</h1>
+    <p class="subtitle">תכף תעבור לאתר משרד החינוך. בינתיים, תראה כאילו המערכת עובדת קשה 😅</p>
 
-<a id="manual-link" href="https://my.edu.gov.il/home" target="_blank">
-  לחצו כאן אם לא נפתח אוטומטית
-</a>
+    <p id="dynamic-line" class="dynamic-line">
+      טוען נתונים סודיים של תלמידים מדהימים…
+    </p>
 
-<script>
-  // משפטים רנדומליים מגניבים
-  const messages = [
-    "מטעין נתונים… מקווה שהמערכת לא נתקעה היום 😅",
-    "בודק אישור כניסה… אל תיבהל מהמסך הלבן 🤫",
-    "מטפל בבירוקרטיה… מישהו חייב לעשות את זה 🤓",
-    "פותח שערים דיגיטליים… לא לשכוח סיסמה! 🔐",
-    "המערכת מתחממת… כמו מורה בתחילת שיעור 😭",
-    "סורק רשתות… מנסה לא ליפול 😬",
-    "בודק קבצים… לא נוגע בכלום, נשבע 🤝",
-    "מחפש את הדרך הכי קצרה למרחב האישי 🚀",
-  ];
+    <p id="countdown" class="countdown">
+      קופצים למרחב האישי בעוד <strong>4</strong> שניות
+    </p>
 
-  const msgEl = document.getElementById("random-message");
-  msgEl.textContent = messages[Math.floor(Math.random() * messages.length)];
+    <div class="spinner-wrap">
+      <div class="spinner-orbit">
+        <div class="spinner-ring"></div>
+        <div class="spinner-center"></div>
+      </div>
+    </div>
 
-  // אחרי 4 שניות — פותח את EDU בטאב חדש
-  setTimeout(() => {
-    const EDU_URL = "https://my.edu.gov.il/home";
-    const newTab = window.open(EDU_URL, "_blank");
+    <p class="hint">
+      אם לא עבר אוטומטית – אפשר ללחוץ
+      <a id="manual-link" href="https://my.edu.gov.il/home" target="_self" rel="noopener">
+        כאן למעבר ידני
+      </a>.
+    </p>
+  </div>
 
-    // אם הדפדפן חסם – מציג כפתור
-    if (!newTab) {
-      msgEl.textContent = "הדפדפן חסם את החלונית. לחצו על הכפתור למטה 👇";
-      document.getElementById("manual-link").style.display = "inline-block";
+  <script>
+    // ===== טקסטים מצחיקים =====
+    const lines = [
+      "מטפל בבירוקרטיה… מישהו חייב לעשות את זה 🤯",
+      "מחבר אותך לשרתים של משרד החינוך… מקווה שהם ערים 😴",
+      "בודק שהסיסמה שלך לא 1234… 👀",
+      "מנקה את הלוח לפני שמביאים מבחנים חדשים 🧽",
+      "מעלה את רמת הנמנום הכללית במערכת… 😴➡😵‍💫",
+      "מתאם בין היומן שלך לבין לוח המבחנים 📅",
+      "מנסה לזכור איפה שמנו את המשתמש שלך… 🤔",
+      "שולח בקשה רשמית לשרת: 'בבקשה תעבוד היום' 🙏",
+      "בודק אם אתה מוכן לעוד שיעור מתמטיקה 📐",
+      "סופר כמה פעמים אמרת 'אין לי כוח' השנה 🧮",
+      "עושה רענון חינוכי למערכת… ייקח שנייה 😇",
+      "מזניק את הטיל הדיגיטלי למרחב האישי 🚀",
+      "מכוון את האנטנה על 'תלמיד תותח מזוהה' 📡",
+      "בודק שציוני בחינות החורף לא נעלמו בדרך ❄️",
+      "מעלה את מפלס המוטיבציה ב־0.0001% 📈",
+      "מחפש קיצורי דרך… אבל רק במערכת, לא בחיים 😉",
+      "משכנע את השרת שלא לקרוס היום 🖥️",
+      "זורק קצת ביטים באוויר כדי להרשים אותך 💾✨",
+      "טוען מחדש את תקנות בית הספר… סבלנות 🧾",
+      "בודק אם מישהו שכח להגיש עבודה 🙃"
+    ];
+
+    const dynamicEl = document.getElementById("dynamic-line");
+    const countdownEl = document.getElementById("countdown").querySelector("strong");
+    const manualLink = document.getElementById("manual-link");
+
+    // בוחר משפט רנדומלי חדש כל ~900ms
+    let lastIndex = -1;
+    function setRandomLine() {
+      let idx = Math.floor(Math.random() * lines.length);
+      if (idx === lastIndex) {
+        idx = (idx + 1) % lines.length;
+      }
+      lastIndex = idx;
+      dynamicEl.style.opacity = 0;
+      setTimeout(() => {
+        dynamicEl.textContent = lines[idx];
+        dynamicEl.style.opacity = 1;
+      }, 160);
     }
-  }, 4000);
-</script>
+
+    setRandomLine();
+    const textInterval = setInterval(setRandomLine, 900);
+
+    // ===== ספירה לאחור ומעבר =====
+    let secondsLeft = 4;
+    countdownEl.textContent = secondsLeft.toString();
+
+    const countdownTimer = setInterval(() => {
+      secondsLeft--;
+      if (secondsLeft <= 0) {
+        countdownEl.textContent = "רגע…";
+        clearInterval(countdownTimer);
+        return;
+      }
+      countdownEl.textContent = secondsLeft.toString();
+    }, 1000);
+
+    // אחרי ~4 שניות – מעבר למרחב האישי באותו טאב
+    const TARGET_URL = "https://my.edu.gov.il/home";
+
+    setTimeout(() => {
+      clearInterval(textInterval);
+      // מעבר רגיל – באותו חלון, בלי לחזור לאתר
+      window.location.href = TARGET_URL;
+    }, 4000);
+
+    // קישור ידני שיהיה מסונכרן ל־URL
+    manualLink.href = TARGET_URL;
+  </script>
 
 </body>
 </html>
