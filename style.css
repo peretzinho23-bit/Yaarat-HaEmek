@@ -2318,3 +2318,21 @@ body[data-theme="light"] .hero-side-card {
     height: 250px;
   }
 }
+/* ===== NAV בלי מלבן – משתלב ברקע ===== */
+
+/* מצב רגיל (דארק) */
+.nav {
+  background: transparent !important;
+  border-radius: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 10px 0; /* רק רווח אנכי קטן */
+}
+
+/* מצב בהיר (ברייט מוד) */
+html[data-theme="light"] .nav,
+body.theme-light .nav {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
