@@ -1,21 +1,23 @@
 // admin.js – לוח ניהול יערת העמק
 
-import { auth, db, storage } from "./firebase-config.js";
+import { db, auth, storage } from "./firebase-config.js";
+import {
+  doc,
+  getDoc,
+  setDoc,
+  onSnapshot
+} from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 import {
   signInWithEmailAndPassword,
   onAuthStateChanged,
   signOut
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 import {
-  doc,
-  getDoc,
-  setDoc
-} from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
-import {
-  ref,
+  ref as storageRef,
   uploadBytes,
   getDownloadURL
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-storage.js";
+
 
 const GRADES = ["z", "h", "t"];
 
