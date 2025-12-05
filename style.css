@@ -270,42 +270,115 @@ body.light-mode .theme-toggle:hover {
   background: #e2e8f0;
 }
 
-/* ========== HERO ========== */
 
 /* ========== HERO ========== */
 
+/* בסיס להירו בכל הדפים */
 .hero {
   position: relative;
-  background: radial-gradient(circle at top, #0288d1, #020818 55%);
   color: #fff;
-  padding: 80px 0 110px;   /* יותר גובה */
-  min-height: 60vh;        /* לפחות 60% מהגובה של המסך */
+  padding: 40px 0 60px;
   overflow: hidden;
 }
 
+/* הירו של דף הבית עם סליידר תמונות */
+.hero-home {
+  position: relative;
+  min-height: 220px;
+  height: clamp(220px, 32vh, 300px); /* לא ענק בדסקטופ, נעים במובייל */
+}
 
+/* כל התמונות אחת על השנייה */
+.hero-slides {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
 
-/* שכבת כהות/מעבר על הרקע – נשארת כמו שהייתה */
-.hero-overlay {
+.hero-slide {
+  position: absolute;
+  inset: 0;
+  background-size: cover;          /* בדסקטופ – ממלא מסך יפה */
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  animation: slideFade 25s infinite;
+}
+
+/* תמונה 1 */
+.hero-slide:nth-child(1) {
+  background-image: url("img/campus_front.jpg");
+  animation-delay: 0s;
+}
+
+/* תמונה 2 */
+.hero-slide:nth-child(2) {
+  background-image: url("img/campus_yard.jpg");
+  animation-delay: 5s;
+}
+
+/* תמונה 3 */
+.hero-slide:nth-child(3) {
+  background-image: url("img/school_hallway.jpg");
+  animation-delay: 10s;
+}
+
+/* תמונה 4 */
+.hero-slide:nth-child(4) {
+  background-image: url("img/students_activity.jpg");
+  animation-delay: 15s;
+}
+
+/* תמונה 5 */
+.hero-slide:nth-child(5) {
+  background-image: url("img/school_aerial.jpg");
+  animation-delay: 20s;
+}
+
+/* אפקט קרוס-פייד בין התמונות */
+@keyframes slideFade {
+  0%   { opacity: 0; }
+  8%   { opacity: 1; }
+  30%  { opacity: 1; }
+  40%  { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+/* שכבת כהות מעל התמונה – כדי שהטקסט יישאר קריא */
+.hero-home::before {
+  content: "";
   position: absolute;
   inset: 0;
   background: linear-gradient(
     to bottom,
-    rgba(0, 0, 0, 0.18),
-    transparent 40%,
-    #040814 90%
+    rgba(0, 0, 0, 0.55),
+    rgba(0, 0, 0, 0.35) 45%,
+    rgba(4, 8, 20, 0.9)
   );
-  z-index: 1;
+  backdrop-filter: blur(1.5px);
+  z-index: 0;
 }
 
-/* תוכן ההירו – תמיד מעל הרקעים */
+/* בלייט מוד נשמור על קונטרסט קצת יותר עדין אבל עדיין קריא */
+html[data-theme="light"] .hero-home::before,
+body.theme-light .hero-home::before {
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.45),
+    rgba(0, 0, 0, 0.25) 45%,
+    rgba(4, 8, 20, 0.85)
+  );
+}
+
+/* התוכן שעל ההירו */
 .hero-content {
   position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 40px;
-  z-index: 2;
 }
 
 .hero-text {
@@ -322,6 +395,58 @@ body.light-mode .theme-toggle:hover {
   max-width: 520px;
   margin-bottom: 16px;
 }
+
+.hero-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* כרטיס צדדי */
+.hero-side-card {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 18px;
+  padding: 16px 18px;
+  border: 1px solid rgba(129, 212, 250, 0.5);
+  font-size: 0.9rem;
+}
+
+/* התאמות מובייל – שם אמרת שכבר נראה טוב, אז רק לוודא שלא נשבר */
+@media (max-width: 768px) {
+  .hero {
+    padding: 30px 0 36px;
+  }
+
+  .hero-home {
+    height: auto;
+    min-height: 220px;
+  }
+
+  .hero-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 20px;
+  }
+
+  .hero-side-card {
+    width: 100%;
+    font-size: 0.85rem;
+  }
+
+  .hero-text h1 {
+    font-size: 1.7rem;
+  }
+
+  .hero-text p {
+    font-size: 0.9rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* ========== SECTIONS GENERIC ========== */
+
 
 .hero-actions {
   display: flex;
