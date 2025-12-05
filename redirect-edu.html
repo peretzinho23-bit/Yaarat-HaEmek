@@ -217,7 +217,6 @@
       font-size: 0.78rem;
     }
 
-    /* קישור fallback */
     .fallback {
       margin-top: 10px;
       font-size: 0.85rem;
@@ -290,65 +289,15 @@
     ];
 
     const msgEl = document.getElementById("random-message");
-    const random = messages[Math.floor(Math.random() * messages.length)];
-    msgEl.textContent = random;
+    msgEl.textContent = messages[Math.floor(Math.random() * messages.length)];
 
-    // ===== פתיחת לשונית חדשה =====
+    // ===== פתיחת לשונית חדשה ישירות ל-EDU =====
     const EDU_URL = "https://my.edu.gov.il/home";
+    const newTab = window.open(EDU_URL, "_blank");
 
-    // פותח לשונית חדשה ריקה
-    const newTab = window.open("", "_blank");
-
-    if (newTab) {
-      // כותב לתוכה תוכן זמני עד שה-URL נטען
-      newTab.document.write(`
-        <!DOCTYPE html>
-        <html lang="he" dir="rtl">
-        <head>
-          <meta charset="UTF-8" />
-          <title>מעביר למרחב האישי…</title>
-          <style>
-            body {
-              margin: 0;
-              height: 100vh;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              font-family: system-ui, sans-serif;
-              background: #020617;
-              color: #e5e7eb;
-            }
-            .box {
-              text-align: center;
-            }
-            .spinner {
-              width: 40px;
-              height: 40px;
-              border-radius: 50%;
-              border: 4px solid rgba(148,163,184,0.4);
-              border-top-color: #38bdf8;
-              animation: spin 1s linear infinite;
-              margin: 0 auto 14px;
-            }
-            @keyframes spin {
-              to { transform: rotate(360deg); }
-            }
-          </style>
-        </head>
-        <body>
-          <div class="box">
-            <div class="spinner"></div>
-            <h2>מעביר אותך למרחב האישי…</h2>
-            <p>אם זה לוקח יותר מדי זמן, רענן את העמוד או סגור ופתח שוב.</p>
-          </div>
-        </body>
-        </html>
-      `);
-
-      // אחרי 3.5 שניות – רק הלשונית החדשה תעבור ל-EDU
-      setTimeout(() => {
-        newTab.location.href = EDU_URL;
-      }, 3500);
+    // אם הדפדפן חסם את הפתיחה – נעדכן את המשתמש
+    if (!newTab) {
+      msgEl.textContent = "הדפדפן חסם פתיחת לשונית חדשה. אפשר ללחוץ על הקישור למטה 👇";
     }
   </script>
 </body>
