@@ -1,13 +1,24 @@
-// app.js – אתר התלמידים, עם עדכונים בזמן אמת (Realtime)
+// app.js – אתר יערת העמק
 
 import { db } from "./firebase-config.js";
 import {
   doc,
+  getDoc,
   onSnapshot
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
+/* ------------ CONSTS ------------ */
+
 const GRADES = ["z", "h", "t"];
-const currentGrade = document.body?.dataset?.grade || null; // "z" | "h" | "t" או null בדף הבית
+
+/* ------------ STATE ------------ */
+
+let homeNews = { z: [], h: [], t: [] };
+let homeExams = { z: [], h: [], t: [] };
+let boardData = [];
+let siteContent = {};
+
+/* ------------ HELPERS ------------ */
 
 function escapeHtml(str) {
   return String(str || "")
@@ -16,554 +27,340 @@ function escapeHtml(str) {
     .replace(/>/g, "&gt;");
 }
 
-/* ------------ מצב כהה / מצב בהיר ------------ */
+/* ------------ LOAD HOME DATA (NEWS / EXAMS / BOARD) ------------ */
 
-const THEME_KEY = "yaarat-theme";
-
-function applyTheme(theme) {
-  const root = document.documentElement;
-  const body = document.body;
-  const btn = document.getElementById("theme-toggle");
-
-  // נעדכן data-theme על <html>
-  root.setAttribute("data-theme", theme);
-
-  // למקרה שיש סטיילים ישנים עם קלאסים:
-  body.classList.toggle("theme-dark", theme === "dark");
-  body.classList.toggle("theme-light", theme === "light");
-  body.classList.toggle("light-mode", theme === "light"); // תואם ל־CSS הנוכחי
-
-  // עדכון האייקון בכפתור
-  if (btn) {
-    if (theme === "dark") {
-      btn.textContent = "🌙";
-      btn.title = "מצב כהה (לחץ למצב בהיר)";
-    } else {
-      btn.textContent = "☀️";
-      btn.title = "מצב בהיר (לחץ למצב כהה)";
+async function loadHomeDataOnce() {
+  try {
+    // NEWS
+    for (const g of GRADES) {
+      const snap = await getDoc(doc(db, "news", g));
+      const data = snap.exists() ? snap.data() : { items: [] };
+      homeNews[g] = data.items || [];
     }
+
+    // EXAMS
+    for (const g of GRADES) {
+      const snap = await getDoc(doc(db, "exams", g));
+      const data = snap.exists() ? snap.data() : { items: [] };
+      homeExams[g] = data.items || [];
+    }
+
+    // BOARD
+    const boardSnap = await getDoc(doc(db, "board", "general"));
+    const b = boardSnap.exists() ? boardSnap.data() : { items: [] };
+    boardData = b.items || [];
+
+    renderHomeNews();
+    renderHomeExams();
+    renderHomeBoard();
+  } catch (err) {
+    console.error("שגיאה בטעינת הדף הראשי:", err);
   }
 }
 
-function initTheme() {
-  const savedTheme = localStorage.getItem(THEME_KEY);
-  const initialTheme =
-    savedTheme === "light" || savedTheme === "dark" ? savedTheme : "dark";
+// אם אתה רוצה לייב: אפשר להפעיל גם onSnapshot
+function subscribeRealtimeHome() {
+  // NEWS
+  for (const g of GRADES) {
+    onSnapshot(doc(db, "news", g), (snap) => {
+      const data = snap.exists() ? snap.data() : { items: [] };
+      homeNews[g] = data.items || [];
+      renderHomeNews();
+    });
+  }
 
-  applyTheme(initialTheme);
+  // EXAMS
+  for (const g of GRADES) {
+    onSnapshot(doc(db, "exams", g), (snap) => {
+      const data = snap.exists() ? snap.data() : { items: [] };
+      homeExams[g] = data.items || [];
+      renderHomeExams();
+    });
+  }
 
-  const btn = document.getElementById("theme-toggle");
-  if (!btn) return;
-
-  btn.addEventListener("click", () => {
-    const current = document.documentElement.getAttribute("data-theme") || "dark";
-    const next = current === "dark" ? "light" : "dark";
-    applyTheme(next);
-    localStorage.setItem(THEME_KEY, next);
+  // BOARD
+  onSnapshot(doc(db, "board", "general"), (snap) => {
+    const data = snap.exists() ? snap.data() : { items: [] };
+    boardData = data.items || [];
+    renderHomeBoard();
   });
 }
 
-/* ------------ חדשות בדף הבית (Realtime) ------------ */
+/* ------------ RENDER HOME NEWS ------------ */
 
-function subscribeHomeNews() {
-  if (!document.getElementById("home-news-z")) return;
+function renderHomeNews() {
+  GRADES.forEach((g) => {
+    const listEl = document.getElementById(`home-news-${g}`);
+    if (!listEl) return;
 
-  for (const g of GRADES) {
-    const box = document.getElementById(`home-news-${g}`);
-    if (!box) continue;
+    const items = homeNews[g] || [];
+    if (!items.length) {
+      listEl.innerHTML = `<p class="empty-msg">אין חדשות בשכבה זו כרגע.</p>`;
+      return;
+    }
 
-    const refDoc = doc(db, "news", g);
+    listEl.innerHTML = items
+      .map((n) => {
+        const hasImage = !!n.imageUrl;
+        const colorStyle = n.color ? ` style="color:${escapeHtml(n.color)}"` : "";
 
-    onSnapshot(
-      refDoc,
-      (snap) => {
-        const data = snap.exists() ? snap.data() : { items: [] };
-        const items = data.items || [];
-
-        if (!items.length) {
-          box.innerHTML = `<p class="empty-msg">אין עדיין חדשות לשכבה זו.</p>`;
-          return;
-        }
-
-        const latest = items.slice(-3).reverse();
-
-        box.innerHTML = latest
-          .map((n) => {
-            const title = escapeHtml(n.title || "");
-            const meta = escapeHtml(n.meta || "");
-            const body = escapeHtml(n.body || "");
-            const img = n.imageUrl ? String(n.imageUrl) : "";
-            const colorStyle = n.color
-              ? ` style="color:${escapeHtml(n.color)}"`
-              : "";
-
-            // עם תמונה
-            if (img) {
-              return `
-                <div class="home-news-item home-news-item-with-image">
-                  <div class="home-news-image-wrap">
-                    <img src="${escapeHtml(img)}" alt="תמונה לחדשות" loading="lazy">
-                  </div>
-                  <div class="home-news-text"${colorStyle}>
-                    <div class="home-news-title">${title}</div>
-                    ${
-                      meta
-                        ? `<div class="home-news-meta">${meta}</div>`
-                        : ""
-                    }
-                    <div class="home-news-body">${body}</div>
-                  </div>
-                </div>
-              `;
-            }
-
-            // בלי תמונה
-            return `
-              <div class="home-news-item"${colorStyle}>
-                <div class="home-news-title">${title}</div>
+        if (hasImage) {
+          return `
+            <article class="home-news-item home-news-item-with-image"${colorStyle}>
+              <div class="home-news-image-wrap">
+                <img src="${escapeHtml(n.imageUrl)}" alt="${escapeHtml(
+            n.title || ""
+          )}" />
+              </div>
+              <div class="home-news-text">
+                <h4 class="home-news-title">${escapeHtml(n.title)}</h4>
                 ${
-                  meta
-                    ? `<div class="home-news-meta">${meta}</div>`
+                  n.meta
+                    ? `<div class="home-news-meta">${escapeHtml(n.meta)}</div>`
                     : ""
                 }
-                <div class="home-news-body">${body}</div>
+                <div class="home-news-body">${escapeHtml(n.body)}</div>
               </div>
-            `;
-          })
-          .join("");
-      },
-      (err) => {
-        console.error("Error subscribing to home news for grade", g, err);
-        box.innerHTML = `<p class="empty-msg">שגיאה בטעינת החדשות.</p>`;
-      }
-    );
-  }
-}
-
-/* ------------ מבחנים בדף הבית (Realtime) ------------ */
-
-function subscribeHomeExams() {
-  if (!document.getElementById("home-exams-z")) return;
-
-  for (const g of GRADES) {
-    const box = document.getElementById(`home-exams-${g}`);
-    if (!box) continue;
-
-    const refDoc = doc(db, "exams", g);
-
-    onSnapshot(
-      refDoc,
-      (snap) => {
-        const data = snap.exists() ? snap.data() : { items: [] };
-        const items = data.items || [];
-
-        if (!items.length) {
-          box.innerHTML = `<p class="empty-msg">אין מבחנים לשכבה זו.</p>`;
-          return;
+            </article>
+          `;
         }
 
-        const latest = items.slice(-5).reverse();
-
-        box.innerHTML = latest
-          .map((ex) => {
-            const subject = escapeHtml(ex.subject || "");
-            const date = escapeHtml(ex.date || "");
-            const topic = escapeHtml(ex.topic || "");
-
-            return `
-              <div class="home-exam-item">
-                <div class="home-exam-top">
-                  <span class="home-exam-subject">${subject}</span>
-                  <span class="home-exam-date">${date}</span>
-                </div>
-                <div class="home-exam-topic">${topic}</div>
-              </div>
-            `;
-          })
-          .join("");
-      },
-      (err) => {
-        console.error("Error subscribing to home exams for grade", g, err);
-        box.innerHTML = `<p class="empty-msg">שגיאה בטעינת המבחנים.</p>`;
-      }
-    );
-  }
+        return `
+          <article class="home-news-item"${colorStyle}>
+            <h4 class="home-news-title">${escapeHtml(n.title)}</h4>
+            ${
+              n.meta
+                ? `<div class="home-news-meta">${escapeHtml(n.meta)}</div>`
+                : ""
+            }
+            <div class="home-news-body">${escapeHtml(n.body)}</div>
+          </article>
+        `;
+      })
+      .join("");
+  });
 }
 
-/* ------------ חדשות בדפי שכבות (z/h/t) – Realtime ------------ */
-/*   פה משתמשים בסטייל של board-item כדי שייראה כמו לוח מודעות   */
+/* ------------ RENDER HOME EXAMS ------------ */
 
-function subscribeGradeNews() {
-  if (!currentGrade) return;
-  const box = document.getElementById("grade-news");
-  if (!box) return;
+function renderHomeExams() {
+  GRADES.forEach((g) => {
+    const listEl = document.getElementById(`home-exams-${g}`);
+    if (!listEl) return;
 
-  const refDoc = doc(db, "news", currentGrade);
-
-  onSnapshot(
-    refDoc,
-    (snap) => {
-      const data = snap.exists() ? snap.data() : { items: [] };
-      const items = data.items || [];
-
-      if (!items.length) {
-        box.innerHTML = `<p class="empty-msg">אין עדיין חדשות לשכבה זו.</p>`;
-        return;
-      }
-
-      const list = items.slice().reverse();
-
-      box.innerHTML = list
-        .map((n) => {
-          const title = escapeHtml(n.title || "");
-          const meta = escapeHtml(n.meta || "");
-          const body = escapeHtml(n.body || "");
-          const img = n.imageUrl ? String(n.imageUrl) : "";
-          const colorStyle = n.color
-            ? ` style="color:${escapeHtml(n.color)}"`
-            : "";
-
-          const imgHtml = img
-            ? `
-              <div class="board-item-image">
-                <img src="${escapeHtml(img)}" alt="${title}" loading="lazy">
-              </div>
-            `
-            : "";
-
-          return `
-            <div class="board-item"${colorStyle}>
-              <div class="board-item-title">${title}</div>
-              ${meta ? `<div class="board-item-meta">${meta}</div>` : ""}
-              <div class="board-item-body">${body}</div>
-              ${imgHtml}
-            </div>
-          `;
-        })
-        .join("");
-    },
-    (err) => {
-      console.error("Error subscribing to grade news", err);
-      box.innerHTML = `<p class="empty-msg">שגיאה בטעינת החדשות.</p>`;
+    const items = homeExams[g] || [];
+    if (!items.length) {
+      listEl.innerHTML = `<p class="empty-msg">אין מבחנים קרובים לשכבה זו.</p>`;
+      return;
     }
-  );
+
+    listEl.innerHTML = items
+      .map(
+        (ex) => `
+        <article class="home-exam-item">
+          <div class="home-exam-top">
+            <span class="home-exam-date">${escapeHtml(ex.date)}</span>
+            <span class="home-exam-subject">${escapeHtml(ex.subject)}</span>
+          </div>
+          ${
+            ex.topic
+              ? `<div class="home-exam-topic">${escapeHtml(ex.topic)}</div>`
+              : ""
+          }
+        </article>
+      `
+      )
+      .join("");
+  });
 }
 
-/* ------------ מבחנים בדפי שכבות (z/h/t) – Realtime ------------ */
+/* ------------ RENDER HOME BOARD ------------ */
 
-function subscribeGradeExams() {
-  if (!currentGrade) return;
-  const box = document.getElementById("grade-exams");
-  if (!box) return;
+function renderHomeBoard() {
+  const listEl = document.getElementById("home-board");
+  if (!listEl) return;
 
-  const refDoc = doc(db, "exams", currentGrade);
-
-  onSnapshot(
-    refDoc,
-    (snap) => {
-      const data = snap.exists() ? snap.data() : { items: [] };
-      const items = data.items || [];
-
-      if (!items.length) {
-        box.innerHTML = `<p class="empty-msg">אין מבחנים לשכבה זו.</p>`;
-        return;
-      }
-
-      const list = items.slice().reverse();
-
-      box.innerHTML = list
-        .map((ex) => {
-          const subject = escapeHtml(ex.subject || "");
-          const date = escapeHtml(ex.date || "");
-          const topic = escapeHtml(ex.topic || "");
-
-          return `
-            <div class="home-exam-item">
-              <div class="home-exam-top">
-                <span class="home-exam-subject">${subject}</span>
-                <span class="home-exam-date">${date}</span>
-              </div>
-              <div class="home-exam-topic">${topic}</div>
-            </div>
-          `;
-        })
-        .join("");
-    },
-    (err) => {
-      console.error("Error subscribing to grade exams", err);
-      box.innerHTML = `<p class="empty-msg">שגיאה בטעינת המבחנים.</p>`;
-    }
-  );
-}
-
-/* ------------ לוח מודעות – דף בית + דפי שכבות – Realtime ------------ */
-
-function subscribeBoard() {
-  const homeBoard = document.getElementById("home-board");
-  const gradeBoard = document.getElementById("board-list");
-
-  if (!homeBoard && !gradeBoard) return;
-
-  const refDoc = doc(db, "board", "general");
-
-  onSnapshot(
-    refDoc,
-    (snap) => {
-      const data = snap.exists() ? snap.data() : { items: [] };
-      const items = data.items || [];
-
-      if (homeBoard) renderBoardList(homeBoard, items);
-      if (gradeBoard) renderBoardList(gradeBoard, items);
-    },
-    (err) => {
-      console.error("Error subscribing to board", err);
-      if (homeBoard) {
-        homeBoard.innerHTML = `<p class="empty-msg">שגיאה בטעינת לוח המודעות.</p>`;
-      }
-      if (gradeBoard) {
-        gradeBoard.innerHTML = `<p class="empty-msg">שגיאה בטעינת לוח המודעות.</p>`;
-      }
-    }
-  );
-}
-
-function renderBoardList(container, items) {
-  if (!items.length) {
-    container.innerHTML = `<p class="empty-msg">אין מודעות כרגע.</p>`;
+  if (!boardData.length) {
+    listEl.innerHTML = `<p class="empty-msg">אין מודעות כרגע.</p>`;
     return;
   }
 
-  const list = items.slice().reverse();
-
-  container.innerHTML = list
+  listEl.innerHTML = boardData
     .map((b) => {
-      const title = escapeHtml(b.title || "");
-      const meta = escapeHtml(b.meta || "");
-      const body = escapeHtml(b.body || "");
       const colorStyle = b.color ? ` style="color:${escapeHtml(b.color)}"` : "";
       const imgHtml = b.imageUrl
         ? `
           <div class="board-item-image">
-            <img src="${escapeHtml(b.imageUrl)}" alt="${title}">
+            <img src="${escapeHtml(b.imageUrl)}" alt="${escapeHtml(
+          b.title || ""
+        )}">
           </div>
         `
         : "";
 
       return `
-        <div class="board-item"${colorStyle}>
-          <div class="board-item-title">${title}</div>
-          ${meta ? `<div class="board-item-meta">${meta}</div>` : ""}
-          <div class="board-item-body">${body}</div>
+        <article class="board-item"${colorStyle}>
+          <div class="board-item-title">${escapeHtml(b.title)}</div>
+          ${
+            b.meta
+              ? `<div class="board-item-meta">${escapeHtml(b.meta)}</div>`
+              : ""
+          }
+          <div class="board-item-body">${escapeHtml(b.body)}</div>
           ${imgHtml}
-        </div>
+        </article>
       `;
     })
     .join("");
 }
 
-/* ------------ תוכן כללי: אודות, יצירת קשר, שכבות, כותרות דף הבית – Realtime ------------ */
+/* ------------ SITE CONTENT (HOME TEXTS) ------------ */
 
-function subscribeSiteContent() {
-  const refDoc = doc(db, "siteContent", "main");
+async function loadSiteContentForHome() {
+  try {
+    const snap = await getDoc(doc(db, "siteContent", "main"));
+    siteContent = snap.exists() ? snap.data() : {};
 
-  onSnapshot(
-    refDoc,
-    (snap) => {
-      if (!snap.exists()) return;
-      const data = snap.data() || {};
-
-      /* ===== HERO – כותרות עליונות והירו ===== */
-
-      const heroTitleHeader = document.getElementById("home-hero-title");
-      const heroSubHeader = document.getElementById("home-hero-subtitle");
-      if (heroTitleHeader && data.homeHeroTitle)
-        heroTitleHeader.textContent = data.homeHeroTitle;
-      if (heroSubHeader && data.homeHeroSubtitle)
-        heroSubHeader.textContent = data.homeHeroSubtitle;
-
-      const heroMainTitle = document.getElementById("hero-main-title");
-      const heroMainBody = document.getElementById("hero-main-body");
-      if (heroMainTitle && data.homeHeroTitle)
-        heroMainTitle.textContent = data.homeHeroTitle;
-      if (heroMainBody && data.homeHeroSubtitle)
-        heroMainBody.textContent = data.homeHeroSubtitle;
-
-      // HERO SIDE – "מידע מהיר"
-      const heroSideTitleEl = document.getElementById("hero-side-title");
-      const heroSideListEl  = document.getElementById("hero-side-list");
-      if (heroSideTitleEl && data.heroSideTitle) {
-        heroSideTitleEl.textContent = data.heroSideTitle;
-      }
-      if (heroSideListEl && data.heroSideList) {
-        const lines = String(data.heroSideList)
-          .split(/\r?\n/)
-          .map((l) => l.trim())
-          .filter((l) => l.length > 0);
-
-        if (lines.length) {
-          heroSideListEl.innerHTML = lines
-            .map((line) => `<li>${escapeHtml(line)}</li>`)
-            .join("");
-        }
-      }
-
-      /* ===== ABOUT ===== */
-
-      const aboutTitleEl = document.getElementById("about-title");
-      const aboutTextEl = document.getElementById("about-text");
-      if (aboutTitleEl && data.aboutTitle)
-        aboutTitleEl.textContent = data.aboutTitle;
-      if (aboutTextEl && data.aboutBody)
-        aboutTextEl.textContent = data.aboutBody;
-
-      /* ===== IMPORTANT SECTION ===== */
-
-      const impTitleEl = document.getElementById("important-title");
-      const impSubEl = document.getElementById("important-subtitle");
-      if (impTitleEl && data.importantTitle)
-        impTitleEl.textContent = data.importantTitle;
-      if (impSubEl && data.importantSubtitle)
-        impSubEl.textContent = data.importantSubtitle;
-
-      const c1Title = document.getElementById("important-card-1-title");
-      const c1Body = document.getElementById("important-card-1-body");
-      const c2Title = document.getElementById("important-card-2-title");
-      const c2Body = document.getElementById("important-card-2-body");
-      const c3Title = document.getElementById("important-card-3-title");
-      const c3Body = document.getElementById("important-card-3-body");
-
-      if (c1Title && data.importantCard1Title)
-        c1Title.textContent = data.importantCard1Title;
-      if (c1Body && data.importantCard1Body)
-        c1Body.textContent = data.importantCard1Body;
-      if (c2Title && data.importantCard2Title)
-        c2Title.textContent = data.importantCard2Title;
-      if (c2Body && data.importantCard2Body)
-        c2Body.textContent = data.importantCard2Body;
-      if (c3Title && data.importantCard3Title)
-        c3Title.textContent = data.importantCard3Title;
-      if (c3Body && data.importantCard3Body)
-        c3Body.textContent = data.importantCard3Body;
-
-      /* ===== כותרות מדורי דף הבית ===== */
-
-      const homeNewsTitleEl    = document.getElementById("home-news-title");
-      const homeNewsSubtitleEl = document.getElementById("home-news-subtitle");
-      if (homeNewsTitleEl && data.homeNewsTitle)
-        homeNewsTitleEl.textContent = data.homeNewsTitle;
-      if (homeNewsSubtitleEl && data.homeNewsSubtitle)
-        homeNewsSubtitleEl.textContent = data.homeNewsSubtitle;
-
-      const boardTitleEl    = document.getElementById("board-title");
-      const boardSubtitleEl = document.getElementById("board-subtitle");
-      if (boardTitleEl && data.boardTitle)
-        boardTitleEl.textContent = data.boardTitle;
-      if (boardSubtitleEl && data.boardSubtitle)
-        boardSubtitleEl.textContent = data.boardSubtitle;
-
-      const homeExamsTitleEl    = document.getElementById("home-exams-title");
-      const homeExamsSubtitleEl = document.getElementById("home-exams-subtitle");
-      if (homeExamsTitleEl && data.homeExamsTitle)
-        homeExamsTitleEl.textContent = data.homeExamsTitle;
-      if (homeExamsSubtitleEl && data.homeExamsSubtitle)
-        homeExamsSubtitleEl.textContent = data.homeExamsSubtitle;
-
-      /* ===== GRADES SECTION ===== */
-
-      const gradesTitle = document.getElementById("grades-section-title");
-      const gradesSub = document.getElementById("grades-section-subtitle");
-      if (gradesTitle && data.gradesSectionTitle)
-        gradesTitle.textContent = data.gradesSectionTitle;
-      if (gradesSub && data.gradesSectionSubtitle)
-        gradesSub.textContent = data.gradesSectionSubtitle;
-
-      const zDesc = document.getElementById("grade-z-text");
-      const hDesc = document.getElementById("grade-h-text");
-      const tDesc = document.getElementById("grade-t-text");
-      if (zDesc && data.zDescription) zDesc.textContent = data.zDescription;
-      if (hDesc && data.hDescription) hDesc.textContent = data.hDescription;
-      if (tDesc && data.tDescription) tDesc.textContent = data.tDescription;
-
-      /* ===== REQUESTS (תיבת בקשות) ===== */
-
-      const reqTitle = document.getElementById("requests-title");
-      const reqSub = document.getElementById("requests-subtitle");
-      const reqBody = document.getElementById("requests-body");
-      if (reqTitle && data.requestsTitle)
-        reqTitle.textContent = data.requestsTitle;
-      if (reqSub && data.requestsSubtitle)
-        reqSub.textContent = data.requestsSubtitle;
-      if (reqBody && data.requestsBody)
-        reqBody.textContent = data.requestsBody;
-
-      /* ===== CONTACT ===== */
-
-      const contactTitle = document.getElementById("contact-section-title");
-      const contactSub = document.getElementById("contact-section-subtitle");
-      const phoneEl = document.getElementById("contact-phone");
-      const emailEl = document.getElementById("contact-email");
-      const addrEl = document.getElementById("contact-address");
-
-      if (contactTitle && data.contactSectionTitle)
-        contactTitle.textContent = data.contactSectionTitle;
-      if (contactSub && data.contactSectionSubtitle)
-        contactSub.textContent = data.contactSectionSubtitle;
-      if (phoneEl && data.contactPhone)
-        phoneEl.textContent = data.contactPhone;
-      if (emailEl && data.contactEmail)
-        emailEl.textContent = data.contactEmail;
-      if (addrEl && data.contactAddress)
-        addrEl.textContent = data.contactAddress;
-
-      /* ===== FOOTER ===== */
-
-      const footerEl = document.getElementById("footer-text");
-      if (footerEl && data.footerText) footerEl.textContent = data.footerText;
-    },
-    (err) => {
-      console.error("Error subscribing to site content", err);
-    }
-  );
-}
-
-/* ------------ שנה בפוטר בדפי שכבות ------------ */
-
-function setYear() {
-  const yearSpan = document.getElementById("year");
-  if (yearSpan) {
-    yearSpan.textContent = new Date().getFullYear().toString();
+    applySiteContentToDom();
+  } catch (err) {
+    console.error("שגיאה בטעינת תוכן האתר:", err);
   }
 }
 
-/* ------------ כפתור חזרה לראש הדף ------------ */
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value || "";
+}
 
-function setupToTop() {
-  const btn = document.getElementById("to-top");
-  if (!btn) return;
+function setHtml(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.innerHTML = value || "";
+}
 
-  btn.addEventListener("click", () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  });
+function setImageSrc(id, url, fallbackAlt) {
+  const el = document.getElementById(id);
+  if (el && url) {
+    el.src = url;
+    if (fallbackAlt) el.alt = fallbackAlt;
+  }
+}
 
-  btn.style.transition = "opacity 0.2s";
-  window.addEventListener("scroll", () => {
-    if (window.scrollY > 200) {
-      btn.style.opacity = "1";
-      btn.style.pointerEvents = "auto";
-    } else {
-      btn.style.opacity = "0";
-      btn.style.pointerEvents = "none";
-    }
+function applySiteContentToDom() {
+  if (!siteContent) return;
+
+  // HERO
+  setText("home-hero-title", siteContent.homeHeroTitle);
+  setText("home-hero-subtitle", siteContent.homeHeroSubtitle);
+
+  // ABOUT
+  setText("about-title", siteContent.aboutTitle);
+  setHtml("about-body", siteContent.aboutBody);
+
+  // IMPORTANT
+  setText("important-title", siteContent.importantTitle);
+  setText("important-subtitle", siteContent.importantSubtitle);
+  setText("important-card1-title", siteContent.importantCard1Title);
+  setHtml("important-card1-body", siteContent.importantCard1Body);
+  setText("important-card2-title", siteContent.importantCard2Title);
+  setHtml("important-card2-body", siteContent.importantCard2Body);
+  setText("important-card3-title", siteContent.importantCard3Title);
+  setHtml("important-card3-body", siteContent.importantCard3Body);
+
+  // GRADES SECTION
+  setText("grades-section-title", siteContent.gradesSectionTitle);
+  setText("grades-section-subtitle", siteContent.gradesSectionSubtitle);
+  setHtml("z-description", siteContent.zDescription);
+  setHtml("h-description", siteContent.hDescription);
+  setHtml("t-description", siteContent.tDescription);
+
+  // REQUESTS
+  setText("requests-title", siteContent.requestsTitle);
+  setText("requests-subtitle", siteContent.requestsSubtitle);
+  setHtml("requests-body", siteContent.requestsBody);
+
+  // CONTACT
+  setText("contact-section-title", siteContent.contactSectionTitle);
+  setText("contact-section-subtitle", siteContent.contactSectionSubtitle);
+  setText("contact-phone", siteContent.contactPhone);
+  setText("contact-email", siteContent.contactEmail);
+  setText("contact-address", siteContent.contactAddress);
+
+  // FOOTER
+  setText("footer-text", siteContent.footerText);
+
+  // IMAGES
+  setImageSrc("logo-img", siteContent.logoUrl, "לוגו יערת העמק");
+  setImageSrc("hero-image", siteContent.heroImageUrl, "בית הספר יערת העמק");
+}
+
+/* ------------ THEME TOGGLE ------------ */
+
+const THEME_KEY = "yaarat-theme";
+
+function applyTheme(theme) {
+  const html = document.documentElement;
+  const body = document.body;
+  const toggle = document.getElementById("theme-toggle");
+
+  if (!toggle) return;
+
+  if (theme === "light") {
+    html.setAttribute("data-theme", "light");
+    body.classList.add("theme-light");
+    toggle.innerText = "☀️";
+  } else {
+    html.removeAttribute("data-theme");
+    body.classList.remove("theme-light");
+    toggle.innerText = "🌙";
+  }
+}
+
+function initTheme() {
+  const stored = localStorage.getItem(THEME_KEY);
+  const systemPrefersLight =
+    window.matchMedia &&
+    window.matchMedia("(prefers-color-scheme: light)").matches;
+
+  const initialTheme = stored || (systemPrefersLight ? "light" : "dark");
+  applyTheme(initialTheme);
+
+  const toggle = document.getElementById("theme-toggle");
+  if (!toggle) return;
+
+  toggle.addEventListener("click", () => {
+    const current =
+      document.documentElement.getAttribute("data-theme") === "light"
+        ? "light"
+        : "dark";
+    const next = current === "light" ? "dark" : "light";
+    localStorage.setItem(THEME_KEY, next);
+    applyTheme(next);
   });
 }
 
-/* ------------ תפריט מובייל (המבורגר) ------------ */
+/* ------------ MOBILE NAV (המבורגר) ------------ */
 
 function setupMobileNav() {
   const navToggle = document.querySelector(".nav-toggle");
   const navRight = document.querySelector(".nav-right");
 
   if (!navToggle || !navRight) return;
+
+  // דואג שהכפתור יופיע תמיד במובייל גם אם ה-CSS עושה display:none
+  function applyNavVisibility() {
+    if (window.innerWidth <= 768) {
+      navToggle.style.display = "flex";
+    } else {
+      navToggle.style.display = "";
+      navRight.classList.remove("open");
+      navToggle.classList.remove("open");
+      navToggle.setAttribute("aria-expanded", "false");
+      document.body.classList.remove("nav-open");
+    }
+  }
+
+  applyNavVisibility();
+  window.addEventListener("resize", applyNavVisibility);
 
   navToggle.addEventListener("click", (e) => {
     e.stopPropagation();
@@ -592,21 +389,37 @@ function setupMobileNav() {
   });
 }
 
+/* ------------ SCROLL TO TOP ------------ */
+
+function setupScrollToTop() {
+  const btn = document.getElementById("to-top");
+  if (!btn) return;
+
+  window.addEventListener("scroll", () => {
+    if (window.scrollY > 300) {
+      btn.style.opacity = "1";
+      btn.style.pointerEvents = "auto";
+    } else {
+      btn.style.opacity = "0";
+      btn.style.pointerEvents = "none";
+    }
+  });
+
+  btn.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+}
+
 /* ------------ INIT ------------ */
 
 document.addEventListener("DOMContentLoaded", () => {
-  initTheme();
-  subscribeSiteContent();
-
-  subscribeHomeNews();
-  subscribeHomeExams();
-
-  subscribeGradeNews();
-  subscribeGradeExams();
-
-  subscribeBoard();
-
-  setYear();
-  setupToTop();
-  setupMobileNav();
+  // דף הבית
+  if (document.body.dataset.page === "home") {
+    loadHomeDataOnce();
+    subscribeRealtimeHome();
+    loadSiteContentForHome();
+    initTheme();
+    setupMobileNav();
+    setupScrollToTop();
+  }
 });

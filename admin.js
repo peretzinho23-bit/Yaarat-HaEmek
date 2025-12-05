@@ -13,7 +13,7 @@ import {
   signOut
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 import {
-  ref as storageRef,
+  ref,
   uploadBytes,
   getDownloadURL
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-storage.js";
@@ -35,15 +35,10 @@ function escapeHtml(str) {
 }
 
 async function getDocSafe(pathArr, def) {
-  try {
-    const refDoc = doc(db, ...pathArr);
-    const snap = await getDoc(refDoc);
-    if (!snap.exists()) return def;
-    return snap.data() || def;
-  } catch (e) {
-    console.error("getDocSafe error for", pathArr, e);
-    return def;
-  }
+  const refDoc = doc(db, ...pathArr);
+  const snap = await getDoc(refDoc);
+  if (!snap.exists()) return def;
+  return snap.data() || def;
 }
 
 /* ------------ auth ------------ */
@@ -116,6 +111,38 @@ async function loadAllData() {
 
   // תוכן אתר
   await loadSiteContent();
+
+  // אופציונלי: האזנה בלייב לעדכונים
+  subscribeRealtimeAdmin();
+}
+
+/* ------------ realtime (optional) ------------ */
+
+function subscribeRealtimeAdmin() {
+  // NEWS
+  for (const g of GRADES) {
+    onSnapshot(doc(db, "news", g), (snap) => {
+      const data = snap.exists() ? snap.data() : { items: [] };
+      newsData[g] = data.items || [];
+      renderNewsAdmin();
+    });
+  }
+
+  // EXAMS
+  for (const g of GRADES) {
+    onSnapshot(doc(db, "exams", g), (snap) => {
+      const data = snap.exists() ? snap.data() : { items: [] };
+      examsData[g] = data.items || [];
+      renderExamsAdmin();
+    });
+  }
+
+  // BOARD
+  onSnapshot(doc(db, "board", "general"), (snap) => {
+    const data = snap.exists() ? snap.data() : { items: [] };
+    boardData = data.items || [];
+    renderBoardAdmin();
+  });
 }
 
 /* ------------ NEWS ------------ */
@@ -140,9 +167,7 @@ function renderNewsAdmin() {
              </div>`
           : "";
 
-        const colorStyle = n.color
-          ? ` style="color:${escapeHtml(n.color)};"`
-          : "";
+        const colorStyle = n.color ? ` style="color:${escapeHtml(n.color)};"` : "";
 
         return `
           <div class="admin-item"${colorStyle}>
@@ -178,7 +203,9 @@ function setupNewsForms() {
       const title = form.title.value.trim();
       const meta = form.meta.value.trim();
       const body = form.body.value.trim();
-      const manualImageUrl = (form.imageUrl && form.imageUrl.value.trim()) || "";
+      const manualImageUrl =
+        (form.imageUrl && form.imageUrl.value && form.imageUrl.value.trim()) ||
+        "";
       const color =
         (form.color && form.color.value && form.color.value.trim()) ||
         "#ffffff";
@@ -194,10 +221,9 @@ function setupNewsForms() {
       try {
         let finalImageUrl = manualImageUrl;
 
-        // אם יש קובץ – מעלים אותו ל-Firebase Storage
         if (file) {
           const filePath = `news/${g}/${Date.now()}_${file.name}`;
-          const fileRef = storageRef(storage, filePath);
+          const fileRef = ref(storage, filePath);
           await uploadBytes(fileRef, file);
           finalImageUrl = await getDownloadURL(fileRef);
         }
@@ -218,8 +244,8 @@ function setupNewsForms() {
         console.error("שגיאה בהעלאת תמונה/שמירת חדשות:", err);
         alert(
           "שגיאה בשמירת הידיעה:\n" +
-          (err.code ? err.code + " – " : "") +
-          (err.message || JSON.stringify(err))
+            (err.code ? err.code + " – " : "") +
+            (err.message || JSON.stringify(err))
         );
       }
     });
@@ -342,7 +368,8 @@ function setupBoardForm() {
     const meta = form.meta.value.trim();
     const body = form.body.value.trim();
     const manualImageUrl =
-      (form.imageUrl && form.imageUrl.value && form.imageUrl.value.trim()) || "";
+      (form.imageUrl && form.imageUrl.value && form.imageUrl.value.trim()) ||
+      "";
     const color =
       (form.color && form.color.value && form.color.value.trim()) ||
       "#ffffff";
@@ -358,15 +385,20 @@ function setupBoardForm() {
     try {
       let finalImageUrl = manualImageUrl;
 
-      // אם נבחר קובץ – מעלים אותו ל-Firebase Storage
       if (file) {
         const filePath = `board/${Date.now()}_${file.name}`;
-        const fileRef = storageRef(storage, filePath);
+        const fileRef = ref(storage, filePath);
         await uploadBytes(fileRef, file);
         finalImageUrl = await getDownloadURL(fileRef);
       }
 
-      boardData.push({ title, meta, body, imageUrl: finalImageUrl, color });
+      boardData.push({
+        title,
+        meta,
+        body,
+        imageUrl: finalImageUrl,
+        color
+      });
 
       form.reset();
       renderBoardAdmin();
@@ -379,7 +411,7 @@ function setupBoardForm() {
   });
 }
 
-/* ------------ SITE CONTENT (about / home / contact / important) ------------ */
+/* ------------ SITE CONTENT (about / home / contact / important / theming) ------------ */
 
 async function loadSiteContent() {
   const data = await getDocSafe(["siteContent", "main"], {});
@@ -400,7 +432,7 @@ function fillSiteContentForm() {
     "aboutTitle",
     "aboutBody",
 
-    // IMPORTANT SECTION
+    // IMPORTANT SECTION (חשוב לדעת)
     "importantTitle",
     "importantSubtitle",
     "importantCard1Title",
@@ -432,10 +464,12 @@ function fillSiteContentForm() {
     // FOOTER
     "footerText",
 
-    // EXTRA (אם תרצה להשתמש בעתיד)
+    // IMAGES (לוגו, הירו, רקעים וכו')
     "logoUrl",
     "heroImageUrl",
     "cardBgImageUrl",
+
+    // THEME / COLORS
     "primaryColor",
     "buttonColor",
     "cardBgColor",
