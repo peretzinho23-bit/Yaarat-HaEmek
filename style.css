@@ -276,12 +276,14 @@ body.light-mode .theme-toggle:hover {
 
 .hero {
   position: relative;
-  /* צבע בסיס מתחת לתמונות */
   background: radial-gradient(circle at top, #0288d1, #020818 55%);
   color: #fff;
-  padding: 60px 0 80px;
+  padding: 80px 0 110px;   /* יותר גובה */
+  min-height: 60vh;        /* לפחות 60% מהגובה של המסך */
   overflow: hidden;
 }
+
+
 
 /* שכבת כהות/מעבר על הרקע – נשארת כמו שהייתה */
 .hero-overlay {
@@ -372,26 +374,16 @@ body.light-mode .theme-toggle:hover {
 
 /* === רקע מתחלף להירו בדף הבית בלבד === */
 /* ההירו בדף הבית (section class="hero hero-home") */
+/* === רקע מתחלף להירו – עם תמונה כמעט מלאה === */
 .hero-home {
   position: relative;
   background-size: cover;
-  background-position: center;
+  background-position: center 40%;   /* מתמקד קצת יותר במרכז מאשר רק בשמיים */
   background-repeat: no-repeat;
+  animation: heroSlideshow 24s infinite ease-in-out;
 }
 
-/* התמונות המתחלפות – על ::before כדי שלא יפריעו לשאר */
-.hero-home::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  animation: heroSlideshow 20s infinite ease-in-out;
-}
-
-/* אנימציה – 5 תמונות, בערך כל 4 שניות מתחלפת */
+/* אנימציה שמחליפה בין 5 התמונות שלך */
 @keyframes heroSlideshow {
   0%   { background-image: url("img/campus_front.jpg"); }
   20%  { background-image: url("img/campus_yard.jpg"); }
@@ -400,6 +392,26 @@ body.light-mode .theme-toggle:hover {
   80%  { background-image: url("img/school_aerial.jpg"); }
   100% { background-image: url("img/campus_front.jpg"); }
 }
+
+/* שכבת כהות מעל התמונה כדי שהטקסט יישאר קריא */
+.hero-home::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.35),
+    rgba(0, 0, 0, 0.55)
+  );
+  backdrop-filter: blur(1.5px);
+  z-index: 0;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+}
+
 
 
 /* ========== SECTIONS GENERIC ========== */
