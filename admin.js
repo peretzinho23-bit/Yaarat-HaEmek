@@ -18,7 +18,6 @@ import {
   getDownloadURL
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-storage.js";
 
-
 const GRADES = ["z", "h", "t"];
 
 let newsData = { z: [], h: [], t: [] };
@@ -36,10 +35,15 @@ function escapeHtml(str) {
 }
 
 async function getDocSafe(pathArr, def) {
-  const refDoc = doc(db, ...pathArr);
-  const snap = await getDoc(refDoc);
-  if (!snap.exists()) return def;
-  return snap.data() || def;
+  try {
+    const refDoc = doc(db, ...pathArr);
+    const snap = await getDoc(refDoc);
+    if (!snap.exists()) return def;
+    return snap.data() || def;
+  } catch (e) {
+    console.error("getDocSafe error for", pathArr, e);
+    return def;
+  }
 }
 
 /* ------------ auth ------------ */
@@ -193,14 +197,19 @@ function setupNewsForms() {
         // אם יש קובץ – מעלים אותו ל-Firebase Storage
         if (file) {
           const filePath = `news/${g}/${Date.now()}_${file.name}`;
-          const storageRef = ref(storage, filePath);
-          await uploadBytes(storageRef, file);
-          finalImageUrl = await getDownloadURL(storageRef);
+          const fileRef = storageRef(storage, filePath);
+          await uploadBytes(fileRef, file);
+          finalImageUrl = await getDownloadURL(fileRef);
         }
 
-        newsData[g].push({ title, meta, body, imageUrl: finalImageUrl, color });
+        newsData[g].push({
+          title,
+          meta,
+          body,
+          imageUrl: finalImageUrl,
+          color
+        });
 
-        // ניקוי הטופס
         form.reset();
         renderNewsAdmin();
         await saveNewsGrade(g);
@@ -352,9 +361,9 @@ function setupBoardForm() {
       // אם נבחר קובץ – מעלים אותו ל-Firebase Storage
       if (file) {
         const filePath = `board/${Date.now()}_${file.name}`;
-        const storageRef = ref(storage, filePath);
-        await uploadBytes(storageRef, file);
-        finalImageUrl = await getDownloadURL(storageRef);
+        const fileRef = storageRef(storage, filePath);
+        await uploadBytes(fileRef, file);
+        finalImageUrl = await getDownloadURL(fileRef);
       }
 
       boardData.push({ title, meta, body, imageUrl: finalImageUrl, color });
@@ -370,9 +379,7 @@ function setupBoardForm() {
   });
 }
 
-
-
-/* ------------ SITE CONTENT (about / home / contact / important / theming) ------------ */
+/* ------------ SITE CONTENT (about / home / contact / important) ------------ */
 
 async function loadSiteContent() {
   const data = await getDocSafe(["siteContent", "main"], {});
@@ -393,7 +400,7 @@ function fillSiteContentForm() {
     "aboutTitle",
     "aboutBody",
 
-    // IMPORTANT SECTION (חשוב לדעת)
+    // IMPORTANT SECTION
     "importantTitle",
     "importantSubtitle",
     "importantCard1Title",
@@ -425,12 +432,10 @@ function fillSiteContentForm() {
     // FOOTER
     "footerText",
 
-    // IMAGES (לוגו, הירו, רקעים וכו')
+    // EXTRA (אם תרצה להשתמש בעתיד)
     "logoUrl",
     "heroImageUrl",
     "cardBgImageUrl",
-
-    // THEME / COLORS
     "primaryColor",
     "buttonColor",
     "cardBgColor",
