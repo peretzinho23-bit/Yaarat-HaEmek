@@ -2257,3 +2257,43 @@ body[data-theme="light"] .hero-side-card {
   height: 100%;
   border: 0;
 }
+/* פריסה של 2 עמודות */
+.contact-flex {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: stretch;
+  margin-top: 20px;
+}
+
+/* תיבת יצירת קשר */
+.contact-info {
+  flex: 1;
+}
+
+/* מפה קטנה */
+.map-container-small {
+  flex: 1;
+  max-width: 350px; /* שולט על גודל המפה */
+  height: 230px;
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+.map-container-small iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* רספונסיב לטלפון */
+@media (max-width: 768px) {
+  .contact-flex {
+    flex-direction: column;
+  }
+  
+  .map-container-small {
+    max-width: 100%;
+    height: 250px;
+  }
+}
