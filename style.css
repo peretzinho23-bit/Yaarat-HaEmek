@@ -2321,19 +2321,19 @@ body[data-theme="light"] .hero-side-card {
 }
 /* ===== NAV בלי מלבן – משתלב ברקע ===== */
 
-/* מצב רגיל (דארק) */
+/* NAV בלי מלבן – גם בלייט מוד */
 .nav {
   background: transparent !important;
   border-radius: 0 !important;
   border: none !important;
   box-shadow: none !important;
-  padding: 10px 0; /* רק רווח אנכי קטן */
+  padding: 10px 0;
 }
 
-/* מצב בהיר (ברייט מוד) */
 html[data-theme="light"] .nav,
 body.theme-light .nav {
   background: transparent !important;
-  border: none !important;
+  border-radius: 0 !important;
   box-shadow: none !important;
 }
+
