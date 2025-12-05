@@ -2203,3 +2203,40 @@ html[data-theme="light"] #hero-main-body {
     ) !important;
   }
 }
+/* ביטול הגלואו מהכותרת הראשית ותת־כותרת בהירו */
+.hero-text h1,
+.hero-text p {
+  text-shadow: none !important;
+}
+/* בסיס לכרטיס "מידע מהיר" */
+.hero-side-card {
+  border-radius: 18px;
+  padding: 14px 18px;
+}
+
+/* מצב כהה (דארק מוד) – נשאר זכוכית כהה */
+body:not([data-theme="light"]) .hero-side-card {
+  background: rgba(15, 23, 42, 0.85);
+  color: #e5e7eb;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+/* מצב בהיר (ברייט מוד) – כרטיס לבן חזק וקריא */
+body[data-theme="light"] .hero-side-card {
+  background: rgba(255, 255, 255, 0.95);
+  color: #020617;
+  box-shadow: 0 18px 60px rgba(15, 23, 42, 0.22);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+/* כותרת "מידע מהיר" קצת יותר מודגשת */
+.hero-side-card h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+/* הטקסט בפנים קצת יותר קריא */
+.hero-side-card li {
+  font-size: 0.9rem;
+}
