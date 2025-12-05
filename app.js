@@ -494,6 +494,20 @@ function initTheme() {
 function setupMobileNav() {
   const navToggle = document.querySelector(".nav-toggle");
   const navRight = document.querySelector(".nav-right");
+
+  // ✨ מוסיפים לפני ה-if — ככה רצית
+  if (navRight) {
+    navRight.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", () => {
+        navRight.classList.remove("open");
+        navToggle?.classList.remove("open");
+        navToggle?.setAttribute("aria-expanded", "false");
+        document.body.classList.remove("nav-open");
+      });
+    });
+  }
+
+  // אם אין תפריט או כפתור – יוצאים
   if (!navToggle || !navRight) return;
 
   function applyNavVisibility() {
@@ -525,6 +539,7 @@ function setupMobileNav() {
     }
   });
 }
+
 
 /* ------------ SCROLL TO TOP ------------ */
 

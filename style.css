@@ -1516,3 +1516,123 @@ html.access-links a {
     bottom: 135px;
   }
 }
+/* =========================
+   שיפורים למובייל – פוליש
+   ========================= */
+@media (max-width: 768px) {
+  html, body {
+    max-width: 100%;
+    overflow-x: hidden; /* לא מאפשר גרירה לצדדים */
+  }
+
+  /* גודל טקסט נעים יותר */
+  body {
+    font-size: 15px;
+  }
+
+  /* מרחקים קצת יותר קטנים במובייל */
+  section {
+    padding: 28px 0;
+  }
+
+  .section-header {
+    margin-bottom: 18px;
+  }
+
+  .section-title {
+    font-size: 1.35rem;
+  }
+
+  .section-subtitle {
+    font-size: 0.9rem;
+  }
+
+  /* רשת הבית – עמודה אחת */
+  .home-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .grade-card {
+    padding: 12px 13px;
+  }
+
+  /* חדשות בדף הבית – שלא יתפרשו מוזר */
+  .home-news-item-with-image {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .home-news-image-wrap {
+    max-width: 80px;
+  }
+
+  .home-news-image-wrap img {
+    width: 80px;
+    height: 80px;
+  }
+
+  /* בדפי שכבה כבר טיפלנו ב-body[data-grade] – פה רק מוודא שלא נשבר */
+  body[data-grade] .home-news-item-with-image {
+    grid-template-columns: 1fr;
+  }
+
+  /* תמונות – באופן כללי במובייל שלא יתפוצצו */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* hero – פחות גבוה במובייל */
+  .hero {
+    padding: 36px 0 40px;
+  }
+
+  .hero-content {
+    gap: 20px;
+  }
+
+  .hero-text h1 {
+    font-size: 1.6rem;
+  }
+
+  .hero-text p {
+    font-size: 0.9rem;
+  }
+
+  /* כרטיס צדדי – לא ענק מדי */
+  .hero-side-card {
+    font-size: 0.85rem;
+  }
+
+  /* כפתורי שכבות + בקשות – שיהיו יפים וסימטריים */
+  .grades-buttons {
+    gap: 8px;
+  }
+
+  .grade-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .card.request-box {
+    padding: 14px 12px;
+  }
+
+  /* כפתור חזרה למעלה – טיפה יותר קטן במובייל */
+  #to-top {
+    right: 12px;
+    bottom: 12px;
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
+
+  /* נגישלי / כפתורים צפים – שלא יכסו את התוכן */
+  .nagishli-btn,
+  #nagishli-btn {
+    z-index: 9999;
+  }
+}
