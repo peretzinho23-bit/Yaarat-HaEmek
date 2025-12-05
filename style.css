@@ -1243,21 +1243,54 @@ body.light-mode button#theme-toggle {
 body.light-mode button#theme-toggle:hover {
   background: #e2e8f0;
 }
-/* -------------------- */
-/* תמונות בדף שכבה     */
-/* -------------------- */
-body[data-grade] .home-news-item-with-image img {
-  width: 400%;
-  height: auto;
-  max-height: 450px;
-  object-fit: cover;
-  border-radius: 10px;
+/* --------------------------
+   תמונות חדשות בדפי שכבה
+--------------------------- */
+
+/* עיצוב חדש לכרטיס חדשות בדף שכבה */
+body[data-grade] .home-news-item-with-image {
+  display: block;
+  width: 100%;
+  max-width: 800px; /* שיהיה יפה באמצע */
+  margin: 0 auto 40px auto;
+  background: #13151c;
+  padding: 20px;
+  border-radius: 14px;
+  border: 1px solid #2a2d36;
 }
 
-/* שהטקסט לא יידבק */
-body[data-grade] .home-news-item-with-image {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  padding: 20px;
+/* תמונה גדולה */
+body[data-grade] .home-news-item-with-image img {
+  width: 100%;
+  height: 420px;
+  object-fit: cover;
+  border-radius: 12px;
+  display: block;
+  margin-bottom: 20px;
+}
+
+/* טקסט קריא ורחב */
+body[data-grade] .home-news-item-with-image .home-news-text {
+  padding: 10px 5px;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+/* כותרת */
+body[data-grade] .home-news-title {
+  font-size: 1.7rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+/* תיאור קצר */
+body[data-grade] .home-news-meta {
+  opacity: 0.8;
+  margin-bottom: 10px;
+}
+
+/* גוף החדשה */
+body[data-grade] .home-news-body {
+  white-space: pre-line;
+  font-size: 1.2rem;
 }
