@@ -1247,7 +1247,7 @@ body.light-mode button#theme-toggle:hover {
 /* תמונות בדף שכבה     */
 /* -------------------- */
 body[data-grade] .home-news-item-with-image img {
-  width: 100%;
+  width: 400%;
   height: auto;
   max-height: 450px;
   object-fit: cover;
