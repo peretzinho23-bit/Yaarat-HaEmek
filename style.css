@@ -1244,34 +1244,40 @@ body.light-mode button#theme-toggle:hover {
   background: #e2e8f0;
 }
 /* --------------------------
-   תמונות חדשות בדפי שכבה
+   חדשות בדפי שכבה – תצוגה מלאה
 --------------------------- */
 
-/* עיצוב חדש לכרטיס חדשות בדף שכבה */
+/* הכרטיס עצמו – רחב ויפה במרכז */
 body[data-grade] .home-news-item-with-image {
   display: block;
   width: 100%;
-  max-width: 800px; /* שיהיה יפה באמצע */
+  max-width: 900px;
   margin: 0 auto 40px auto;
   background: #13151c;
-  padding: 20px;
-  border-radius: 14px;
+  padding: 24px;
+  border-radius: 18px;
   border: 1px solid #2a2d36;
 }
 
-/* תמונה גדולה */
-body[data-grade] .home-news-item-with-image img {
+/* מבטלים את הטור הצר של התמונה מהדף הראשי */
+body[data-grade] .home-news-item-with-image .home-news-image-wrap {
   width: 100%;
-  height: 420px;
-  object-fit: cover;
-  border-radius: 12px;
-  display: block;
-  margin-bottom: 20px;
+  margin: 0 0 18px 0;
 }
 
-/* טקסט קריא ורחב */
+/* התמונה – רוחב מלא */
+body[data-grade] .home-news-item-with-image .home-news-image-wrap img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 480px;
+  object-fit: contain; /* אם תרצה חתוך – תחליף ל-cover */
+  border-radius: 14px;
+}
+
+/* טקסט החדשה */
 body[data-grade] .home-news-item-with-image .home-news-text {
-  padding: 10px 5px;
+  padding: 4px 2px;
   font-size: 1.1rem;
   line-height: 1.6;
 }
@@ -1292,5 +1298,5 @@ body[data-grade] .home-news-meta {
 /* גוף החדשה */
 body[data-grade] .home-news-body {
   white-space: pre-line;
-  font-size: 1.2rem;
+  font-size: 1.15rem;
 }
