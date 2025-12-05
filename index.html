@@ -46,58 +46,47 @@
 </head>
 
 <body>
-  <!-- HEADER -->
-  <header class="header-main">
-    <div class="container">
-      <nav class="nav">
-        <!-- צד שמאל: לוגו + כותרת -->
-        <div class="nav-left">
-          <div class="logo-circle">
-            <img
-              src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png"
-              alt="סמל בית הספר יערת העמק"
-              class="logo-img"
-            >
-          </div>
-
-          <div>
-            <!-- כותרת ראשית – מתעדכנת מהאדמין דרך siteContent -->
-            <div class="school-title-main" id="home-hero-title">
-              ברוכים הבאים ליערת העמק
-            </div>
-            <div class="school-title-sub" id="home-hero-subtitle">
-              סביבת למידה בטוחה, תומכת ומובילה – כל תלמיד ותלמידה עולם ומלואו.
-            </div>
+<!-- HEADER -->
+<header class="header-main">
+  <div class="container">
+    <nav class="nav">
+      <div class="nav-left">
+        <div class="logo-square">
+          <img src="./assets/logo.png" alt="סמל בית הספר" class="logo-img">
+        </div>
+        <div>
+          <div class="school-title-main">בית ספר יערת העמק – מגדל העמק</div>
+          <div class="school-title-sub">
+            אתר לתלמידים | <a href="https://yaarat.gdomain.co.il/" target="_blank" rel="noopener">אתר רשמי</a>
           </div>
         </div>
+      </div>
 
-        <!-- צד ימין: תפריט -->
-        <div class="nav-right">
-          <a href="#about">אודות</a>
-          <a href="#home-news">חדשות</a>
-          <a href="#home-exams">מבחנים</a>
-          <a href="#grades">השכבות</a>
-          <a href="#contact">יצירת קשר</a>
-          <a href="https://my.edu.gov.il/home" class="personal-btn">למרחב האישי</a>
-          <a href="admin.html" class="btn-outline">Admin</a>
+      <!-- לינקים ותפריט ימני -->
+      <div class="nav-right">
+        <a href="#about">אודות</a>
+        <a href="#home-news">חדשות</a>
+        <a href="#home-exams">מבחנים</a>
+        <a href="#grades">שכבות</a>
+        <a href="#contact">יצירת קשר</a>
+        <a href="./admin.html" class="btn-outline">כניסת צוות</a>
 
-          <!-- כפתור מצב כהה/בהיר – בתוך התפריט (במובייל יופיע מתחת ל-Admin) -->
-<button id="theme-toggle" class="theme-toggle" type="button">🌙</button>
-
-
-        <!-- כפתור תפריט מובייל (המבורגר) – setupMobileNav ב-app.js -->
-        <button
-          class="nav-toggle"
-          type="button"
-          aria-label="פתח תפריט"
-          aria-expanded="false">
-          <span></span>
-          <span></span>
-          <span></span>
+        <!-- כפתור מצב כהה/בהיר -->
+        <button id="theme-toggle" class="theme-toggle" type="button">
+          <span class="theme-icon">🌙</span>
         </button>
-      </nav>
-    </div>
-  </header>
+      </div>
+
+      <!-- כפתור המבורגר למובייל (מחוץ ל-nav-right!) -->
+      <button class="nav-toggle" type="button" aria-label="תפריט">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </nav>
+  </div>
+</header>
+
 
   <!-- HERO -->
   <section class="hero hero-home">
