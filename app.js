@@ -88,58 +88,47 @@ function subscribeRealtimeHome() {
 
 /* ------------ RENDER HOME NEWS ------------ */
 
-function renderHomeNews() {
-  GRADES.forEach((g) => {
-    const listEl = document.getElementById(`home-news-${g}`);
-    if (!listEl) return;
+function renderGradeNews(grade) {
+  const listEl = document.getElementById("grade-news");
+  if (!listEl) return;
 
-    const items = homeNews[g] || [];
-    if (!items.length) {
-      listEl.innerHTML = `<p class="empty-msg">אין חדשות בשכבה זו כרגע.</p>`;
-      return;
-    }
+  const items = homeNews[grade] || [];
+  if (!items.length) {
+    listEl.innerHTML = `<p class="empty-msg">אין חדשות בשכבה זו כרגע.</p>`;
+    return;
+  }
 
-    listEl.innerHTML = items
-      .map((n) => {
-        const hasImage = !!n.imageUrl;
-        const colorStyle = n.color ? ` style="color:${escapeHtml(n.color)}"` : "";
-
-        if (hasImage) {
-          return `
-            <article class="home-news-item home-news-item-with-image"${colorStyle}>
-              <div class="home-news-image-wrap">
-                <img src="${escapeHtml(n.imageUrl)}" alt="${escapeHtml(
+  listEl.innerHTML = items
+    .map((n) => {
+      const colorStyle = n.color ? ` style="color:${escapeHtml(n.color)}"` : "";
+      const imageHtml = n.imageUrl
+        ? `
+          <div class="grade-news-image-wrap">
+            <img src="${escapeHtml(n.imageUrl)}" alt="${escapeHtml(
             n.title || ""
-          )}" />
-              </div>
-              <div class="home-news-text">
-                <h4 class="home-news-title">${escapeHtml(n.title)}</h4>
-                ${
-                  n.meta
-                    ? `<div class="home-news-meta">${escapeHtml(n.meta)}</div>`
-                    : ""
-                }
-                <div class="home-news-body">${escapeHtml(n.body)}</div>
-              </div>
-            </article>
-          `;
-        }
+          )}">
+          </div>
+        `
+        : "";
 
-        return `
-          <article class="home-news-item"${colorStyle}>
-            <h4 class="home-news-title">${escapeHtml(n.title)}</h4>
+      return `
+        <article class="grade-news-card"${colorStyle}>
+          ${imageHtml}
+          <div class="grade-news-text">
+            <h4 class="grade-news-title">${escapeHtml(n.title)}</h4>
             ${
               n.meta
-                ? `<div class="home-news-meta">${escapeHtml(n.meta)}</div>`
+                ? `<div class="grade-news-meta">${escapeHtml(n.meta)}</div>`
                 : ""
             }
-            <div class="home-news-body">${escapeHtml(n.body)}</div>
-          </article>
-        `;
-      })
-      .join("");
-  });
+            <div class="grade-news-body">${escapeHtml(n.body)}</div>
+          </div>
+        </article>
+      `;
+    })
+    .join("");
 }
+
 
 /* ------------ RENDER HOME EXAMS ------------ */
 
@@ -364,6 +353,33 @@ async function loadSiteContentForHome() {
     console.error("שגיאה בטעינת תוכן האתר:", err);
   }
 }
+// טעינת טקסט האודות מהמסמך siteContent/main
+async function loadAboutSectionFromSiteContent() {
+  const titleEl = document.getElementById("about-title");
+  const bodyEl  = document.getElementById("about-body");
+
+  // אם זה לא דף הבית – לא עושים כלום
+  if (!titleEl || !bodyEl) return;
+
+  try {
+    const snap = await getDoc(doc(db, "siteContent", "main"));
+    if (!snap.exists()) {
+      return; // אין מסמך עדיין – נשאר טקסט ברירת מחדל
+    }
+
+    const data = snap.data() || {};
+
+    if (data.aboutTitle && data.aboutTitle.trim()) {
+      titleEl.textContent = data.aboutTitle.trim();
+    }
+
+    if (data.aboutBody && data.aboutBody.trim()) {
+      bodyEl.textContent = data.aboutBody.trim();
+    }
+  } catch (err) {
+    console.error("Error loading about section:", err);
+  }
+}
 
 function setText(id, value) {
   const el = document.getElementById(id);
@@ -518,4 +534,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // דף שכבה (z / h / t)
     loadGradePage(grade);
   }
+
+});
+document.addEventListener("DOMContentLoaded", () => {
+  // מה שכבר יש לך פה (חדשות, מבחנים וכו')...
+
+  loadAboutSectionFromSiteContent(); // ← להוסיף את זה
 });
