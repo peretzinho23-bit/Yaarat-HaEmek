@@ -1298,3 +1298,37 @@ body.light-mode button#theme-toggle:hover {
   white-space: pre-line;
   font-size: 1.05rem;
 }
+/* ===============================
+   חיזוק ניגודיות במצב בהיר
+   =============================== */
+
+html[data-theme="light"] body {
+  color: #0b1120;
+}
+
+/* טקסטים עיקריים – שלא יהיו שקופים מדי */
+html[data-theme="light"] .section-title,
+html[data-theme="light"] .section-subtitle,
+html[data-theme="light"] .hero-text h1,
+html[data-theme="light"] .hero-text p,
+html[data-theme="light"] .about-text,
+html[data-theme="light"] .about-text p,
+html[data-theme="light"] .grade-card,
+html[data-theme="light"] .card,
+html[data-theme="light"] .contact-box,
+html[data-theme="light"] .home-news-title,
+html[data-theme="light"] .home-news-body,
+html[data-theme="light"] .home-item-title,
+html[data-theme="light"] .home-item-body {
+  color: #111827;
+  opacity: 1;
+}
+
+/* תתי־כותרות ומטא – טיפה יותר עדין אבל עדיין קריא */
+html[data-theme="light"] .home-news-meta,
+html[data-theme="light"] .home-item-meta,
+html[data-theme="light"] .section-subtitle,
+html[data-theme="light"] .board-item-meta {
+  color: #1f2937;
+  opacity: 0.9;
+}
