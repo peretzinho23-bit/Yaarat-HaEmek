@@ -27,7 +27,7 @@ function escapeHtml(str) {
     .replace(/>/g, "&gt;");
 }
 
-/* ------------ LOAD HOME DATA (NEWS / EXAMS / BOARD) ------------ */
+/* ------------ LOAD HOME DATA (ONE SHOT) ------------ */
 
 async function loadHomeDataOnce() {
   try {
@@ -58,7 +58,7 @@ async function loadHomeDataOnce() {
   }
 }
 
-// אם אתה רוצה לייב: אפשר להפעיל גם onSnapshot
+// לייב (לא חובה אבל נחמד)
 function subscribeRealtimeHome() {
   // NEWS
   for (const g of GRADES) {
@@ -214,6 +214,144 @@ function renderHomeBoard() {
     .join("");
 }
 
+/* ------------ GRADE PAGES (NEWS / EXAMS / BOARD) ------------ */
+
+function renderGradeNews(grade) {
+  const listEl = document.getElementById("grade-news");
+  if (!listEl) return;
+
+  const items = homeNews[grade] || [];
+  if (!items.length) {
+    listEl.innerHTML = `<p class="empty-msg">אין חדשות בשכבה זו כרגע.</p>`;
+    return;
+  }
+
+  listEl.innerHTML = items
+    .map((n) => {
+      const hasImage = !!n.imageUrl;
+      const colorStyle = n.color ? ` style="color:${escapeHtml(n.color)}"` : "";
+
+      if (hasImage) {
+        return `
+          <article class="home-news-item home-news-item-with-image"${colorStyle}>
+            <div class="home-news-image-wrap">
+              <img src="${escapeHtml(n.imageUrl)}" alt="${escapeHtml(
+          n.title || ""
+        )}" />
+            </div>
+            <div class="home-news-text">
+              <h4 class="home-news-title">${escapeHtml(n.title)}</h4>
+              ${
+                n.meta
+                  ? `<div class="home-news-meta">${escapeHtml(n.meta)}</div>`
+                  : ""
+              }
+              <div class="home-news-body">${escapeHtml(n.body)}</div>
+            </div>
+          </article>
+        `;
+      }
+
+      return `
+        <article class="home-news-item"${colorStyle}>
+          <h4 class="home-news-title">${escapeHtml(n.title)}</h4>
+          ${
+            n.meta
+              ? `<div class="home-news-meta">${escapeHtml(n.meta)}</div>`
+              : ""
+          }
+          <div class="home-news-body">${escapeHtml(n.body)}</div>
+        </article>
+      `;
+    })
+    .join("");
+}
+
+function renderGradeExams(grade) {
+  const listEl = document.getElementById("grade-exams");
+  if (!listEl) return;
+
+  const items = homeExams[grade] || [];
+  if (!items.length) {
+    listEl.innerHTML = `<p class="empty-msg">אין מבחנים קרובים לשכבה זו.</p>`;
+    return;
+  }
+
+  listEl.innerHTML = items
+    .map(
+      (ex) => `
+      <article class="home-exam-item">
+        <div class="home-exam-top">
+          <span class="home-exam-date">${escapeHtml(ex.date)}</span>
+          <span class="home-exam-subject">${escapeHtml(ex.subject)}</span>
+        </div>
+        ${
+          ex.topic
+            ? `<div class="home-exam-topic">${escapeHtml(ex.topic)}</div>`
+            : ""
+        }
+      </article>
+    `
+    )
+    .join("");
+}
+
+function renderGradeBoard() {
+  const listEl = document.getElementById("board-list");
+  if (!listEl) return;
+
+  if (!boardData.length) {
+    listEl.innerHTML = `<p class="empty-msg">אין מודעות כרגע.</p>`;
+    return;
+  }
+
+  listEl.innerHTML = boardData
+    .map((b) => {
+      const colorStyle = b.color ? ` style="color:${escapeHtml(b.color)}"` : "";
+      const imgHtml = b.imageUrl
+        ? `
+        <div class="board-item-image">
+          <img src="${escapeHtml(b.imageUrl)}" alt="${escapeHtml(
+          b.title || ""
+        )}">
+        </div>
+      `
+        : "";
+
+      return `
+        <article class="board-item"${colorStyle}>
+          <div class="board-item-title">${escapeHtml(b.title)}</div>
+          ${
+            b.meta
+              ? `<div class="board-item-meta">${escapeHtml(b.meta)}</div>`
+              : ""
+          }
+          <div class="board-item-body">${escapeHtml(b.body)}</div>
+          ${imgHtml}
+        </article>
+      `;
+    })
+    .join("");
+}
+
+async function loadGradePage(grade) {
+  try {
+    // נטען את כל הדאטה (אותו מודל כמו הבית)
+    await loadHomeDataOnce();
+
+    // נרנדר לדף שכבה
+    renderGradeNews(grade);
+    renderGradeExams(grade);
+    renderGradeBoard();
+
+    initTheme();
+    setupMobileNav();
+    setupScrollToTop();
+  } catch (err) {
+    console.error("שגיאה בטעינת דף שכבה:", err);
+  }
+}
+
 /* ------------ SITE CONTENT (HOME TEXTS) ------------ */
 
 async function loadSiteContentForHome() {
@@ -229,20 +367,19 @@ async function loadSiteContentForHome() {
 
 function setText(id, value) {
   const el = document.getElementById(id);
-  if (el) el.textContent = value || "";
+  if (el && value != null) el.textContent = value;
 }
 
 function setHtml(id, value) {
   const el = document.getElementById(id);
-  if (el) el.innerHTML = value || "";
+  if (el && value != null) el.innerHTML = value;
 }
 
-function setImageSrc(id, url, fallbackAlt) {
-  const el = document.getElementById(id);
-  if (el && url) {
-    el.src = url;
-    if (fallbackAlt) el.alt = fallbackAlt;
-  }
+function setImageSrc(id, url, alt) {
+  const img = document.getElementById(id);
+  if (!img || !url) return;
+  img.src = url;
+  if (alt) img.alt = alt;
 }
 
 function applySiteContentToDom() {
@@ -251,20 +388,6 @@ function applySiteContentToDom() {
   // HERO
   setText("home-hero-title", siteContent.homeHeroTitle);
   setText("home-hero-subtitle", siteContent.homeHeroSubtitle);
-
-  // ABOUT
-  setText("about-title", siteContent.aboutTitle);
-  setHtml("about-body", siteContent.aboutBody);
-
-  // IMPORTANT
-  setText("important-title", siteContent.importantTitle);
-  setText("important-subtitle", siteContent.importantSubtitle);
-  setText("important-card1-title", siteContent.importantCard1Title);
-  setHtml("important-card1-body", siteContent.importantCard1Body);
-  setText("important-card2-title", siteContent.importantCard2Title);
-  setHtml("important-card2-body", siteContent.importantCard2Body);
-  setText("important-card3-title", siteContent.importantCard3Title);
-  setHtml("important-card3-body", siteContent.importantCard3Body);
 
   // GRADES SECTION
   setText("grades-section-title", siteContent.gradesSectionTitle);
@@ -298,60 +421,36 @@ function applySiteContentToDom() {
 const THEME_KEY = "yaarat-theme";
 
 function applyTheme(theme) {
-  const html = document.documentElement;
-  const body = document.body;
-  const toggle = document.getElementById("theme-toggle");
-
-  if (!toggle) return;
-
-  if (theme === "light") {
-    html.setAttribute("data-theme", "light");
-    body.classList.add("theme-light");
-    toggle.innerText = "☀️";
-  } else {
-    html.removeAttribute("data-theme");
-    body.classList.remove("theme-light");
-    toggle.innerText = "🌙";
-  }
+  document.documentElement.setAttribute("data-theme", theme);
 }
 
 function initTheme() {
-  const stored = localStorage.getItem(THEME_KEY);
-  const systemPrefersLight =
-    window.matchMedia &&
-    window.matchMedia("(prefers-color-scheme: light)").matches;
+  const saved = localStorage.getItem(THEME_KEY) || "light";
+  applyTheme(saved);
 
-  const initialTheme = stored || (systemPrefersLight ? "light" : "dark");
-  applyTheme(initialTheme);
+  const btn = document.getElementById("theme-toggle");
+  if (!btn) return;
 
-  const toggle = document.getElementById("theme-toggle");
-  if (!toggle) return;
+  btn.textContent = saved === "dark" ? "☀️" : "🌙";
 
-  toggle.addEventListener("click", () => {
-    const current =
-      document.documentElement.getAttribute("data-theme") === "light"
-        ? "light"
-        : "dark";
-    const next = current === "light" ? "dark" : "light";
-    localStorage.setItem(THEME_KEY, next);
+  btn.addEventListener("click", () => {
+    const current = document.documentElement.getAttribute("data-theme");
+    const next = current === "dark" ? "light" : "dark";
     applyTheme(next);
+    localStorage.setItem(THEME_KEY, next);
+    btn.textContent = next === "dark" ? "☀️" : "🌙";
   });
 }
 
-/* ------------ MOBILE NAV (המבורגר) ------------ */
+/* ------------ NAV (MOBILE) ------------ */
 
 function setupMobileNav() {
   const navToggle = document.querySelector(".nav-toggle");
   const navRight = document.querySelector(".nav-right");
-
   if (!navToggle || !navRight) return;
 
-  // דואג שהכפתור יופיע תמיד במובייל גם אם ה-CSS עושה display:none
   function applyNavVisibility() {
-    if (window.innerWidth <= 768) {
-      navToggle.style.display = "flex";
-    } else {
-      navToggle.style.display = "";
+    if (window.innerWidth > 900) {
       navRight.classList.remove("open");
       navToggle.classList.remove("open");
       navToggle.setAttribute("aria-expanded", "false");
@@ -370,22 +469,13 @@ function setupMobileNav() {
     document.body.classList.toggle("nav-open", isOpen);
   });
 
-  navRight.querySelectorAll("a").forEach((link) => {
-    link.addEventListener("click", () => {
+  document.addEventListener("click", (e) => {
+    if (!navRight.contains(e.target) && !navToggle.contains(e.target)) {
       navRight.classList.remove("open");
       navToggle.classList.remove("open");
       navToggle.setAttribute("aria-expanded", "false");
       document.body.classList.remove("nav-open");
-    });
-  });
-
-  document.addEventListener("click", (e) => {
-    if (!navRight.classList.contains("open")) return;
-    if (navRight.contains(e.target) || navToggle.contains(e.target)) return;
-    navRight.classList.remove("open");
-    navToggle.classList.remove("open");
-    navToggle.setAttribute("aria-expanded", "false");
-    document.body.classList.remove("nav-open");
+    }
   });
 }
 
@@ -413,13 +503,19 @@ function setupScrollToTop() {
 /* ------------ INIT ------------ */
 
 document.addEventListener("DOMContentLoaded", () => {
-  // דף הבית
-  if (document.body.dataset.page === "home") {
+  const page = document.body.dataset.page;
+  const grade = document.body.dataset.grade;
+
+  if (page === "home") {
+    // דף הבית הרגיל
     loadHomeDataOnce();
     subscribeRealtimeHome();
     loadSiteContentForHome();
     initTheme();
     setupMobileNav();
     setupScrollToTop();
+  } else if (grade) {
+    // דף שכבה (z / h / t)
+    loadGradePage(grade);
   }
 });
