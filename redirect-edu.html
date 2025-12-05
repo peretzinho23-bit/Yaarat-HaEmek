@@ -2,55 +2,84 @@
 <html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8" />
+  <title>המרחב האישי – יערת העמק</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>מרחב אישי – יערת העמק</title>
-
+  <link rel="stylesheet" href="style.css" />
   <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background: #0a1124;
-      color: white;
-      font-family: system-ui, sans-serif;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
+    .personal-wrapper {
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: 16px;
     }
-
-    .header {
-      padding: 14px;
-      font-size: 1.2rem;
-      text-align: center;
-      background: rgba(255,255,255,0.06);
-      border-bottom: 1px solid rgba(255,255,255,0.1);
+    .personal-card {
+      background: rgba(0,0,0,0.5);
+      border-radius: 18px;
+      border: 1px solid rgba(129,212,250,0.4);
+      padding: 18px;
     }
-
-    .frame-wrap {
-      flex: 1;
-      padding: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+    .personal-card h1 {
+      font-size: 1.6rem;
+      margin-bottom: 8px;
     }
-
-    iframe {
-      width: 95%;
-      height: 90%;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.2);
-      background: #000;
+    .personal-card p {
+      font-size: 0.95rem;
+      opacity: 0.9;
+      margin-bottom: 12px;
+    }
+    .personal-iframe {
+      width: 100%;
+      height: 75vh;
+      border: 1px solid rgba(148,163,184,0.6);
+      border-radius: 14px;
+      background: #020617;
     }
   </style>
 </head>
+<body data-page="personal">
+  <header class="header-main">
+    <div class="container">
+      <nav class="nav">
+        <div class="nav-left">
+          <div class="logo-circle">
+            <img src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png"
+                 alt="סמל בית הספר" class="logo-img">
+          </div>
+          <div>
+            <div class="school-title-main">יערת העמק · המרחב האישי</div>
+            <div class="school-title-sub">התחברות דרך משרד החינוך</div>
+          </div>
+        </div>
 
-<body>
-  <div class="header">
-    נטען את המרחב האישי עבורך...
-  </div>
+        <div class="nav-right">
+          <a href="index.html">דף הבית</a>
+          <a href="admin.html" class="btn-outline">Admin</a>
+          <button id="theme-toggle" class="theme-toggle">🌙</button>
+        </div>
 
-  <div class="frame-wrap">
-    <iframe src="https://my.edu.gov.il/home" allowfullscreen></iframe>
-  </div>
+        <button class="nav-toggle" type="button" aria-label="פתח תפריט">
+          <span></span><span></span><span></span>
+        </button>
+      </nav>
+    </div>
+  </header>
 
+  <main class="personal-wrapper">
+    <div class="personal-card">
+      <h1>התחברות למרחב האישי</h1>
+      <p>
+        כאן מתחברים למרחב האישי של משרד החינוך דרך האתר של יערת העמק.
+        ההתחברות מתבצעת דרך מערכת משרד החינוך (edu.gov.il).
+      </p>
+
+      <iframe
+        class="personal-iframe"
+        src="https://my.edu.gov.il/home"
+        title="המרחב האישי – משרד החינוך"
+      ></iframe>
+    </div>
+  </main>
+
+  <div id="to-top">↑</div>
+  <script type="module" src="app.js"></script>
 </body>
 </html>
