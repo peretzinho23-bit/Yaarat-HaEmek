@@ -86,7 +86,6 @@
             🌙
           </button>
         </div>
-        
 
         <!-- כפתור תפריט מובייל (המבורגר) – setupMobileNav ב-app.js -->
         <button
@@ -388,7 +387,7 @@
     </div>
   </section>
 
-  <footer>
+    <footer>
     <div class="container">
       <p id="footer-text">© כל הזכויות שמורות לבית ספר יערת העמק</p>
     </div>
@@ -397,7 +396,19 @@
   <!-- כפתור חזרה לראש הדף – הסטייל מגיע מ-style.css -->
   <div id="to-top">↑</div>
 
-  <!-- לוגיקת Firebase / אתר (כולל initTheme + setupMobileNav + הכל) -->
+  <!-- לוגיקת Firebase / אתר -->
   <script type="module" src="app.js"></script>
+
+  <!-- נגישות – חייב להיות לפני </body> -->
+  <script src="https://cdn.jsdelivr.net/gh/nagishli/nagishli/dist/nagishli.min.js"></script>
+  <script>
+    nagishli.init({
+      position: "right",
+      color: "#38bdf8",
+      iconSize: "large",
+      language: "he"
+    });
+  </script>
+
 </body>
 </html>
