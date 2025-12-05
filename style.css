@@ -445,9 +445,17 @@ body.light-mode .theme-toggle:hover {
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.35);
-  z-index: 10;
+  /* רק הצללה קלה מלמעלה ולמטה – בלי טשטוש בצדדים */
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.3),
+    rgba(0,0,0,0.05) 45%,
+    rgba(4,8,20,0.8)
+  );
+  backdrop-filter: none; /* ביטול הטשטוש */
+  z-index: 0;
 }
+
 
 .hero-content {
   position: relative;
