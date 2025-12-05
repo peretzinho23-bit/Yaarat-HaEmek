@@ -1746,3 +1746,24 @@ html.access-links a {
   position: relative;
   z-index: 1;
 }
+/* הקטנת גובה ההירו בדף הבית */
+.hero.hero-home {
+  min-height: 230px;       /* במקום 360px – תרגיש חופשי לשחק בין 220–260 */
+  padding: 30px 0 32px;    /* פחות רווח מעל ומתחת */
+}
+
+/* במובייל – אפילו קצת פחות */
+@media (max-width: 768px) {
+  .hero.hero-home {
+    min-height: 200px;
+    padding: 24px 0 26px;
+  }
+
+  .hero-text h1 {
+    font-size: 1.4rem;
+  }
+
+  .hero-text p {
+    font-size: 0.9rem;
+  }
+}
