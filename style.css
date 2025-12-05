@@ -1188,3 +1188,57 @@ body.theme-light .nav-right {
   object-fit: cover;
   display: block;
 }
+/* ===== תיקון סופי לכפתור המצב כהה/בהיר ===== */
+
+button#theme-toggle,
+#theme-toggle.theme-toggle {
+  all: unset;                 /* מוחק את הסגנון המכוער של הדפדפן */
+  box-sizing: border-box;
+
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #020617;        /* רקע כהה */
+  color: #f9fafb;             /* צבע אייקון */
+  border: 1px solid rgba(148, 163, 184, 0.7);
+
+  cursor: pointer;
+  font-size: 1.7rem;
+  line-height: 1;
+
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.7);
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
+}
+
+button#theme-toggle:hover {
+  background: rgba(37, 99, 235, 0.95);
+  border-color: rgba(129, 212, 250, 0.9);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.9);
+}
+
+button#theme-toggle:active {
+  transform: translateY(1px) scale(0.97);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7);
+}
+
+/* מצב בהיר */
+body.light-mode button#theme-toggle {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #0f172a;
+  box-shadow: 0 6px 16px rgba(148, 163, 184, 0.6);
+}
+
+body.light-mode button#theme-toggle:hover {
+  background: #e2e8f0;
+}
