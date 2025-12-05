@@ -1636,3 +1636,33 @@ html.access-links a {
     z-index: 9999;
   }
 }
+.hero-home {
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  animation: heroSlideshow 20s infinite linear;
+}
+
+@keyframes heroSlideshow {
+  0%   { background-image: url("pictures/school1.jpg"); }
+  20%  { background-image: url("pictures/school2.jpg"); }
+  40%  { background-image: url("pictures/school3.jpg"); }
+  60%  { background-image: url("pictures/school4.jpg"); }
+  80%  { background-image: url("pictures/school5.jpg"); }
+  100% { background-image: url("pictures/school1.jpg"); }
+}
+
+/* הצללה מעל הרקע כדי שהטקסט יישאר ברור */
+.hero-home::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.45); 
+  backdrop-filter: blur(2px);
+  z-index: 0;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+}
