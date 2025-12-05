@@ -284,12 +284,10 @@ body.light-mode .theme-toggle:hover {
 /* HERO של דף הבית – רקע מתחלף, גובה רגוע */
 .hero-home {
   position: relative;
-  min-height: clamp(220px, 30vh, 260px); /* לא ענק בדסקטופ */
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  animation: heroSlideshow 25s infinite ease-in-out;
+  height: 380px; /* היה 320px – תגדיל/תקטין איך שבא לך */
+  overflow: hidden;
 }
+
 
 /* סליידר רקע לפי זמן – בלי divים נוספים */
 @keyframes heroSlideshow {
@@ -1970,12 +1968,29 @@ body.theme-light .hero-overlay {
   position: absolute;
   inset: 0;
   background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.55),
-    rgba(0, 0, 0, 0.65)
+      to bottom,
+      rgba(255,255,255,0.9) 0%,    /* פייד עליון במצב בהיר */
+      rgba(255,255,255,0.5) 20%,
+      rgba(255,255,255,0) 40%,
+      rgba(255,255,255,0) 60%,
+      rgba(0,0,0,0.45) 100%       /* פייד תחתון כהה */
   );
-  z-index: 1;
+  z-index: 0;
+  pointer-events: none;
 }
+
+/* מצב כהה */
+html[data-theme="dark"] .hero-home::before {
+  background: linear-gradient(
+      to bottom,
+      rgba(0,0,0,0.6) 0%,     /* פייד עליון כהה */
+      rgba(0,0,0,0.3) 25%,
+      rgba(0,0,0,0) 45%,
+      rgba(0,0,0,0) 60%,
+      rgba(0,0,0,0.75) 100%   /* פייד תחתון חזק */
+  );
+}
+
 
 /* התוכן של ההירו – תמיד מעל הכל וממורכז אנכית */
 .hero-content {
@@ -2004,19 +2019,24 @@ body.theme-light .hero-overlay {
 }
 
 /* מובייל – טור אחד, טקסט באמצע */
-@media (max-width: 768px) {
+@@media (max-width: 600px) {
   .hero-content {
-    flex-direction: column;
-    text-align: center;
-    padding: 16px 0;
-    gap: 18px;
+    padding-top: 40px !important;  /* היה רחוק מדי מלמעלה */
   }
+  
+  .hero-text h1 {
+    font-size: 1.6rem !important; /* שלא יהיה ענק */
+  }
+
+  .hero-text p {
+    font-size: 0.95rem !important;
+  }
+}
 
   .hero-side-card {
     width: 100%;
     font-size: 0.85rem;
   }
-}
 
 /* ריווח יותר נעים בסקשנים בדסקטופ (כבר לא דחוס) */
 @media (min-width: 1024px) {
