@@ -2362,4 +2362,19 @@ body.theme-light .header-main .nav {
   padding-left: 16px;
   padding-right: 16px;
 }
+/* מחיקת ה"גלולה" הלבנה של ההדר */
+.header-main,
+.header-main > * {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+/* גם בלייט מוד – שלא יחזור להיות לבן */
+html[data-theme="light"] .header-main,
+html[data-theme="light"] .header-main > * {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
 
