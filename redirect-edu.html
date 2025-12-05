@@ -2,84 +2,228 @@
 <html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <title>המרחב האישי – יערת העמק</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>מתחבר למרחב האישי…</title>
+
+  <!-- אם יש לך style.css של האתר, אפשר להשאיר -->
   <link rel="stylesheet" href="style.css" />
+
   <style>
-    .personal-wrapper {
-      max-width: 1100px;
-      margin: 40px auto;
-      padding: 16px;
+    /* רק לעמוד הזה – לא הורס את שאר האתר */
+
+    body.redirect-body {
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, #1d4ed8, #020617 55%);
+      color: #e5e7eb;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow: hidden;
+      animation: pageFadeIn 0.7s ease-out;
     }
-    .personal-card {
-      background: rgba(0,0,0,0.5);
-      border-radius: 18px;
-      border: 1px solid rgba(129,212,250,0.4);
-      padding: 18px;
-    }
-    .personal-card h1 {
-      font-size: 1.6rem;
-      margin-bottom: 8px;
-    }
-    .personal-card p {
-      font-size: 0.95rem;
-      opacity: 0.9;
-      margin-bottom: 12px;
-    }
-    .personal-iframe {
+
+    .redirect-wrapper {
+      text-align: center;
+      max-width: 520px;
       width: 100%;
-      height: 75vh;
-      border: 1px solid rgba(148,163,184,0.6);
-      border-radius: 14px;
-      background: #020617;
+      padding: 26px 20px 30px;
+      border-radius: 24px;
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid rgba(148, 163, 184, 0.55);
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.8);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* הילה זוהרת מאחורי הכרטיס */
+    .redirect-wrapper::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background: radial-gradient(circle at top, rgba(59, 130, 246, 0.18), transparent 55%);
+      opacity: 0.9;
+      pointer-events: none;
+      z-index: -1;
+      animation: glowPulse 3s ease-in-out infinite;
+    }
+
+    .redirect-title {
+      font-size: 1.6rem;
+      margin-bottom: 6px;
+    }
+
+    .redirect-subtitle {
+      font-size: 0.95rem;
+      opacity: 0.85;
+      margin-bottom: 18px;
+    }
+
+    /* איזור ספינר + פרוגרס */
+    .loader-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    /* ספינר עגול */
+    .loader {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      border: 4px solid rgba(148, 163, 184, 0.35);
+      border-top-color: #38bdf8;
+      border-right-color: #22c55e;
+      animation: spin 1s linear infinite;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
+    }
+
+    /* פרוגרס־בר */
+    .progress-track {
+      width: 100%;
+      max-width: 320px;
+      height: 9px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.55);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #22c55e, #38bdf8, #a855f7);
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.8);
+      animation: progressFill 2.1s ease-out forwards;
+    }
+
+    /* טקסטים מתחלפים */
+    #changing-text {
+      font-size: 1.05rem;
+      margin-top: 4px;
+      min-height: 40px;
+      line-height: 1.7;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .fallback-link {
+      margin-top: 12px;
+      font-size: 0.85rem;
+      opacity: 0.7;
+    }
+
+    .fallback-link a {
+      color: #38bdf8;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    /* אנימציות */
+
+    @keyframes pageFadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes glowPulse {
+      0%, 100% { opacity: 0.5; transform: scale(1); }
+      50%      { opacity: 1; transform: scale(1.05); }
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes progressFill {
+      0%   { width: 0%; }
+      10%  { width: 12%; }
+      40%  { width: 40%; }
+      70%  { width: 75%; }
+      100% { width: 100%; }
+    }
+
+    @media (max-width: 480px) {
+      .redirect-wrapper {
+        margin: 0 14px;
+        padding: 20px 16px 24px;
+      }
+      .redirect-title {
+        font-size: 1.4rem;
+      }
+      #changing-text {
+        font-size: 0.95rem;
+      }
     }
   </style>
 </head>
-<body data-page="personal">
-  <header class="header-main">
-    <div class="container">
-      <nav class="nav">
-        <div class="nav-left">
-          <div class="logo-circle">
-            <img src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png"
-                 alt="סמל בית הספר" class="logo-img">
-          </div>
-          <div>
-            <div class="school-title-main">יערת העמק · המרחב האישי</div>
-            <div class="school-title-sub">התחברות דרך משרד החינוך</div>
-          </div>
-        </div>
 
-        <div class="nav-right">
-          <a href="index.html">דף הבית</a>
-          <a href="admin.html" class="btn-outline">Admin</a>
-          <button id="theme-toggle" class="theme-toggle">🌙</button>
-        </div>
+<body class="redirect-body">
+  <div class="redirect-wrapper">
+    <h1 class="redirect-title">🚀 מתחבר למרחב האישי</h1>
+    <p class="redirect-subtitle">אל תסגור את החלון – אנחנו מנתבים אותך למערכת משרד החינוך.</p>
 
-        <button class="nav-toggle" type="button" aria-label="פתח תפריט">
-          <span></span><span></span><span></span>
-        </button>
-      </nav>
+    <div class="loader-area">
+      <div class="loader"></div>
+
+      <div class="progress-track">
+        <div class="progress-fill"></div>
+      </div>
     </div>
-  </header>
 
-  <main class="personal-wrapper">
-    <div class="personal-card">
-      <h1>התחברות למרחב האישי</h1>
-      <p>
-        כאן מתחברים למרחב האישי של משרד החינוך דרך האתר של יערת העמק.
-        ההתחברות מתבצעת דרך מערכת משרד החינוך (edu.gov.il).
-      </p>
+    <p id="changing-text">טוען…</p>
 
-      <iframe
-        class="personal-iframe"
-        src="https://my.edu.gov.il/home"
-        title="המרחב האישי – משרד החינוך"
-      ></iframe>
-    </div>
-  </main>
+    <p class="fallback-link">
+      אם תוך כמה שניות לא קרה כלום,
+      <a href="https://my.edu.gov.il/home">לחצו כאן למעבר ידני</a>.
+    </p>
+  </div>
 
-  <div id="to-top">↑</div>
-  <script type="module" src="app.js"></script>
+  <script>
+    // משפטים מתחלפים – תרגיש חופשי להוסיף/להחליף
+    const messages = [
+      "מחפש את היוזר שלך בענן של משרד החינוך…",
+      "שואל את היועצת אם מותר להכניס אותך 😉",
+      "בודק שאין לך מבחן מפתיע היום…",
+      "מעדכן את לוח המבחנים… בערך.",
+      "נותן למורה למתמטיקה לחשב את הסיסמה שלך…",
+      "טוען ציונים… לא נלחץ, רק מסתכלים.",
+      "מיישר את הכפכפים במסדרון ואז ממשיכים…",
+      "עוד שנייה וזה עובר – אל תעשה רענן, זה מלחיץ."
+    ];
+
+    const textEl = document.getElementById("changing-text");
+    let index = 0;
+
+    function showMessage(i) {
+      textEl.style.opacity = 0;
+      setTimeout(() => {
+        textEl.textContent = messages[i];
+        textEl.style.opacity = 1;
+      }, 200);
+    }
+
+    // הצגת ההודעה הראשונה
+    showMessage(0);
+
+    // כל 650ms מחליף משפט (עד המעבר)
+    const msgInterval = setInterval(() => {
+      index = (index + 1) % messages.length;
+      showMessage(index);
+    }, 650);
+
+    // אחרי ~2.4 שניות מעביר לאתר המשרד
+    const REDIRECT_DELAY = 2400;
+    setTimeout(() => {
+      clearInterval(msgInterval);
+      window.location.href = "https://my.edu.gov.il/home";
+    }, REDIRECT_DELAY);
+  </script>
 </body>
 </html>
