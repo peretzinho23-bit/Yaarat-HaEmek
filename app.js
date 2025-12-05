@@ -417,18 +417,32 @@ function setImageSrc(id, url, alt) {
 function applySiteContentToDom() {
   if (!siteContent) return;
 
-  // HERO
+  // HERO (כותרת למעלה ליד הלוגו)
   setText("home-hero-title", siteContent.homeHeroTitle);
   setText("home-hero-subtitle", siteContent.homeHeroSubtitle);
 
-  // GRADES SECTION
+  // ABOUT – אודות בית הספר
+  setText("about-title", siteContent.aboutTitle);
+  setHtml("about-body", siteContent.aboutBody);
+
+  // IMPORTANT SECTION – "חשוב לדעת"
+  setText("important-title", siteContent.importantTitle);
+  setText("important-subtitle", siteContent.importantSubtitle);
+  setText("important-card-1-title", siteContent.importantCard1Title);
+  setHtml("important-card-1-body", siteContent.importantCard1Body);
+  setText("important-card-2-title", siteContent.importantCard2Title);
+  setHtml("important-card-2-body", siteContent.importantCard2Body);
+  setText("important-card-3-title", siteContent.importantCard3Title);
+  setHtml("important-card-3-body", siteContent.importantCard3Body);
+
+  // GRADES SECTION – טקסט על השכבות
   setText("grades-section-title", siteContent.gradesSectionTitle);
   setText("grades-section-subtitle", siteContent.gradesSectionSubtitle);
-  setHtml("z-description", siteContent.zDescription);
-  setHtml("h-description", siteContent.hDescription);
-  setHtml("t-description", siteContent.tDescription);
+  setHtml("grade-z-text", siteContent.zDescription);
+  setHtml("grade-h-text", siteContent.hDescription);
+  setHtml("grade-t-text", siteContent.tDescription);
 
-  // REQUESTS
+  // REQUESTS – תיבת בקשות
   setText("requests-title", siteContent.requestsTitle);
   setText("requests-subtitle", siteContent.requestsSubtitle);
   setHtml("requests-body", siteContent.requestsBody);
@@ -443,10 +457,11 @@ function applySiteContentToDom() {
   // FOOTER
   setText("footer-text", siteContent.footerText);
 
-  // IMAGES (אם ה־id לא קיים – לא קורה כלום)
+  // IMAGES (אם קיים id כזה ב־HTML)
   setImageSrc("logo-img", siteContent.logoUrl, "לוגו יערת העמק");
   setImageSrc("hero-image", siteContent.heroImageUrl, "בית הספר יערת העמק");
 }
+
 
 /* ------------ THEME TOGGLE ------------ */
 
