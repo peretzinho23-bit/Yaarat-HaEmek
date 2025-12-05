@@ -1137,9 +1137,10 @@ body.theme-light {
 
 html[data-theme="light"] .header-main,
 body.theme-light .header-main {
-  background: transparent;          /* גם בלייט – בלי פס לבן מלא */
-  box-shadow: none;
+  background: transparent !important;
+  box-shadow: none !important;
 }
+
 
 /* הניווט עצמו בלייט מוד – זכוכית בהירה */
 html[data-theme="light"] .nav,
