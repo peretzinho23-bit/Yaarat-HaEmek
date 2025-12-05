@@ -45,6 +45,10 @@
       z-index: -2;
       animation: bgMove 18s ease-in-out infinite alternate;
     }
+.dynamic-line.fade {
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
 
     @keyframes bgMove {
       0%   { transform: translate3d(0,0,0) scale(1); }
@@ -282,20 +286,24 @@
     // בוחר משפט רנדומלי חדש כל ~900ms
     let lastIndex = -1;
     function setRandomLine() {
-      let idx = Math.floor(Math.random() * lines.length);
-      if (idx === lastIndex) {
-        idx = (idx + 2) % lines.length;
-      }
-      lastIndex = idx;
-      dynamicEl.style.opacity = 0;
-      setTimeout(() => {
-        dynamicEl.textContent = lines[idx];
-        dynamicEl.style.opacity = 2;
-      }, 160);
-    }
+  let idx = Math.floor(Math.random() * lines.length);
+  if (idx === lastIndex) {
+    idx = (idx + 2) % lines.length;
+  }
+  lastIndex = idx;
+
+  // מוסיף אפקט הבהוב
+  dynamicEl.classList.add("fade");
+
+  setTimeout(() => {
+    dynamicEl.textContent = lines[idx];
+    dynamicEl.classList.remove("fade");
+  }, 250); // זמן הבהוב
+}
+
 
     setRandomLine();
-    const textInterval = setInterval(setRandomLine, 900);
+    const textInterval = setInterval(setRandomLine, 1500);
 
     // ===== ספירה לאחור ומעבר =====
     let secondsLeft = 4;
