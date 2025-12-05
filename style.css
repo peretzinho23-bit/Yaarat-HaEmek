@@ -272,26 +272,38 @@ body.light-mode .theme-toggle:hover {
 
 /* ========== HERO ========== */
 
+/* ========== HERO ========== */
+
 .hero {
   position: relative;
+  /* צבע בסיס מתחת לתמונות */
   background: radial-gradient(circle at top, #0288d1, #020818 55%);
   color: #fff;
   padding: 60px 0 80px;
   overflow: hidden;
 }
 
+/* שכבת כהות/מעבר על הרקע – נשארת כמו שהייתה */
 .hero-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.15), transparent 40%, #040814 90%);
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.18),
+    transparent 40%,
+    #040814 90%
+  );
+  z-index: 1;
 }
 
+/* תוכן ההירו – תמיד מעל הרקעים */
 .hero-content {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 40px;
+  z-index: 2;
 }
 
 .hero-text {
@@ -315,6 +327,7 @@ body.light-mode .theme-toggle:hover {
   flex-wrap: wrap;
 }
 
+/* כפתורים */
 .btn,
 .btn-outline {
   display: inline-block;
@@ -343,6 +356,7 @@ body.light-mode .theme-toggle:hover {
   background: rgba(0, 0, 0, 0.2);
 }
 
+/* כרטיס צדדי בהירו */
 .hero-side-card {
   flex: 1;
   background: rgba(0, 0, 0, 0.35);
@@ -355,6 +369,38 @@ body.light-mode .theme-toggle:hover {
 .hero-side-card h3 {
   margin-bottom: 8px;
 }
+
+/* === רקע מתחלף להירו בדף הבית בלבד === */
+/* ההירו בדף הבית (section class="hero hero-home") */
+.hero-home {
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* התמונות המתחלפות – על ::before כדי שלא יפריעו לשאר */
+.hero-home::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  animation: heroSlideshow 20s infinite ease-in-out;
+}
+
+/* אנימציה – 5 תמונות, בערך כל 4 שניות מתחלפת */
+@keyframes heroSlideshow {
+  0%   { background-image: url("img/campus_front.jpg"); }
+  20%  { background-image: url("img/campus_yard.jpg"); }
+  40%  { background-image: url("img/school_hallway.jpg"); }
+  60%  { background-image: url("img/students_activity.jpg"); }
+  80%  { background-image: url("img/school_aerial.jpg"); }
+  100% { background-image: url("img/campus_front.jpg"); }
+}
+
 
 /* ========== SECTIONS GENERIC ========== */
 
@@ -1636,28 +1682,29 @@ html.access-links a {
     z-index: 9999;
   }
 }
+/* === רקע מתחלף להירו === */
 .hero-home {
   position: relative;
   background-size: cover;
   background-position: center;
-  animation: heroSlideshow 20s infinite linear;
+  background-repeat: no-repeat;
+  animation: heroSlideshow 20s infinite ease-in-out;
 }
 
 @keyframes heroSlideshow {
-  0%   { background-image: url("pictures/school1.jpg"); }
-  20%  { background-image: url("pictures/school2.jpg"); }
-  40%  { background-image: url("pictures/school3.jpg"); }
-  60%  { background-image: url("pictures/school4.jpg"); }
-  80%  { background-image: url("pictures/school5.jpg"); }
-  100% { background-image: url("pictures/school1.jpg"); }
+  0%   { background-image: url("img/campus_front.jpg"); }
+  20%  { background-image: url("img/campus_yard.jpg"); }
+  40%  { background-image: url("img/school_hallway.jpg"); }
+  60%  { background-image: url("img/students_activity.jpg"); }
+  80%  { background-image: url("img/school_aerial.jpg"); }
+  100% { background-image: url("img/campus_front.jpg"); }
 }
 
-/* הצללה מעל הרקע כדי שהטקסט יישאר ברור */
 .hero-home::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.45); 
+  background: rgba(0,0,0,0.45);
   backdrop-filter: blur(2px);
   z-index: 0;
 }
