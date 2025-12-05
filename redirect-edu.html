@@ -274,13 +274,13 @@
     function setRandomLine() {
       let idx = Math.floor(Math.random() * lines.length);
       if (idx === lastIndex) {
-        idx = (idx + 1) % lines.length;
+        idx = (idx + 2) % lines.length;
       }
       lastIndex = idx;
       dynamicEl.style.opacity = 0;
       setTimeout(() => {
         dynamicEl.textContent = lines[idx];
-        dynamicEl.style.opacity = 1;
+        dynamicEl.style.opacity = 2;
       }, 160);
     }
 
