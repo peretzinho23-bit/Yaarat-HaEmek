@@ -2036,3 +2036,50 @@ html[data-theme="light"] .section-dark-strong,
 body.theme-light .section-dark-strong {
   background: #f5f7fb;  /* כמעט לבן, משתלב חלק */
 }
+/* גרדיאנט שונה למצב בהיר */
+html[data-theme="light"] .hero-home::before {
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.50),
+    rgba(255, 255, 255, 0.80) 65%,
+    rgba(245, 247, 251, 1)
+  );
+}
+/* טקסט כותרת בהירו */
+.hero-title,
+.hero-title * {
+  color: #ffffff;     /* במצב כהה */
+}
+
+/* במצב בהיר – טקסט כהה */
+html[data-theme="light"] .hero-title,
+html[data-theme="light"] .hero-title * {
+  color: #1b1d29;
+}
+/* ⭐ גלואו לכותרת "יחד צומחים..." */
+
+/* מצב כהה – טקסט לבן עם הילה כהה */
+#hero-main-title {
+  color: #ffffff;
+  text-shadow:
+    0 0 8px rgba(0, 0, 0, 0.8),
+    0 0 18px rgba(0, 0, 0, 0.7);
+  transition: text-shadow 0.25s ease, color 0.25s ease;
+}
+
+/* מצב בהיר – טקסט כהה עם הילה לבנה עדינה */
+html[data-theme="light"] #hero-main-title {
+  color: #111827;
+  text-shadow:
+    0 0 6px rgba(255, 255, 255, 0.9),
+    0 0 16px rgba(255, 255, 255, 0.75);
+}
+#hero-main-body {
+  text-shadow:
+    0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+html[data-theme="light"] #hero-main-body {
+  text-shadow:
+    0 0 5px rgba(255, 255, 255, 0.8);
+}
