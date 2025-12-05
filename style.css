@@ -377,28 +377,33 @@ body.light-mode .theme-toggle:hover {
 /* === רקע מתחלף להירו – עם תמונה כמעט מלאה === */
 /* === רקע מתחלף להירו – תמונה נכנסת בלי שייראה חתוך === */
 /* === HERO SLIDESHOW מקצועי עם קרוס-פייד === */
+/* === HERO SLIDER חדש ונקי === */
+
 .hero-home {
   position: relative;
-  height: 320px; /* אתה יכול לשנות */
+  min-height: 360px;         /* גובה סביר – אפשר לשחק עם זה */
   overflow: hidden;
 }
 
-/* כל התמונות נמצאות אחת על השנייה */
+/* כל השקופיות – שכבת רקע מתחת לכל התוכן */
 .hero-slides {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
+  z-index: 0;
 }
 
+/* שקופית אחת */
 .hero-slide {
   position: absolute;
   inset: 0;
-  background-size: contain;
+  background-size: cover;    /* מכסה את כל ההירו בלי ריבועים מכוערים */
   background-position: center;
   background-repeat: no-repeat;
   opacity: 0;
-  animation: slideFade 25s infinite;
+  transform: scale(1.05);    /* זום-אין קטן ואלגנטי */
+  animation: heroSlide 25s infinite;
 }
 
 /* תמונה 1 */
@@ -431,87 +436,32 @@ body.light-mode .theme-toggle:hover {
   animation-delay: 20s;
 }
 
-/* אפקט הקרוס-פייד */
-@keyframes slideFade {
-  0%   { opacity: 0; }
-  10%  { opacity: 1; }
-  30%  { opacity: 1; }
-  40%  { opacity: 0; }
-  100% { opacity: 0; }
+/* אנימציה – פייד עדין + זום-אין קטן (Ken Burns) */
+@keyframes heroSlide {
+  0%   { opacity: 0;   transform: scale(1.05); }
+  4%   { opacity: 1;   transform: scale(1.05); }
+  20%  { opacity: 1;   transform: scale(1.00); }
+  24%  { opacity: 0;   transform: scale(1.00); }
+  100% { opacity: 0;   transform: scale(1.05); }
 }
 
-/* שכבת כהות */
-.hero-home::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  /* רק הצללה קלה מלמעלה ולמטה – בלי טשטוש בצדדים */
-  background: linear-gradient(
-    to bottom,
-    rgba(0,0,0,0.3),
-    rgba(0,0,0,0.05) 45%,
-    rgba(4,8,20,0.8)
-  );
-  backdrop-filter: none; /* ביטול הטשטוש */
-  z-index: 0;
-}
-
-
-.hero-content {
-  position: relative;
-  z-index: 20;
-}
-
-
-
-/* שכבת כהות מעל התמונה כדי שהטקסט יישאר קריא */
-.hero-home::before {
-  content: "";
+/* שכבת כהות מעל התמונות, מתחת לטקסט (ה-hero-overlay שכבר יש לך) */
+.hero-overlay {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     to bottom,
     rgba(0, 0, 0, 0.35),
-    rgba(0, 0, 0, 0.55)
+    rgba(0, 0, 0, 0.10) 40%,
+    rgba(4, 8, 20, 0.85)
   );
-  backdrop-filter: blur(1.5px);
-  z-index: 0;
-}
-
-.hero-content {
-  position: relative;
   z-index: 1;
 }
 
-
-
-/* ========== SECTIONS GENERIC ========== */
-
-section {
-  padding: 40px 0;
-}
-
-.section-light {
-  background: #050a18;
-}
-
-.section-dark-strong {
-  background: #020814;
-}
-
-.section-header {
-  text-align: center;
-  margin-bottom: 24px;
-}
-
-.section-title {
-  font-size: 1.6rem;
-  margin-bottom: 8px;
-}
-
-.section-subtitle {
-  font-size: 0.95rem;
-  opacity: 0.8;
+/* התוכן של ההירו – מעל הכל */
+.hero-content {
+  position: relative;
+  z-index: 2;
 }
 
 /* ========== HOME NEWS + EXAMS ========== */
