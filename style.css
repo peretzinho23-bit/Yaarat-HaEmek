@@ -162,8 +162,8 @@ button:focus-visible {
   background: #1d4ed8;
   color: #ffffff;
   padding: 8px 14px;
-  border-radius: 999px;
-  font-weight: 600;
+  border-radius: 1040px;
+  font-weight: 540;
   transition: 0.2s;
   display: inline-block;
 }
