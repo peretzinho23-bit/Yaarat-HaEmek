@@ -1332,3 +1332,41 @@ html[data-theme="light"] .board-item-meta {
   color: #1f2937;
   opacity: 0.9;
 }
+/* ===============================
+   מצב בהיר לדפי שכבות (ז / ח / ט)
+   =============================== */
+
+html[data-theme="light"] body[data-grade] {
+  background: #e5edf7;      /* רקע בהיר במקום שחור */
+  color: #0f172a;           /* טקסט כהה וקריא */
+}
+
+/* ה־HERO של דף השכבה */
+html[data-theme="light"] body[data-grade] .grade-hero {
+  background: radial-gradient(circle at top, #e0f2fe, #f3f4f6);
+  border-bottom: 1px solid #cbd5e1;
+}
+
+/* הסקשנים בדף השכבה */
+html[data-theme="light"] body[data-grade] .section-dark-strong {
+  background: #e5edf7;
+}
+
+/* טקסטים חשובים – שלא יהיו שקופים */
+html[data-theme="light"] body[data-grade] .grade-hero h1,
+html[data-theme="light"] body[data-grade] .grade-hero p,
+html[data-theme="light"] body[data-grade] .section-title,
+html[data-theme="light"] body[data-grade] .section-subtitle,
+html[data-theme="light"] body[data-grade] .empty-msg {
+  color: #0f172a;
+  opacity: 0.9;
+}
+
+/* כרטיסי חדשות + מבחנים + לוח בדפי שכבות בלייט */
+html[data-theme="light"] body[data-grade] .home-news-item,
+html[data-theme="light"] body[data-grade] .board-item,
+html[data-theme="light"] body[data-grade] .grade-card {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
