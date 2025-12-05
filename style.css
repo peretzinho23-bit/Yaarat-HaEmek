@@ -1246,111 +1246,55 @@ body.light-mode button#theme-toggle:hover {
 /* --------------------------
    חדשות בדפי שכבה – תצוגה מלאה
 --------------------------- */
+/* ===== חדשות בדפי שכבה (Z / H / T) – כרטיס גדול נורמלי ===== */
 
-/* הכרטיס עצמו – רחב ויפה במרכז */
-body[data-grade] .home-news-item-with-image {
-  display: block;
-  width: 100%;
+/* הכרטיס עצמו */
+.grade-news .home-news-item {
   max-width: 900px;
-  margin: 0 auto 40px auto;
-  background: #13151c;
-  padding: 24px;
-  border-radius: 18px;
-  border: 1px solid #2a2d36;
+  margin: 0 auto 32px;
 }
 
-/* מבטלים את הטור הצר של התמונה מהדף הראשי */
-body[data-grade] .home-news-item-with-image .home-news-image-wrap {
-  width: 100%;
-  margin: 0 0 18px 0;
-}
-
-/* התמונה – רוחב מלא */
-body[data-grade] .home-news-item-with-image .home-news-image-wrap img {
+/* מבטלים את לייאאוט שני הטורים – כרטיס שלם */
+.grade-news .home-news-item-with-image {
   display: block;
-  width: 200%;
+}
+
+/* עטיפה של התמונה */
+.grade-news .home-news-image-wrap {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 0 16px 0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* התמונה עצמה – גודל נורמלי, רואים את כולה */
+.grade-news .home-news-image-wrap img {
+  display: block;
+  width: 100%;
   height: auto;
-  max-height: 480px;
-  object-fit: contain; /* אם תרצה חתוך – תחליף ל-cover */
-  border-radius: 14px;
+  max-height: 450px;
+  object-fit: contain;  /* לא חותך את התמונה */
 }
 
 /* טקסט החדשה */
-body[data-grade] .home-news-item-with-image .home-news-text {
-  padding: 4px 2px;
-  font-size: 1.1rem;
+.grade-news .home-news-text {
+  font-size: 1.05rem;
   line-height: 1.6;
 }
 
-/* כותרת */
-body[data-grade] .home-news-title {
-  font-size: 1.7rem;
+.grade-news .home-news-title {
+  font-size: 1.6rem;
   font-weight: 700;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
-/* תיאור קצר */
-body[data-grade] .home-news-meta {
+.grade-news .home-news-meta {
   opacity: 0.8;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
 }
 
-/* גוף החדשה */
-body[data-grade] .home-news-body {
+.grade-news .home-news-body {
   white-space: pre-line;
-  font-size: 1.15rem;
-}
-/* ------------------------------------------
-   RESET לחדשות בדפי שכבה — מבטל את העיצוב
-   של דף הבית, ומחזיר מבנה רגיל של פוסט
-------------------------------------------- */
-
-/* הכרטיס עצמו */
-body[data-grade] .home-news-item-with-image {
-  display: block !important;              /* מבטל FLEX מהדף הראשי */
-  width: 100%;
-  max-width: 900px;
-  margin: 0 auto 40px auto;
-  background: #13151c;
-  padding: 24px;
-  border-radius: 14px;
-  border: 1px solid #2a2d36;
-}
-
-/* העטיפה של התמונה — שלא תהיה בצד */
-body[data-grade] .home-news-image-wrap {
-  width: 100% !important;
-  margin: 0 0 20px 0 !important;
-  display: block !important;
-}
-
-/* התמונה עצמה */
-body[data-grade] .home-news-image-wrap img {
-  width: 100% !important;         /* רוחב מלא */
-  height: auto !important;        /* בלי מתיחה */
-  max-height: 450px;              /* גובה יפה */
-  object-fit: contain !important; /* מציג את כל התמונה בלי חיתוך */
-  border-radius: 12px;
-  display: block;
-}
-
-/* ביטול כיווץ צדדי */
-body[data-grade] .home-news-text {
-  display: block !important;
-  width: 100% !important;
-  margin: 0;
-  padding: 0;
-}
-
-/* כותרת החדשה */
-body[data-grade] .home-news-title {
-  font-size: 1.8rem;
-  margin-bottom: 10px;
-}
-
-/* גוף חדשה */
-body[data-grade] .home-news-body {
-  font-size: 1.2rem;
-  line-height: 1.6;
-  white-space: pre-line;
+  font-size: 1.05rem;
 }
