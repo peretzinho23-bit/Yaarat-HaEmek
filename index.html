@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- SEO חזק -->
+  <!-- SEO -->
   <title>בית ספר יערת העמק – האתר הרשמי | מגדל העמק</title>
   <meta name="description" content="האתר הרשמי של בית ספר יערת העמק במגדל העמק. חדשות, לוח מבחנים, לוח מודעות, מידע לשכבות ז'-ט' ויצירת קשר עם צוות בית הספר – הכל במקום אחד עבור תלמידים והורים." />
   <meta name="keywords" content="יערת העמק, בית ספר יערת העמק, אתר יערת העמק, מגדל העמק, חטיבת ביניים, חטיבת הביניים יערת העמק, שכבת ז, שכבת ח, שכבת ט, לוח מבחנים, חדשות בית ספר, לוח מודעות, אתר רשמי" />
@@ -20,7 +20,7 @@
   <!-- אימות לגוגל -->
   <meta name="google-site-verification" content="014e0d8fdc8f329c" />
 
-  <!-- כתובת קנונית – הדומיין החדש -->
+  <!-- כתובת קנונית – הדומיין -->
   <link rel="canonical" href="https://yaarathaemek.online/" />
 
   <!-- Open Graph / Social -->
@@ -45,59 +45,67 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 
-<body><header class="header-main">
-  <div class="container">
-    <nav class="nav">
-      <!-- צד שמאל: לוגו + כותרת -->
-      <div class="nav-left">
-        <div class="logo-circle">
-          <img
-            src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png"
-            alt="סמל בית הספר יערת העמק"
-            class="logo-img"
+<body>
+  <!-- HEADER -->
+  <header class="header-main">
+    <div class="container">
+      <nav class="nav">
+        <!-- צד שמאל: לוגו + כותרת -->
+        <div class="nav-left">
+          <div class="logo-circle">
+            <img
+              src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png"
+              alt="סמל בית הספר יערת העמק"
+              class="logo-img"
+            >
+          </div>
+
+          <div>
+            <!-- כותרת ראשית – מתעדכנת מהאדמין דרך siteContent -->
+            <div class="school-title-main" id="home-hero-title">
+              ברוכים הבאים ליערת העמק
+            </div>
+            <div class="school-title-sub" id="home-hero-subtitle">
+              סביבת למידה בטוחה, תומכת ומובילה – כל תלמיד ותלמידה עולם ומלואו.
+            </div>
+          </div>
+        </div>
+
+        <!-- צד ימין: תפריט -->
+        <div class="nav-right">
+          <a href="#about">אודות</a>
+          <a href="#home-news">חדשות</a>
+          <a href="#home-exams">מבחנים</a>
+          <a href="#grades">השכבות</a>
+          <a href="#contact">יצירת קשר</a>
+          <a href="https://my.edu.gov.il/home" class="personal-btn">למרחב האישי</a>
+          <a href="admin.html" class="btn-outline">Admin</a>
+
+          <!-- כפתור מצב כהה/בהיר – בתוך התפריט (במובייל יופיע מתחת ל-Admin) -->
+          <button
+            id="theme-toggle"
+            class="theme-toggle-btn"
+            type="button"
+            aria-label="החלפת מצב תצוגה"
+            title="מצב כהה / בהיר"
           >
+            🌙
+          </button>
         </div>
 
-        <div>
-          <!-- כותרת ראשית – מתעדכנת מהאדמין דרך siteContent -->
-          <div class="school-title-main" id="home-hero-title">
-            ברוכים הבאים ליערת העמק
-          </div>
-          <div class="school-title-sub" id="home-hero-subtitle">
-            סביבת למידה בטוחה, תומכת ומובילה – כל תלמיד ותלמידה עולם ומלואו.
-          </div>
-        </div>
-      </div>
-
-      <!-- תפריט קישורים (דסקטופ + צד במובייל) -->
-      <div class="nav-right">
-        <a href="#about">אודות</a>
-        <a href="#home-news">חדשות</a>
-        <a href="#home-exams">מבחנים</a>
-        <a href="#grades">השכבות</a>
-        <a href="#contact">יצירת קשר</a>
-        <a href="https://my.edu.gov.il/home" class="personal-btn">למרחב האישי</a>
-        <a href="admin.html" class="btn-outline">Admin</a>
-
-        <!-- פה! כפתור מצב כהה/בהיר – יישב מתחת ל-Admin במובייל -->
-        <button id="theme-toggle" class="theme-toggle" type="button">
-    <span class="theme-icon">🌙</span>
-  </button>
-</div>
-      <!-- כפתור תפריט מובייל (המבורגר) – setupMobileNav ב-app.js -->
-      <button
-        class="nav-toggle"
-        type="button"
-        aria-label="פתח תפריט"
-        aria-expanded="false">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
-    </nav>
-  </div>
-</header>
-
+        <!-- כפתור תפריט מובייל (המבורגר) – setupMobileNav ב-app.js -->
+        <button
+          class="nav-toggle"
+          type="button"
+          aria-label="פתח תפריט"
+          aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </nav>
+    </div>
+  </header>
 
   <!-- HERO -->
   <section class="hero hero-home">
@@ -108,11 +116,30 @@
         <p id="hero-main-body">
           סביבה חינוכית בטוחה, תומכת ומובילה. כל תלמיד ותלמידה – עולם ומלואו.
         </p>
+
+        <!-- פס "סטטוס מהיר" קטן -->
         <div class="hero-actions">
           <a href="#home-news" class="btn">חדשות ועדכונים</a>
           <a href="#home-exams" class="btn-outline">מבחנים קרובים</a>
         </div>
+
+        <div class="home-grid" style="margin-top:18px;">
+          <div class="grade-card">
+            <strong>🕒 שעות פעילות</strong>
+            <p style="font-size:0.85rem; margin-top:4px;">
+              א'–ה': 08:00–15:00 · ו': 08:00–12:00
+            </p>
+          </div>
+          <div class="grade-card">
+            <strong>📌 עדכון מהנהלת בית הספר</strong>
+            <p style="font-size:0.85rem; margin-top:4px;">
+              הודעות רשמיות יתעדכנו כאן ובאזור לוח המודעות.
+            </p>
+          </div>
+        </div>
       </div>
+
+      <!-- כרטיס צדדי -->
       <div class="hero-side-card">
         <h3 id="hero-side-title">מידע מהיר</h3>
         <ul id="hero-side-list">
@@ -126,13 +153,29 @@
   </section>
 
   <!-- ABOUT -->
-  <section id="about">
+  <section id="about" class="section-light">
     <div class="container">
       <div class="section-header">
         <h2 class="section-title" id="about-title">אודות בית הספר</h2>
         <p class="section-subtitle" id="about-text">
           כאן יהיה טקסט האודות. האדמין יכול לשנות את זה דרך לוח הניהול.
         </p>
+      </div>
+
+      <!-- אפשרות ל"על בית הספר" + רשימת יתרונות -->
+      <div class="home-grid">
+        <div class="grade-card">
+          <h3>ערכים חינוכיים</h3>
+          <p style="font-size:0.9rem; margin-top:4px;">
+            כבוד, אחריות, הקשבה, שייכות וראיית התלמיד במרכז.
+          </p>
+        </div>
+        <div class="grade-card">
+          <h3>חיי בית ספר</h3>
+          <p style="font-size:0.9rem; margin-top:4px;">
+            טיולים, פרויקטים חברתיים, יוזמות של מועצת תלמידים ועוד.
+          </p>
+        </div>
       </div>
     </div>
   </section>
@@ -159,6 +202,13 @@
           <h3 id="important-card-2-title">🤝 עם מי מדברים?</h3>
           <p id="important-card-2-body" style="font-size:0.9rem;">
             יש קושי? מורה, מחנכת, יועצת או צוות הנהלה – כולם כאן כדי לעזור. לא נשארים עם בעיה לבד.
+          </p>
+        </div>
+
+        <div class="grade-card">
+          <h3 id="important-card-3-title">📣 עדכונים שוטפים</h3>
+          <p id="important-card-3-body" style="font-size:0.9rem;">
+            החדשות, לוח המודעות והודעות החשובות תמיד יתעדכנו כאן בזמן אמת.
           </p>
         </div>
       </div>
@@ -208,7 +258,9 @@
     <div class="container">
       <div class="section-header">
         <h2 class="section-title" id="board-title">לוח מודעות</h2>
-        <p class="section-subtitle" id="board-subtitle">הודעות חשובות, פעילויות ואירועים לבית הספר.</p>
+        <p class="section-subtitle" id="board-subtitle">
+          הודעות חשובות, פעילויות ואירועים לבית הספר.
+        </p>
       </div>
 
       <div id="home-board" class="home-board-list">
@@ -253,7 +305,7 @@
   </section>
 
   <!-- GRADES -->
-  <section id="grades">
+  <section id="grades" class="section-dark-strong">
     <div class="container">
       <div class="section-header">
         <h2 class="section-title" id="grades-section-title">היכרות עם השכבות</h2>
@@ -296,18 +348,22 @@
     <div class="container">
       <div class="section-header">
         <h2 class="section-title" id="requests-title">תיבת בקשות</h2>
-        <p class="section-subtitle" id="requests-subtitle">רוצים לבקש משהו? יש רעיון?</p>
+        <p class="section-subtitle" id="requests-subtitle">
+          רוצים לבקש משהו? יש רעיון לשיפור?
+        </p>
       </div>
 
       <div class="card request-box">
-        <h3 id="requests-box-title">שליחת בקשה</h3>
-        <p id="requests-body">למילוי טופס הבקשות – לחצו כאן:</p>
+        <h3 id="requests-box-title">שליחת בקשה למועצת התלמידים / הנהלה</h3>
+        <p id="requests-body">
+          למילוי טופס הבקשות – לחצו על הכפתור, מלאו פרטים בקצרה ונחזור אליכם בהקדם.
+        </p>
         <a
           href="https://docs.google.com/forms/d/e/1FAIpQLScisdjJ5h9t7VgSOa8hmnmrJh6H5VSy84uyE32hhOgDQEU05w/viewform?usp=sharing&ouid=106991680453150303010"
           target="_blank"
           class="btn"
         >
-          לחצו כאן
+          למעבר לטופס הבקשות
         </a>
       </div>
     </div>

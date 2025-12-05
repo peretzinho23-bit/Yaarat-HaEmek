@@ -101,7 +101,7 @@
                 <label>קישור לתמונה (אופציונלי)</label>
                 <input name="imageUrl" placeholder="https://..." />
 
-                <!-- חדש: העלאת תמונה מקובץ -->
+                <!-- העלאת תמונה מקובץ -->
                 <label>תמונה מקובץ (אופציונלי)</label>
                 <input type="file" name="imageFile" accept="image/*" />
 
@@ -132,7 +132,6 @@
                 <label>קישור לתמונה (אופציונלי)</label>
                 <input name="imageUrl" placeholder="https://..." />
 
-                <!-- חדש: העלאת תמונה מקובץ -->
                 <label>תמונה מקובץ (אופציונלי)</label>
                 <input type="file" name="imageFile" accept="image/*" />
 
@@ -163,7 +162,6 @@
                 <label>קישור לתמונה (אופציונלי)</label>
                 <input name="imageUrl" placeholder="https://..." />
 
-                <!-- חדש: העלאת תמונה מקובץ -->
                 <label>תמונה מקובץ (אופציונלי)</label>
                 <input type="file" name="imageFile" accept="image/*" />
 
@@ -280,8 +278,9 @@
 
               <label>קישור לתמונה (אופציונלי)</label>
               <input name="imageUrl" placeholder="https://..." />
-<label>העלה קובץ תמונה (אופציונלי)</label>
-<input type="file" name="imageFile" accept="image/*" />
+
+              <label>העלה קובץ תמונה (אופציונלי)</label>
+              <input type="file" name="imageFile" accept="image/*" />
 
               <label>תוכן המודעה</label>
               <textarea name="body"></textarea>
@@ -296,7 +295,7 @@
         <!-- SITE CONTENT -->
         <h3 class="section-title" style="font-size:1.2rem;margin-bottom:10px;">ניהול תוכן האתר</h3>
         <p class="section-subtitle">
-          כאן ניתן לעדכן את כל הטקסטים הראשיים באתר – דף בית, אודות, "חשוב לדעת", שכבות, בקשות, יצירת קשר ופוטר.
+          כל השדות כאן נשמרים במסמך Firestore אחד (siteContent/main) ומוזנים לכל חלקי האתר.
         </p>
 
         <div class="admin-columns">
@@ -305,15 +304,30 @@
 
             <form id="site-content-form" class="admin-form">
               <!-- HERO -->
-              <h4>דף בית – אזור הירו</h4>
+              <h4>דף בית – אזור הירו (המשפטים הגדולים למעלה)</h4>
+
               <label>כותרת ראשית בהירו</label>
               <input name="homeHeroTitle" placeholder="ברוכים הבאים ליערת העמק" />
 
               <label>תת־כותרת בהירו</label>
               <input name="homeHeroSubtitle" placeholder="סביבת למידה בטוחה, תומכת ומובילה..." />
 
+              <!-- HERO SIDE -->
+              <h4 style="margin-top:16px;">תיבת "מידע מהיר" בהירו</h4>
+
+              <label>כותרת התיבה</label>
+              <input name="heroSideTitle" placeholder="מידע מהיר" />
+
+              <label>שורות 'מידע מהיר' (כל שורה – שורה בנפרד ברשימה)</label>
+              <textarea
+                name="heroSideList"
+                rows="3"
+                placeholder="📍 מגדל העמק&#10;🧑‍🎓 שכבות ז'–ט'&#10;👩‍🏫 צוות חינוכי מסור&#10;🤝 שיתופי פעולה קהילתיים"
+              ></textarea>
+
               <!-- ABOUT -->
               <h4 style="margin-top:16px;">אודות בית הספר</h4>
+
               <label>כותרת אודות</label>
               <input name="aboutTitle" placeholder="אודות בית הספר יערת העמק" />
 
@@ -322,6 +336,7 @@
 
               <!-- IMPORTANT SECTION -->
               <h4 style="margin-top:16px;">מדור "חשוב לדעת"</h4>
+
               <label>כותרת המדור</label>
               <input name="importantTitle" placeholder="חשוב לדעת" />
 
@@ -349,8 +364,30 @@
               <label>טקסט כרטיס 3</label>
               <textarea name="importantCard3Body" rows="2"></textarea>
 
+              <!-- HOME SECTIONS TITLES -->
+              <h4 style="margin-top:16px;">כותרות למדורי דף הבית</h4>
+
+              <label>כותרת מדור חדשות</label>
+              <input name="homeNewsTitle" placeholder="חדשות אחרונות" />
+
+              <label>תת־כותרת מדור חדשות</label>
+              <input name="homeNewsSubtitle" placeholder="שלושת העדכונים האחרונים מכל שכבה – ישר מול העיניים של התלמידים." />
+
+              <label>כותרת מדור לוח מודעות</label>
+              <input name="boardTitle" placeholder="לוח מודעות" />
+
+              <label>תת־כותרת מדור לוח מודעות</label>
+              <input name="boardSubtitle" placeholder="הודעות חשובות, פעילויות ואירועים לבית הספר." />
+
+              <label>כותרת מדור מבחנים</label>
+              <input name="homeExamsTitle" placeholder="מבחנים קרובים" />
+
+              <label>תת־כותרת מדור מבחנים</label>
+              <input name="homeExamsSubtitle" placeholder="תאריכים, מקצועות ונושאים – כדי שאף אחד לא יפספס." />
+
               <!-- GRADES SECTION -->
               <h4 style="margin-top:16px;">מדור "היכרות עם השכבות"</h4>
+
               <label>כותרת המדור</label>
               <input name="gradesSectionTitle" placeholder="היכרות עם השכבות" />
 
@@ -369,6 +406,7 @@
 
               <!-- REQUESTS -->
               <h4 style="margin-top:16px;">תיבת בקשות</h4>
+
               <label>כותרת המדור</label>
               <input name="requestsTitle" placeholder="תיבת בקשות" />
 
@@ -380,6 +418,7 @@
 
               <!-- CONTACT -->
               <h4 style="margin-top:16px;">יצירת קשר</h4>
+
               <label>כותרת המדור</label>
               <input name="contactSectionTitle" placeholder="יצירת קשר" />
 
@@ -397,13 +436,11 @@
 
               <!-- FOOTER -->
               <h4 style="margin-top:16px;">פוטר</h4>
+
               <label>טקסט תחתון (פוטר)</label>
               <input name="footerText" placeholder="© כל הזכויות שמורות לבית ספר יערת העמק" />
 
               <button type="submit" style="margin-top:16px;">שמור תוכן אתר</button>
-              <!-- כרטיס: גלריית תמונות -->
-
-
             </form>
           </div>
         </div>

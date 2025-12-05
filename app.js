@@ -191,7 +191,7 @@ function subscribeHomeExams() {
 }
 
 /* ------------ חדשות בדפי שכבות (z/h/t) – Realtime ------------ */
-/*   פה שיניתי: משתמש ב־board-item כדי שייראה כמו לוח מודעות   */
+/*   פה משתמשים בסטייל של board-item כדי שייראה כמו לוח מודעות   */
 
 function subscribeGradeNews() {
   if (!currentGrade) return;
@@ -361,7 +361,7 @@ function renderBoardList(container, items) {
     .join("");
 }
 
-/* ------------ תוכן כללי: אודות, יצירת קשר, תיאור שכבות – Realtime ------------ */
+/* ------------ תוכן כללי: אודות, יצירת קשר, שכבות, כותרות דף הבית – Realtime ------------ */
 
 function subscribeSiteContent() {
   const refDoc = doc(db, "siteContent", "main");
@@ -372,7 +372,8 @@ function subscribeSiteContent() {
       if (!snap.exists()) return;
       const data = snap.data() || {};
 
-      // HERO
+      /* ===== HERO – כותרות עליונות והירו ===== */
+
       const heroTitleHeader = document.getElementById("home-hero-title");
       const heroSubHeader = document.getElementById("home-hero-subtitle");
       if (heroTitleHeader && data.homeHeroTitle)
@@ -380,7 +381,34 @@ function subscribeSiteContent() {
       if (heroSubHeader && data.homeHeroSubtitle)
         heroSubHeader.textContent = data.homeHeroSubtitle;
 
-      // ABOUT
+      const heroMainTitle = document.getElementById("hero-main-title");
+      const heroMainBody = document.getElementById("hero-main-body");
+      if (heroMainTitle && data.homeHeroTitle)
+        heroMainTitle.textContent = data.homeHeroTitle;
+      if (heroMainBody && data.homeHeroSubtitle)
+        heroMainBody.textContent = data.homeHeroSubtitle;
+
+      // HERO SIDE – "מידע מהיר"
+      const heroSideTitleEl = document.getElementById("hero-side-title");
+      const heroSideListEl  = document.getElementById("hero-side-list");
+      if (heroSideTitleEl && data.heroSideTitle) {
+        heroSideTitleEl.textContent = data.heroSideTitle;
+      }
+      if (heroSideListEl && data.heroSideList) {
+        const lines = String(data.heroSideList)
+          .split(/\r?\n/)
+          .map((l) => l.trim())
+          .filter((l) => l.length > 0);
+
+        if (lines.length) {
+          heroSideListEl.innerHTML = lines
+            .map((line) => `<li>${escapeHtml(line)}</li>`)
+            .join("");
+        }
+      }
+
+      /* ===== ABOUT ===== */
+
       const aboutTitleEl = document.getElementById("about-title");
       const aboutTextEl = document.getElementById("about-text");
       if (aboutTitleEl && data.aboutTitle)
@@ -388,7 +416,8 @@ function subscribeSiteContent() {
       if (aboutTextEl && data.aboutBody)
         aboutTextEl.textContent = data.aboutBody;
 
-      // IMPORTANT SECTION
+      /* ===== IMPORTANT SECTION ===== */
+
       const impTitleEl = document.getElementById("important-title");
       const impSubEl = document.getElementById("important-subtitle");
       if (impTitleEl && data.importantTitle)
@@ -416,7 +445,31 @@ function subscribeSiteContent() {
       if (c3Body && data.importantCard3Body)
         c3Body.textContent = data.importantCard3Body;
 
-      // GRADES SECTION
+      /* ===== כותרות מדורי דף הבית ===== */
+
+      const homeNewsTitleEl    = document.getElementById("home-news-title");
+      const homeNewsSubtitleEl = document.getElementById("home-news-subtitle");
+      if (homeNewsTitleEl && data.homeNewsTitle)
+        homeNewsTitleEl.textContent = data.homeNewsTitle;
+      if (homeNewsSubtitleEl && data.homeNewsSubtitle)
+        homeNewsSubtitleEl.textContent = data.homeNewsSubtitle;
+
+      const boardTitleEl    = document.getElementById("board-title");
+      const boardSubtitleEl = document.getElementById("board-subtitle");
+      if (boardTitleEl && data.boardTitle)
+        boardTitleEl.textContent = data.boardTitle;
+      if (boardSubtitleEl && data.boardSubtitle)
+        boardSubtitleEl.textContent = data.boardSubtitle;
+
+      const homeExamsTitleEl    = document.getElementById("home-exams-title");
+      const homeExamsSubtitleEl = document.getElementById("home-exams-subtitle");
+      if (homeExamsTitleEl && data.homeExamsTitle)
+        homeExamsTitleEl.textContent = data.homeExamsTitle;
+      if (homeExamsSubtitleEl && data.homeExamsSubtitle)
+        homeExamsSubtitleEl.textContent = data.homeExamsSubtitle;
+
+      /* ===== GRADES SECTION ===== */
+
       const gradesTitle = document.getElementById("grades-section-title");
       const gradesSub = document.getElementById("grades-section-subtitle");
       if (gradesTitle && data.gradesSectionTitle)
@@ -431,7 +484,8 @@ function subscribeSiteContent() {
       if (hDesc && data.hDescription) hDesc.textContent = data.hDescription;
       if (tDesc && data.tDescription) tDesc.textContent = data.tDescription;
 
-      // REQUESTS
+      /* ===== REQUESTS (תיבת בקשות) ===== */
+
       const reqTitle = document.getElementById("requests-title");
       const reqSub = document.getElementById("requests-subtitle");
       const reqBody = document.getElementById("requests-body");
@@ -442,7 +496,8 @@ function subscribeSiteContent() {
       if (reqBody && data.requestsBody)
         reqBody.textContent = data.requestsBody;
 
-      // CONTACT
+      /* ===== CONTACT ===== */
+
       const contactTitle = document.getElementById("contact-section-title");
       const contactSub = document.getElementById("contact-section-subtitle");
       const phoneEl = document.getElementById("contact-phone");
@@ -460,7 +515,8 @@ function subscribeSiteContent() {
       if (addrEl && data.contactAddress)
         addrEl.textContent = data.contactAddress;
 
-      // FOOTER
+      /* ===== FOOTER ===== */
+
       const footerEl = document.getElementById("footer-text");
       if (footerEl && data.footerText) footerEl.textContent = data.footerText;
     },
