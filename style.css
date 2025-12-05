@@ -2336,4 +2336,30 @@ body.theme-light .nav {
   border-radius: 0 !important;
   box-shadow: none !important;
 }
+/* ===== יישור ההדר לרקע – בלי גלולה לבנה ===== */
+.header-main,
+.header-main .container,
+.header-main .nav {
+  background: transparent !important;  /* בלי לבן */
+  border-radius: 0 !important;         /* בלי קצוות עגולים */
+  box-shadow: none !important;         /* בלי צל */
+}
+
+/* בלייט מוד גם אותו דבר – שלא יחזור רקע לבן */
+html[data-theme="light"] .header-main,
+html[data-theme="light"] .header-main .container,
+html[data-theme="light"] .header-main .nav,
+body.theme-light .header-main,
+body.theme-light .header-main .container,
+body.theme-light .header-main .nav {
+  background: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* קצת מרווח אבל בלי מסגרת מסביב */
+.header-main .container {
+  padding-left: 16px;
+  padding-right: 16px;
+}
 
