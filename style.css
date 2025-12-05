@@ -1243,3 +1243,21 @@ body.light-mode button#theme-toggle {
 body.light-mode button#theme-toggle:hover {
   background: #e2e8f0;
 }
+/* -------------------- */
+/* תמונות בדף שכבה     */
+/* -------------------- */
+body[data-grade] .home-news-item-with-image img {
+  width: 100%;
+  height: auto;
+  max-height: 450px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+/* שהטקסט לא יידבק */
+body[data-grade] .home-news-item-with-image {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 20px;
+}
