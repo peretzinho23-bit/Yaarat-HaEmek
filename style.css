@@ -1370,3 +1370,149 @@ html[data-theme="light"] body[data-grade] .grade-card {
   border-color: #cbd5e1;
   box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
 }
+/* =========================
+   נגישות – כפתור + פאנל צף
+   ========================= */
+
+.accessibility-btn {
+  position: fixed;
+  bottom: 90px;
+  right: 18px;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.9);
+  background: radial-gradient(circle at 30% 20%, #38bdf8, #1e3a8a);
+  color: #ffffff;
+  font-size: 22px;
+  cursor: pointer;
+  z-index: 1200;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.2s ease;
+}
+
+.accessibility-btn:hover {
+  transform: translateY(-1px) scale(1.03);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.95);
+}
+
+.accessibility-btn:active {
+  transform: translateY(1px) scale(0.97);
+}
+
+/* פאנל קטן מעל הכפתור */
+.accessibility-panel {
+  position: fixed;
+  bottom: 145px;
+  right: 18px;
+  width: 240px;
+  max-width: 90vw;
+  border-radius: 16px;
+  background: rgba(15, 23, 42, 0.98);
+  border: 1px solid rgba(148, 163, 184, 0.8);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.9);
+  padding: 10px 12px;
+  font-size: 0.85rem;
+  color: #e5e7eb;
+  z-index: 1199;
+  display: none;
+}
+
+.accessibility-panel.open {
+  display: block;
+}
+
+.accessibility-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.accessibility-panel-title {
+  font-weight: 700;
+  font-size: 0.88rem;
+}
+
+.accessibility-panel-close {
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.accessibility-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.accessibility-option input {
+  accent-color: #38bdf8;
+}
+
+.accessibility-option label {
+  cursor: pointer;
+}
+
+.accessibility-reset-btn {
+  margin-top: 10px;
+  width: 100%;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.8);
+  background: rgba(15, 23, 42, 0.9);
+  color: #e5e7eb;
+  padding: 6px 0;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+/* מצבי נגישות בפועל */
+
+/* טקסט גדול */
+html.access-font-lg {
+  font-size: 115%;
+}
+
+html.access-font-xl {
+  font-size: 125%;
+}
+
+/* קונטרסט גבוה – הופך את הצבעים, אבל משחזר תמונות */
+html.access-contrast body {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+html.access-contrast img,
+html.access-contrast video,
+html.access-contrast picture,
+html.access-contrast canvas {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+/* הדגשת קישורים */
+html.access-links a {
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+}
+
+/* במובייל – נרים קצת את הכפתור */
+@media (max-width: 768px) {
+  .accessibility-btn {
+    bottom: 80px;
+    right: 14px;
+  }
+
+  .accessibility-panel {
+    right: 14px;
+    bottom: 135px;
+  }
+}
