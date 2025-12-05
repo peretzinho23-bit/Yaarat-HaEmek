@@ -1805,49 +1805,56 @@ html.access-links a {
     z-index: 9999;
   }
 }
-/* === רקע מתחלף להירו === */
+/* === רקע מתחלף להירו (גרסת ניקוי) === */
 .hero-home {
   position: relative;
+  overflow: hidden;
+  /* גובה נעים גם במחשב וגם בנייד */
+  padding: 40px 0 70px;
+  min-height: 260px;
   background-size: cover;
-  background-position: center;
+  background-position: center center;
   background-repeat: no-repeat;
-  animation: heroSlideshow 20s infinite ease-in-out;
+  animation: heroSlideshow 24s infinite ease-in-out;
 }
 
+/* אנימציית סליידר פשוטה על הרקע */
 @keyframes heroSlideshow {
-  0%   { background-image: url("img/campus_front.jpg"); }
-  20%  { background-image: url("img/campus_yard.jpg"); }
-  40%  { background-image: url("img/school_hallway.jpg"); }
-  60%  { background-image: url("img/students_activity.jpg"); }
-  80%  { background-image: url("img/school_aerial.jpg"); }
-  100% { background-image: url("img/campus_front.jpg"); }
+  0%, 19%   { background-image: url("img/campus_front.jpg"); }
+  20%, 39%  { background-image: url("img/campus_yard.jpg"); }
+  40%, 59%  { background-image: url("img/school_hallway.jpg"); }
+  60%, 79%  { background-image: url("img/students_activity.jpg"); }
+  80%, 100% { background-image: url("img/school_aerial.jpg"); }
 }
 
-.hero-home::before {
-  content: "";
+/* שכבת הצללה מעל התמונה – כדי שהטקסט יישאר קריא */
+.hero-home .hero-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.45);
-  backdrop-filter: blur(2px);
-  z-index: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.60),
+    rgba(0, 0, 0, 0.25) 40%,
+    rgba(4, 8, 20, 0.9)
+  );
+  pointer-events: none;
 }
 
-.hero-content {
+/* לוודא שהתוכן תמיד מעל התמונה */
+.hero-home .hero-content {
   position: relative;
   z-index: 1;
 }
-/* הקטנת גובה ההירו בדף הבית */
-.hero.hero-home {
-  min-height: 230px;       /* במקום 360px – תרגיש חופשי לשחק בין 220–260 */
-  padding: 30px 0 32px;    /* פחות רווח מעל ומתחת */
+
+/* במובייל – קצת יותר קומפקטי ומהיר */
+@media (max-width: 768px) {
+  .hero-home {
+    padding: 30px 0 40px;
+    min-height: 220px;
+    animation-duration: 20s;
+  }
 }
 
-/* במובייל – אפילו קצת פחות */
-@media (max-width: 768px) {
-  .hero.hero-home {
-    min-height: 200px;
-    padding: 24px 0 26px;
-  }
 
   .hero-text h1 {
     font-size: 1.4rem;
