@@ -66,20 +66,32 @@ button:focus-visible {
 
 /* ========== HEADER + NAV ========== */
 
+/* ========== HEADER + NAV ========== */
+
 .header-main {
-  background: #020816;
+  /* רקע שקוף – שההירו ייראה מאחור */
+  background: transparent;
   position: sticky;
   top: 0;
   z-index: 20;
 }
 
+/* המלבן של הניווט עצמו – אפקט זכוכית */
 .nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 0;
+  padding: 10px 16px;        /* קצת ריווח לצדדים */
   gap: 1rem;
+
+  background: rgba(15, 23, 42, 0.82);       /* כהה שקוף לדארק־מוד */
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.65);
 }
+
 
 .nav-left {
   display: flex;
@@ -1125,9 +1137,18 @@ body.theme-light {
 
 html[data-theme="light"] .header-main,
 body.theme-light .header-main {
-  background: #ffffff;
-  box-shadow: 0 1px 6px rgba(15, 23, 42, 0.08);
+  background: transparent;          /* גם בלייט – בלי פס לבן מלא */
+  box-shadow: none;
 }
+
+/* הניווט עצמו בלייט מוד – זכוכית בהירה */
+html[data-theme="light"] .nav,
+body.theme-light .nav {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(148, 163, 184, 0.55);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);
+}
+
 
 html[data-theme="light"] footer,
 body.theme-light footer {
