@@ -1154,3 +1154,93 @@ body.theme-light .hero-side-card p,
 body.theme-light .hero-side-card li {
   color: #111827;
 }
+/* ============================
+   🔧 תיקון תפריט המבורגר בנייד
+   ============================ */
+.nav-toggle {
+  background: transparent !important;
+  border: none !important;
+  font-size: 28px;
+  cursor: pointer;
+  color: var(--text-color);
+  padding: 4px 8px;
+  margin-left: 10px;
+}
+
+.nav-toggle:hover {
+  opacity: 0.7;
+}
+
+/* תפריט נפתח */
+.nav-right {
+  position: fixed;
+  top: 70px;
+  left: 10px;
+  width: 220px;
+  background: var(--card-bg);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  border-radius: 12px;
+  padding: 12px 0;
+  opacity: 0;
+  transform: translateX(-20px);
+  visibility: hidden;
+  transition: 0.25s ease;
+  z-index: 9999;
+}
+
+.nav-right.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+}
+
+.nav-right a {
+  display: block;
+  padding: 12px 18px;
+  font-size: 17px;
+  color: var(--text-color);
+  text-align: right;
+}
+
+.nav-right a:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+/* ============================
+   🔧 תיקון לוגו קטן
+   ============================ */
+header .logo img {
+  width: 70px;
+  height: auto;
+}
+
+@media (max-width: 600px) {
+  header .logo img {
+    width: 55px;
+  }
+}
+
+/* ============================
+   🔧 תיקון "מידע מהיר" בלייט מוד
+   ============================ */
+.quick-info-box {
+  background: var(--card-bg) !important;
+  color: var(--text-color) !important;
+}
+
+.quick-info-box li {
+  color: var(--text-color);
+}
+
+/* ============================
+   🔧 כפתור אדמין בלייט מוד
+   ============================ */
+.btn-admin {
+  border: 2px solid var(--primary);
+  color: var(--primary) !important;
+}
+
+[data-theme="light"] .btn-admin {
+  color: #007bff !important;
+  border-color: #007bff !important;
+}
