@@ -1118,3 +1118,78 @@ html[data-theme="light"] .nav-toggle span {
     display: none !important;
   }
 }
+/* =========================
+   1) תפריט המבורגר – נפתח משמאל במובייל
+   ========================= */
+@media (max-width: 900px) {
+  .nav-right {
+    right: auto !important;
+    left: 0 !important;
+    border-radius: 0 22px 22px 0 !important;
+    transform: translateX(-100%) !important;  /* מתחבא משמאל */
+  }
+
+  .nav-right.open {
+    transform: translateX(0) !important;      /* נכנס משמאל */
+  }
+}
+
+/* =========================
+   2) צבע לייט מוד – קצת יותר נקי ובהיר
+   ========================= */
+html[data-theme="light"] body {
+  background: #eef3fb;        /* טיפה כחול בהיר במקום אפור-ורדרד */
+  color: #0b1120;
+}
+
+html[data-theme="light"] .hero-home {
+  background-color: #eef3fb;
+}
+
+/* שכבת ההירו בלייט – פחות "שרופה" */
+html[data-theme="light"] .hero-home::before {
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.75) 0%,
+    rgba(239,243,251,0.92) 45%,
+    rgba(239,243,251,1) 100%
+  );
+}
+
+/* כרטיסים חשובים בלייט – לבן נקי */
+html[data-theme="light"] .grade-card,
+html[data-theme="light"] .hero-side-card,
+html[data-theme="light"] .card,
+html[data-theme="light"] .home-exam-item,
+html[data-theme="light"] .home-news-item {
+  background: #ffffff;
+  color: #0b1120;
+}
+
+/* טיימר מבחן בלייט – שחור חזק */
+html[data-theme="light"] .home-exam-countdown {
+  color: #111827;
+}
+
+/* =========================
+   3) הקטנת התמונה של הבית ספר (Hero)
+   ========================= */
+.hero.hero-home {
+  min-height: 320px;     /* היה גבוה יותר */
+  padding: 32px 0 56px;  /* קצת פחות רווח */
+}
+
+@media (max-width: 900px) {
+  .hero.hero-home {
+    min-height: 420px;   /* היה 520 – מקטין במובייל */
+    padding: 28px 0 52px;
+  }
+
+  /* טקסט בהירו במובייל שיהיה קצת יותר צפוף ונעים */
+  .hero-text h1 {
+    font-size: 1.9rem;
+  }
+  .hero-text p {
+    font-size: 0.95rem;
+  }
+}
