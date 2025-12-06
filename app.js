@@ -36,19 +36,32 @@ let examCountdownIntervalId = null;
 // תומך ב: "2025-12-31" או "2025-12-31 08:30"
 function parseExamDateToDateObj(dateStr) {
   if (!dateStr) return null;
-  const s = String(dateStr).trim();
+  let s = String(dateStr).trim();
   if (!s) return null;
 
-  // רק תאריך – מהאדמין (input type="date")
-  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
-    const [y, m, d] = s.split("-").map(Number);
-    return new Date(y, m - 1, d, 8, 0); // 08:00 בבוקר
+  // ✔ פורמט ישראלי: DD/MM/YYYY או DD/MM/YY
+  const matchIL = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/);
+  if (matchIL) {
+    let day = Number(matchIL[1]);
+    let month = Number(matchIL[2]);
+    let year = Number(matchIL[3]);
+
+    // המרה של שנתיים לשנה מלאה
+    if (year < 100) {
+      year = 2000 + year; // 22 → 2022
+    }
+
+    return new Date(year, month - 1, day, 8, 0); 
   }
 
-  // תאריך + שעה: "2025-12-31 08:30" או עם רווח/טאב/‏T
-  const m = s.match(
-    /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})$/
-  );
+  // ✔ פורמט רגיל: YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+    const [y, m, d] = s.split("-").map(Number);
+    return new Date(y, m - 1, d, 8, 0);
+  }
+
+  // ✔ תאריך + שעה: YYYY-MM-DD HH:MM
+  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{1,2}):(\d{2})$/);
   if (m) {
     const y = Number(m[1]);
     const mo = Number(m[2]);
@@ -58,10 +71,11 @@ function parseExamDateToDateObj(dateStr) {
     return new Date(y, mo - 1, d, hh, mm);
   }
 
-  // ניסיון אחרון – Date רגיל
+  // ✔ ניסיון אחרון
   const dObj = new Date(s);
   return isNaN(dObj.getTime()) ? null : dObj;
 }
+
 
 // פורמט נחמד לתאריך: DD.MM.YYYY
 function formatLocalDate(d) {
