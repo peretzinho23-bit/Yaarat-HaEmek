@@ -1196,7 +1196,7 @@ html[data-theme="light"] .home-exam-countdown {
 /* === הקטנת תפריט המובייל === */
 @media (max-width: 900px) {
   .nav-right {
-    width: min(220px, 70vw);   /* היה 260px, עכשיו קטן יותר */
+    width: min(180px, 60vw);   /* היה 260px, עכשיו קטן יותר */
     padding: 12px 16px 24px;   /* פחות ריווח פנימי */
     gap: 10px;
   }
