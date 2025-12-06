@@ -254,6 +254,8 @@ function renderHomeNews() {
 
 /* ------------ RENDER HOME EXAMS (עם מבחן הבא + מבחנים שהיו + ספירה לאחור) ------------ */
 
+/* ------------ RENDER HOME EXAMS (עם מבחן הבא + מבחנים שהיו + ספירה לאחור) ------------ */
+
 function renderHomeExams() {
   GRADES.forEach((g) => {
     const listEl = document.getElementById(`home-exams-${g}`);
@@ -261,7 +263,7 @@ function renderHomeExams() {
 
     const rawItems = homeExams[g] || [];
 
-    // ממפים לאובייקטים עם Date
+    // מוסיפים אובייקט Date לכל מבחן
     const itemsWithDates = rawItems
       .map((ex) => ({
         ...ex,
@@ -274,17 +276,16 @@ function renderHomeExams() {
       return;
     }
 
-    // מיון לפי תאריך מהקרוב לרחוק
+    // מיון מהקרוב לרחוק
     itemsWithDates.sort((a, b) => a._dateObj - b._dateObj);
 
     const now = new Date();
-
     const upcoming = itemsWithDates.filter((ex) => ex._dateObj >= now);
     const past = itemsWithDates.filter((ex) => ex._dateObj < now);
 
     let html = "";
 
-    // מבחן הבא עם ספירה לאחור
+    // ===== המבחן הבא =====
     if (upcoming.length) {
       const next = upcoming[0];
       const ts = next._dateObj.getTime();
@@ -296,22 +297,24 @@ function renderHomeExams() {
               <span class="home-exam-date">${escapeHtml(
                 formatLocalDate(next._dateObj)
               )}</span>
-              <span class="home-exam-subject">${escapeHtml(
-                next.subject
-              )}</span>
             </div>
+
+            <div class="home-exam-subject-main">
+              ${escapeHtml(next.subject || "")}
+            </div>
+
             ${
               next.topic
-                ? `<div class="home-exam-topic">${escapeHtml(
-                    next.topic
-                  )}</div>`
+                ? `<div class="home-exam-topic">${escapeHtml(next.topic)}</div>`
                 : ""
             }
+
             <div class="home-exam-countdown" data-exam-timestamp="${ts}"></div>
           </article>
         </div>
       `;
 
+      // ===== עוד מבחנים עתידיים =====
       const moreUpcoming = upcoming.slice(1);
       if (moreUpcoming.length) {
         html += `<div class="home-exam-list-upcoming">`;
@@ -323,10 +326,12 @@ function renderHomeExams() {
                   <span class="home-exam-date">${escapeHtml(
                     formatLocalDate(ex._dateObj)
                   )}</span>
-                  <span class="home-exam-subject">${escapeHtml(
-                    ex.subject
-                  )}</span>
                 </div>
+
+                <div class="home-exam-subject-main">
+                  ${escapeHtml(ex.subject || "")}
+                </div>
+
                 ${
                   ex.topic
                     ? `<div class="home-exam-topic">${escapeHtml(
@@ -344,12 +349,13 @@ function renderHomeExams() {
       html += `<p class="empty-msg">אין מבחנים קרובים לשכבה זו.</p>`;
     }
 
-    // מבחנים שהיו
+    // ===== מבחנים שהיו =====
     if (past.length) {
       html += `
         <div class="home-exam-past-block">
           <h4 class="home-exam-past-title">מבחנים שהיו</h4>
       `;
+
       html += past
         .map(
           (ex) => `
@@ -358,10 +364,12 @@ function renderHomeExams() {
                 <span class="home-exam-date">${escapeHtml(
                   formatLocalDate(ex._dateObj)
                 )}</span>
-                <span class="home-exam-subject">${escapeHtml(
-                  ex.subject
-                )}</span>
               </div>
+
+              <div class="home-exam-subject-main">
+                ${escapeHtml(ex.subject || "")}
+              </div>
+
               ${
                 ex.topic
                   ? `<div class="home-exam-topic">${escapeHtml(
@@ -373,16 +381,18 @@ function renderHomeExams() {
           `
         )
         .join("");
+
       html += `</div>`;
     }
 
     listEl.innerHTML = html;
   });
 
-  // מפעיל ספירה לאחור למי שיש data-exam-timestamp
+  // מפעיל ספירה לאחור
   updateExamCountdownElements();
   startExamCountdownLoop();
 }
+
 
 /* ------------ RENDER HOME BOARD ------------ */
 

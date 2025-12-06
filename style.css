@@ -2334,3 +2334,75 @@ body[data-theme="light"] .hero-side-card {
     0 0 8px rgba(0, 0, 0, 0.85),
     0 0 18px rgba(0, 0, 0, 0.75);
 }
+/* ===== עיצוב חדש לכרטיסי מבחנים ===== */
+
+/* כותרת המקצוע – מיושר למרכז, מודגש */
+.exam-subject {
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 8px;
+  color: var(--text-strong, #111);
+}
+
+/* תאריך מצד ימין כמו עכשיו, נשאר */
+.exam-date {
+  text-align: left;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--accent, #1e88e5);
+  margin-bottom: 6px;
+}
+
+/* תיאור המבחן */
+.exam-topic {
+  white-space: pre-line;
+  line-height: 1.45;
+  color: var(--text-normal, #333);
+  margin-bottom: 10px;
+}
+
+/* ספירה לאחור */
+.exam-countdown {
+  margin-top: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: center;
+
+  /* צבע חזק שמותאם לפי מצב בהיר/כהה */
+  color: var(--countdown-color);
+}
+
+body.light .exam-countdown {
+  --countdown-color: #111;
+}
+body.dark .exam-countdown {
+  --countdown-color: #fff;
+}
+/* ===== מבחנים בדף הבית – עיצוב מקצוע וספירה לאחור ===== */
+
+.home-exam-subject-main {
+  margin-top: 0.35rem;
+  margin-bottom: 0.25rem;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+/* ספירה לאחור – טקסט מודגש בצבע חזק */
+.home-exam-countdown {
+  margin-top: 0.35rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* בלייט מוד – שחור חזק */
+[data-theme="light"] .home-exam-countdown {
+  color: #111827; /* שחור כהה */
+}
+
+/* בדארק מוד – לבן חזק */
+[data-theme="dark"] .home-exam-countdown {
+  color: #f9fafb; /* לבן בהיר */
+}
