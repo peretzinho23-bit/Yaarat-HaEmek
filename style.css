@@ -2629,3 +2629,61 @@ body.dark .exam-countdown {
     font-size: 1.2rem;
   }
 }
+/* ==== תיקון תפריט מובייל – להדביק בסוף style.css ==== */
+@media (max-width: 768px) {
+  /* הבסיס של הניווט */
+  .nav {
+    position: relative;
+  }
+
+  /* התפריט שגולש מהשמאל */
+  .nav-right {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 72%;           /* לא מלא – כמו פעם */
+    max-width: 280px;
+    padding: 80px 20px 24px;
+    background: #020617;
+    box-shadow: 12px 0 30px rgba(15, 23, 42, 0.95);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transform: translateX(-100%);
+    opacity: 0;
+    pointer-events: none;
+    border-radius: 0 18px 18px 0;
+    z-index: 1000;
+  }
+
+  /* לייט מוד לתפריט */
+  html[data-theme="light"] .nav-right,
+  body.theme-light .nav-right {
+    background: #ffffff;
+    box-shadow: 12px 0 30px rgba(148, 163, 184, 0.6);
+  }
+
+  .nav-right a {
+    font-size: 0.98rem;
+    padding: 8px 0;
+  }
+
+  /* כשהתפריט פתוח */
+  .nav-right.open {
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* כפתור ההמבורגר */
+  .nav-toggle {
+    display: flex;
+    position: relative;
+    z-index: 1100;
+  }
+
+  body.nav-open {
+    overflow: hidden;
+  }
+}
