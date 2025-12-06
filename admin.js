@@ -271,7 +271,10 @@ function renderExamsAdmin() {
         <div class="admin-item">
           <div class="admin-item-main">
             <strong>${escapeHtml(ex.subject)}</strong>
-            <span class="admin-item-meta">${escapeHtml(ex.date || "")}</span>
+           <span class="admin-item-meta">
+  ${escapeHtml(ex.date || "")}${ex.time ? " · " + escapeHtml(ex.time) : ""}
+</span>
+
           </div>
           <div class="admin-item-body">${escapeHtml(ex.topic || "")}</div>
           <button class="admin-remove" data-type="exam" data-grade="${g}" data-index="${i}">
@@ -296,7 +299,9 @@ function setupExamForms() {
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
+
       const date = form.date.value.trim();
+      const time = form.time ? form.time.value.trim() : "";
       const subject = form.subject.value.trim();
       const topic = form.topic.value.trim();
 
@@ -305,7 +310,9 @@ function setupExamForms() {
         return;
       }
 
-      examsData[g].push({ date, subject, topic });
+      // שומרים גם time, אבל date נשאר בדיוק כמו "22/10/24"
+      examsData[g].push({ date, time, subject, topic });
+
       form.reset();
       renderExamsAdmin();
       await saveExamsGrade(g);
@@ -313,6 +320,7 @@ function setupExamForms() {
     });
   }
 }
+
 
 /* ------------ BOARD ------------ */
 
