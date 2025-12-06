@@ -2297,3 +2297,10 @@ body[data-theme="light"] .hero-side-card {
     height: 250px;
   }
 }
+/* גלואו לכותרת ולשורה שמתחתיה בהירו */
+.hero-text h1,
+.hero-text p:first-of-type {
+  text-shadow:
+    0 0 8px rgba(0, 0, 0, 0.85),
+    0 0 18px rgba(0, 0, 0, 0.75);
+}
