@@ -1449,3 +1449,24 @@ html:not([data-theme="light"]) .hero-home::after {
   position: relative;
   z-index: 2;
 }
+
+/* ===== תיקון שכבת HERO בדפי שכבה במצב בהיר ===== */
+
+html[data-theme="light"] .grade-hero,
+body.theme-light .grade-hero {
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.92),
+    rgba(240,243,248,1)
+  ) !important;
+  color: #0f172a !important;
+}
+
+/* תתי־כותרות + טקסט בתוך ההירו */
+html[data-theme="light"] .grade-hero h1,
+html[data-theme="light"] .grade-hero p,
+body.theme-light .grade-hero h1,
+body.theme-light .grade-hero p {
+  color: #0f172a !important;
+  opacity: 1 !important;
+}
