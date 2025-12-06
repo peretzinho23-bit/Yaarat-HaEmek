@@ -1363,13 +1363,13 @@ html[data-theme="light"] .hero-home::before {
 }
 /* הזזת תמונת הרקע + הקטנה */
 .hero-home .hero-slides .hero-slide {
-  background-position: center right 18% !important;
+  background-position: center right 8% !important;
   background-size: 115% !important;
 }
 
 @media (max-width: 900px) {
   .hero-home .hero-slides .hero-slide {
-    background-position: center right 25% !important;
+    background-position: center right 4% !important;
     background-size: 160% !important;
   }
 }
