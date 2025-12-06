@@ -1337,3 +1337,25 @@ html[data-theme="light"] .hero-home::before {
     color: #0f172a !important;
   }
 }
+/* === לוגו יותר קטן בדסקטופ ובמובייל === */
+.logo-circle {
+  width: 54px;
+  height: 54px;
+}
+
+@media (max-width: 900px) {
+  .logo-circle {
+    width: 46px;
+    height: 46px;
+  }
+}
+
+/* === לייט מוד – רקע התמונה פחות שקוף (יותר לבן, טקסט נשאר קריא) === */
+html[data-theme="light"] .hero-home::before {
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.96) 0%,
+    rgba(255, 255, 255, 0.98) 40%,
+    #f3f4f8 100%
+  );
+}
