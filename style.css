@@ -1212,3 +1212,76 @@ html[data-theme="light"] .home-exam-countdown {
     padding: 6px 10px;
   }
 }
+/* ===== טקסט שחור בלייט מוד בכל האזורים ===== */
+
+html[data-theme="light"] body,
+html[data-theme="light"] .hero-text h1,
+html[data-theme="light"] .hero-text p,
+html[data-theme="light"] .section-title,
+html[data-theme="light"] .section-subtitle,
+html[data-theme="light"] .grade-card,
+html[data-theme="light"] .hero-side-card,
+html[data-theme="light"] .home-news-title,
+html[data-theme="light"] .home-news-body,
+html[data-theme="light"] .home-exam-item,
+html[data-theme="light"] .board-item,
+html[data-theme="light"] footer,
+html[data-theme="light"] .about-text,
+html[data-theme="light"] .contact-box,
+html[data-theme="light"] .nav-right a {
+    color: #0f172a !important; /* שחור כהה */
+}
+
+/* טקסט שמופיע בתוך קופסאות */
+html[data-theme="light"] .hero-side-card p,
+html[data-theme="light"] .hero-side-card li,
+html[data-theme="light"] .quick-info-box li {
+    color: #111827 !important;
+}
+
+/* קישורים בלייט מוד */
+html[data-theme="light"] a {
+    color: #0f172a !important;
+}
+
+/* כפתורי תפריט בחלק העליון */
+html[data-theme="light"] .nav-right .btn-outline,
+html[data-theme="light"] .btn-outline {
+    color: #1e3a8a !important;        
+    border-color: #1e3a8a !important;
+    background: #ffffff !important;
+}
+
+html[data-theme="light"] .btn-outline:hover {
+    background: #1e3a8a !important;
+    color: #ffffff !important;
+}
+
+/* טקסט בהירו — למנוע שקיפות בהירה מדי בלייט */
+html[data-theme="light"] .hero-home::before {
+    background: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.9) 0%,
+        rgba(255, 255, 255, 0.95) 40%,
+        rgba(255, 255, 255, 1) 100%
+    ) !important;
+}
+
+html[data-theme="light"] .hero-text h1,
+html[data-theme="light"] .hero-text p {
+    text-shadow: none !important;
+}
+/* הקטנת לוגו */
+.logo-square,
+.logo-circle {
+    width: 55px !important;
+    height: 55px !important;
+}
+
+@media (max-width: 768px) {
+  .logo-square,
+  .logo-circle {
+      width: 45px !important;
+      height: 45px !important;
+  }
+}
