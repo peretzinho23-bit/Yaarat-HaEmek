@@ -80,8 +80,8 @@ button:focus-visible {
 }
 
 .logo-square {
-  width: 46px;
-  height: 46px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   overflow: hidden;
   display: flex;
@@ -965,8 +965,8 @@ html[data-theme="light"] .nav-toggle span {
   }
 
   .logo-square {
-    width: 40px;
-    height: 40px;
+    width: 30px;
+    height: 30px;
   }
 
   /* הירו – יותר גבוה למובייל */
@@ -1276,15 +1276,15 @@ html[data-theme="light"] .hero-text p {
    ========================= */
 .logo-circle,
 .logo-square {
-  width: 54px !important;
-  height: 54px !important;
+  width: 30px !important;
+  height: 30px !important;
 }
 
 @media (max-width: 600px) {
   .logo-circle,
   .logo-square {
-    width: 48px !important;
-    height: 48px !important;
+    width: 22px !important;
+    height: 22px !important;
   }
 }
 
@@ -1339,14 +1339,14 @@ html[data-theme="light"] .hero-home::before {
 }
 /* לוגו קטן יותר */
 .logo-square {
-  width: 42px !important;
-  height: 42px !important;
+  width: 30px !important;
+  height: 30px !important;
 }
 
 @media (max-width: 900px) {
   .logo-square {
-    width: 36px !important;
-    height: 36px !important;
+    width: 22px !important;
+    height: 22px !important;
   }
 }
 
