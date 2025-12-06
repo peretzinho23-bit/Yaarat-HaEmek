@@ -67,10 +67,13 @@ button:focus-visible {
 /* ========== HEADER + NAV ========== */
 
 .header-main {
-  background: #020816;
+  background: rgba(2, 8, 22, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   position: sticky;
   top: 0;
   z-index: 20;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.18);
 }
 
 .nav {
@@ -1125,8 +1128,11 @@ body.theme-light {
 
 html[data-theme="light"] .header-main,
 body.theme-light .header-main {
-  background: #ffffff;
-  box-shadow: 0 1px 6px rgba(15, 23, 42, 0.08);
+ background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
 }
 
 html[data-theme="light"] footer,
