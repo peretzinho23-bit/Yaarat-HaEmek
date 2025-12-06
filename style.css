@@ -1427,8 +1427,8 @@ html[data-theme="light"] .hero-home::before {
    לוגו מעוצב מחדש – מבוסס על הגרסה הישנה
    ============================ */
 .logo-circle {
-  width: 54px;        /* גדול מהישן (44px), אבל לא מוגזם */
-  height: 54px;
+  width: 70px;        /* גדול מהישן (44px), אבל לא מוגזם */
+  height: 70px;
   border-radius: 50%;
   background: radial-gradient(circle at top, #29b6f6, #01579b);
   display: flex;
@@ -1453,8 +1453,8 @@ html[data-theme="light"] .hero-home::before {
 /* גרסה קטנה יותר בנייד */
 @media (max-width: 900px) {
   .logo-circle {
-    width: 44px;
-    height: 44px;
+    width: 70px;
+    height: 70x;
     top: -4px;
     right: -6px;
   }
