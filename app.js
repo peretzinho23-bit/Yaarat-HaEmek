@@ -259,45 +259,129 @@ function renderHomeExams() {
     const listEl = document.getElementById(`home-exams-${g}`);
     if (!listEl) return;
 
-    const items = homeExams[g] || [];
-    if (!items.length) {
-      listEl.innerHTML = `
-        <div class="exam-card empty">
-          אין מבחנים קרובים לשכבה זו.
-        </div>`;
+    const rawItems = homeExams[g] || [];
+
+    // ממפים לאובייקטים עם Date
+    const itemsWithDates = rawItems
+      .map((ex) => ({
+        ...ex,
+        _dateObj: parseExamDateToDateObj(ex.date)
+      }))
+      .filter((ex) => ex._dateObj); // זורק מבחנים בלי תאריך תקין
+
+    if (!itemsWithDates.length) {
+      listEl.innerHTML = `<p class="empty-msg">אין מבחנים קרובים לשכבה זו.</p>`;
       return;
     }
 
-    listEl.innerHTML = items
-      .map((ex) => {
-        const dateStr = escapeHtml(ex.date);
-        const subject = escapeHtml(ex.subject);
-        const topic = escapeHtml(ex.topic || "");
-        const countdownSpan = ex.timestamp
-          ? `<div class="exam-countdown" data-exam-timestamp="${ex.timestamp}"></div>`
-          : "";
+    // מיון לפי תאריך מהקרוב לרחוק
+    itemsWithDates.sort((a, b) => a._dateObj - b._dateObj);
 
-        return `
-          <div class="exam-card">
-            <div class="exam-card-top">
-              <div class="exam-date">${dateStr}</div>
-              <div class="exam-subject">${subject}</div>
+    const now = new Date();
+
+    const upcoming = itemsWithDates.filter((ex) => ex._dateObj >= now);
+    const past = itemsWithDates.filter((ex) => ex._dateObj < now);
+
+    let html = "";
+
+    // מבחן הבא עם ספירה לאחור
+    if (upcoming.length) {
+      const next = upcoming[0];
+      const ts = next._dateObj.getTime();
+
+      html += `
+        <div class="home-exam-next">
+          <article class="home-exam-item home-exam-item-next">
+            <div class="home-exam-top">
+              <span class="home-exam-date">${escapeHtml(
+                formatLocalDate(next._dateObj)
+              )}</span>
+              <span class="home-exam-subject">${escapeHtml(
+                next.subject
+              )}</span>
             </div>
-
             ${
-              topic
-                ? `<div class="exam-topic">נושא: ${topic}</div>`
+              next.topic
+                ? `<div class="home-exam-topic">${escapeHtml(
+                    next.topic
+                  )}</div>`
                 : ""
             }
+            <div class="home-exam-countdown" data-exam-timestamp="${ts}"></div>
+          </article>
+        </div>
+      `;
 
-            ${countdownSpan}
-          </div>
-        `;
-      })
-      .join("");
+      const moreUpcoming = upcoming.slice(1);
+      if (moreUpcoming.length) {
+        html += `<div class="home-exam-list-upcoming">`;
+        html += moreUpcoming
+          .map(
+            (ex) => `
+              <article class="home-exam-item">
+                <div class="home-exam-top">
+                  <span class="home-exam-date">${escapeHtml(
+                    formatLocalDate(ex._dateObj)
+                  )}</span>
+                  <span class="home-exam-subject">${escapeHtml(
+                    ex.subject
+                  )}</span>
+                </div>
+                ${
+                  ex.topic
+                    ? `<div class="home-exam-topic">${escapeHtml(
+                        ex.topic
+                      )}</div>`
+                    : ""
+                }
+              </article>
+            `
+          )
+          .join("");
+        html += `</div>`;
+      }
+    } else {
+      html += `<p class="empty-msg">אין מבחנים קרובים לשכבה זו.</p>`;
+    }
 
-    startExamCountdownLoop();
+    // מבחנים שהיו
+    if (past.length) {
+      html += `
+        <div class="home-exam-past-block">
+          <h4 class="home-exam-past-title">מבחנים שהיו</h4>
+      `;
+      html += past
+        .map(
+          (ex) => `
+            <article class="home-exam-item home-exam-item-past">
+              <div class="home-exam-top">
+                <span class="home-exam-date">${escapeHtml(
+                  formatLocalDate(ex._dateObj)
+                )}</span>
+                <span class="home-exam-subject">${escapeHtml(
+                  ex.subject
+                )}</span>
+              </div>
+              ${
+                ex.topic
+                  ? `<div class="home-exam-topic">${escapeHtml(
+                      ex.topic
+                    )}</div>`
+                  : ""
+              }
+            </article>
+          `
+        )
+        .join("");
+      html += `</div>`;
+    }
+
+    listEl.innerHTML = html;
   });
+
+  // מפעיל ספירה לאחור למי שיש data-exam-timestamp
+  updateExamCountdownElements();
+  startExamCountdownLoop();
 }
 
 /* ------------ RENDER HOME BOARD ------------ */
