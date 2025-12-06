@@ -1376,3 +1376,120 @@ html[data-theme="light"] .header-main {
   background: #ffffff;
   box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
 }
+/* =========================
+   FIXES HEADER / NAV / LIGHT MODE
+   ========================== */
+
+/* דסקטופ – לייאאוט של הכותרת + תפריט */
+@media (min-width: 901px) {
+  .header-main .container {
+    display: flex;
+    justify-content: center;
+  }
+
+  .header-main .container .nav {
+    width: 100%;
+    max-width: 1150px;
+    padding-inline: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* ימין – לוגו, שמאל – תפריט */
+  }
+
+  .nav-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  /* בדסקטופ – תפריט רגיל בשורה אחת */
+  .nav-right {
+    position: static !important;
+    inset: auto !important;
+    width: auto !important;
+    height: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    display: flex !important;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .nav-right a {
+    font-size: 0.9rem;
+  }
+
+  /* כפתור המבורגר לא נראה בדסקטופ */
+  .nav-toggle {
+    display: none !important;
+  }
+}
+
+/* מובייל – תפריט המבורגר צדדי ברור */
+@media (max-width: 900px) {
+  /* כפתור המבורגר בצד שמאל (בראש המסך) */
+  .nav-toggle {
+    display: flex;
+  }
+
+  /* תפריט צד כהה */
+  .nav-right {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(260px, 80vw);
+    padding: 18px 20px 32px;
+    background: rgba(15, 23, 42, 0.98); /* כמעט שחור */
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.55);
+    border-radius: 0 0 0 28px;
+    transform: translateX(100%);
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      transform 0.28s ease,
+      opacity 0.28s ease;
+    z-index: 60;
+  }
+
+  .nav-right.open {
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* הקישורים בתוך התפריט – לבנים וברורים */
+  .nav-right a,
+  .nav-right .personal-btn,
+  .nav-right .btn-outline {
+    width: 100%;
+    justify-content: flex-start;
+    text-align: right;
+    color: #e5f0ff !important;
+  }
+
+  .nav-right .personal-btn,
+  .nav-right .btn-outline {
+    border-radius: 999px;
+  }
+}
+
+/* לייט מוד – כפתור Admin שלא נעלם */
+body[data-theme="light"] .btn-outline {
+  border-color: #2563eb !important;
+  color: #2563eb !important;
+  background: #ffffff !important;
+  font-weight: 600;
+}
+
+body[data-theme="light"] .btn-outline:hover {
+  background: #2563eb !important;
+  color: #ffffff !important;
+}
