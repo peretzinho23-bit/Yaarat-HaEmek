@@ -1271,17 +1271,69 @@ html[data-theme="light"] .hero-text h1,
 html[data-theme="light"] .hero-text p {
     text-shadow: none !important;
 }
-/* הקטנת לוגו */
-.logo-square,
-.logo-circle {
-    width: 55px !important;
-    height: 55px !important;
+/* =========================
+   🔧 תיקון גודל לוגו
+   ========================= */
+.logo-circle,
+.logo-square {
+  width: 54px !important;
+  height: 54px !important;
 }
 
-@media (max-width: 768px) {
-  .logo-square,
-  .logo-circle {
-      width: 45px !important;
-      height: 45px !important;
+@media (max-width: 600px) {
+  .logo-circle,
+  .logo-square {
+    width: 48px !important;
+    height: 48px !important;
+  }
+}
+
+
+/* =========================
+   🔧 חיזוק רקע הירו בלייט מוד
+   (שלא יהיה שקוף מדי)
+   ========================= */
+html[data-theme="light"] .hero-home::before {
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.92) 0%,
+    rgba(255,255,255,0.95) 40%,
+    rgba(245,247,251,1) 100%
+  ) !important;
+}
+
+
+/* =========================
+   🔧 תפריט המבורגר – צד שמאל
+   וגודל קצת קטן
+   ========================= */
+@media (max-width: 900px) {
+
+  /* כפתור המבורגר */
+  .nav-toggle {
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 999px;
+  }
+  .nav-toggle span {
+    width: 16px;
+    height: 2px;
+  }
+
+  /* תפריט נפתח – שמאל */
+  .nav-right {
+    right: auto !important;
+    left: 0 !important;
+    width: min(230px, 78vw) !important;
+    border-radius: 0 18px 18px 0 !important;
+  }
+
+  /* לייט מוד של התפריט */
+  html[data-theme="light"] .nav-right {
+    background: rgba(255,255,255,0.98) !important;
+    color: #0f172a !important;
+  }
+  html[data-theme="light"] .nav-right a {
+    color: #0f172a !important;
   }
 }
