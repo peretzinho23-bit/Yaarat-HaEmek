@@ -27,6 +27,95 @@ function escapeHtml(str) {
     .replace(/>/g, "&gt;");
 }
 
+/* ------------ עזר למבחנים + ספירה לאחור ------------ */
+
+// מזהה אינטרוואל גלובלי כדי שלא יווצרו מיליון אינטרוואלים
+let examCountdownIntervalId = null;
+
+// ממיר מחרוזת תאריך של המבחן לאובייקט Date
+// תומך ב: "2025-12-31" או "2025-12-31 08:30"
+function parseExamDateToDateObj(dateStr) {
+  if (!dateStr) return null;
+  const s = String(dateStr).trim();
+  if (!s) return null;
+
+  // רק תאריך – מהאדמין (input type="date")
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+    const [y, m, d] = s.split("-").map(Number);
+    return new Date(y, m - 1, d, 8, 0); // 08:00 בבוקר
+  }
+
+  // תאריך + שעה: "2025-12-31 08:30" או עם רווח/טאב/‏T
+  const m = s.match(
+    /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})$/
+  );
+  if (m) {
+    const y = Number(m[1]);
+    const mo = Number(m[2]);
+    const d = Number(m[3]);
+    const hh = Number(m[4]);
+    const mm = Number(m[5]);
+    return new Date(y, mo - 1, d, hh, mm);
+  }
+
+  // ניסיון אחרון – Date רגיל
+  const dObj = new Date(s);
+  return isNaN(dObj.getTime()) ? null : dObj;
+}
+
+// פורמט נחמד לתאריך: DD.MM.YYYY
+function formatLocalDate(d) {
+  try {
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const year = d.getFullYear();
+    return `${day}.${month}.${year}`;
+  } catch {
+    return "";
+  }
+}
+
+// מעדכן את כל האלמנטים עם data-exam-timestamp
+function updateExamCountdownElements() {
+  const els = document.querySelectorAll("[data-exam-timestamp]");
+  if (!els.length) return;
+
+  const now = Date.now();
+
+  els.forEach((el) => {
+    const ts = Number(el.dataset.examTimestamp);
+    if (!ts || Number.isNaN(ts)) {
+      el.textContent = "";
+      return;
+    }
+
+    const diff = ts - now;
+    if (diff <= 0) {
+      el.textContent = "המבחן כבר היה או מתקיים עכשיו";
+      return;
+    }
+
+    const totalSeconds = Math.floor(diff / 1000);
+    const days = Math.floor(totalSeconds / (24 * 3600));
+    const hours = Math.floor((totalSeconds % (24 * 3600)) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+
+    let parts = [];
+    if (days > 0) parts.push(`${days} ימים`);
+    parts.push(
+      `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`
+    );
+
+    el.textContent = `ספירה לאחור: ${parts.join(" · ")}`;
+  });
+}
+
+// מפעיל אינטרוואל אחד גלובלי
+function startExamCountdownLoop() {
+  if (examCountdownIntervalId) return;
+  examCountdownIntervalId = setInterval(updateExamCountdownElements, 1000);
+}
+
 /* ------------ LOAD HOME DATA (ONE SHOT) ------------ */
 
 async function loadHomeDataOnce() {
@@ -143,37 +232,136 @@ function renderHomeNews() {
   });
 }
 
-/* ------------ RENDER HOME EXAMS ------------ */
+/* ------------ RENDER HOME EXAMS (עם מבחן הבא + מבחנים שהיו + ספירה לאחור) ------------ */
 
 function renderHomeExams() {
   GRADES.forEach((g) => {
     const listEl = document.getElementById(`home-exams-${g}`);
     if (!listEl) return;
 
-    const items = homeExams[g] || [];
-    if (!items.length) {
+    const rawItems = homeExams[g] || [];
+
+    // ממפים לאובייקטים עם Date
+    const itemsWithDates = rawItems
+      .map((ex) => ({
+        ...ex,
+        _dateObj: parseExamDateToDateObj(ex.date)
+      }))
+      .filter((ex) => ex._dateObj); // זורק מבחנים בלי תאריך תקין
+
+    if (!itemsWithDates.length) {
       listEl.innerHTML = `<p class="empty-msg">אין מבחנים קרובים לשכבה זו.</p>`;
       return;
     }
 
-    listEl.innerHTML = items
-      .map(
-        (ex) => `
-        <article class="home-exam-item">
-          <div class="home-exam-top">
-            <span class="home-exam-date">${escapeHtml(ex.date)}</span>
-            <span class="home-exam-subject">${escapeHtml(ex.subject)}</span>
-          </div>
-          ${
-            ex.topic
-              ? `<div class="home-exam-topic">${escapeHtml(ex.topic)}</div>`
-              : ""
-          }
-        </article>
-      `
-      )
-      .join("");
+    // מיון לפי תאריך מהקרוב לרחוק
+    itemsWithDates.sort((a, b) => a._dateObj - b._dateObj);
+
+    const now = new Date();
+
+    const upcoming = itemsWithDates.filter((ex) => ex._dateObj >= now);
+    const past = itemsWithDates.filter((ex) => ex._dateObj < now);
+
+    let html = "";
+
+    // מבחן הבא עם ספירה לאחור
+    if (upcoming.length) {
+      const next = upcoming[0];
+      const ts = next._dateObj.getTime();
+
+      html += `
+        <div class="home-exam-next">
+          <article class="home-exam-item home-exam-item-next">
+            <div class="home-exam-top">
+              <span class="home-exam-date">${escapeHtml(
+                formatLocalDate(next._dateObj)
+              )}</span>
+              <span class="home-exam-subject">${escapeHtml(
+                next.subject
+              )}</span>
+            </div>
+            ${
+              next.topic
+                ? `<div class="home-exam-topic">${escapeHtml(
+                    next.topic
+                  )}</div>`
+                : ""
+            }
+            <div class="home-exam-countdown" data-exam-timestamp="${ts}"></div>
+          </article>
+        </div>
+      `;
+
+      const moreUpcoming = upcoming.slice(1);
+      if (moreUpcoming.length) {
+        html += `<div class="home-exam-list-upcoming">`;
+        html += moreUpcoming
+          .map(
+            (ex) => `
+              <article class="home-exam-item">
+                <div class="home-exam-top">
+                  <span class="home-exam-date">${escapeHtml(
+                    formatLocalDate(ex._dateObj)
+                  )}</span>
+                  <span class="home-exam-subject">${escapeHtml(
+                    ex.subject
+                  )}</span>
+                </div>
+                ${
+                  ex.topic
+                    ? `<div class="home-exam-topic">${escapeHtml(
+                        ex.topic
+                      )}</div>`
+                    : ""
+                }
+              </article>
+            `
+          )
+          .join("");
+        html += `</div>`;
+      }
+    } else {
+      html += `<p class="empty-msg">אין מבחנים קרובים לשכבה זו.</p>`;
+    }
+
+    // מבחנים שהיו
+    if (past.length) {
+      html += `
+        <div class="home-exam-past-block">
+          <h4 class="home-exam-past-title">מבחנים שהיו</h4>
+      `;
+      html += past
+        .map(
+          (ex) => `
+            <article class="home-exam-item home-exam-item-past">
+              <div class="home-exam-top">
+                <span class="home-exam-date">${escapeHtml(
+                  formatLocalDate(ex._dateObj)
+                )}</span>
+                <span class="home-exam-subject">${escapeHtml(
+                  ex.subject
+                )}</span>
+              </div>
+              ${
+                ex.topic
+                  ? `<div class="home-exam-topic">${escapeHtml(
+                      ex.topic
+                    )}</div>`
+                  : ""
+              }
+            </article>
+          `
+        )
+        .join("");
+      html += `</div>`;
+    }
+
+    listEl.innerHTML = html;
   });
+
+  // מפעיל ספירה לאחור למי שיש data-exam-timestamp
+  updateExamCountdownElements();
+  startExamCountdownLoop();
 }
 
 /* ------------ RENDER HOME BOARD ------------ */
@@ -228,8 +416,6 @@ function renderGradeNews(grade) {
     return;
   }
 
-  // שים לב: כאן אנחנו משתמשים באותם classes כמו בדף הבית,
-  // וה-CSS כבר דואג שב-body[data-grade] זה יהיה גדול ורחב.
   listEl.innerHTML = items
     .map((n) => {
       const hasImage = !!n.imageUrl;
@@ -282,21 +468,24 @@ function renderGradeExams(grade) {
   }
 
   listEl.innerHTML = items
-    .map(
-      (ex) => `
-      <article class="home-exam-item">
-        <div class="home-exam-top">
-          <span class="home-exam-date">${escapeHtml(ex.date)}</span>
-          <span class="home-exam-subject">${escapeHtml(ex.subject)}</span>
-        </div>
-        ${
-          ex.topic
-            ? `<div class="home-exam-topic">${escapeHtml(ex.topic)}</div>`
-            : ""
-        }
-      </article>
-    `
-    )
+    .map((ex) => {
+      const dObj = parseExamDateToDateObj(ex.date);
+      const dateLabel = dObj ? formatLocalDate(dObj) : ex.date || "";
+
+      return `
+        <article class="home-exam-item">
+          <div class="home-exam-top">
+            <span class="home-exam-date">${escapeHtml(dateLabel)}</span>
+            <span class="home-exam-subject">${escapeHtml(ex.subject)}</span>
+          </div>
+          ${
+            ex.topic
+              ? `<div class="home-exam-topic">${escapeHtml(ex.topic)}</div>`
+              : ""
+          }
+        </article>
+      `;
+    })
     .join("");
 }
 
@@ -340,10 +529,8 @@ function renderGradeBoard() {
 
 async function loadGradePage(grade) {
   try {
-    // נטען את כל הדאטה (אותו מודל כמו הבית)
     await loadHomeDataOnce();
 
-    // נרנדר לדף שכבה
     renderGradeNews(grade);
     renderGradeExams(grade);
     renderGradeBoard();
@@ -351,6 +538,7 @@ async function loadGradePage(grade) {
     initTheme();
     setupMobileNav();
     setupScrollToTop();
+    startExamCountdownLoop();
   } catch (err) {
     console.error("שגיאה בטעינת דף שכבה:", err);
   }
@@ -372,16 +560,13 @@ async function loadSiteContentForHome() {
 // טעינת טקסט האודות מהמסמך siteContent/main
 async function loadAboutSectionFromSiteContent() {
   const titleEl = document.getElementById("about-title");
-  const bodyEl = document.getElementById("about-body");
+  const bodyEl = document.getElementById("about-text"); // האינדקס שלך
 
-  // אם זה לא דף הבית – לא עושים כלום
   if (!titleEl || !bodyEl) return;
 
   try {
     const snap = await getDoc(doc(db, "siteContent", "main"));
-    if (!snap.exists()) {
-      return; // אין מסמך עדיין – נשאר טקסט ברירת מחדל
-    }
+    if (!snap.exists()) return;
 
     const data = snap.data() || {};
 
@@ -423,7 +608,7 @@ function applySiteContentToDom() {
 
   // ABOUT – אודות בית הספר
   setText("about-title", siteContent.aboutTitle);
-  setHtml("about-body", siteContent.aboutBody);
+  setHtml("about-text", siteContent.aboutBody || siteContent.aboutText);
 
   // IMPORTANT SECTION – "חשוב לדעת"
   setText("important-title", siteContent.importantTitle);
@@ -462,7 +647,6 @@ function applySiteContentToDom() {
   setImageSrc("hero-image", siteContent.heroImageUrl, "בית הספר יערת העמק");
 }
 
-
 /* ------------ THEME TOGGLE ------------ */
 
 const THEME_KEY = "yaarat-theme";
@@ -495,7 +679,7 @@ function setupMobileNav() {
   const navToggle = document.querySelector(".nav-toggle");
   const navRight = document.querySelector(".nav-right");
 
-  // ✨ מוסיפים לפני ה-if — ככה רצית
+  // סוגר תפריט אחרי לחיצה על לינק
   if (navRight) {
     navRight.querySelectorAll("a").forEach((link) => {
       link.addEventListener("click", () => {
@@ -507,7 +691,6 @@ function setupMobileNav() {
     });
   }
 
-  // אם אין תפריט או כפתור – יוצאים
   if (!navToggle || !navRight) return;
 
   function applyNavVisibility() {
@@ -540,7 +723,6 @@ function setupMobileNav() {
   });
 }
 
-
 /* ------------ SCROLL TO TOP ------------ */
 
 function setupScrollToTop() {
@@ -569,7 +751,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const grade = document.body.dataset.grade;
 
   if (page === "home") {
-    // דף הבית
     loadHomeDataOnce();
     subscribeRealtimeHome();
     loadSiteContentForHome();
@@ -577,8 +758,8 @@ document.addEventListener("DOMContentLoaded", () => {
     initTheme();
     setupMobileNav();
     setupScrollToTop();
+    startExamCountdownLoop();
   } else if (grade) {
-    // דף שכבה (z / h / t)
     loadGradePage(grade);
   }
 });
