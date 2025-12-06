@@ -1423,3 +1423,44 @@ html[data-theme="light"] .hero-home::before {
     rgba(245,247,251,0.70) 100%
   ) !important;
 }
+/* ============================
+   לוגו מעוצב מחדש – מבוסס על הגרסה הישנה
+   ============================ */
+.logo-circle {
+  width: 54px;        /* גדול מהישן (44px), אבל לא מוגזם */
+  height: 54px;
+  border-radius: 50%;
+  background: radial-gradient(circle at top, #29b6f6, #01579b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  
+  /* הזזה למיקום שביקשת */
+  top: -6px;     /* מעלה קצת */
+  right: -8px;   /* מזיז קצת ימינה */
+}
+
+.logo-circle .logo-img {
+  width: 122%;      /* בדיוק כמו שהיה – ממלא יפה */
+  height: 122%;
+  object-fit: cover;
+  object-position: 50% 60%;
+  display: block;
+}
+
+/* גרסה קטנה יותר בנייד */
+@media (max-width: 900px) {
+  .logo-circle {
+    width: 44px;
+    height: 44px;
+    top: -4px;
+    right: -6px;
+  }
+
+  .logo-circle .logo-img {
+    width: 125%;
+    height: 125%;
+  }
+}
