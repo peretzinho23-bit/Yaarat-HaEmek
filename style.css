@@ -2436,45 +2436,33 @@ body.dark .exam-countdown {
   white-space: pre-wrap;   /* שורות חדשות יורדות יפה */
   word-break: break-word;  /* שלא יישבר העיצוב במילים ארוכות */
 }
-/* ===================== */
-/*  תיקוני מובייל כלליים */
-/* ===================== */
-
 @media (max-width: 900px) {
-  html, body {
-    overflow-x: hidden;
-  }
-
-  .container {
-    padding-inline: 12px;
-  }
-
-  /* כותרת עליונה נמוכה יותר */
-  .header-main {
-    position: sticky;
-    top: 0;
-    z-index: 50;
-  }
-
   .nav {
-    height: 56px;
-    align-items: center;
+    gap: 0.5rem;
   }
 
-  /* תפריט מובייל נפתח כמו מגירה */
   .nav-right {
     position: fixed;
-    inset: 56px 0 auto 0;
-    background: rgba(15, 23, 42, 0.96);
-    backdrop-filter: blur(12px);
-    display: flex;
+    top: 0;
+    left: 0; /* בצד שמאל כמו שביקשת */
+    margin-top: 60px; /* גובה ההדר בערך – אם צריך תכוון */
+    width: 260px;     /* תפריט קטן יחסית */
+    max-height: calc(100vh - 60px);
+    overflow-y: auto;
+
+    background: var(--card-bg, #ffffff);
+    border-radius: 0 0 1.25rem 0;
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.45);
+
+    padding: 12px 16px 16px;
+    display: none;
     flex-direction: column;
-    gap: 10px;
-    padding: 14px 18px 18px;
-    transform: translateY(-100%);
-    opacity: 0;
-    pointer-events: none;
-    transition: transform 0.25s ease, opacity 0.25s ease;
+    gap: 0.35rem;
+    z-index: 900;
+  }
+
+  .nav-right.open {
+    display: flex;
   }
 
   .nav-right a,
@@ -2484,79 +2472,36 @@ body.dark .exam-countdown {
     text-align: center;
   }
 
-  .nav-right.open {
-    transform: translateY(0);
-    opacity: 1;
-    pointer-events: auto;
-  }
-
   .nav-toggle {
-    display: flex;
-  }
-
-  /* ההירו – טור אחד ולא צד-לצד */
-  .hero.hero-home {
-    min-height: calc(100vh - 56px);
-  }
-
-  .hero-content {
+    display: inline-flex;
     flex-direction: column;
-    align-items: stretch;
-    gap: 16px;
-    padding-block: 16px 24px;
-    text-align: center;
-  }
-
-  .hero-text {
-    max-width: 100%;
-  }
-
-  .hero-side-card {
-    max-width: 100%;
-    width: 100%;
-  }
-
-  /* כרטיסים / גריד בכל האתר */
-  .home-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 14px;
-  }
-
-  .grade-card,
-  .home-exam-item,
-  .home-news-item,
-  .board-item {
-    margin-inline: 0;
-    border-radius: 18px;
-    padding: 12px 14px;
-  }
-
-  /* קצת טקסט קטן יותר שלא יתפוצץ */
-  .home-news-body,
-  .home-exam-topic,
-  .board-item-body {
-    font-size: 0.9rem;
-  }
-}
-
-/* מובייל ממש קטן (טלפונים ישנים/קטנים) */
-@media (max-width: 400px) {
-  body {
-    font-size: 14px;
-  }
-
-  .school-title-main {
-    font-size: 1.05rem;
-  }
-
-  .school-title-sub {
-    font-size: 0.8rem;
-  }
-
-  .hero-actions .btn,
-  .hero-actions .btn-outline {
-    width: 100%;
     justify-content: center;
+    align-items: center;
+    gap: 4px;
+    width: 38px;
+    height: 32px;
+    border-radius: 999px;
+    border: none;
+    background: rgba(15, 23, 42, 0.85);
+    cursor: pointer;
+  }
+
+  .nav-toggle span {
+    width: 18px;
+    height: 2px;
+    border-radius: 999px;
+    background: #f9fafb;
+  }
+
+  .theme-toggle {
+    width: 40px;
+    height: 40px;
+    margin: 4px auto 0;
+    border-radius: 999px;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
   }
 }
