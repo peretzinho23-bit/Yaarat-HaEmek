@@ -1534,4 +1534,25 @@ body.theme-light .grade-hero p {
       rgba(255,255,255,0.0) 80%
     );
   }
+}/* ===== לוגו עגול במובייל ===== */
+@media (max-width: 768px) {
+  .logo-square,
+  .logo-circle {
+    width: 60px !important;
+    height: 60px !important;
+    border-radius: 50% !important;
+    overflow: hidden !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .logo-circle .logo-img,
+  .logo-square img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
+  }
 }
+
