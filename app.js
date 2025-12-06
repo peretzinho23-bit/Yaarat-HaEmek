@@ -33,7 +33,7 @@ function escapeHtml(str) {
 let examCountdownIntervalId = null;
 
 // ממיר מחרוזת תאריך של המבחן לאובייקט Date
-// תומך ב: "2025-12-31" או "2025-12-31 08:30"
+// תומך ב: "22/10/2025", "22/10/25", "2025-10-22", "2025-10-22 08:30"
 function parseExamDateToDateObj(dateStr) {
   if (!dateStr) return null;
   let s = String(dateStr).trim();
@@ -51,7 +51,7 @@ function parseExamDateToDateObj(dateStr) {
       year = 2000 + year; // 22 → 2022
     }
 
-    return new Date(year, month - 1, day, 8, 0); 
+    return new Date(year, month - 1, day, 8, 0);
   }
 
   // ✔ פורמט רגיל: YYYY-MM-DD
@@ -71,11 +71,10 @@ function parseExamDateToDateObj(dateStr) {
     return new Date(y, mo - 1, d, hh, mm);
   }
 
-  // ✔ ניסיון אחרון
+  // ✔ ניסיון אחרון – שיזרום אם הכנסת משהו מוזר
   const dObj = new Date(s);
   return isNaN(dObj.getTime()) ? null : dObj;
 }
-
 
 // פורמט נחמד לתאריך: DD.MM.YYYY
 function formatLocalDate(d) {
@@ -128,8 +127,6 @@ function updateExamCountdownElements() {
   });
 }
 
-
-
 // מפעיל אינטרוואל אחד גלובלי
 function startExamCountdownLoop() {
   if (examCountdownIntervalId) return;
@@ -167,7 +164,7 @@ async function loadHomeDataOnce() {
   }
 }
 
-// לייב (לא חובה אבל נחמד)
+// לייב
 function subscribeRealtimeHome() {
   // NEWS
   for (const g of GRADES) {
@@ -254,8 +251,6 @@ function renderHomeNews() {
 
 /* ------------ RENDER HOME EXAMS (עם מבחן הבא + מבחנים שהיו + ספירה לאחור) ------------ */
 
-/* ------------ RENDER HOME EXAMS (עם מבחן הבא + מבחנים שהיו + ספירה לאחור) ------------ */
-
 function renderHomeExams() {
   GRADES.forEach((g) => {
     const listEl = document.getElementById(`home-exams-${g}`);
@@ -263,7 +258,7 @@ function renderHomeExams() {
 
     const rawItems = homeExams[g] || [];
 
-    // מוסיפים אובייקט Date לכל מבחן
+    // ממפים לאובייקטים עם Date
     const itemsWithDates = rawItems
       .map((ex) => ({
         ...ex,
@@ -276,16 +271,17 @@ function renderHomeExams() {
       return;
     }
 
-    // מיון מהקרוב לרחוק
+    // מיון לפי תאריך מהקרוב לרחוק
     itemsWithDates.sort((a, b) => a._dateObj - b._dateObj);
 
     const now = new Date();
+
     const upcoming = itemsWithDates.filter((ex) => ex._dateObj >= now);
     const past = itemsWithDates.filter((ex) => ex._dateObj < now);
 
     let html = "";
 
-    // ===== המבחן הבא =====
+    // מבחן הבא עם ספירה לאחור
     if (upcoming.length) {
       const next = upcoming[0];
       const ts = next._dateObj.getTime();
@@ -297,41 +293,38 @@ function renderHomeExams() {
               <span class="home-exam-date">${escapeHtml(
                 formatLocalDate(next._dateObj)
               )}</span>
+              <span class="home-exam-subject">${escapeHtml(
+                next.subject
+              )}</span>
             </div>
-
-            <div class="home-exam-subject-main">
-              ${escapeHtml(next.subject || "")}
-            </div>
-
             ${
               next.topic
-                ? `<div class="home-exam-topic">${escapeHtml(next.topic)}</div>`
+                ? `<div class="home-exam-topic">${escapeHtml(
+                    next.topic
+                  )}</div>`
                 : ""
             }
-
             <div class="home-exam-countdown" data-exam-timestamp="${ts}"></div>
           </article>
         </div>
       `;
 
-      // ===== עוד מבחנים עתידיים =====
       const moreUpcoming = upcoming.slice(1);
       if (moreUpcoming.length) {
         html += `<div class="home-exam-list-upcoming">`;
         html += moreUpcoming
-          .map(
-            (ex) => `
+          .map((ex) => {
+            const ts2 = ex._dateObj.getTime();
+            return `
               <article class="home-exam-item">
                 <div class="home-exam-top">
                   <span class="home-exam-date">${escapeHtml(
                     formatLocalDate(ex._dateObj)
                   )}</span>
+                  <span class="home-exam-subject">${escapeHtml(
+                    ex.subject
+                  )}</span>
                 </div>
-
-                <div class="home-exam-subject-main">
-                  ${escapeHtml(ex.subject || "")}
-                </div>
-
                 ${
                   ex.topic
                     ? `<div class="home-exam-topic">${escapeHtml(
@@ -339,9 +332,10 @@ function renderHomeExams() {
                       )}</div>`
                     : ""
                 }
+                <div class="home-exam-countdown" data-exam-timestamp="${ts2}"></div>
               </article>
-            `
-          )
+            `;
+          })
           .join("");
         html += `</div>`;
       }
@@ -349,13 +343,12 @@ function renderHomeExams() {
       html += `<p class="empty-msg">אין מבחנים קרובים לשכבה זו.</p>`;
     }
 
-    // ===== מבחנים שהיו =====
+    // מבחנים שהיו (בלי ספירה לאחור)
     if (past.length) {
       html += `
         <div class="home-exam-past-block">
           <h4 class="home-exam-past-title">מבחנים שהיו</h4>
       `;
-
       html += past
         .map(
           (ex) => `
@@ -364,12 +357,10 @@ function renderHomeExams() {
                 <span class="home-exam-date">${escapeHtml(
                   formatLocalDate(ex._dateObj)
                 )}</span>
+                <span class="home-exam-subject">${escapeHtml(
+                  ex.subject
+                )}</span>
               </div>
-
-              <div class="home-exam-subject-main">
-                ${escapeHtml(ex.subject || "")}
-              </div>
-
               ${
                 ex.topic
                   ? `<div class="home-exam-topic">${escapeHtml(
@@ -381,18 +372,16 @@ function renderHomeExams() {
           `
         )
         .join("");
-
       html += `</div>`;
     }
 
     listEl.innerHTML = html;
   });
 
-  // מפעיל ספירה לאחור
+  // מפעיל ספירה לאחור למי שיש data-exam-timestamp
   updateExamCountdownElements();
   startExamCountdownLoop();
 }
-
 
 /* ------------ RENDER HOME BOARD ------------ */
 
@@ -491,21 +480,31 @@ function renderGradeExams(grade) {
   const listEl = document.getElementById("grade-exams");
   if (!listEl) return;
 
-  const items = homeExams[grade] || [];
-  if (!items.length) {
+  const rawItems = homeExams[grade] || [];
+
+  const itemsWithDates = rawItems
+    .map((ex) => ({
+      ...ex,
+      _dateObj: parseExamDateToDateObj(ex.date)
+    }))
+    .filter((ex) => ex._dateObj);
+
+  if (!itemsWithDates.length) {
     listEl.innerHTML = `<p class="empty-msg">אין מבחנים קרובים לשכבה זו.</p>`;
     return;
   }
 
-  listEl.innerHTML = items
-    .map((ex) => {
-      const dObj = parseExamDateToDateObj(ex.date);
-      const dateLabel = dObj ? formatLocalDate(dObj) : ex.date || "";
+  itemsWithDates.sort((a, b) => a._dateObj - b._dateObj);
 
+  listEl.innerHTML = itemsWithDates
+    .map((ex) => {
+      const ts = ex._dateObj.getTime();
       return `
         <article class="home-exam-item">
           <div class="home-exam-top">
-            <span class="home-exam-date">${escapeHtml(dateLabel)}</span>
+            <span class="home-exam-date">${escapeHtml(
+              formatLocalDate(ex._dateObj)
+            )}</span>
             <span class="home-exam-subject">${escapeHtml(ex.subject)}</span>
           </div>
           ${
@@ -513,10 +512,14 @@ function renderGradeExams(grade) {
               ? `<div class="home-exam-topic">${escapeHtml(ex.topic)}</div>`
               : ""
           }
+          <div class="home-exam-countdown" data-exam-timestamp="${ts}"></div>
         </article>
       `;
     })
     .join("");
+
+  updateExamCountdownElements();
+  startExamCountdownLoop();
 }
 
 function renderGradeBoard() {
@@ -568,7 +571,6 @@ async function loadGradePage(grade) {
     initTheme();
     setupMobileNav();
     setupScrollToTop();
-    startExamCountdownLoop();
   } catch (err) {
     console.error("שגיאה בטעינת דף שכבה:", err);
   }
@@ -590,7 +592,7 @@ async function loadSiteContentForHome() {
 // טעינת טקסט האודות מהמסמך siteContent/main
 async function loadAboutSectionFromSiteContent() {
   const titleEl = document.getElementById("about-title");
-  const bodyEl = document.getElementById("about-text"); // האינדקס שלך
+  const bodyEl = document.getElementById("about-body"); // זה ה-id אצלך באינדקס
 
   if (!titleEl || !bodyEl) return;
 
@@ -638,7 +640,7 @@ function applySiteContentToDom() {
 
   // ABOUT – אודות בית הספר
   setText("about-title", siteContent.aboutTitle);
-  setHtml("about-text", siteContent.aboutBody || siteContent.aboutText);
+  setHtml("about-body", siteContent.aboutBody || siteContent.aboutText);
 
   // IMPORTANT SECTION – "חשוב לדעת"
   setText("important-title", siteContent.importantTitle);
@@ -794,4 +796,3 @@ document.addEventListener("DOMContentLoaded", () => {
   setupMobileNav();
   setupScrollToTop();
 });
-

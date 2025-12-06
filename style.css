@@ -2406,3 +2406,33 @@ body.dark .exam-countdown {
 [data-theme="dark"] .home-exam-countdown {
   color: #f9fafb; /* לבן בהיר */
 }
+/* טיימר – שיהיה בצבע חזק וקריא */
+.home-exam-countdown {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #020617; /* שחור חזק בלייט מוד */
+}
+
+[data-theme="dark"] .home-exam-countdown {
+  color: #f9fafb; /* לבן חזק בדארק מוד */
+}
+
+/* חדשות – שהטקסט יתפרס יפה ולא ייתקע באמצע */
+.home-news-item {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto 1rem;
+  display: flex;
+  gap: 1rem;
+  text-align: right;
+}
+
+.home-news-text {
+  flex: 1;
+}
+
+.home-news-body {
+  white-space: pre-wrap;   /* שורות חדשות יורדות יפה */
+  word-break: break-word;  /* שלא יישבר העיצוב במילים ארוכות */
+}
