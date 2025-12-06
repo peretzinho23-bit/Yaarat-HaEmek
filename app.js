@@ -747,19 +747,21 @@ function setupScrollToTop() {
 /* ------------ INIT ------------ */
 
 document.addEventListener("DOMContentLoaded", () => {
-  const page = document.body.dataset.page;
   const grade = document.body.dataset.grade;
 
-  if (page === "home") {
-    loadHomeDataOnce();
-    subscribeRealtimeHome();
-    loadSiteContentForHome();
-    loadAboutSectionFromSiteContent();
-    initTheme();
-    setupMobileNav();
-    setupScrollToTop();
-    startExamCountdownLoop();
-  } else if (grade) {
+  // אם יש data-grade → דף שכבה (z / h / t)
+  if (grade) {
     loadGradePage(grade);
+    return;
   }
+
+  // אחרת – זה דף הבית
+  loadHomeDataOnce();
+  subscribeRealtimeHome();
+  loadSiteContentForHome();
+  loadAboutSectionFromSiteContent();
+  initTheme();
+  setupMobileNav();
+  setupScrollToTop();
 });
+
