@@ -1047,3 +1047,64 @@ html[data-theme="light"] button#theme-toggle {
     bottom: 135px;
   }
 }
+/* === FIXES ל-LIGHT MODE במובייל + דסקטופ – להוסיף בסוף הקובץ === */
+
+html[data-theme="light"] body {
+  background: #f3f4f6;
+  color: #0b1120;
+}
+
+/* אזורים "כהים" שיהיו בהירים בלייט מוד */
+html[data-theme="light"] .section-dark-strong,
+html[data-theme="light"] .hero-home {
+  background: #f3f4f6;
+  color: #0b1120;
+}
+
+/* ההדר של ההירו בלייט – בלי שכבה כהה מוגזמת */
+html[data-theme="light"] .hero-overlay {
+  background: linear-gradient(
+    180deg,
+    rgba(248, 250, 252, 0.98) 0%,
+    rgba(248, 250, 252, 0.96) 40%,
+    rgba(248, 250, 252, 0.94) 100%
+  );
+  mix-blend-mode: normal;
+}
+
+/* כרטיסים בלייט – לבן נקי וטקסט כהה */
+html[data-theme="light"] .card,
+html[data-theme="light"] .grade-card,
+html[data-theme="light"] .home-news-item,
+html[data-theme="light"] .home-exam-item,
+html[data-theme="light"] .board-item,
+html[data-theme="light"] .request-box {
+  background: #ffffff;
+  color: #0b1120;
+}
+
+/* טיימר מבחן בלייט – טקסט שחור/כהה חזק */
+html[data-theme="light"] .home-exam-countdown {
+  color: #111827;
+  font-weight: 600;
+}
+
+/* מובייל – ריווח ושבירות יפות בלייט מוד */
+@media (max-width: 768px) {
+  html[data-theme="light"] .hero-home {
+    padding-top: 90px;
+  }
+
+  html[data-theme="light"] .hero-content {
+    padding-top: 0;
+  }
+
+  html[data-theme="light"] .section-dark-strong {
+    background: #f3f4f6;
+  }
+
+  html[data-theme="light"] .home-grid .grade-card,
+  html[data-theme="light"] .card {
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  }
+}
