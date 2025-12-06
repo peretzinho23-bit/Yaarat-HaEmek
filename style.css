@@ -2436,6 +2436,130 @@ body.dark .exam-countdown {
   white-space: pre-wrap;   /* שורות חדשות יורדות יפה */
   word-break: break-word;  /* שלא יישבר העיצוב במילים ארוכות */
 }
+/* ===================== */
+/*  תיקוני מובייל כלליים */
+/* ===================== */
+
+@media (max-width: 900px) {
+  html, body {
+    overflow-x: hidden;
+  }
+
+  .container {
+    padding-inline: 12px;
+  }
+
+  /* כותרת עליונה נמוכה יותר */
+  .header-main {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .nav {
+    height: 56px;
+    align-items: center;
+  }
+
+  /* תפריט מובייל נפתח כמו מגירה */
+  .nav-right {
+    position: fixed;
+    inset: 56px 0 auto 0;
+    background: rgba(15, 23, 42, 0.96);
+    backdrop-filter: blur(12px);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px 18px 18px;
+    transform: translateY(-100%);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+  }
+
+  .nav-right a,
+  .nav-right .personal-btn,
+  .nav-right .btn-outline {
+    width: 100%;
+    text-align: center;
+  }
+
+  .nav-right.open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .nav-toggle {
+    display: flex;
+  }
+
+  /* ההירו – טור אחד ולא צד-לצד */
+  .hero.hero-home {
+    min-height: calc(100vh - 56px);
+  }
+
+  .hero-content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    padding-block: 16px 24px;
+    text-align: center;
+  }
+
+  .hero-text {
+    max-width: 100%;
+  }
+
+  .hero-side-card {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  /* כרטיסים / גריד בכל האתר */
+  .home-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .grade-card,
+  .home-exam-item,
+  .home-news-item,
+  .board-item {
+    margin-inline: 0;
+    border-radius: 18px;
+    padding: 12px 14px;
+  }
+
+  /* קצת טקסט קטן יותר שלא יתפוצץ */
+  .home-news-body,
+  .home-exam-topic,
+  .board-item-body {
+    font-size: 0.9rem;
+  }
+}
+
+/* מובייל ממש קטן (טלפונים ישנים/קטנים) */
+@media (max-width: 400px) {
+  body {
+    font-size: 14px;
+  }
+
+  .school-title-main {
+    font-size: 1.05rem;
+  }
+
+  .school-title-sub {
+    font-size: 0.8rem;
+  }
+
+  .hero-actions .btn,
+  .hero-actions .btn-outline {
+    width: 100%;
+    justify-content: center;
+  }
+}
 @media (max-width: 900px) {
   .nav {
     gap: 0.5rem;
