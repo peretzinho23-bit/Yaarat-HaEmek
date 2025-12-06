@@ -34,10 +34,23 @@ let examCountdownIntervalId = null;
 
 // ממיר מחרוזת תאריך של המבחן לאובייקט Date
 // תומך ב: "22/10/2025", "22/10/25", "2025-10-22", "2025-10-22 08:30"
-function parseExamDateToDateObj(dateStr) {
+// ויכול לקבל שעת מבחן נפרדת מהשדה time ("08:30")
+function parseExamDateToDateObj(dateStr, timeStr) {
   if (!dateStr) return null;
   let s = String(dateStr).trim();
   if (!s) return null;
+
+  // שעת ברירת מחדל 08:00 – ואם יש time תקין מחליפים
+  let hh = 8;
+  let mm = 0;
+
+  if (timeStr) {
+    const tm = String(timeStr).trim().match(/^(\d{1,2}):(\d{2})$/);
+    if (tm) {
+      hh = Number(tm[1]);
+      mm = Number(tm[2]);
+    }
+  }
 
   // ✔ פורמט ישראלי: DD/MM/YYYY או DD/MM/YY
   const matchIL = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/);
@@ -51,24 +64,24 @@ function parseExamDateToDateObj(dateStr) {
       year = 2000 + year; // 22 → 2022
     }
 
-    return new Date(year, month - 1, day, 8, 0);
+    return new Date(year, month - 1, day, hh, mm);
   }
 
   // ✔ פורמט רגיל: YYYY-MM-DD
   if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
     const [y, m, d] = s.split("-").map(Number);
-    return new Date(y, m - 1, d, 8, 0);
+    return new Date(y, m - 1, d, hh, mm);
   }
 
-  // ✔ תאריך + שעה: YYYY-MM-DD HH:MM
+  // ✔ תאריך + שעה: YYYY-MM-DD HH:MM או YYYY-MM-DDTHH:MM
   const m = s.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{1,2}):(\d{2})$/);
   if (m) {
     const y = Number(m[1]);
     const mo = Number(m[2]);
     const d = Number(m[3]);
-    const hh = Number(m[4]);
-    const mm = Number(m[5]);
-    return new Date(y, mo - 1, d, hh, mm);
+    const hh2 = Number(m[4]);
+    const mm2 = Number(m[5]);
+    return new Date(y, mo - 1, d, hh2, mm2);
   }
 
   // ✔ ניסיון אחרון – שיזרום אם הכנסת משהו מוזר
@@ -86,6 +99,19 @@ function formatLocalDate(d) {
   } catch {
     return "";
   }
+}
+
+// בונה מחרוזת "תאריך · שעה" (אם יש שעה)
+function buildDateTimeLabel(ex, dObjOverride) {
+  const dObj = dObjOverride || parseExamDateToDateObj(ex.date, ex.time);
+  const baseLabel = dObj
+    ? formatLocalDate(dObj)
+    : escapeHtml(ex.date || "");
+
+  if (ex.time) {
+    return `${baseLabel} · ${escapeHtml(ex.time)}`;
+  }
+  return baseLabel;
 }
 
 // מעדכן את כל האלמנטים עם data-exam-timestamp
@@ -258,11 +284,11 @@ function renderHomeExams() {
 
     const rawItems = homeExams[g] || [];
 
-    // ממפים לאובייקטים עם Date
+    // ממפים לאובייקטים עם Date (כולל time)
     const itemsWithDates = rawItems
       .map((ex) => ({
         ...ex,
-        _dateObj: parseExamDateToDateObj(ex.date)
+        _dateObj: parseExamDateToDateObj(ex.date, ex.time)
       }))
       .filter((ex) => ex._dateObj); // זורק מבחנים בלי תאריך תקין
 
@@ -290,8 +316,9 @@ function renderHomeExams() {
         <div class="home-exam-next">
           <article class="home-exam-item home-exam-item-next">
             <div class="home-exam-top">
-              <span class="home-exam-date">${escapeHtml(
-                formatLocalDate(next._dateObj)
+              <span class="home-exam-date">${buildDateTimeLabel(
+                next,
+                next._dateObj
               )}</span>
               <span class="home-exam-subject">${escapeHtml(
                 next.subject
@@ -318,8 +345,9 @@ function renderHomeExams() {
             return `
               <article class="home-exam-item">
                 <div class="home-exam-top">
-                  <span class="home-exam-date">${escapeHtml(
-                    formatLocalDate(ex._dateObj)
+                  <span class="home-exam-date">${buildDateTimeLabel(
+                    ex,
+                    ex._dateObj
                   )}</span>
                   <span class="home-exam-subject">${escapeHtml(
                     ex.subject
@@ -354,8 +382,9 @@ function renderHomeExams() {
           (ex) => `
             <article class="home-exam-item home-exam-item-past">
               <div class="home-exam-top">
-                <span class="home-exam-date">${escapeHtml(
-                  formatLocalDate(ex._dateObj)
+                <span class="home-exam-date">${buildDateTimeLabel(
+                  ex,
+                  ex._dateObj
                 )}</span>
                 <span class="home-exam-subject">${escapeHtml(
                   ex.subject
@@ -485,7 +514,7 @@ function renderGradeExams(grade) {
   const itemsWithDates = rawItems
     .map((ex) => ({
       ...ex,
-      _dateObj: parseExamDateToDateObj(ex.date)
+      _dateObj: parseExamDateToDateObj(ex.date, ex.time)
     }))
     .filter((ex) => ex._dateObj);
 
@@ -502,8 +531,9 @@ function renderGradeExams(grade) {
       return `
         <article class="home-exam-item">
           <div class="home-exam-top">
-            <span class="home-exam-date">${escapeHtml(
-              formatLocalDate(ex._dateObj)
+            <span class="home-exam-date">${buildDateTimeLabel(
+              ex,
+              ex._dateObj
             )}</span>
             <span class="home-exam-subject">${escapeHtml(ex.subject)}</span>
           </div>
@@ -592,7 +622,7 @@ async function loadSiteContentForHome() {
 // טעינת טקסט האודות מהמסמך siteContent/main
 async function loadAboutSectionFromSiteContent() {
   const titleEl = document.getElementById("about-title");
-  const bodyEl = document.getElementById("about-body"); // זה ה-id אצלך באינדקס
+  const bodyEl = document.getElementById("about-body");
 
   if (!titleEl || !bodyEl) return;
 
