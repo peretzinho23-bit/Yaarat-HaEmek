@@ -1271,22 +1271,6 @@ html[data-theme="light"] .hero-text h1,
 html[data-theme="light"] .hero-text p {
     text-shadow: none !important;
 }
-/* =========================
-   🔧 תיקון גודל לוגו
-   ========================= */
-.logo-circle,
-.logo-square {
-  width: 30px !important;
-  height: 30px !important;
-}
-
-@media (max-width: 600px) {
-  .logo-circle,
-  .logo-square {
-    width: 22px !important;
-    height: 22px !important;
-  }
-}
 
 
 /* =========================
@@ -1337,19 +1321,6 @@ html[data-theme="light"] .hero-home::before {
     color: #0f172a !important;
   }
 }
-/* לוגו קטן יותר */
-.logo-square {
-  width: 30px !important;
-  height: 30px !important;
-}
-
-@media (max-width: 900px) {
-  .logo-square {
-    width: 22px !important;
-    height: 22px !important;
-  }
-}
-
 
 
 /* === לייט מוד – רקע התמונה פחות שקוף (יותר לבן, טקסט נשאר קריא) === */
@@ -1381,25 +1352,6 @@ html[data-theme="light"] .hero-home::before {
     rgba(255,255,255,0.65) 40%,
     rgba(255,255,255,0.85) 100%
   ) !important;
-}
-/* =========================
-   🔧 לוגו – מיקום מדויק יותר
-   ========================= */
-.logo-circle {
-  position: relative;
-  top: -6px;      /* מעלה טיפה */
-  right: -8px;    /* מזיז ימינה */
-  width: 62px;    /* גודל יפה ונקי */
-  height: 62px;
-}
-
-@media (max-width: 900px) {
-  .logo-circle {
-    top: -4px;
-    right: -6px;
-    width: 50px;
-    height: 50px;
-  }
 }
 
 /* =========================
