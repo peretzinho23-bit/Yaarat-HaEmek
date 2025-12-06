@@ -151,17 +151,19 @@ button:focus-visible {
 
 /* ========== כפתור המבורגר – דיפולט: מוסתר (דסקטופ) ========== */
 
+/* ===== כפתור תפריט המבורגר – כמו פעם ===== */
+
 .nav-toggle {
-  display: none;
+  display: flex; /* במובייל נראה, בדסקטופ מוחבא ע"י ה־@media */
   flex-direction: column;
   justify-content: center;
   align-items: center;
   gap: 4px;
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: 999px;
-  border: 2px solid rgba(148, 163, 184, 0.9);
-  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  background: rgba(15, 23, 42, 0.9);
   cursor: pointer;
 }
 
@@ -169,21 +171,29 @@ button:focus-visible {
   width: 18px;
   height: 2px;
   border-radius: 999px;
-  background: #f9fafb;
-  transition: transform 0.25s ease, opacity 0.25s ease, width 0.2s ease;
+  background: #e5e7eb;
+  transition: transform 0.25s ease, opacity 0.25s ease;
 }
 
 /* מצב פתוח – X */
 .nav-toggle.open span:nth-child(1) {
-  transform: translateY(3px) rotate(45deg);
-  width: 14px;
+  transform: translateY(6px) rotate(45deg);
 }
 .nav-toggle.open span:nth-child(2) {
   opacity: 0;
 }
 .nav-toggle.open span:nth-child(3) {
-  transform: translateY(-3px) rotate(-45deg);
-  width: 14px;
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+/* לייט מוד – רקע לבן, קווים כהים */
+html[data-theme="light"] .nav-toggle {
+  background: #ffffff;
+  border-color: #cbd5e1;
+}
+
+html[data-theme="light"] .nav-toggle span {
+  background: #111827;
 }
 
 /* ========== כפתור מצב כהה/בהיר ========== */
