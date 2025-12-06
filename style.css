@@ -56,7 +56,7 @@ button:focus-visible {
 /* ========== HEADER + NAV ========== */
 
 .header-main {
-  background: #040814;
+  background: #020617;
   position: sticky;
   top: 0;
   z-index: 20;
@@ -72,6 +72,7 @@ button:focus-visible {
   gap: 1rem;
 }
 
+/* צד ימין – לוגו + טקסט בית הספר */
 .nav-left {
   display: flex;
   align-items: center;
@@ -79,8 +80,8 @@ button:focus-visible {
 }
 
 .logo-square {
-  width: 50px;
-  height: 50px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   overflow: hidden;
   display: flex;
@@ -110,6 +111,7 @@ button:focus-visible {
   font-size: 0.78rem;
 }
 
+/* צד שמאל – תפריט */
 .nav-right {
   display: flex;
   gap: 10px;
@@ -147,7 +149,7 @@ button:focus-visible {
   transform: translateY(-2px);
 }
 
-/* ========== כפתור המבורגר למובייל ========== */
+/* ========== כפתור המבורגר – דיפולט: מוסתר (דסקטופ) ========== */
 
 .nav-toggle {
   display: none;
@@ -155,11 +157,11 @@ button:focus-visible {
   justify-content: center;
   align-items: center;
   gap: 4px;
-  width: 40px;
-  height: 40px;
+  width: 38px;
+  height: 38px;
   border-radius: 999px;
-  border: 1px solid rgba(148, 163, 184, 0.7);
-  background: rgba(15, 23, 42, 0.9);
+  border: 2px solid rgba(148, 163, 184, 0.9);
+  background: rgba(15, 23, 42, 0.85);
   cursor: pointer;
 }
 
@@ -167,19 +169,21 @@ button:focus-visible {
   width: 18px;
   height: 2px;
   border-radius: 999px;
-  background: #e5e7eb;
-  transition: transform 0.25s ease, opacity 0.25s ease;
+  background: #f9fafb;
+  transition: transform 0.25s ease, opacity 0.25s ease, width 0.2s ease;
 }
 
 /* מצב פתוח – X */
 .nav-toggle.open span:nth-child(1) {
-  transform: translateY(6px) rotate(45deg);
+  transform: translateY(3px) rotate(45deg);
+  width: 14px;
 }
 .nav-toggle.open span:nth-child(2) {
   opacity: 0;
 }
 .nav-toggle.open span:nth-child(3) {
-  transform: translateY(-6px) rotate(-45deg);
+  transform: translateY(-3px) rotate(-45deg);
+  width: 14px;
 }
 
 /* ========== כפתור מצב כהה/בהיר ========== */
@@ -334,7 +338,7 @@ button#theme-toggle:active {
   flex-wrap: wrap;
 }
 
-/* כרטיס צד */
+/* כרטיס צד – מידע מהיר */
 .hero-side-card {
   flex: 1;
   background: rgba(15, 23, 42, 0.85);
@@ -904,12 +908,6 @@ html[data-theme="light"] .board-item-meta {
   color: #2563eb;
 }
 
-html[data-theme="light"] .grade-btn {
-  background: #ffffff;
-  color: #111827;
-  border-color: #bfdbfe;
-}
-
 /* הירו לייט */
 html[data-theme="light"] .hero-home::before {
   background: linear-gradient(
@@ -928,11 +926,52 @@ html[data-theme="light"] button#theme-toggle {
   box-shadow: 0 6px 16px rgba(148, 163, 184, 0.6);
 }
 
+/* כרטיס מידע מהיר בלייט – לא שחור */
+html[data-theme="light"] .hero-side-card {
+  background: rgba(255, 255, 255, 0.98);
+  color: #0f172a;
+  border-color: rgba(148, 163, 184, 0.65);
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.18);
+}
+
+/* כפתור Admin בלייט שלא נעלם */
+html[data-theme="light"] .btn-outline {
+  color: #1d4ed8;
+  border-color: #1d4ed8;
+  background-color: #ffffff;
+  font-weight: 600;
+}
+
+html[data-theme="light"] .btn-outline:hover {
+  background-color: #1d4ed8;
+  color: #ffffff;
+}
+
+/* כפתור המבורגר בלייט – אייקון כהה */
+html[data-theme="light"] .nav-toggle {
+  background: rgba(255, 255, 255, 0.96);
+  border-color: rgba(148, 163, 184, 0.9);
+}
+html[data-theme="light"] .nav-toggle span {
+  background: #0f172a;
+}
+
 /* ========== RESPONSIVE (מובייל) ========== */
 
 @media (max-width: 900px) {
+  html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .logo-square {
+    width: 40px;
+    height: 40px;
+  }
+
+  /* הירו – יותר גבוה למובייל */
   .hero.hero-home {
-    min-height: 520px;      /* מספיק מקום ל-hero + קארדים */
+    min-height: 520px;
   }
 
   .hero-content {
@@ -950,13 +989,6 @@ html[data-theme="light"] button#theme-toggle {
     width: 100%;
     font-size: 0.85rem;
   }
-}
-
-@media (max-width: 768px) {
-  html, body {
-    max-width: 100%;
-    overflow-x: hidden;
-  }
 
   section {
     padding: 28px 0;
@@ -965,10 +997,6 @@ html[data-theme="light"] button#theme-toggle {
   .home-grid {
     grid-template-columns: 1fr;
     row-gap: 14px;
-  }
-
-  .grade-card {
-    padding: 12px 13px;
   }
 
   .about-grid,
@@ -980,338 +1008,12 @@ html[data-theme="light"] button#theme-toggle {
     text-align: center;
   }
 
-  /*תפריט מובייל – מגירה משמאל*/
-  .nav {
-    position: relative;
-  }
-
-  .nav-right {
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: 75%;
-    max-width: 280px;
-    background: #020617;
-    box-shadow: 12px 0 30px rgba(15, 23, 42, 0.9);
-    padding: 80px 20px 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    transform: translateX(-100%);
-    opacity: 0;
-    pointer-events: none;
-    transition: transform 0.25s ease, opacity 0.25s ease;
-    z-index: 1000;
-  }
-
-  .nav-right a {
-    font-size: 0.98rem;
-    padding: 8px 0;
-  }
-
-  .nav-right.open {
-    transform: translateX(0);
-    opacity: 1;
-    pointer-events: auto;
-  }
-
+  /* תפריט המבורגר – מופיע רק במובייל */
   .nav-toggle {
     display: flex;
-    z-index: 1100;
   }
 
-  body.nav-open {
-    overflow: hidden;
-  }
-
-  .nav-right button#theme-toggle {
-    margin-top: 10px;
-  }
-
-  /* התאמות כפתור חזרה למעלה ונגישות */
-  #to-top {
-    right: 12px;
-    bottom: 12px;
-    width: 36px;
-    height: 36px;
-  }
-
-  .accessibility-btn {
-    bottom: 80px;
-    right: 14px;
-  }
-
-  .accessibility-panel {
-    right: 14px;
-    bottom: 135px;
-  }
-}
-/* === FIXES ל-LIGHT MODE במובייל + דסקטופ – להוסיף בסוף הקובץ === */
-
-html[data-theme="light"] body {
-  background: #f3f4f6;
-  color: #0b1120;
-}
-
-/* אזורים "כהים" שיהיו בהירים בלייט מוד */
-html[data-theme="light"] .section-dark-strong,
-html[data-theme="light"] .hero-home {
-  background: #f3f4f6;
-  color: #0b1120;
-}
-
-/* ההדר של ההירו בלייט – בלי שכבה כהה מוגזמת */
-html[data-theme="light"] .hero-overlay {
-  background: linear-gradient(
-    180deg,
-    rgba(248, 250, 252, 0.98) 0%,
-    rgba(248, 250, 252, 0.96) 40%,
-    rgba(248, 250, 252, 0.94) 100%
-  );
-  mix-blend-mode: normal;
-}
-
-/* כרטיסים בלייט – לבן נקי וטקסט כהה */
-html[data-theme="light"] .card,
-html[data-theme="light"] .grade-card,
-html[data-theme="light"] .home-news-item,
-html[data-theme="light"] .home-exam-item,
-html[data-theme="light"] .board-item,
-html[data-theme="light"] .request-box {
-  background: #ffffff;
-  color: #0b1120;
-}
-
-/* טיימר מבחן בלייט – טקסט שחור/כהה חזק */
-html[data-theme="light"] .home-exam-countdown {
-  color: #111827;
-  font-weight: 600;
-}
-
-/* מובייל – ריווח ושבירות יפות בלייט מוד */
-@media (max-width: 768px) {
-  html[data-theme="light"] .hero-home {
-    padding-top: 90px;
-  }
-
-  html[data-theme="light"] .hero-content {
-    padding-top: 0;
-  }
-
-  html[data-theme="light"] .section-dark-strong {
-    background: #f3f4f6;
-  }
-
-  html[data-theme="light"] .home-grid .grade-card,
-  html[data-theme="light"] .card {
-    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
-  }
-}
-/* ================================
-   FIXES – LIGHT THEME ONLY
-   ================================ */
-
-/* 1. אייקון המבורגר בלייט מוד – שיהיה כהה ובולט */
-html[data-theme="light"] .nav-toggle span,
-body.theme-light .nav-toggle span {
-  background-color: rgba(15, 23, 42, 0.95); /* כמעט שחור */
-}
-
-/* 2. כפתור Admin בלייט מוד – צבעוני ובולט */
-html[data-theme="light"] .btn-outline,
-body.theme-light .btn-outline {
-  color: #1d4ed8;                      /* כחול חזק */
-  border-color: #1d4ed8;
-  background-color: rgba(255, 255, 255, 0.98);
-  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.35);
-}
-
-html[data-theme="light"] .btn-outline:hover,
-body.theme-light .btn-outline:hover {
-  background-color: #1d4ed8;
-  color: #ffffff;
-}
-
-/* 3. כרטיס "מידע מהיר" בלייט מוד – להפוך ללבן ולא כהה */
-html[data-theme="light"] .hero-side-card,
-body.theme-light .hero-side-card {
-  background: rgba(255, 255, 255, 0.98);
-  color: #0f172a;
-  border-color: rgba(148, 163, 184, 0.65);
-  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.18);
-}
-
-/* כותרת וטקסט בתוך "מידע מהיר" שיהיו כהים בלייט מוד */
-html[data-theme="light"] .hero-side-card h3,
-body.theme-light .hero-side-card h3 {
-  color: #0f172a;
-}
-
-html[data-theme="light"] .hero-side-card p,
-html[data-theme="light"] .hero-side-card li,
-body.theme-light .hero-side-card p,
-body.theme-light .hero-side-card li {
-  color: #111827;
-}
-/* ============================
-   🔧 תיקון תפריט המבורגר בנייד
-   ============================ */
-.nav-toggle {
-  background: transparent !important;
-  border: none !important;
-  font-size: 28px;
-  cursor: pointer;
-  color: var(--text-color);
-  padding: 4px 8px;
-  margin-left: 10px;
-}
-
-.nav-toggle:hover {
-  opacity: 0.7;
-}
-
-/* תפריט נפתח */
-.nav-right {
-  position: fixed;
-  top: 70px;
-  left: 10px;
-  width: 220px;
-  background: var(--card-bg);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-  border-radius: 12px;
-  padding: 12px 0;
-  opacity: 0;
-  transform: translateX(-20px);
-  visibility: hidden;
-  transition: 0.25s ease;
-  z-index: 9999;
-}
-
-.nav-right.open {
-  opacity: 1;
-  visibility: visible;
-  transform: translateX(0);
-}
-
-.nav-right a {
-  display: block;
-  padding: 12px 18px;
-  font-size: 17px;
-  color: var(--text-color);
-  text-align: right;
-}
-
-.nav-right a:hover {
-  background: rgba(0,0,0,0.05);
-}
-
-/* ============================
-   🔧 תיקון לוגו קטן
-   ============================ */
-header .logo img {
-  width: 70px;
-  height: auto;
-}
-
-@media (max-width: 600px) {
-  header .logo img {
-    width: 55px;
-  }
-}
-
-/* ============================
-   🔧 תיקון "מידע מהיר" בלייט מוד
-   ============================ */
-.quick-info-box {
-  background: var(--card-bg) !important;
-  color: var(--text-color) !important;
-}
-
-.quick-info-box li {
-  color: var(--text-color);
-}
-
-/* ============================
-   🔧 כפתור אדמין בלייט מוד
-   ============================ */
-.btn-admin {
-  border: 2px solid var(--primary);
-  color: var(--primary) !important;
-}
-
-[data-theme="light"] .btn-admin {
-  color: #007bff !important;
-  border-color: #007bff !important;
-}
-/* ===========================
-   תיקוני ניווט + לוגו + לייט מוד
-   להדביק בסוף style.css
-   =========================== */
-
-/* 1. לוגו – קצת קטן יותר */
-.logo-circle {
-  width: 64px;
-  height: 64px;
-}
-
-@media (max-width: 900px) {
-  .logo-circle {
-    width: 54px;
-    height: 54px;
-  }
-}
-
-/* 2. כפתור המבורגר – חזרה לכפתור עגול וברור */
-.nav-toggle {
-  width: 38px;
-  height: 38px;
-  border-radius: 999px;
-  border: 2px solid rgba(148, 163, 184, 0.9);
-  background: rgba(15, 23, 42, 0.75);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  cursor: pointer;
-}
-
-.nav-toggle span {
-  width: 18px;
-  height: 2px;
-  border-radius: 999px;
-  background: #f9fafb;
-  transition:
-    transform 0.25s ease,
-    opacity 0.25s ease,
-    width 0.2s ease;
-}
-
-/* מצב פתוח של ההמבורגר */
-.nav-toggle.open span:nth-child(1) {
-  transform: translateY(3px) rotate(45deg);
-  width: 14px;
-}
-.nav-toggle.open span:nth-child(2) {
-  opacity: 0;
-}
-.nav-toggle.open span:nth-child(3) {
-  transform: translateY(-3px) rotate(-45deg);
-  width: 14px;
-}
-
-/* בלייט מוד – כפתור בהיר ואייקון כהה */
-html[data-theme="light"] .nav-toggle {
-  background: rgba(255, 255, 255, 0.9);
-  border-color: rgba(148, 163, 184, 0.9);
-}
-html[data-theme="light"] .nav-toggle span {
-  background: #0f172a;
-}
-
-/* 3. תפריט מובייל – בלוק ברור עם טקסט קריא */
-@media (max-width: 900px) {
+  /* nav-right הופך למגירת צד שנפתחת עם class="open" */
   .nav-right {
     position: fixed;
     top: 70px;
@@ -1325,6 +1027,7 @@ html[data-theme="light"] .nav-toggle span {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    background: rgba(15, 23, 42, 0.98);
     opacity: 0;
     visibility: hidden;
     transform: translateY(-12px);
@@ -1345,6 +1048,17 @@ html[data-theme="light"] .nav-toggle span {
     display: block;
     font-size: 0.95rem;
     padding: 6px 2px;
+    color: #e5f0ff;
+  }
+
+  .nav-right .personal-btn,
+  .nav-right .btn-outline {
+    width: 100%;
+    justify-content: center;
+  }
+
+  body.nav-open {
+    overflow: hidden;
   }
 
   /* לייט מוד – תפריט לבן */
@@ -1356,31 +1070,26 @@ html[data-theme="light"] .nav-toggle span {
     color: #0f172a;
   }
 
-  /* דארק מוד – תפריט כהה */
-  html[data-theme="dark"] .nav-right {
-    background: rgba(15, 23, 42, 0.98);
-    color: #e5e7eb;
+  /* התאמות כפתור חזרה למעלה ונגישות */
+  #to-top {
+    right: 12px;
+    bottom: 12px;
+    width: 36px;
+    height: 36px;
+  }
+
+  .accessibility-btn {
+    bottom: 80px;
+    right: 14px;
+  }
+
+  .accessibility-panel {
+    right: 14px;
+    bottom: 135px;
   }
 }
 
-/* 4. פס עליון בדסקטופ – ברור עם צל */
-.header-main {
-  background:
-    radial-gradient(circle at top, rgba(255, 255, 255, 0.18), transparent 55%),
-    var(--header-bg, #020617);
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.55);
-}
-
-/* בלייט מוד – לבן נקי עם צל עדין */
-html[data-theme="light"] .header-main {
-  background: #ffffff;
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
-}
-/* =========================
-   FIXES HEADER / NAV / LIGHT MODE
-   ========================== */
-
-/* דסקטופ – לייאאוט של הכותרת + תפריט */
+/* דסקטופ – מבטיח שהתפריט בצד שמאל מלא וההמבורגר מוסתר */
 @media (min-width: 901px) {
   .header-main .container {
     display: flex;
@@ -1391,105 +1100,21 @@ html[data-theme="light"] .header-main {
     width: 100%;
     max-width: 1150px;
     padding-inline: 24px;
-    display: flex;
     align-items: center;
     justify-content: space-between; /* ימין – לוגו, שמאל – תפריט */
   }
 
-  .nav-left {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-
-  /* בדסקטופ – תפריט רגיל בשורה אחת */
   .nav-right {
-    position: static !important;
-    inset: auto !important;
-    width: auto !important;
-    height: auto !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    border-radius: 0 !important;
-    display: flex !important;
-    flex-direction: row;
-    align-items: center;
-    gap: 16px;
+    position: static;
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
   }
 
-  .nav-right a {
-    font-size: 0.9rem;
-  }
-
-  /* כפתור המבורגר לא נראה בדסקטופ */
   .nav-toggle {
     display: none !important;
   }
-}
-
-/* מובייל – תפריט המבורגר צדדי ברור */
-@media (max-width: 900px) {
-  /* כפתור המבורגר בצד שמאל (בראש המסך) */
-  .nav-toggle {
-    display: flex;
-  }
-
-  /* תפריט צד כהה */
-  .nav-right {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: min(260px, 80vw);
-    padding: 18px 20px 32px;
-    background: rgba(15, 23, 42, 0.98); /* כמעט שחור */
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.55);
-    border-radius: 0 0 0 28px;
-    transform: translateX(100%);
-    opacity: 0;
-    pointer-events: none;
-    transition:
-      transform 0.28s ease,
-      opacity 0.28s ease;
-    z-index: 60;
-  }
-
-  .nav-right.open {
-    transform: translateX(0);
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  /* הקישורים בתוך התפריט – לבנים וברורים */
-  .nav-right a,
-  .nav-right .personal-btn,
-  .nav-right .btn-outline {
-    width: 100%;
-    justify-content: flex-start;
-    text-align: right;
-    color: #e5f0ff !important;
-  }
-
-  .nav-right .personal-btn,
-  .nav-right .btn-outline {
-    border-radius: 999px;
-  }
-}
-
-/* לייט מוד – כפתור Admin שלא נעלם */
-body[data-theme="light"] .btn-outline {
-  border-color: #2563eb !important;
-  color: #2563eb !important;
-  background: #ffffff !important;
-  font-weight: 600;
-}
-
-body[data-theme="light"] .btn-outline:hover {
-  background: #2563eb !important;
-  color: #ffffff !important;
 }
