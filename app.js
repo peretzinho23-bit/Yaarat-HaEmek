@@ -110,20 +110,24 @@ function updateExamCountdownElements() {
       return;
     }
 
-    const totalMinutes = Math.floor(diff / 60000);
-    const days = Math.floor(totalMinutes / (60 * 24));
-    const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
-    const minutes = totalMinutes % 60;
+    const totalSeconds = Math.floor(diff / 1000);
+    const days = Math.floor(totalSeconds / (24 * 3600));
+    const hours = Math.floor((totalSeconds % (24 * 3600)) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
 
     let parts = [];
 
     if (days > 0) parts.push(`${days} ימים`);
     if (hours > 0) parts.push(`${hours} שעות`);
-    parts.push(`${minutes} דקות`);
+    if (minutes > 0) parts.push(`${minutes} דקות`);
+
+    parts.push(`${seconds} שניות`);
 
     el.textContent = `ספירה לאחור: ${parts.join(" · ")}`;
   });
 }
+
 
 
 // מפעיל אינטרוואל אחד גלובלי
