@@ -1415,6 +1415,27 @@ body.light-mode button#theme-toggle {
   color: #0f172a;
   box-shadow: 0 6px 16px rgba(148, 163, 184, 0.6);
 }
+/* --- תיקון טקסט בהיר בהירו במצב לייט --- */
+
+body.light-mode .hero-text h1,
+body.light-mode .hero-text p {
+  color: #ffffff !important;          /* לבן נקי */
+  text-shadow: 0 0 6px rgba(0,0,0,0.35);  /* זוהר עדין לקריאות */
+}
+
+/* אפשרות יותר זוהרת – אם תרצה WOW אמיתי */
+body.light-mode .hero-text h1 {
+  font-weight: 800;
+  color: #ffffff !important;
+  text-shadow:
+    0 0 10px rgba(0,0,0,0.4),
+    0 0 18px rgba(0,0,0,0.25);
+}
+
+body.light-mode .hero-text p {
+  color: #f8fafc !important;
+  text-shadow: 0 0 4px rgba(0,0,0,0.25);
+}
 
 body.light-mode button#theme-toggle:hover {
   background: #e2e8f0;
