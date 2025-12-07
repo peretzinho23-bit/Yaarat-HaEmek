@@ -1,9 +1,10 @@
-// exam.js – דף לוח מבחנים לפי כיתה
+// exam.js – דף לוח מבחנים לפי כיתה (REALTIME)
 
+// חיבור לפיירבייס
 import { db } from "./firebase-config.js";
 import {
   doc,
-  getDoc,
+  onSnapshot,
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
 const CLASS_LABELS = {
@@ -64,13 +65,15 @@ function renderError() {
   if (titleEl)
     titleEl.textContent = "שגיאה בנתוני הכתובת";
   if (subtitleEl)
-    subtitleEl.textContent = "הקישור אינו תקין. חזרו לעמוד המבחנים הראשי ובחרו כיתה מחדש.";
+    subtitleEl.textContent =
+      "הקישור אינו תקין. חזרו לעמוד המבחנים הראשי ובחרו כיתה מחדש.";
   if (chipEl)
     chipEl.textContent = "?";
   if (inlineName)
     inlineName.textContent = "כיתה לא ידועה";
   if (helpText)
-    helpText.textContent = "לחצו על כפתור החזרה למעלה כדי לבחור שוב כיתה.";
+    helpText.textContent =
+      "לחצו על כפתור החזרה למעלה כדי לבחור שוב כיתה.";
 
   if (listEl) {
     listEl.innerHTML = `
@@ -93,14 +96,7 @@ function renderNoExams(listEl) {
   `;
 }
 
-async function loadClassExams() {
-  const params = getParams();
-  if (!params) {
-    renderError();
-    return;
-  }
-
-  const { grade, classId } = params;
+function setupClassHeader({ grade, classId }) {
   const niceClass = CLASS_LABELS[classId];
   const gradeTitle = GRADE_TITLES[grade] || "";
 
@@ -109,7 +105,6 @@ async function loadClassExams() {
   const chipEl = document.getElementById("class-chip");
   const inlineName = document.getElementById("class-name-inline");
   const helpText = document.getElementById("class-help-text");
-  const listEl = document.getElementById("class-exams-list");
 
   if (titleEl)
     titleEl.textContent = `לוח מבחנים – כיתה ${niceClass}`;
@@ -122,61 +117,88 @@ async function loadClassExams() {
   if (helpText)
     helpText.textContent =
       "המבחנים מסודרים לפי תאריך. אם אין עדיין מבחנים – תראו כאן הודעה מתאימה.";
-
-  if (!listEl) return;
-  listEl.innerHTML = `<p class="empty-msg">טוען מבחנים...</p>`;
-
-  try {
-    const refDoc = doc(db, "exams", grade);
-    const snap = await getDoc(refDoc);
-    const data = snap.exists() ? snap.data() : { items: [] };
-    const allExams = data.items || [];
-
-    const classExams = allExams
-      .filter((ex) => ex.classId === classId)
-      .map((ex) => ({
-        ...ex,
-        _sortDate: ex.date || "",
-      }));
-
-    if (!classExams.length) {
-      renderNoExams(listEl);
-      return;
-    }
-
-    classExams.sort((a, b) => (a._sortDate > b._sortDate ? 1 : -1));
-
-    listEl.innerHTML = classExams
-      .map((ex) => {
-        const metaParts = [];
-        if (ex.date) metaParts.push(escapeHtml(ex.date));
-        if (ex.time) metaParts.push(escapeHtml(ex.time));
-        const metaText = metaParts.join(" · ");
-
-        return `
-          <div class="exam-item">
-            <div class="exam-main-row">
-              <span class="exam-subject">${escapeHtml(ex.subject || "ללא מקצוע")}</span>
-              ${metaText ? `<span class="exam-meta">${metaText}</span>` : ""}
-            </div>
-            ${
-              ex.topic
-                ? `<div class="exam-topic">${escapeHtml(ex.topic)}</div>`
-                : ""
-            }
-          </div>
-        `;
-      })
-      .join("");
-  } catch (err) {
-    console.error("שגיאה בטעינת מבחנים לכיתה:", err);
-    listEl.innerHTML = `
-      <p class="empty-msg">
-        חלה שגיאה בטעינת המבחנים. נסו לרענן את הדף,
-        ואם זה ממשיך – פנו למנהל המערכת.
-      </p>
-    `;
-  }
 }
 
-document.addEventListener("DOMContentLoaded", loadClassExams);
+function subscribeToClassExams() {
+  const params = getParams();
+  const listEl = document.getElementById("class-exams-list");
+
+  if (!params) {
+    renderError();
+    return;
+  }
+
+  if (!listEl) return;
+
+  // סטטוס טעינה התחלתי
+  listEl.innerHTML = `<p class="empty-msg">טוען מבחנים...</p>`;
+
+  setupClassHeader(params);
+
+  const { grade, classId } = params;
+  const refDoc = doc(db, "exams", grade);
+
+  // מאזין בזמן אמת למסמך של השכבה
+  onSnapshot(
+    refDoc,
+    (snap) => {
+      if (!snap.exists()) {
+        renderNoExams(listEl);
+        return;
+      }
+
+      const data = snap.data() || {};
+      const allExams = data.items || [];
+
+      const classExams = allExams
+        .filter((ex) => ex.classId === classId)
+        .map((ex) => ({
+          ...ex,
+          _sortDate: ex.date || "",
+        }));
+
+      if (!classExams.length) {
+        renderNoExams(listEl);
+        return;
+      }
+
+      classExams.sort((a, b) => (a._sortDate > b._sortDate ? 1 : -1));
+
+      listEl.innerHTML = classExams
+        .map((ex) => {
+          const metaParts = [];
+          if (ex.date) metaParts.push(escapeHtml(ex.date));
+          if (ex.time) metaParts.push(escapeHtml(ex.time));
+          const metaText = metaParts.join(" · ");
+
+          return `
+            <div class="exam-item">
+              <div class="exam-main-row">
+                <span class="exam-subject">${escapeHtml(
+                  ex.subject || "ללא מקצוע"
+                )}</span>
+                ${metaText ? `<span class="exam-meta">${metaText}</span>` : ""}
+              </div>
+              ${
+                ex.topic
+                  ? `<div class="exam-topic">${escapeHtml(ex.topic)}</div>`
+                  : ""
+              }
+            </div>
+          `;
+        })
+        .join("");
+    },
+    (err) => {
+      console.error("שגיאה בטעינת מבחנים לכיתה:", err);
+      listEl.innerHTML = `
+        <p class="empty-msg">
+          חלה שגיאה בטעינת המבחנים. נסו לרענן את הדף,
+          ואם זה ממשיך – פנו למנהל המערכת.
+        </p>
+      `;
+    }
+  );
+}
+
+document.addEventListener("DOMContentLoaded", subscribeToClassExams);
