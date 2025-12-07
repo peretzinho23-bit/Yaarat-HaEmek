@@ -172,10 +172,10 @@
           </div>
         </div>
 
-        <div class="section-title-sm">דף "מבחנים" – צפיות</div>
+        <div class="section-title-sm">דף "מבחנים" – צפיות (pageId = home-exams)</div>
         <div id="metric-exams-views" class="metric-value" style="font-size:1rem;">-</div>
 
-        <div class="section-title-sm">דף "מבחנים לפי כיתה" – צפיות</div>
+        <div class="section-title-sm">דף "מבחנים לפי כיתה" – צפיות (pageId = class-exams)</div>
         <div id="metric-class-exams-views" class="metric-value" style="font-size:1rem;">-</div>
       </div>
 
@@ -194,7 +194,7 @@
       </div>
     </div>
 
-    <!-- צד ימין – לפי דפים / שעות / שכבות -->
+    <!-- צד ימין – לפי דפים / שעות / שכבות / כיתות -->
     <div>
       <div class="card">
         <h2>צפיות לפי דף</h2>
@@ -212,7 +212,7 @@
       <div class="card" style="margin-top:12px;">
         <h2>פעילות לפי שעה / שכבה / כיתה</h2>
 
-        <div class="section-title-sm">לפי שעה (על בסיס events)</div>
+        <div class="section-title-sm">לפי שעה (כל הדפים)</div>
         <table>
           <thead>
             <tr>
@@ -224,7 +224,7 @@
           <tbody id="table-by-hour"></tbody>
         </table>
 
-        <div class="section-title-sm">לפי שכבה</div>
+        <div class="section-title-sm">לפי שכבה – כל הדפים</div>
         <table>
           <thead>
             <tr>
@@ -235,7 +235,7 @@
           <tbody id="table-by-grade"></tbody>
         </table>
 
-        <div class="section-title-sm">לפי כיתה</div>
+        <div class="section-title-sm">לפי כיתה – כל הדפים</div>
         <table>
           <thead>
             <tr>
@@ -244,6 +244,28 @@
             </tr>
           </thead>
           <tbody id="table-by-class"></tbody>
+        </table>
+
+        <div class="section-title-sm">דף המבחנים הראשי – לפי שכבה</div>
+        <table>
+          <thead>
+            <tr>
+              <th>שכבה</th>
+              <th>צפיות (home-exams)</th>
+            </tr>
+          </thead>
+          <tbody id="table-exams-by-grade"></tbody>
+        </table>
+
+        <div class="section-title-sm">דף "מבחנים לפי כיתה" – לפי כיתה</div>
+        <table>
+          <thead>
+            <tr>
+              <th>כיתה</th>
+              <th>צפיות (class-exams)</th>
+            </tr>
+          </thead>
+          <tbody id="table-classExams-by-class"></tbody>
         </table>
       </div>
     </div>
@@ -277,6 +299,8 @@
     const tbodyByHour = document.getElementById("table-by-hour");
     const tbodyByGrade = document.getElementById("table-by-grade");
     const tbodyByClass = document.getElementById("table-by-class");
+    const tbodyExamsByGrade = document.getElementById("table-exams-by-grade");
+    const tbodyClassExamsByClass = document.getElementById("table-classExams-by-class");
 
     function humanPageId(pageId) {
       if (!pageId) return "-";
@@ -325,7 +349,6 @@
       const snapViews = await getDocs(qViews);
       const viewsRows = snapViews.docs.map(d => d.data());
 
-      // סיכומים כלליים
       let totalViews = 0;
       const pagesSet = new Set();
       const daysMap = new Map();   // dateKey -> sum
@@ -345,7 +368,6 @@
         }
       });
 
-      // "כמה לחצו על לוח מבחנים" – מניח pageId="home-exams"
       const examsViews = pagesMap.get("home-exams") || 0;
       const classExamsViews = pagesMap.get("class-exams") || 0;
 
@@ -358,7 +380,7 @@
       // טבלת לפי ימים
       const daysArr = Array.from(daysMap.entries())
         .map(([dateKey, views]) => ({ dateKey, views }))
-        .sort((a, b) => (a.dateKey > b.dateKey ? -1 : 1)); // מהחדש לישן
+        .sort((a, b) => (a.dateKey > b.dateKey ? -1 : 1));
 
       const maxDayViews = daysArr.reduce((m, r) => Math.max(m, r.views), 0);
       tbodyByDay.innerHTML = "";
@@ -395,7 +417,7 @@
         });
       }
 
-      // --------- events (שעה / שכבה / כיתה) ----------
+      // --------- events (שעה / שכבה / כיתה / דפים ספציפיים) ----------
       const qEvents = query(
         collection(db, "analytics_events"),
         orderBy("dateKey", "desc")
@@ -403,9 +425,11 @@
       const snapEvents = await getDocs(qEvents);
       const events = snapEvents.docs.map(d => d.data());
 
-      const hourMap = new Map();   // "00".."23" -> count
-      const gradeMap = new Map();  // grade -> count
-      const classMap = new Map();  // classId -> count
+      const hourMap = new Map();        // "00".."23" -> count
+      const gradeMap = new Map();       // grade -> count (כל הדפים)
+      const classMap = new Map();       // classId -> count (כל הדפים)
+      const examsByGrade = new Map();   // grade -> count (רק home-exams)
+      const classExamsByClass = new Map(); // classId -> count (רק class-exams)
 
       events.forEach(ev => {
         const h = ev.hour || "??";
@@ -417,6 +441,14 @@
         if (ev.classId) {
           classMap.set(ev.classId, (classMap.get(ev.classId) || 0) + 1);
         }
+
+        if (ev.pageId === "home-exams" && ev.grade) {
+          examsByGrade.set(ev.grade, (examsByGrade.get(ev.grade) || 0) + 1);
+        }
+
+        if (ev.pageId === "class-exams" && ev.classId) {
+          classExamsByClass.set(ev.classId, (classExamsByClass.get(ev.classId) || 0) + 1);
+        }
       });
 
       // לפי שעה
@@ -427,7 +459,7 @@
       const maxHour = hourArr.reduce((m, r) => Math.max(m, r.count), 0);
       tbodyByHour.innerHTML = "";
       if (!hourArr.length) {
-        tbodyByHour.innerHTML = `<tr><td colspan="3">אין עדיין נתוני שעות (עדכנו את analytics.js וגלשו קצת באתר).</td></tr>`;
+        tbodyByHour.innerHTML = `<tr><td colspan="3">אין עדיין נתוני שעות.</td></tr>`;
       } else {
         hourArr.forEach(r => {
           const tr = document.createElement("tr");
@@ -440,7 +472,7 @@
         });
       }
 
-      // לפי שכבה
+      // לפי שכבה – כל הדפים
       const gradeArr = Array.from(gradeMap.entries())
         .map(([grade, count]) => ({ grade, count }))
         .sort((a, b) => b.count - a.count);
@@ -459,7 +491,7 @@
         });
       }
 
-      // לפי כיתה
+      // לפי כיתה – כל הדפים
       const classArr = Array.from(classMap.entries())
         .map(([classId, count]) => ({ classId, count }))
         .sort((a, b) => b.count - a.count);
@@ -475,6 +507,44 @@
             <td>${r.count}</td>
           `;
           tbodyByClass.appendChild(tr);
+        });
+      }
+
+      // דף המבחנים הראשי – לפי שכבה
+      const examsGradeArr = Array.from(examsByGrade.entries())
+        .map(([grade, count]) => ({ grade, count }))
+        .sort((a, b) => b.count - a.count);
+
+      tbodyExamsByGrade.innerHTML = "";
+      if (!examsGradeArr.length) {
+        tbodyExamsByGrade.innerHTML = `<tr><td colspan="2">אין עדיין צפיות בדף המבחנים הראשי עם grade.</td></tr>`;
+      } else {
+        examsGradeArr.forEach(r => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td><span class="pill">${gradeToLabel(r.grade)}</span></td>
+            <td>${r.count}</td>
+          `;
+          tbodyExamsByGrade.appendChild(tr);
+        });
+      }
+
+      // דף "מבחנים לפי כיתה" – לפי כיתה
+      const classExamsArr = Array.from(classExamsByClass.entries())
+        .map(([classId, count]) => ({ classId, count }))
+        .sort((a, b) => b.count - a.count);
+
+      tbodyClassExamsByClass.innerHTML = "";
+      if (!classExamsArr.length) {
+        tbodyClassExamsByClass.innerHTML = `<tr><td colspan="2">אין עדיין צפיות בעמוד class-exams עם classId.</td></tr>`;
+      } else {
+        classExamsArr.forEach(r => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td><span class="pill">${classIdToLabel(r.classId)}</span></td>
+            <td>${r.count}</td>
+          `;
+          tbodyClassExamsByClass.appendChild(tr);
         });
       }
 

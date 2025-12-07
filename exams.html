@@ -12,9 +12,20 @@
   <style>
     /* ===== עיצוב דף מבחני כיתה ===== */
 
+    /* ברירת מחדל – בלי צבע, נלקח מה-theme הכללי */
     body[data-page="class-exams"] {
+    }
+
+    /* דארק מוד – רקע כהה מיוחד לדף מבחנים */
+    html[data-theme="dark"] body[data-page="class-exams"] {
       background: #0b1120;
       color: #e5f0ff;
+    }
+
+    /* לייט מוד – רקע בהיר כמו שאר האתר */
+    html[data-theme="light"] body[data-page="class-exams"] {
+      background: #eef3fb;
+      color: #0b1120;
     }
 
     .class-exams-wrapper {
@@ -86,6 +97,14 @@
       align-items: center;
     }
 
+    /* לייט מוד – כרטיס לבן נקי */
+    html[data-theme="light"] .exam-card {
+      background: #ffffff;
+      color: #0f172a;
+      border: 1px solid #cbd5e1;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    }
+
     .exam-main-title {
       font-size: 1rem;
       font-weight: 600;
@@ -102,6 +121,12 @@
       font-size: 0.9rem;
       color: #e5e7eb;
       margin-top: 4px;
+    }
+
+    /* טקסטים בכרטיס בלייט מוד – אפור כהה */
+    html[data-theme="light"] .exam-meta,
+    html[data-theme="light"] .exam-topic {
+      color: #4b5563;
     }
 
     .exam-date-pill {
@@ -158,7 +183,7 @@
 </head>
 
 <body data-page="class-exams">
-      <script type="module" src="analytics.js"></script>
+  <script type="module" src="analytics.js"></script>
 
   <!-- HEADER כמו באתר הראשי -->
   <header class="header-main">
@@ -374,7 +399,7 @@
         if (minutes > 0) parts.push(`${minutes} דקות`);
         parts.push(`${seconds} שניות`);
 
-    el.textContent = `המבחן בעוד ${parts.join(" · ")}`;
+        el.textContent = `המבחן בעוד ${parts.join(" · ")}`;
       });
     }
 
