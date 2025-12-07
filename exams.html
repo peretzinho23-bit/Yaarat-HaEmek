@@ -249,7 +249,7 @@
 
   <script src="accessibility.js"></script>
 
-  <!-- JS לטעינת המבחנים לכיתה -->
+  <!-- JS לדף המבחנים לפי כיתה -->
   <script type="module">
     import { db } from "./firebase-config.js";
     import {
@@ -257,32 +257,23 @@
       getDoc
     } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
-    // ===== קריאת פרמטרים מה-URL בצורה סבלנית =====
-    const urlParams = new URLSearchParams(window.location.search);
+    // ===== קריאת פרמטרים מה-URL =====
+    const params = new URLSearchParams(window.location.search);
 
-    // מאפשר גם grade / g / shkava
     const rawGrade =
-      urlParams.get("grade") ||
-      urlParams.get("g") ||
-      urlParams.get("shkava");
+      params.get("grade") ||
+      params.get("g") ||
+      params.get("shkava");
 
-    // מאפשר class / classId / c
     const rawClassId =
-      urlParams.get("class") ||
-      urlParams.get("classId") ||
-      urlParams.get("c");
+      params.get("class") ||
+      params.get("classId") ||
+      params.get("c");
 
-    // מנרמלים לאותיות קטנות
     const grade = rawGrade ? rawGrade.toLowerCase() : null;
     const classId = rawClassId ? rawClassId.toLowerCase() : null;
 
-    console.log("GRADE FROM URL =", grade, "CLASSID =", classId);
-
-    const VALID_CLASSES = {
-      z: ["z1", "z2", "z3", "z4", "z5"],
-      h: ["h1", "h2", "h3", "h4", "h5", "h6"],
-      t: ["t1", "t2", "t3", "t4", "t5"]
-    };
+    console.log("URL params:", { grade, classId });
 
     const GRADE_LABEL = {
       z: "שכבת ז'",
@@ -304,12 +295,14 @@
       if (!dateStr) return null;
       const parts = String(dateStr).split("/");
       if (parts.length !== 3) return null;
+
       const [dd, mm, yy] = parts.map((p) => parseInt(p, 10));
       if (Number.isNaN(dd) || Number.isNaN(mm) || Number.isNaN(yy)) return null;
 
       const year = yy < 50 ? 2000 + yy : 1900 + yy;
       let hours = 8;
       let minutes = 0;
+
       if (timeStr) {
         const tParts = String(timeStr).split(":");
         if (tParts.length === 2) {
@@ -319,6 +312,7 @@
           if (!Number.isNaN(m)) minutes = m;
         }
       }
+
       return new Date(year, mm - 1, dd, hours, minutes);
     }
 
@@ -328,18 +322,13 @@
       const subtitleEl = document.getElementById("class-subtitle");
       const chipLabel = document.getElementById("class-chip-label");
 
-      // בדיקת תקינות פרמטרים
-      if (
-        !grade ||
-        !classId ||
-        !VALID_CLASSES[grade] ||
-        !VALID_CLASSES[grade].includes(classId)
-      ) {
+      // אם בכלל אין פרמטרים – שגיאה עדינה
+      if (!grade || !classId) {
         titleEl.textContent = "שגיאה בנתוני הכתובת";
         subtitleEl.textContent =
           "הקישור אינו תקין. נסו לחזור למסך המבחנים הראשי ולבחור שוב את הכיתה.";
         listEl.innerHTML =
-          '<p class="class-empty-msg">לא ניתן לטעון את המבחנים – כיתה לא קיימת.</p>';
+          '<p class="class-empty-msg">לא ניתן לטעון את המבחנים – חסר מידע על שכבה או כיתה.</p>';
         chipLabel.textContent = "?";
         return;
       }
@@ -348,23 +337,17 @@
       const gradeLabel = GRADE_LABEL[grade] || "";
 
       titleEl.textContent = `מבחנים · כיתה ${classLabel}`;
-      subtitleEl.textContent = `כל המבחנים הקרובים של כיתה ${classLabel} (${gradeLabel}).`;
+      subtitleEl.textContent = `כל המבחנים הקרובים של כיתה ${classLabel} ${gradeLabel ? "(" + gradeLabel + ")" : ""}.`;
       chipLabel.textContent = classLabel;
 
       try {
         const refDoc = doc(db, "exams", grade);
         const snap = await getDoc(refDoc);
         const data = snap.exists() ? snap.data() : { items: [] };
-        const allExams = Array.isArray(data.items) ? data.items : [];
-
-        console.log("allExams for grade", grade, allExams);
+        const allExams = (data && data.items) || [];
 
         const forClass = allExams
-          .filter(
-            (ex) =>
-              ex.classId &&
-              String(ex.classId).toLowerCase() === classId
-          )
+          .filter((ex) => ex.classId && ex.classId.toLowerCase() === classId)
           .map((ex) => ({
             ...ex,
             _dateObj: parseExamDate(ex.date, ex.time)
