@@ -124,6 +124,13 @@
       font-size: 0.9rem;
     }
 
+    .exam-countdown {
+      grid-column: 1 / -1;
+      font-size: 0.8rem;
+      color: #a5b4fc;
+      margin-top: 4px;
+    }
+
     .class-empty-msg {
       text-align: center;
       font-size: 0.9rem;
@@ -250,216 +257,224 @@
   <script src="accessibility.js"></script>
 
   <!-- JS לדף המבחנים לפי כיתה -->
- <script type="module">
-  import { db } from "./firebase-config.js";
-  import {
-    doc,
-    getDoc
-  } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+  <script type="module">
+    import { db } from "./firebase-config.js";
+    import {
+      doc,
+      getDoc
+    } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
-  // ===== קריאת פרמטרים מה-URL =====
-  const urlParams = new URLSearchParams(window.location.search);
+    // ===== פרמטרים מה-URL =====
+    const params = new URLSearchParams(window.location.search);
+    const grade = (params.get("grade") || "").toLowerCase();   // z / h / t
+    const classId = (params.get("class") || "").toLowerCase(); // z1 / h3 / t5
 
-  const rawGrade =
-    urlParams.get("grade") ||
-    urlParams.get("g") ||
-    urlParams.get("shkava");
-
-  const rawClassId =
-    urlParams.get("class") ||
-    urlParams.get("classId") ||
-    urlParams.get("c");
-
-  const grade = rawGrade ? rawGrade.toLowerCase() : null;
-  const classId = rawClassId ? rawClassId.toLowerCase() : null;
-
-  console.log("GRADE FROM URL =", grade, "CLASSID =", classId);
-
-  const VALID_CLASSES = {
-    z: ["z1", "z2", "z3", "z4", "z5"],
-    h: ["h1", "h2", "h3", "h4", "h5", "h6"],
-    t: ["t1", "t2", "t3", "t4", "t5"]
-  };
-
-  const GRADE_LABEL = {
-    z: "שכבת ז'",
-    h: "שכבת ח'",
-    t: "שכבת ט'"
-  };
-
-  function classIdToLabel(id) {
-    const map = {
-      z1: "ז1", z2: "ז2", z3: "ז3", z4: "ז4", z5: "ז5",
-      h1: "ח1", h2: "ח2", h3: "ח3", h4: "ח4", h5: "ח5", h6: "ח6",
-      t1: "ט1", t2: "ט2", t3: "ט3", t4: "ט4", t5: "ט5"
+    const VALID_CLASSES = {
+      z: ["z1", "z2", "z3", "z4", "z5"],
+      h: ["h1", "h2", "h3", "h4", "h5", "h6"],
+      t: ["t1", "t2", "t3", "t4", "t5"]
     };
-    return map[id] || id;
-  }
 
-  // מנרמל classId מכל צורה (ז1 / 1 / z1 וכו') ל-z1/h2/t3
-  function normalizeClassId(raw, grade) {
-    if (!raw) return null;
-    let v = String(raw).trim().toLowerCase();
+    const GRADE_LABEL = {
+      z: "שכבת ז'",
+      h: "שכבת ח'",
+      t: "שכבת ט'"
+    };
 
-    // אם כבר בפורמט z1/h2/t3
-    if (VALID_CLASSES[grade] && VALID_CLASSES[grade].includes(v)) {
-      return v;
+    function classIdToLabel(id) {
+      const map = {
+        z1: "ז1", z2: "ז2", z3: "ז3", z4: "ז4", z5: "ז5",
+        h1: "ח1", h2: "ח2", h3: "ח3", h4: "ח4", h5: "ח5", h6: "ח6",
+        t1: "ט1", t2: "ט2", t3: "ט3", t4: "ט4", t5: "ט5"
+      };
+      return map[id] || id;
     }
 
-    // מוציא רק ספרות מתוך מה שהוזן (ז1 -> 1, "כיתה 2" -> 2)
-    const digits = v.replace(/[^\d]/g, "");
-    if (!digits) return null;
+    // === פירוש תאריך + שעה לאובייקט Date (כמו ב-app.js) ===
+    function parseExamDateToDateObj(dateStr, timeStr) {
+      if (!dateStr) return null;
+      let s = String(dateStr).trim();
+      if (!s) return null;
 
-    const candidate = `${grade}${digits}`;
-    if (VALID_CLASSES[grade] && VALID_CLASSES[grade].includes(candidate)) {
-      return candidate;
-    }
+      let hh = 8;
+      let mm = 0;
 
-    return null;
-  }
-
-  // ===== תאריכים – אותו רעיון כמו ב-app.js =====
-  function parseExamDateToDateObj(dateStr, timeStr) {
-    if (!dateStr) return null;
-    let s = String(dateStr).trim();
-    if (!s) return null;
-
-    let hh = 8;
-    let mm = 0;
-
-    if (timeStr) {
-      const tm = String(timeStr).trim().match(/^(\d{1,2}):(\d{2})$/);
-      if (tm) {
-        hh = Number(tm[1]);
-        mm = Number(tm[2]);
+      if (timeStr) {
+        const tm = String(timeStr).trim().match(/^(\d{1,2}):(\d{2})$/);
+        if (tm) {
+          hh = Number(tm[1]);
+          mm = Number(tm[2]);
+        }
       }
+
+      const matchIL = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/);
+      if (matchIL) {
+        let day = Number(matchIL[1]);
+        let month = Number(matchIL[2]);
+        let year = Number(matchIL[3]);
+        if (year < 100) year = 2000 + year;
+        return new Date(year, month - 1, day, hh, mm);
+      }
+
+      if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+        const [y, m, d] = s.split("-").map(Number);
+        return new Date(y, m - 1, d, hh, mm);
+      }
+
+      const m = s.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{1,2}):(\d{2})$/);
+      if (m) {
+        const y = Number(m[1]);
+        const mo = Number(m[2]);
+        const d = Number(m[3]);
+        const hh2 = Number(m[4]);
+        const mm2 = Number(m[5]);
+        return new Date(y, mo - 1, d, hh2, mm2);
+      }
+
+      const dObj = new Date(s);
+      return isNaN(dObj.getTime()) ? null : dObj;
     }
 
-    // DD/MM/YYYY או DD/MM/YY
-    const matchIL = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/);
-    if (matchIL) {
-      let day = Number(matchIL[1]);
-      let month = Number(matchIL[2]);
-      let year = Number(matchIL[3]);
-      if (year < 100) year = 2000 + year;
-      return new Date(year, month - 1, day, hh, mm);
+    function formatLocalDate(d) {
+      const day = String(d.getDate()).padStart(2, "0");
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const year = d.getFullYear();
+      return `${day}.${month}.${year}`;
     }
 
-    // YYYY-MM-DD
-    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
-      const [y, m, d] = s.split("-").map(Number);
-      return new Date(y, m - 1, d, hh, mm);
+    // ===== ספירה לאחור בדף כיתה =====
+    let countdownIntervalId = null;
+
+    function updateCountdowns() {
+      const els = document.querySelectorAll("[data-exam-timestamp]");
+      if (!els.length) return;
+
+      const now = Date.now();
+
+      els.forEach((el) => {
+        const ts = Number(el.dataset.examTimestamp);
+        if (!ts || Number.isNaN(ts)) {
+          el.textContent = "";
+          return;
+        }
+
+        const diff = ts - now;
+        if (diff <= 0) {
+          el.textContent = "המבחן כבר היה או מתקיים עכשיו.";
+          return;
+        }
+
+        const totalSeconds = Math.floor(diff / 1000);
+        const days = Math.floor(totalSeconds / (24 * 3600));
+        const hours = Math.floor((totalSeconds % (24 * 3600)) / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+
+        let parts = [];
+        if (days > 0) parts.push(`${days} ימים`);
+        if (hours > 0) parts.push(`${hours} שעות`);
+        if (minutes > 0) parts.push(`${minutes} דקות`);
+        parts.push(`${seconds} שניות`);
+
+        el.textContent = `ספירה לאחור: ${parts.join(" · ")}`;
+      });
     }
 
-    // YYYY-MM-DD HH:MM או YYYY-MM-DDTHH:MM
-    const m = s.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{1,2}):(\d{2})$/);
-    if (m) {
-      const y = Number(m[1]);
-      const mo = Number(m[2]);
-      const d = Number(m[3]);
-      const hh2 = Number(m[4]);
-      const mm2 = Number(m[5]);
-      return new Date(y, mo - 1, d, hh2, mm2);
+    function startCountdownLoop() {
+      if (countdownIntervalId) return;
+      countdownIntervalId = setInterval(updateCountdowns, 1000);
     }
 
-    const dObj = new Date(s);
-    return isNaN(dObj.getTime()) ? null : dObj;
-  }
+    // ===== טעינת המבחנים לכיתה =====
+    async function loadClassExams() {
+      const listEl = document.getElementById("class-exams-list");
+      const titleEl = document.getElementById("class-title");
+      const subtitleEl = document.getElementById("class-subtitle");
+      const chipLabel = document.getElementById("class-chip-label");
 
-  async function loadClassExams() {
-    const listEl = document.getElementById("class-exams-list");
-    const titleEl = document.getElementById("class-title");
-    const subtitleEl = document.getElementById("class-subtitle");
-    const chipLabel = document.getElementById("class-chip-label");
-
-    // בדיקת תקינות פרמטרים
-    if (
-      !grade ||
-      !classId ||
-      !VALID_CLASSES[grade]
-    ) {
-      titleEl.textContent = "שגיאה בנתוני הכתובת";
-      subtitleEl.textContent =
-        "הקישור אינו תקין. נסו לחזור למסך המבחנים הראשי ולבחור שוב את הכיתה.";
-      listEl.innerHTML =
-        '<p class="class-empty-msg">לא ניתן לטעון את המבחנים – כיתה לא קיימת.</p>';
-      chipLabel.textContent = "?";
-      return;
-    }
-
-    const classLabel = classIdToLabel(classId);
-    const gradeLabel = GRADE_LABEL[grade] || "";
-
-    titleEl.textContent = `מבחנים · כיתה ${classLabel}`;
-    subtitleEl.textContent = `כל המבחנים הקרובים של כיתה ${classLabel} (${gradeLabel}).`;
-    chipLabel.textContent = classLabel;
-
-    try {
-      const refDoc = doc(db, "exams", grade);
-      const snap = await getDoc(refDoc);
-      const data = snap.exists() ? snap.data() : { items: [] };
-      const allExams = (data && data.items) || [];
-
-      console.log("ALL EXAMS FROM FIRESTORE:", allExams);
-
-      const forClass = allExams
-        .map((ex) => {
-          const normId = normalizeClassId(ex.classId, grade);
-          return {
-            ...ex,
-            _normClassId: normId,
-            _dateObj: parseExamDateToDateObj(ex.date, ex.time),
-          };
-        })
-        .filter((ex) => ex._normClassId === classId && ex._dateObj);
-
-      console.log("FILTERED FOR CLASS:", classId, forClass);
-
-      if (!forClass.length) {
+      // בדיקת תקינות פרמטרים
+      const validForGrade = VALID_CLASSES[grade] || [];
+      if (!grade || !classId || !validForGrade.includes(classId)) {
+        titleEl.textContent = "שגיאה בנתוני הכתובת";
+        subtitleEl.textContent =
+          "הקישור אינו תקין. נסו לחזור למסך המבחנים הראשי ולבחור שוב את הכיתה.";
         listEl.innerHTML =
-          '<p class="class-empty-msg">כרגע אין מבחנים רשומים לכיתה זו.</p>';
+          '<p class="class-empty-msg">לא ניתן לטעון את המבחנים – כיתה לא קיימת.</p>';
+        chipLabel.textContent = "?";
         return;
       }
 
-      forClass.sort((a, b) => a._dateObj - b._dateObj);
-      listEl.innerHTML = "";
+      const classLabel = classIdToLabel(classId);
+      const gradeLabel = GRADE_LABEL[grade] || "";
 
-      forClass.forEach((ex) => {
-        const dateObj = ex._dateObj;
-        const day = String(dateObj.getDate()).padStart(2, "0");
-        const month = String(dateObj.getMonth() + 1).padStart(2, "0");
-        const yearShort = String(dateObj.getFullYear()).slice(-2);
-        const timeText = ex.time ? ex.time : "שעה לא צוינה";
+      titleEl.textContent = `מבחנים · כיתה ${classLabel}`;
+      subtitleEl.textContent = `כל המבחנים הקרובים של כיתה ${classLabel} (${gradeLabel}).`;
+      chipLabel.textContent = classLabel;
 
-        const card = document.createElement("div");
-        card.className = "exam-card";
-        card.innerHTML = `
-          <div>
-            <div class="exam-main-title">${ex.subject || "מבחן"}</div>
-            <div class="exam-meta">
-              תאריך: ${ex.date || `${day}/${month}/${yearShort}`} · שעה: ${timeText}
+      try {
+        // שימי לב: כאן המסמך הוא לפי כיתה! exams/z1, exams/h3 וכו'
+        const refDoc = doc(db, "exams", classId);
+        const snap = await getDoc(refDoc);
+        const data = snap.exists() ? snap.data() : { items: [] };
+        const allExams = data.items || [];
+
+        const withDates = allExams
+          .map((ex) => ({
+            ...ex,
+            _dateObj: parseExamDateToDateObj(ex.date, ex.time)
+          }))
+          .filter((ex) => ex._dateObj);
+
+        if (!withDates.length) {
+          listEl.innerHTML =
+            '<p class="class-empty-msg">כרגע אין מבחנים רשומים לכיתה זו.</p>';
+          return;
+        }
+
+        withDates.sort((a, b) => a._dateObj - b._dateObj);
+
+        listEl.innerHTML = "";
+
+        withDates.forEach((ex) => {
+          const d = ex._dateObj;
+          const day = String(d.getDate()).padStart(2, "0");
+          const month = String(d.getMonth() + 1).padStart(2, "0");
+          const yearShort = String(d.getFullYear()).slice(-2);
+          const timeText = ex.time ? ex.time : "שעה לא צוינה";
+          const ts = d.getTime();
+
+          const card = document.createElement("div");
+          card.className = "exam-card";
+          card.innerHTML = `
+            <div>
+              <div class="exam-main-title">${ex.subject || "מבחן"}</div>
+              <div class="exam-meta">
+                תאריך: ${ex.date || formatLocalDate(d)} · שעה: ${timeText}
+              </div>
+            </div>
+            <div class="exam-date-pill">
+              <span class="exam-date-main">${day}/${month}</span>
+              <span>${yearShort}</span>
             </div>
             <div class="exam-topic">
               ${ex.topic || "ללא תיאור מפורט."}
             </div>
-          </div>
-          <div class="exam-date-pill">
-            <span class="exam-date-main">${day}/${month}</span>
-            <span>${yearShort}</span>
-          </div>
-        `;
-        listEl.appendChild(card);
-      });
-    } catch (err) {
-      console.error(err);
-      listEl.innerHTML =
-        '<p class="class-empty-msg">אירעה שגיאה בטעינת המבחנים. נסו שוב מאוחר יותר.</p>';
+            <div class="exam-countdown" data-exam-timestamp="${ts}"></div>
+          `;
+          listEl.appendChild(card);
+        });
+
+        updateCountdowns();
+        startCountdownLoop();
+      } catch (err) {
+        console.error(err);
+        listEl.innerHTML =
+          '<p class="class-empty-msg">אירעה שגיאה בטעינת המבחנים. נסו שוב מאוחר יותר.</p>';
+      }
     }
-  }
 
-  loadClassExams();
-</script>
-
+    loadClassExams();
+  </script>
 
   <!-- app.js בשביל מצב כהה / תפריט מובייל וכו' -->
   <script type="module" src="app.js"></script>
