@@ -287,8 +287,8 @@ function renderHomeExams() {
       .filter((ex) => ex._dateObj); // זורק מבחנים בלי תאריך תקין
 
     if (!itemsWithDates.length) {
-      listEl.innerHTML = `<p class="empty-msg">אין מבחנים קרובים לשכבה זו.</p>`;
-      return;
+listEl.innerHTML = "";
+
     }
 
     // מיון לפי תאריך מהקרוב לרחוק
