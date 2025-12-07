@@ -5,7 +5,10 @@ import {
   doc,
   getDoc,
   setDoc,
-  onSnapshot
+  onSnapshot,
+  collection,
+  addDoc,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 import {
   signInWithEmailAndPassword,
@@ -28,12 +31,35 @@ const CLASS_IDS_BY_GRADE = {
 };
 
 let newsData = { z: [], h: [], t: [] };
-// פה – כל שכבה היא מערך מבחנים (לא לפי כיתה).
-// בכל מבחן יש שדה classId.
-// עכשיו מבחנים לפי שכבה – מערך לכל שכבה, כל מבחן כולל classId
+// מבחנים לפי שכבה – מערך לכל שכבה, כל מבחן כולל classId
 let examsData = { z: [], h: [], t: [] };
 let boardData = [];
 let siteContent = {};
+
+/* ------------ LOGS – לוג שינויים למבחנים ------------ */
+
+async function logExamChange(action, examData) {
+  try {
+    const logsRef = collection(db, "exams_logs");
+    await addDoc(logsRef, {
+      action, // "create" / "delete"
+      grade: examData.grade || null,
+      classId: examData.classId || null,
+      subject: examData.subject || null,
+      date: examData.date || null,
+      time: examData.time || null,
+      topic: examData.topic || null,
+      itemsCount: examData.itemsCount ?? null,
+
+      adminUid: auth.currentUser ? auth.currentUser.uid : null,
+      adminEmail: auth.currentUser ? auth.currentUser.email : null,
+
+      createdAt: serverTimestamp()
+    });
+  } catch (err) {
+    console.error("שגיאה בלוג של המבחנים:", err);
+  }
+}
 
 /* ------------ helpers ------------ */
 
@@ -137,7 +163,6 @@ async function loadAllData() {
   }
   renderExamsAdmin();
 
-
   // BOARD
   const b = await getDocSafe(["board", "general"], { items: [] });
   boardData = b.items || [];
@@ -170,7 +195,6 @@ function subscribeRealtimeAdmin() {
       renderExamsAdmin();
     });
   }
-
 
   // BOARD
   onSnapshot(doc(db, "board", "general"), (snap) => {
@@ -239,11 +263,9 @@ function setupNewsForms() {
       const meta = form.meta.value.trim();
       const body = form.body.value.trim();
       const manualImageUrl =
-        (form.imageUrl && form.imageUrl.value && form.imageUrl.value.trim()) ||
-        "";
+        (form.imageUrl && form.imageUrl.value && form.imageUrl.value.trim()) || "";
       const color =
-        (form.color && form.color.value && form.color.value.trim()) ||
-        "#ffffff";
+        (form.color && form.color.value && form.color.value.trim()) || "#ffffff";
 
       const fileInput = form.imageFile;
       const file = fileInput && fileInput.files && fileInput.files[0];
@@ -339,7 +361,6 @@ function renderExamsAdmin() {
   }
 }
 
-
 function setupExamForms() {
   for (const g of GRADES) {
     const form = document.getElementById(`exams-form-${g}`);
@@ -380,10 +401,27 @@ function setupExamForms() {
       if (!examsData[g]) examsData[g] = [];
       examsData[g].push(newExam);
 
-      form.reset();
-      renderExamsAdmin();
-      await saveExamsGrade(g);
-      alert("המבחן נשמר.");
+      try {
+        form.reset();
+        renderExamsAdmin();
+        await saveExamsGrade(g);
+
+        // לוג יצירה
+        await logExamChange("create", {
+          grade: g,
+          classId: newExam.classId,
+          subject: newExam.subject,
+          date: newExam.date,
+          time: newExam.time,
+          topic: newExam.topic,
+          itemsCount: examsData[g].length
+        });
+
+        alert("המבחן נשמר.");
+      } catch (err) {
+        console.error("שגיאה בשמירת מבחן:", err);
+        alert("שגיאה בשמירת המבחן. נסו שוב.");
+      }
     });
   }
 }
@@ -440,11 +478,9 @@ function setupBoardForm() {
     const meta = form.meta.value.trim();
     const body = form.body.value.trim();
     const manualImageUrl =
-      (form.imageUrl && form.imageUrl.value && form.imageUrl.value.trim()) ||
-      "";
+      (form.imageUrl && form.imageUrl.value && form.imageUrl.value.trim()) || "";
     const color =
-      (form.color && form.color.value && form.color.value.trim()) ||
-      "#ffffff";
+      (form.color && form.color.value && form.color.value.trim()) || "#ffffff";
 
     const fileInput = form.imageFile;
     const file = fileInput && fileInput.files && fileInput.files[0];
@@ -643,13 +679,28 @@ function setupDeleteHandler() {
       newsData[grade].splice(index, 1);
       renderNewsAdmin();
       await saveNewsGrade(grade);
-        } else if (type === "exam") {
+    } else if (type === "exam") {
       if (!examsData[grade]) return;
+
+      // שומרים את המבחן לפני מחיקה בשביל הלוג
+      const deletedExam = examsData[grade][index];
 
       examsData[grade].splice(index, 1);
       renderExamsAdmin();
       await saveExamsGrade(grade);
 
+      // לוג מחיקה
+      if (deletedExam) {
+        await logExamChange("delete", {
+          grade,
+          classId: deletedExam.classId,
+          subject: deletedExam.subject,
+          date: deletedExam.date,
+          time: deletedExam.time,
+          topic: deletedExam.topic,
+          itemsCount: examsData[grade].length
+        });
+      }
     } else if (type === "board") {
       boardData.splice(index, 1);
       renderBoardAdmin();
