@@ -34,6 +34,29 @@ function escapeHtml(str) {
     .replace(/>/g, "&gt;");
 }
 
+// המרת classId לטקסט יפה (ז1, ח3, ט5 וכו')
+function classIdToLabel(classId) {
+  const map = {
+    z1: "ז1",
+    z2: "ז2",
+    z3: "ז3",
+    z4: "ז4",
+    z5: "ז5",
+    h1: "ח1",
+    h2: "ח2",
+    h3: "ח3",
+    h4: "ח4",
+    h5: "ח5",
+    h6: "ח6",
+    t1: "ט1",
+    t2: "ט2",
+    t3: "ט3",
+    t4: "ט4",
+    t5: "ט5"
+  };
+  return map[classId] || "";
+}
+
 async function getDocSafe(pathArr, def) {
   const refDoc = doc(db, ...pathArr);
   const snap = await getDoc(refDoc);
@@ -243,7 +266,7 @@ function setupNewsForms() {
       } catch (err) {
         console.error("שגיאה בהעלאת תמונה/שמירת חדשות:", err);
         alert(
-          "שגיאה בשמירת הידיעה:\n" +
+          "שגיאה בשמירת הידיעה:\נ" +
             (err.code ? err.code + " – " : "") +
             (err.message || JSON.stringify(err))
         );
@@ -266,23 +289,31 @@ function renderExamsAdmin() {
     }
 
     listEl.innerHTML = items
-      .map(
-        (ex, i) => `
+      .map((ex, i) => {
+        const classLabel = classIdToLabel(ex.classId);
+        const metaParts = [];
+
+        if (ex.date) metaParts.push(escapeHtml(ex.date));
+        if (ex.time) metaParts.push(escapeHtml(ex.time));
+        if (classLabel) metaParts.push("כיתה " + escapeHtml(classLabel));
+
+        const metaText = metaParts.join(" · ");
+
+        return `
         <div class="admin-item">
           <div class="admin-item-main">
             <strong>${escapeHtml(ex.subject)}</strong>
-           <span class="admin-item-meta">
-  ${escapeHtml(ex.date || "")}${ex.time ? " · " + escapeHtml(ex.time) : ""}
-</span>
-
+            <span class="admin-item-meta">
+              ${metaText}
+            </span>
           </div>
           <div class="admin-item-body">${escapeHtml(ex.topic || "")}</div>
           <button class="admin-remove" data-type="exam" data-grade="${g}" data-index="${i}">
             מחיקה
           </button>
         </div>
-      `
-      )
+      `;
+      })
       .join("");
   }
 }
@@ -304,14 +335,14 @@ function setupExamForms() {
       const time = form.time ? form.time.value.trim() : "";
       const subject = form.subject.value.trim();
       const topic = form.topic.value.trim();
+      const classId = form.classId ? form.classId.value.trim() : "";
 
-      if (!date || !subject) {
-        alert("חובה למלא תאריך ומקצוע.");
+      if (!date || !subject || !classId) {
+        alert("חובה למלא תאריך, מקצוע וכיתה.");
         return;
       }
 
-      // שומרים גם time, אבל date נשאר בדיוק כמו "22/10/24"
-      examsData[g].push({ date, time, subject, topic });
+      examsData[g].push({ date, time, subject, topic, classId });
 
       form.reset();
       renderExamsAdmin();
@@ -320,7 +351,6 @@ function setupExamForms() {
     });
   }
 }
-
 
 /* ------------ BOARD ------------ */
 

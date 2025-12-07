@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>לוח ניהול – יערת העמק</title>
@@ -184,34 +185,42 @@
 
         <div class="admin-columns">
           <!-- Z EXAMS -->
-<section class="admin-grade-section" data-grade="z">
-  <div class="card">
-    <h3>מבחנים · ז'</h3>
-    <div id="admin-exams-z" class="admin-list"></div>
+          <section class="admin-grade-section" data-grade="z">
+            <div class="card">
+              <h3>מבחנים · ז'</h3>
+              <div id="admin-exams-z" class="admin-list"></div>
 
-    <form id="exams-form-z" class="admin-form">
+              <form id="exams-form-z" class="admin-form" data-grade="z">
+                <label>תאריך המבחן</label>
+                <input name="date" type="text" placeholder="למשל: 22/10/24" required />
 
-      <label>תאריך</label>
-      <input name="date" placeholder="לדוגמה: 22/10/24" />
+                <label>שעת המבחן</label>
+                <input type="time" name="time" />
 
-      <label>שעת המבחן</label>
-      <input type="time" name="time" />
+                <label>מקצוע</label>
+                <input name="subject" />
 
-      <label>מקצוע</label>
-      <input name="subject" />
+                <label>כיתה</label>
+                <select name="classId" required>
+                  <option value="">בחר כיתה</option>
+                  <option value="z1">ז1</option>
+                  <option value="z2">ז2</option>
+                  <option value="z3">ז3</option>
+                  <option value="z4">ז4</option>
+                  <option value="z5">ז5</option>
+                </select>
 
-      <label>נושא המבחן</label>
-      <textarea name="topic"></textarea>
+                <label>נושא המבחן</label>
+                <textarea name="topic"></textarea>
 
-      <label>קישור לתמונה (אופציונלי)</label>
-      <input name="imageUrl" placeholder="https://..." />
+                <label>קישור לתמונה (אופציונלי)</label>
+                <input name="imageUrl" placeholder="https://..." />
 
-      <button type="submit">הוסף מבחן לז'</button>
-    </form>
+                <button type="submit">הוסף מבחן לז'</button>
+              </form>
 
-  </div>
-</section>
-
+            </div>
+          </section>
 
           <!-- H EXAMS -->
           <section class="admin-grade-section" data-grade="h">
@@ -219,16 +228,26 @@
               <h3>מבחנים · ח'</h3>
               <div id="admin-exams-h" class="admin-list"></div>
 
-              <form id="exams-form-h" class="admin-form">
-                <form id="exams-form-h" data-grade="h">
-  <label>תאריך המבחן</label>
-  <input name="date" type="text" placeholder="למשל: 22/10/24" required />
+              <form id="exams-form-h" class="admin-form" data-grade="h">
+                <label>תאריך המבחן</label>
+                <input name="date" type="text" placeholder="למשל: 22/10/24" required />
 
-  <label>שעת המבחן</label>
-  <input name="time" type="time" />
+                <label>שעת המבחן</label>
+                <input name="time" type="time" />
 
                 <label>מקצוע</label>
                 <input name="subject" />
+
+                <label>כיתה</label>
+                <select name="classId" required>
+                  <option value="">בחר כיתה</option>
+                  <option value="h1">ח1</option>
+                  <option value="h2">ח2</option>
+                  <option value="h3">ח3</option>
+                  <option value="h4">ח4</option>
+                  <option value="h5">ח5</option>
+                  <option value="h6">ח6</option>
+                </select>
 
                 <label>נושא המבחן</label>
                 <textarea name="topic"></textarea>
@@ -247,16 +266,25 @@
               <h3>מבחנים · ט'</h3>
               <div id="admin-exams-t" class="admin-list"></div>
 
-              <form id="exams-form-t" class="admin-form">
-                <form id="exams-form-t" data-grade="t">
-  <label>תאריך המבחן</label>
-  <input name="date" type="text" placeholder="למשל: 22/10/24" required />
+              <form id="exams-form-t" class="admin-form" data-grade="t">
+                <label>תאריך המבחן</label>
+                <input name="date" type="text" placeholder="למשל: 22/10/24" required />
 
-  <label>שעת המבחן</label>
-  <input name="time" type="time" />
+                <label>שעת המבחן</label>
+                <input name="time" type="time" />
 
                 <label>מקצוע</label>
                 <input name="subject" />
+
+                <label>כיתה</label>
+                <select name="classId" required>
+                  <option value="">בחר כיתה</option>
+                  <option value="t1">ט1</option>
+                  <option value="t2">ט2</option>
+                  <option value="t3">ט3</option>
+                  <option value="t4">ט4</option>
+                  <option value="t5">ט5</option>
+                </select>
 
                 <label>נושא המבחן</label>
                 <textarea name="topic"></textarea>

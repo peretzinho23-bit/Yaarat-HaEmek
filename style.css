@@ -1580,3 +1580,41 @@ body.light-mode .grade-hero h1,
 body.light-mode .grade-hero p {
   color: #0d1b2a !important;
 }
+/* כפתורי כיתות בתוך כרטיס המבחנים */
+.class-links {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(148, 163, 184, 0.5);
+  font-size: 0.85rem;
+}
+
+.class-links-label {
+  display: block;
+  margin-bottom: 6px;
+  opacity: 0.9;
+}
+
+.class-links-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.class-links-row a {
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(129, 212, 250, 0.7);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+/* לייט מוד – שיהיה יפה גם בברייט */
+html[data-theme="light"] .class-links-row a {
+  border-color: #93c5fd;
+  color: #1d4ed8;
+  background: #ffffff;
+}
+
+html[data-theme="light"] .class-links-row a:hover {
+  background: #e0edff;
+}
