@@ -249,12 +249,12 @@
 
   <script src="accessibility.js"></script>
 
-  <!-- JS לדף המבחנים לפי כיתה -->
+  <!-- JS לדף המבחנים לפי כיתה – REALTIME -->
   <script type="module">
     import { db } from "./firebase-config.js";
     import {
       doc,
-      getDoc
+      onSnapshot
     } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
     // ----- פרמטרים מה-URL -----
@@ -283,7 +283,7 @@
       return map[id] || id;
     }
 
-    // ===== פונקציות תאריך + ספירה לאחור (אותו קטע כמו ב-app.js) =====
+    // ===== פונקציות תאריך + ספירה לאחור =====
 
     let examCountdownIntervalId = null;
 
@@ -372,7 +372,7 @@
         if (minutes > 0) parts.push(`${minutes} דקות`);
         parts.push(`${seconds} שניות`);
 
-        el.textContent = `ספירה לאחור: ${parts.join(" · ")}`;
+        el.textContent = `המבחן בעוד: ${parts.join(" · ")}`;
       });
     }
 
@@ -381,9 +381,9 @@
       examCountdownIntervalId = setInterval(updateExamCountdownElements, 1000);
     }
 
-    // ===== טעינת המבחנים לכיתה =====
+    // ===== טעינת המבחנים לכיתה – בזמן אמת =====
 
-    async function loadClassExams() {
+    function loadClassExams() {
       const listEl = document.getElementById("class-exams-list");
       const titleEl = document.getElementById("class-title");
       const subtitleEl = document.getElementById("class-subtitle");
@@ -401,7 +401,7 @@
           "הקישור אינו תקין. נסו לחזור למסך המבחנים הראשי ולבחור שוב את הכיתה.";
         listEl.innerHTML =
           '<p class="class-empty-msg">לא ניתן לטעון את המבחנים – כיתה לא קיימת.</p>';
-        chipLabel.textContent = "?";
+        if (chipLabel) chipLabel.textContent = "?";
         return;
       }
 
@@ -410,70 +410,85 @@
 
       titleEl.textContent = `מבחנים · כיתה ${classLabel}`;
       subtitleEl.textContent = `כל המבחנים הקרובים של כיתה ${classLabel} (${gradeLabel}).`;
-      chipLabel.textContent = classLabel;
+      if (chipLabel) chipLabel.textContent = classLabel;
+
+      // מצב טעינה ראשוני
+      listEl.innerHTML =
+        '<p class="class-empty-msg">טוען מבחנים...</p>';
 
       try {
         const refDoc = doc(db, "exams", grade); // מסמך של השכבה (z/h/t)
-        const snap = await getDoc(refDoc);
-        const data = snap.exists() ? snap.data() : { items: [] };
-        const allExams = data.items || [];
 
-        const forClass = allExams
-          .filter(
-            (ex) =>
-              ex.classId &&
-              String(ex.classId).toLowerCase() === classId.toLowerCase()
-          )
-          .map((ex) => ({
-            ...ex,
-            _dateObj: parseExamDateToDateObj(ex.date, ex.time)
-          }))
-          .filter((ex) => ex._dateObj);
+        // מאזין בזמן אמת לשינויים במסמך
+        onSnapshot(
+          refDoc,
+          (snap) => {
+            const data = snap.exists() ? snap.data() : { items: [] };
+            const allExams = data.items || [];
 
-        if (!forClass.length) {
-          listEl.innerHTML =
-            '<p class="class-empty-msg">כרגע אין מבחנים רשומים לכיתה זו.</p>';
-          return;
-        }
+            const forClass = allExams
+              .filter(
+                (ex) =>
+                  ex.classId &&
+                  String(ex.classId).toLowerCase() === classId.toLowerCase()
+              )
+              .map((ex) => ({
+                ...ex,
+                _dateObj: parseExamDateToDateObj(ex.date, ex.time)
+              }))
+              .filter((ex) => ex._dateObj instanceof Date && !isNaN(ex._dateObj));
 
-        // למיין לפי תאריך
-        forClass.sort((a, b) => a._dateObj - b._dateObj);
+            if (!forClass.length) {
+              listEl.innerHTML =
+                '<p class="class-empty-msg">כרגע אין מבחנים רשומים לכיתה זו.</p>';
+              return;
+            }
 
-        listEl.innerHTML = "";
+            // למיין לפי תאריך
+            forClass.sort((a, b) => a._dateObj - b._dateObj);
 
-        forClass.forEach((ex) => {
-          const dObj = ex._dateObj;
-          const ts = dObj.getTime();
+            listEl.innerHTML = "";
 
-          const day = String(dObj.getDate()).padStart(2, "0");
-          const month = String(dObj.getMonth() + 1).padStart(2, "0");
-          const yearShort = String(dObj.getFullYear()).slice(-2);
+            forClass.forEach((ex) => {
+              const dObj = ex._dateObj;
+              const ts = dObj.getTime();
 
-          const card = document.createElement("div");
-          card.className = "exam-card";
-          card.innerHTML = `
-            <div>
-              <div class="exam-main-title">${ex.subject || "מבחן"}</div>
-              <div class="exam-meta">
-                ${buildDateTimeLabel(ex, dObj)}
-              </div>
-            </div>
-            <div class="exam-date-pill">
-              <span class="exam-date-main">${day}/${month}</span>
-              <span>${yearShort}</span>
-            </div>
-            <div class="exam-topic">
-              ${ex.topic || "ללא תיאור מפורט."}
-            </div>
-            <div class="home-exam-countdown" data-exam-timestamp="${ts}"></div>
-          `;
-          listEl.appendChild(card);
-        });
+              const day = String(dObj.getDate()).padStart(2, "0");
+              const month = String(dObj.getMonth() + 1).padStart(2, "0");
+              const yearShort = String(dObj.getFullYear()).slice(-2);
 
-        updateExamCountdownElements();
-        startExamCountdownLoop();
+              const card = document.createElement("div");
+              card.className = "exam-card";
+              card.innerHTML = `
+                <div>
+                  <div class="exam-main-title">${ex.subject || "מבחן"}</div>
+                  <div class="exam-meta">
+                    ${buildDateTimeLabel(ex, dObj)}
+                  </div>
+                </div>
+                <div class="exam-date-pill">
+                  <span class="exam-date-main">${day}/${month}</span>
+                  <span>${yearShort}</span>
+                </div>
+                <div class="exam-topic">
+                  ${ex.topic || "ללא תיאור מפורט."}
+                </div>
+                <div class="home-exam-countdown" data-exam-timestamp="${ts}"></div>
+              `;
+              listEl.appendChild(card);
+            });
+
+            updateExamCountdownElements();
+            startExamCountdownLoop();
+          },
+          (err) => {
+            console.error("שגיאה בטעינת מבחנים בזמן אמת:", err);
+            listEl.innerHTML =
+              '<p class="class-empty-msg">אירעה שגיאה בטעינת המבחנים. נסו שוב מאוחר יותר.</p>';
+          }
+        );
       } catch (err) {
-        console.error(err);
+        console.error("שגיאה בטעינת המבחנים:", err);
         listEl.innerHTML =
           '<p class="class-empty-msg">אירעה שגיאה בטעינת המבחנים. נסו שוב מאוחר יותר.</p>';
       }
