@@ -3,145 +3,390 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>מבחנים – יערת העמק</title>
+
+  <title>מבחנים לפי כיתה – יערת העמק</title>
+
+  <link rel="icon" href="logo.png" />
   <link rel="stylesheet" href="style.css" />
+
+  <style>
+    /* ===== עיצוב דף מבחני כיתה ===== */
+
+    body[data-page="class-exams"] {
+      background: #0b1120;
+      color: #e5f0ff;
+    }
+
+    .class-exams-wrapper {
+      padding-top: 90px;
+    }
+
+    .class-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .class-chip {
+      border-radius: 999px;
+      padding: 8px 18px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(10px);
+      font-size: 0.95rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: default;
+      white-space: nowrap;
+    }
+
+    .class-chip span {
+      font-weight: 600;
+      font-size: 1.05rem;
+    }
+
+    .class-chip-badge {
+      border-radius: 999px;
+      padding: 3px 9px;
+      font-size: 0.7rem;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.6);
+      color: #7dd3fc;
+    }
+
+    .back-btn-small {
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      text-decoration: none;
+    }
+
+    .class-exams-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    .exam-card {
+      border-radius: 18px;
+      padding: 14px 16px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.7);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      column-gap: 16px;
+      row-gap: 6px;
+      align-items: center;
+    }
+
+    .exam-main-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+
+    .exam-meta {
+      font-size: 0.85rem;
+      color: #9ca3af;
+    }
+
+    .exam-topic {
+      grid-column: 1 / -1;
+      font-size: 0.9rem;
+      color: #e5e7eb;
+      margin-top: 4px;
+    }
+
+    .exam-date-pill {
+      border-radius: 999px;
+      padding: 6px 12px;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.6);
+      color: #e0f2fe;
+      font-size: 0.8rem;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .exam-date-pill span {
+      display: block;
+    }
+
+    .exam-date-pill .exam-date-main {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .class-empty-msg {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #9ca3af;
+      padding: 18px 0;
+    }
+
+    @media (max-width: 768px) {
+      .class-exams-wrapper {
+        padding-top: 80px;
+      }
+
+      .class-header-row {
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      .class-exams-list {
+        max-width: 100%;
+      }
+
+      .exam-card {
+        grid-template-columns: 1fr;
+        row-gap: 8px;
+      }
+
+      .exam-date-pill {
+        justify-self: flex-start;
+      }
+    }
+  </style>
 </head>
 
-<body data-page="exams">
-  <!-- HEADER פשוט -->
+<body data-page="class-exams">
+  <!-- HEADER כמו באתר הראשי -->
   <header class="header-main">
     <div class="container">
       <nav class="nav">
         <div class="nav-left">
           <div class="logo-circle">
-            <span>יערת<br>העמק</span>
+            <img
+              src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png"
+              alt="סמל בית הספר יערת העמק"
+              class="logo-img"
+              id="logo-img"
+            >
           </div>
+
           <div>
-            <div class="school-title-main">לוח מבחנים לכיתות</div>
+            <div class="school-title-main">
+              לוח מבחנים לפי כיתה
+            </div>
             <div class="school-title-sub">
-              <a href="index.html">חזרה לאתר התלמידים</a>
+              <a href="index.html#home-exams" style="text-decoration:underline;">
+                חזרה למסך המבחנים הראשי
+              </a>
             </div>
           </div>
         </div>
+
+        <div class="nav-right">
+          <a href="index.html#about">אודות</a>
+          <a href="index.html#home-news">חדשות</a>
+          <a href="index.html#home-exams">מבחנים</a>
+          <a href="index.html#grades">השכבות</a>
+          <a href="index.html#contact">יצירת קשר</a>
+          <a href="redirect-edu.html" class="personal-btn">למרחב האישי</a>
+          <a href="admin.html" class="btn-outline">Admin</a>
+        </div>
+
+        <button id="theme-toggle" class="theme-toggle" type="button">
+          🌙
+        </button>
+
+        <button
+          class="nav-toggle"
+          type="button"
+          aria-label="פתח תפריט"
+          aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
       </nav>
     </div>
   </header>
 
-  <section class="section-light">
-    <div class="container">
-      <div class="section-header">
-        <h1 class="section-title" id="exams-title">מבחנים</h1>
-        <p class="section-subtitle" id="exams-subtitle">
-          כאן תראו את כל המבחנים שהוזנו לאתר עבור הכיתה שבחרתם.
-        </p>
-      </div>
+  <main class="class-exams-wrapper">
+    <section class="section-light">
+      <div class="container">
+        <div class="section-header">
+          <h1 id="class-title" class="section-title">מבחנים לכיתה</h1>
+          <p id="class-subtitle" class="section-subtitle">
+            כאן יופיעו כל המבחנים הקרובים של הכיתה שנבחרה.
+          </p>
+        </div>
 
-      <div id="exams-list" class="home-board-list">
-        <p class="empty-msg">טוען מבחנים...</p>
+        <div class="class-header-row">
+          <div class="class-chip" id="class-chip">
+            <div class="class-chip-badge">כיתה</div>
+            <span id="class-chip-label">?</span>
+          </div>
+
+          <a href="index.html#home-exams" class="btn-outline back-btn-small">
+            ← חזרה למבחני השכבות
+          </a>
+        </div>
+
+        <div id="class-exams-list" class="class-exams-list">
+          <!-- ממולא דרך JS -->
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
+  </main>
 
   <footer>
     <div class="container">
-      <p>© כל הזכויות שמורות לבית ספר יערת העמק</p>
+      <p id="footer-text">© כל הזכויות שמורות לבית ספר יערת העמק</p>
     </div>
   </footer>
 
+  <div id="to-top">↑</div>
+
+  <script src="accessibility.js"></script>
+
+  <!-- JS לדף המבחנים לפי כיתה -->
   <script type="module">
     import { db } from "./firebase-config.js";
-    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+    import {
+      doc,
+      getDoc
+    } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
-    // מפה classId → טקסט יפה
-    const CLASS_LABELS = {
-      z1: "ז1", z2: "ז2", z3: "ז3", z4: "ז4", z5: "ז5",
-      h1: "ח1", h2: "ח2", h3: "ח3", h4: "ח4", h5: "ח5", h6: "ח6",
-      t1: "ט1", t2: "ט2", t3: "ט3", t4: "ט4", t5: "ט5"
+    const params = new URLSearchParams(window.location.search);
+    const grade = params.get("grade");   // z / h / t
+    const classId = params.get("class"); // z1 / h3 / t5 וכו'
+
+    const VALID_CLASSES = {
+      z: ["z1", "z2", "z3", "z4", "z5"],
+      h: ["h1", "h2", "h3", "h4", "h5", "h6"],
+      t: ["t1", "t2", "t3", "t4", "t5"]
     };
 
-    const GRADE_LABELS = {
+    const GRADE_LABEL = {
       z: "שכבת ז'",
       h: "שכבת ח'",
       t: "שכבת ט'"
     };
 
-    function getQueryParam(name) {
-      const params = new URLSearchParams(window.location.search);
-      return params.get(name);
+    function classIdToLabel(id) {
+      const map = {
+        z1: "ז1", z2: "ז2", z3: "ז3", z4: "ז4", z5: "ז5",
+        h1: "ח1", h2: "ח2", h3: "ח3", h4: "ח4", h5: "ח5", h6: "ח6",
+        t1: "ט1", t2: "ט2", t3: "ט3", t4: "ט4", t5: "ט5"
+      };
+      return map[id] || id;
     }
 
-    const classId = getQueryParam("class"); // לדוגמה z1
-    const examsTitleEl = document.getElementById("exams-title");
-    const examsSubtitleEl = document.getElementById("exams-subtitle");
-    const listEl = document.getElementById("exams-list");
+    function parseExamDate(dateStr, timeStr) {
+      if (!dateStr) return null;
+      // פורמט צפוי: 22/10/24
+      const parts = dateStr.split("/");
+      if (parts.length !== 3) return null;
+      const [dd, mm, yy] = parts.map((p) => parseInt(p, 10));
+      if (Number.isNaN(dd) || Number.isNaN(mm) || Number.isNaN(yy)) return null;
 
-    if (!classId) {
-      examsTitleEl.textContent = "שגיאה";
-      examsSubtitleEl.textContent = "לא הועברה כיתה בכתובת.";
-      listEl.innerHTML = `<p class="empty-msg">נראה שהגעתם לכאן בלי לבחור כיתה.</p>`;
-    } else {
-      const niceClassLabel = CLASS_LABELS[classId] || classId;
-      const gradeKey = classId[0]; // z / h / t
-      const gradeLabel = GRADE_LABELS[gradeKey] || "";
-
-      examsTitleEl.textContent = `מבחנים – כיתה ${niceClassLabel}`;
-      examsSubtitleEl.textContent = `${gradeLabel} · כל המבחנים שהוזנו לאתר עבור כיתה זו.`;
-
-      loadExamsForClass(classId);
+      const year = yy < 50 ? 2000 + yy : 1900 + yy;
+      let hours = 8;
+      let minutes = 0;
+      if (timeStr) {
+        const tParts = timeStr.split(":");
+        if (tParts.length === 2) {
+          const h = parseInt(tParts[0], 10);
+          const m = parseInt(tParts[1], 10);
+          if (!Number.isNaN(h)) hours = h;
+          if (!Number.isNaN(m)) minutes = m;
+        }
+      }
+      return new Date(year, mm - 1, dd, hours, minutes);
     }
 
-    async function loadExamsForClass(classId) {
+    async function loadClassExams() {
+      const listEl = document.getElementById("class-exams-list");
+      const titleEl = document.getElementById("class-title");
+      const subtitleEl = document.getElementById("class-subtitle");
+      const chipLabel = document.getElementById("class-chip-label");
+
+      // בדיקת פרמטרים
+      if (!grade || !classId || !VALID_CLASSES[grade] || !VALID_CLASSES[grade].includes(classId)) {
+        titleEl.textContent = "שגיאה בנתוני הכתובת";
+        subtitleEl.textContent = "הקישור אינו תקין. נסו לחזור למסך המבחנים הראשי ולבחור שוב את הכיתה.";
+        listEl.innerHTML = '<p class="class-empty-msg">לא ניתן לטעון את המבחנים – כיתה לא קיימת.</p>';
+        chipLabel.textContent = "?";
+        return;
+      }
+
+      const classLabel = classIdToLabel(classId);
+      const gradeLabel = GRADE_LABEL[grade] || "";
+
+      titleEl.textContent = `מבחנים · כיתה ${classLabel}`;
+      subtitleEl.textContent = `כל המבחנים הקרובים של כיתה ${classLabel} (${gradeLabel}).`;
+      chipLabel.textContent = classLabel;
+
       try {
-        const refDoc = doc(db, "exams", classId);
+        const refDoc = doc(db, "exams", grade);
         const snap = await getDoc(refDoc);
+        const data = snap.exists() ? snap.data() : { items: [] };
+        const allExams = data.items || [];
 
-        if (!snap.exists()) {
-          listEl.innerHTML = `<p class="empty-msg">אין עדיין מבחנים לכיתה זו.</p>`;
+        const forClass = allExams
+          .filter((ex) => ex.classId === classId)
+          .map((ex) => ({
+            ...ex,
+            _dateObj: parseExamDate(ex.date, ex.time)
+          }))
+          .filter((ex) => ex._dateObj);
+
+        if (!forClass.length) {
+          listEl.innerHTML = '<p class="class-empty-msg">כרגע אין מבחנים רשומים לכיתה זו.</p>';
           return;
         }
 
-        const data = snap.data() || {};
-        const items = data.items || [];
+        forClass.sort((a, b) => a._dateObj - b._dateObj);
 
-        if (!items.length) {
-          listEl.innerHTML = `<p class="empty-msg">אין עדיין מבחנים לכיתה זו.</p>`;
-          return;
-        }
+        listEl.innerHTML = "";
 
-        // מציגים כל מבחן ככרטיס
-        listEl.innerHTML = items.map(ex => {
-          const date = ex.date || "";
-          const time = ex.time || "";
-          const subject = ex.subject || "";
-          const topic = ex.topic || "";
-          const imageUrl = ex.imageUrl || "";
+        forClass.forEach((ex) => {
+          const dateObj = ex._dateObj;
+          const day = String(dateObj.getDate()).padStart(2, "0");
+          const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+          const yearShort = String(dateObj.getFullYear()).slice(-2);
 
-          const metaParts = [];
-          if (date) metaParts.push(date);
-          if (time) metaParts.push(time);
+          const timeText = ex.time ? ex.time : "שעה לא צוינה";
 
-          const metaText = metaParts.join(" · ");
-
-          const imgHtml = imageUrl
-            ? `<div style="margin-top:8px;">
-                 <img src="${imageUrl}" style="max-width:100%;border-radius:12px;border:1px solid #e2e8f0;">
-               </div>`
-            : "";
-
-          return `
-            <article class="card" style="margin-bottom:12px;">
-              <h3 style="margin-bottom:4px;">${subject}</h3>
-              <p class="card-meta">${metaText}</p>
-              <p style="margin-top:6px;font-size:0.95rem;">${topic}</p>
-              ${imgHtml}
-            </article>
+          const card = document.createElement("div");
+          card.className = "exam-card";
+          card.innerHTML = `
+            <div>
+              <div class="exam-main-title">${ex.subject ? ex.subject : "מבחן"}</div>
+              <div class="exam-meta">
+                תאריך: ${ex.date || `${day}/${month}/${yearShort}`} · שעה: ${timeText}
+              </div>
+            </div>
+            <div class="exam-date-pill">
+              <span class="exam-date-main">${day}/${month}</span>
+              <span>${yearShort}</span>
+            </div>
+            <div class="exam-topic">
+              ${ex.topic ? ex.topic : "ללא תיאור מפורט."}
+            </div>
           `;
-        }).join("");
+          listEl.appendChild(card);
+        });
       } catch (err) {
-        console.error("שגיאה בטעינת מבחנים:", err);
-        listEl.innerHTML = `<p class="empty-msg">הייתה שגיאה בטעינת המבחנים. נסו שוב מאוחר יותר.</p>`;
+        console.error(err);
+        listEl.innerHTML = '<p class="class-empty-msg">אירעה שגיאה בטעינת המבחנים. נסו שוב מאוחר יותר.</p>';
       }
     }
+
+    loadClassExams();
   </script>
+
+  <!-- app.js בשביל מצב כהה / תפריט מובייל וכו' -->
+  <script type="module" src="app.js"></script>
 </body>
 </html>
