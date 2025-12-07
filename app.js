@@ -220,54 +220,59 @@ function subscribeRealtimeHome() {
 
 /* ------------ RENDER HOME NEWS (לדף הבית) ------------ */
 
-function renderHomeExamsSummary(allExamsByGrade) {
-  const mapIds = {
-    z: "home-exams-z",
-    h: "home-exams-h",
-    t: "home-exams-t",
-  };
+function renderHomeNews() {
+  for (const g of GRADES) {
+    const listEl = document.getElementById(`home-news-${g}`);
+    if (!listEl) continue;
 
-  ["z", "h", "t"].forEach((g) => {
-    const box = document.getElementById(mapIds[g]);
-    if (!box) return;
-
-    // לנקות הכול – בלי טקסט "אין מבחנים..."
-    box.innerHTML = "";
-
-    const exams = allExamsByGrade[g] || [];
-    if (!exams.length) {
-      // אם אין מבחנים – פשוט משאירים את הקארד ריק, בלי טקסט
-      return;
+    const items = homeNews[g] || [];
+    if (!items.length) {
+      listEl.innerHTML = `<p class="empty-msg">אין עדיין חדשות לשכבה זו.</p>`;
+      continue;
     }
 
-    // מיון לפי תאריך (ואז שעה)
-    const parsed = exams
-      .map((ex) => ({
-        ...ex,
-        _dateObj: parseExamDate(ex.date, ex.time),
-      }))
-      .filter((ex) => ex._dateObj);
+    listEl.innerHTML = items
+      .slice(0, 3)
+      .map((n) => {
+        const hasImage = !!n.imageUrl;
+        const colorStyle = n.color ? ` style="color:${escapeHtml(n.color)}"` : "";
 
-    parsed.sort((a, b) => a._dateObj - b._dateObj);
+        if (hasImage) {
+          return `
+            <article class="home-news-item home-news-item-with-image"${colorStyle}>
+              <div class="home-news-image-wrap">
+                <img src="${escapeHtml(n.imageUrl)}" alt="${escapeHtml(
+            n.title || ""
+          )}" />
+              </div>
+              <div class="home-news-text">
+                <h4 class="home-news-title">${escapeHtml(n.title)}</h4>
+                ${
+                  n.meta
+                    ? `<div class="home-news-meta">${escapeHtml(n.meta)}</div>`
+                    : ""
+                }
+                <div class="home-news-body">${escapeHtml(n.body)}</div>
+              </div>
+            </article>
+          `;
+        }
 
-    // לוקחים רק כמה ראשונים (למשל 5)
-    const nextFew = parsed.slice(0, 5);
-
-    const line = document.createElement("p");
-    line.style.fontSize = "0.9rem";
-    line.style.marginTop = "6px";
-
-    line.textContent = nextFew
-      .map((ex) => {
-        const timePart = ex.time ? ` ${ex.time}` : "";
-        return `${ex.subject} (${ex.date}${timePart})`;
+        return `
+          <article class="home-news-item"${colorStyle}>
+            <h4 class="home-news-title">${escapeHtml(n.title)}</h4>
+            ${
+              n.meta
+                ? `<div class="home-news-meta">${escapeHtml(n.meta)}</div>`
+                : ""
+            }
+            <div class="home-news-body">${escapeHtml(n.body)}</div>
+          </article>
+        `;
       })
-      .join(" · ");
-
-    box.appendChild(line);
-  });
+      .join("");
+  }
 }
-
 
 /* ------------ RENDER HOME EXAMS (עם מבחן הבא + מבחנים שהיו + ספירה לאחור) ------------ */
 
@@ -287,8 +292,9 @@ function renderHomeExams() {
       .filter((ex) => ex._dateObj); // זורק מבחנים בלי תאריך תקין
 
     if (!itemsWithDates.length) {
-listEl.innerHTML = "";
-
+      // אם אין מבחנים – משאירים את הקארד ריק
+      listEl.innerHTML = "";
+      return;
     }
 
     // מיון לפי תאריך מהקרוב לרחוק
@@ -361,8 +367,6 @@ listEl.innerHTML = "";
           .join("");
         html += `</div>`;
       }
-    } else {
-      html += `<p class="empty-msg">אין מבחנים קרובים לשכבה זו.</p>`;
     }
 
     // מבחנים שהיו (בלי ספירה לאחור)
@@ -513,7 +517,8 @@ function renderGradeExams(grade) {
     .filter((ex) => ex._dateObj);
 
   if (!itemsWithDates.length) {
-    listEl.innerHTML = `<p class="empty-msg">אין מבחנים קרובים לשכבה זו.</p>`;
+    // גם בדף שכבה – אם אין מבחנים, פשוט לא מציגים כלום
+    listEl.innerHTML = "";
     return;
   }
 
