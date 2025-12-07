@@ -1618,3 +1618,62 @@ html[data-theme="light"] .class-links-row a {
 html[data-theme="light"] .class-links-row a:hover {
   background: #e0edff;
 }
+/* ===== כפתורי בחירת כיתה (בדף הראשי) ===== */
+
+.grades-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.grade-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  background: linear-gradient(135deg,
+    rgba(59, 130, 246, 0.06),
+    rgba(56, 189, 248, 0.14)
+  );
+  color: #0f172a;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.14);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+/* דארק מוד */
+[data-theme="dark"] .grade-btn {
+  border-color: rgba(148, 163, 184, 0.5);
+  background: linear-gradient(135deg,
+    rgba(15, 23, 42, 0.9),
+    rgba(30, 64, 175, 0.8)
+  );
+  color: #e5f0ff;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.7);
+}
+
+.grade-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.22);
+  border-color: rgba(37, 99, 235, 0.85);
+}
+
+.grade-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.2);
+}
+
+@media (max-width: 768px) {
+  .grades-buttons {
+    justify-content: center;
+  }
+}

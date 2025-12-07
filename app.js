@@ -291,10 +291,10 @@ function renderHomeExams() {
       }))
       .filter((ex) => ex._dateObj); // זורק מבחנים בלי תאריך תקין
 
+    // אם אין אף מבחן – משאירים את הקופסה ריקה (בלי טקסט ״אין מבחנים״)
     if (!itemsWithDates.length) {
-      // אם אין מבחנים – משאירים את הקארד ריק
       listEl.innerHTML = "";
-      return;
+      return; // חשוב!!
     }
 
     // מיון לפי תאריך מהקרוב לרחוק
@@ -409,6 +409,7 @@ function renderHomeExams() {
   updateExamCountdownElements();
   startExamCountdownLoop();
 }
+
 
 /* ------------ RENDER HOME BOARD ------------ */
 
