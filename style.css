@@ -1555,4 +1555,14 @@ body.theme-light .grade-hero p {
     object-position: center !important;
   }
 }
+/* כפתור למרחב האישי – טקסט לבן בלייט ודארק */
+.header-right .personal-area-btn,
+.personal-area-btn {
+  color: #ffffff !important;
+}
+
+/* דואג שגם בתוך ההמבורגר הטקסט יהיה לבן */
+.mobile-menu .personal-area-btn {
+  color: #ffffff !important;
+}
 
