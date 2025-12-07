@@ -256,11 +256,27 @@
     getDoc
   } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
-  const params = new URLSearchParams(window.location.search);
+  // ===== קריאת פרמטרים מה-URL בצורה סבלנית =====
+  const urlParams = new URLSearchParams(window.location.search);
 
-  // ננקה ונוריד לאותיות קטנות שלא יהיו פאשלות
-  const grade = (params.get("grade") || "").toLowerCase();   // z / h / t
-  const classId = (params.get("class") || "").toLowerCase(); // z1 / h3 / t5
+  // מאפשר גם grade / g / shkava
+  const rawGrade =
+    urlParams.get("grade") ||
+    urlParams.get("g") ||
+    urlParams.get("shkava");
+
+  // מאפשר class / classId / c
+  const rawClassId =
+    urlParams.get("class") ||
+    urlParams.get("classId") ||
+    urlParams.get("c");
+
+  // מנרמלים לאותיות קטנות
+  const grade = rawGrade ? rawGrade.toLowerCase() : null;
+  const classId = rawClassId ? rawClassId.toLowerCase() : null;
+
+  // לשם דיבוג – תראה ב-console אם משהו דפוק
+  console.log("GRADE FROM URL =", grade, "CLASSID =", classId);
 
   const VALID_CLASSES = {
     z: ["z1", "z2", "z3", "z4", "z5"],
@@ -283,6 +299,7 @@
     return map[id] || id;
   }
 
+  // מפרש "22/10/24" + שעה ל- Date
   function parseExamDate(dateStr, timeStr) {
     if (!dateStr) return null;
     const parts = dateStr.split("/");
@@ -311,11 +328,18 @@
     const subtitleEl = document.getElementById("class-subtitle");
     const chipLabel = document.getElementById("class-chip-label");
 
-    // בדיקת פרמטרים
-    if (!grade || !classId || !VALID_CLASSES[grade] || !VALID_CLASSES[grade].includes(classId)) {
+    // בדיקת תקינות – אחרי נרמול
+    if (
+      !grade ||
+      !classId ||
+      !VALID_CLASSES[grade] ||
+      !VALID_CLASSES[grade].includes(classId)
+    ) {
       titleEl.textContent = "שגיאה בנתוני הכתובת";
-      subtitleEl.textContent = "הקישור אינו תקין. נסו לחזור למסך המבחנים הראשי ולבחור שוב את הכיתה.";
-      listEl.innerHTML = '<p class="class-empty-msg">לא ניתן לטעון את המבחנים – כיתה לא קיימת.</p>';
+      subtitleEl.textContent =
+        "הקישור אינו תקין. נסו לחזור למסך המבחנים הראשי ולבחור שוב את הכיתה.";
+      listEl.innerHTML =
+        '<p class="class-empty-msg">לא ניתן לטעון את המבחנים – כיתה לא קיימת.</p>';
       chipLabel.textContent = "?";
       return;
     }
@@ -330,11 +354,11 @@
     try {
       const refDoc = doc(db, "exams", grade);
       const snap = await getDoc(refDoc);
-      const data = snap.exists() ? snap.data() : { items: [] };
-      const allExams = data.items || [];
+      const data = snap.exists ? snap.data() : { items: [] };
+      const allExams = (data && data.items) || [];
 
       const forClass = allExams
-        .filter((ex) => ex.classId === classId)
+        .filter((ex) => ex.classId && ex.classId.toLowerCase() === classId)
         .map((ex) => ({
           ...ex,
           _dateObj: parseExamDate(ex.date, ex.time)
@@ -342,7 +366,8 @@
         .filter((ex) => ex._dateObj);
 
       if (!forClass.length) {
-        listEl.innerHTML = '<p class="class-empty-msg">כרגע אין מבחנים רשומים לכיתה זו.</p>';
+        listEl.innerHTML =
+          '<p class="class-empty-msg">כרגע אין מבחנים רשומים לכיתה זו.</p>';
         return;
       }
 
@@ -355,14 +380,13 @@
         const day = String(dateObj.getDate()).padStart(2, "0");
         const month = String(dateObj.getMonth() + 1).padStart(2, "0");
         const yearShort = String(dateObj.getFullYear()).slice(-2);
-
         const timeText = ex.time ? ex.time : "שעה לא צוינה";
 
         const card = document.createElement("div");
         card.className = "exam-card";
         card.innerHTML = `
           <div>
-            <div class="exam-main-title">${ex.subject ? ex.subject : "מבחן"}</div>
+            <div class="exam-main-title">${ex.subject || "מבחן"}</div>
             <div class="exam-meta">
               תאריך: ${ex.date || `${day}/${month}/${yearShort}`} · שעה: ${timeText}
             </div>
@@ -372,19 +396,21 @@
             <span>${yearShort}</span>
           </div>
           <div class="exam-topic">
-            ${ex.topic ? ex.topic : "ללא תיאור מפורט."}
+            ${ex.topic || "ללא תיאור מפורט."}
           </div>
         `;
         listEl.appendChild(card);
       });
     } catch (err) {
       console.error(err);
-      listEl.innerHTML = '<p class="class-empty-msg">אירעה שגיאה בטעינת המבחנים. נסו שוב מאוחר יותר.</p>';
+      listEl.innerHTML =
+        '<p class="class-empty-msg">אירעה שגיאה בטעינת המבחנים. נסו שוב מאוחר יותר.</p>';
     }
   }
 
   loadClassExams();
 </script>
+
 
 
   <!-- app.js בשביל מצב כהה / תפריט מובייל וכו' -->
