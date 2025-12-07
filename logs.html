@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>לוג מערכת – מבחנים</title>
+
+  <style>
+    body {
+      background: #0f172a;
+      color: white;
+      font-family: system-ui, sans-serif;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #38bdf8;
+    }
+
+    .status {
+      text-align: center;
+      margin-bottom: 15px;
+      color: #e5e7eb;
+      font-size: 0.95rem;
+    }
+
+    .status.error {
+      color: #f97373;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: #1e293b;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #334155;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    th {
+      background: #020617;
+      color: #38bdf8;
+    }
+
+    tr:hover {
+      background: #334155;
+    }
+
+    .action-create {
+      color: #4ade80;
+      font-weight: 600;
+    }
+
+    .action-delete {
+      color: #f87171;
+      font-weight: 600;
+    }
+
+    .filters {
+      margin-bottom: 20px;
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    select {
+      padding: 8px;
+      border-radius: 6px;
+      background: #1e293b;
+      color: white;
+      border: 1px solid #475569;
+      min-width: 130px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .btn-link {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid #38bdf8;
+      color: #38bdf8;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>מערכת לוגים – שינויים במבחנים</h1>
+  <div id="status" class="status">בודק הרשאות...</div>
+
+  <div id="filters" class="filters hidden">
+    <select id="filter-action">
+      <option value="">כל הפעולות</option>
+      <option value="create">יצירה</option>
+      <option value="delete">מחיקה</option>
+    </select>
+
+    <select id="filter-grade">
+      <option value="">כל השכבות</option>
+      <option value="z">ז'</option>
+      <option value="h">ח'</option>
+      <option value="t">ט'</option>
+    </select>
+  </div>
+
+  <table id="logs-table" class="hidden">
+    <thead>
+      <tr>
+        <th>פעולה</th>
+        <th>שכבה</th>
+        <th>כיתה</th>
+        <th>מקצוע</th>
+        <th>תאריך המבחן</th>
+        <th>נושא</th>
+        <th>מנהל שביצע</th>
+        <th>זמן פעולה</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { db, auth } from "./firebase-config.js";
+    import {
+      collection,
+      query,
+      orderBy,
+      onSnapshot
+    } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+    import {
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+
+    // 🔒 רק המיילים פה יכולים לראות לוגים
+    // תחליף פה לכתובת המייל שלך בפיירבייס
+    const OWNER_EMAILS = [
+      "YOUR_EMAIL_HERE@example.com"
+    ];
+
+    const tableBody = document.querySelector("#logs-table tbody");
+    const filterAction = document.getElementById("filter-action");
+    const filterGrade = document.getElementById("filter-grade");
+    const statusEl = document.getElementById("status");
+    const filtersEl = document.getElementById("filters");
+    const tableEl = document.getElementById("logs-table");
+
+    let allLogs = [];
+
+    function formatTimestamp(ts) {
+      if (!ts || !ts.toDate) return "";
+      const d = ts.toDate();
+      return d.toLocaleDateString("he-IL") + " " + d.toLocaleTimeString("he-IL");
+    }
+
+    function renderLogs(logs) {
+      tableBody.innerHTML = "";
+
+      if (!logs.length) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td colspan="8">אין עדיין רשומות לוג להצגה.</td>`;
+        tableBody.appendChild(tr);
+        return;
+      }
+
+      logs.forEach((log) => {
+        const tr = document.createElement("tr");
+
+        const actionText = log.action === "create" ? "יצירה" :
+                           log.action === "delete" ? "מחיקה" :
+                           (log.action || "-");
+
+        tr.innerHTML = `
+          <td class="action-${log.action || ""}">${actionText}</td>
+          <td>${log.grade || "-"}</td>
+          <td>${log.classId || "-"}</td>
+          <td>${log.subject || "-"}</td>
+          <td>${log.date || "-"}</td>
+          <td>${log.topic || "-"}</td>
+          <td>${log.adminEmail || "-"}</td>
+          <td>${formatTimestamp(log.createdAt)}</td>
+        `;
+
+        tableBody.appendChild(tr);
+      });
+    }
+
+    function applyFilters() {
+      let filtered = [...allLogs];
+
+      if (filterAction.value) {
+        filtered = filtered.filter((l) => l.action === filterAction.value);
+      }
+
+      if (filterGrade.value) {
+        filtered = filtered.filter((l) => l.grade === filterGrade.value);
+      }
+
+      renderLogs(filtered);
+    }
+
+    function initLogsListener() {
+      const qLogs = query(
+        collection(db, "exams_logs"),
+        orderBy("createdAt", "desc")
+      );
+
+      onSnapshot(qLogs, (snapshot) => {
+        allLogs = snapshot.docs.map((doc) => doc.data());
+        applyFilters();
+      });
+    }
+
+    // הגנה – רק משתמש מחובר *וברשימת OWNER_EMAILS* רואה לוגים
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        statusEl.classList.add("error");
+        statusEl.innerHTML = `
+          אין לך גישה לעמוד הלוגים. <br>
+          התחבר דרך דף הניהול.
+          <br>
+          <a class="btn-link" href="admin.html">לעמוד ההתחברות</a>
+        `;
+        filtersEl.classList.add("hidden");
+        tableEl.classList.add("hidden");
+        return;
+      }
+
+      const email = (user.email || "").toLowerCase();
+      const allowed = OWNER_EMAILS.map(e => e.toLowerCase()).includes(email);
+
+      if (!allowed) {
+        statusEl.classList.add("error");
+        statusEl.innerHTML = `
+          החשבון <b>${email}</b> אינו מורשה לצפות בלוגים.<br>
+          רק בעל המערכת יכול לראות אותם.
+        `;
+        filtersEl.classList.add("hidden");
+        tableEl.classList.add("hidden");
+        return;
+      }
+
+      // מחובר ומורשה – תן גישה
+      statusEl.textContent = "מחובר כ: " + email;
+      filtersEl.classList.remove("hidden");
+      tableEl.classList.remove("hidden");
+
+      initLogsListener();
+    });
+
+    filterAction.addEventListener("change", applyFilters);
+    filterGrade.addEventListener("change", applyFilters);
+  </script>
+
+</body>
+</html>
