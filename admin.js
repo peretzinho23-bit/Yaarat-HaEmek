@@ -335,6 +335,32 @@ async function saveExamsGrade(grade) {
 }
 
 function renderExamsAdmin() {
+  // פונקציה קטנה רק בשביל מיון לפי תאריך
+  function parseDateForSort(dateStr) {
+    if (!dateStr) return null;
+    const s = String(dateStr).trim();
+    if (!s) return null;
+
+    // פורמט DD/MM/YY או DD/MM/YYYY
+    const matchIL = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/);
+    if (matchIL) {
+      let day = Number(matchIL[1]);
+      let month = Number(matchIL[2]);
+      let year = Number(matchIL[3]);
+      if (year < 100) year = 2000 + year;
+      return new Date(year, month - 1, day);
+    }
+
+    // פורמט ISO YYYY-MM-DD
+    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+      const [y, m, d] = s.split("-").map(Number);
+      return new Date(y, m - 1, d);
+    }
+
+    const dObj = new Date(s);
+    return isNaN(dObj.getTime()) ? null : dObj;
+  }
+
   for (const g of GRADES) {
     const listEl = document.getElementById(`admin-exams-${g}`);
     if (!listEl) continue;
@@ -346,9 +372,37 @@ function renderExamsAdmin() {
       continue;
     }
 
-    listEl.innerHTML = items
-      .map((ex, index) => {
-        const classLabel = classIdToLabel(ex.classId);
+    const parts = [];
+    const classIdsForGrade = CLASS_IDS_BY_GRADE[g] || [];
+
+    // לכל כיתה בשכבה – כותרת + רשימת מבחנים ממיונים לפי תאריך
+    classIdsForGrade.forEach((classId) => {
+      let examsForClass = items
+        .map((ex, index) => ({
+          ...ex,
+          _index: index,
+          _dateObj: parseDateForSort(ex.date)
+        }))
+        .filter((ex) => String(ex.classId).toLowerCase() === classId);
+
+      if (!examsForClass.length) return;
+
+      // מיון לפי תאריך (ללא תאריך נשארים בסוף)
+      examsForClass.sort((a, b) => {
+        const da = a._dateObj ? a._dateObj.getTime() : Infinity;
+        const db = b._dateObj ? b._dateObj.getTime() : Infinity;
+        return da - db;
+      });
+
+      const classLabel = classIdToLabel(classId);
+
+      parts.push(`
+        <h4 class="admin-class-title" style="margin-top:16px;margin-bottom:6px;">
+          כיתה ${escapeHtml(classLabel)}
+        </h4>
+      `);
+
+      examsForClass.forEach((ex) => {
         const metaParts = [];
 
         if (ex.date) metaParts.push(escapeHtml(ex.date));
@@ -357,7 +411,7 @@ function renderExamsAdmin() {
 
         const metaText = metaParts.join(" · ");
 
-        return `
+        parts.push(`
           <div class="admin-item">
             <div class="admin-item-main">
               <strong>${escapeHtml(ex.subject || "")}</strong>
@@ -367,15 +421,71 @@ function renderExamsAdmin() {
             <button class="admin-remove"
                     data-type="exam"
                     data-grade="${g}"
-                    data-index="${index}">
+                    data-index="${ex._index}">
               מחיקה
             </button>
           </div>
-        `;
-      })
-      .join("");
+        `);
+      });
+    });
+
+    // מבחנים עם classId לא תקין – בסוף, תחת "ללא כיתה"
+    const knownIdsSet = new Set(classIdsForGrade);
+    let unassigned = items
+      .map((ex, index) => ({
+        ...ex,
+        _index: index,
+        _dateObj: parseDateForSort(ex.date)
+      }))
+      .filter((ex) => !knownIdsSet.has(String(ex.classId).toLowerCase()));
+
+    if (unassigned.length) {
+      // גם אותם נמיין לפי תאריך
+      unassigned.sort((a, b) => {
+        const da = a._dateObj ? a._dateObj.getTime() : Infinity;
+        const db = b._dateObj ? b._dateObj.getTime() : Infinity;
+        return da - db;
+      });
+
+      parts.push(`
+        <h4 class="admin-class-title" style="margin-top:16px;margin-bottom:6px;">
+          ללא כיתה מוכרת
+        </h4>
+      `);
+
+      unassigned.forEach((ex) => {
+        const metaParts = [];
+
+        if (ex.date) metaParts.push(escapeHtml(ex.date));
+        if (ex.time) metaParts.push(escapeHtml(ex.time));
+        if (ex.classId) metaParts.push("classId=" + escapeHtml(ex.classId));
+
+        const metaText = metaParts.join(" · ");
+
+        parts.push(`
+          <div class="admin-item">
+            <div class="admin-item-main">
+              <strong>${escapeHtml(ex.subject || "")}</strong>
+              <span class="admin-item-meta">${metaText}</span>
+            </div>
+            <div class="admin-item-body">${escapeHtml(ex.topic || "")}</div>
+            <button class="admin-remove"
+                    data-type="exam"
+                    data-grade="${g}"
+                    data-index="${ex._index}">
+              מחיקה
+            </button>
+          </div>
+        `);
+      });
+    }
+
+    listEl.innerHTML = parts.join("");
   }
 }
+
+
+
 
 function setupExamForms() {
   for (const g of GRADES) {
