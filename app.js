@@ -277,6 +277,7 @@ function renderHomeNews() {
 /* ------------ RENDER HOME EXAMS (עם מבחן הבא + מבחנים שהיו + ספירה לאחור) ------------ */
 
 function renderHomeExams() {
+  
   GRADES.forEach((g) => {
     const listEl = document.getElementById(`home-exams-${g}`);
     if (!listEl) return;
