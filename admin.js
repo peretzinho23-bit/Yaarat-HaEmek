@@ -20,30 +20,17 @@ import {
 
 const GRADES = ["z", "h", "t"];
 
-// תוויות לכיתות (לשימוש גם ברנדר)
-const CLASS_LABELS = {
-  z1: "ז1",
-  z2: "ז2",
-  z3: "ז3",
-  z4: "ז4",
-  z5: "ז5",
-
-  h1: "ח1",
-  h2: "ח2",
-  h3: "ח3",
-  h4: "ח4",
-  h5: "ח5",
-  h6: "ח6",
-
-  t1: "ט1",
-  t2: "ט2",
-  t3: "ט3",
-  t4: "ט4",
-  t5: "ט5"
+// כיתות לכל שכבה – חשוב שיהיה בדיוק כמו באדמין ובאתר
+const CLASS_IDS_BY_GRADE = {
+  z: ["z1", "z2", "z3", "z4", "z5"],
+  h: ["h1", "h2", "h3", "h4", "h5", "h6"],
+  t: ["t1", "t2", "t3", "t4", "t5"]
 };
 
 let newsData = { z: [], h: [], t: [] };
-let examsData = { z: [], h: [], t: [] };
+// עכשיו מבחנים לפי שכבה -> כיתה -> מערך מבחנים
+// examsData.z.z1 = [...] וכן הלאה
+let examsData = { z: {}, h: {}, t: {} };
 let boardData = [];
 let siteContent = {};
 
@@ -54,6 +41,29 @@ function escapeHtml(str) {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
+}
+
+// המרת classId לטקסט יפה (ז1, ח3, ט5 וכו')
+function classIdToLabel(classId) {
+  const map = {
+    z1: "ז1",
+    z2: "ז2",
+    z3: "ז3",
+    z4: "ז4",
+    z5: "ז5",
+    h1: "ח1",
+    h2: "ח2",
+    h3: "ח3",
+    h4: "ח4",
+    h5: "ח5",
+    h6: "ח6",
+    t1: "ט1",
+    t2: "ט2",
+    t3: "ט3",
+    t4: "ט4",
+    t5: "ט5"
+  };
+  return map[classId] || "";
 }
 
 async function getDocSafe(pathArr, def) {
@@ -119,10 +129,14 @@ async function loadAllData() {
   }
   renderNewsAdmin();
 
-  // מבחנים
+  // מבחנים – קורא לכל כיתה בנפרד
   for (const g of GRADES) {
-    const res = await getDocSafe(["exams", g], { items: [] });
-    examsData[g] = res.items || [];
+    examsData[g] = {};
+    const classIds = CLASS_IDS_BY_GRADE[g] || [];
+    for (const classId of classIds) {
+      const res = await getDocSafe(["exams", classId], { items: [] });
+      examsData[g][classId] = res.items || [];
+    }
   }
   renderExamsAdmin();
 
@@ -150,13 +164,17 @@ function subscribeRealtimeAdmin() {
     });
   }
 
-  // EXAMS
+  // EXAMS – האזנה לכל כיתה
   for (const g of GRADES) {
-    onSnapshot(doc(db, "exams", g), (snap) => {
-      const data = snap.exists() ? snap.data() : { items: [] };
-      examsData[g] = data.items || [];
-      renderExamsAdmin();
-    });
+    const classIds = CLASS_IDS_BY_GRADE[g] || [];
+    for (const classId of classIds) {
+      onSnapshot(doc(db, "exams", classId), (snap) => {
+        const data = snap.exists() ? snap.data() : { items: [] };
+        if (!examsData[g]) examsData[g] = {};
+        examsData[g][classId] = data.items || [];
+        renderExamsAdmin();
+      });
+    }
   }
 
   // BOARD
@@ -199,7 +217,9 @@ function renderNewsAdmin() {
             </div>
             <div class="admin-item-body">${escapeHtml(n.body)}</div>
             ${imgHtml}
-            <button class="admin-remove" data-type="news" data-grade="${g}" data-index="${i}">מחיקה</button>
+            <button class="admin-remove" data-type="news" data-grade="${g}" data-index="${i}">
+              מחיקה
+            </button>
           </div>
         `;
       })
@@ -272,53 +292,73 @@ function setupNewsForms() {
   }
 }
 
-/* ------------ EXAMS – עכשיו כולל כיתה ------------ */
+/* ------------ EXAMS ------------ */
+
+// שמירת מסמך של כיתה ספציפית
+async function saveExamsClass(grade, classId) {
+  const items = (examsData[grade] && examsData[grade][classId]) || [];
+  const refDoc = doc(db, "exams", classId);
+  await setDoc(refDoc, { items });
+}
 
 function renderExamsAdmin() {
   for (const g of GRADES) {
     const listEl = document.getElementById(`admin-exams-${g}`);
     if (!listEl) continue;
 
-    const items = examsData[g];
-    if (!items.length) {
+    const byClass = examsData[g] || {};
+    const classIds = CLASS_IDS_BY_GRADE[g] || [];
+
+    const allItems = [];
+
+    classIds.forEach((classId) => {
+      const arr = byClass[classId] || [];
+      arr.forEach((ex, idx) => {
+        allItems.push({
+          ...ex,
+          _classId: classId,
+          _index: idx
+        });
+      });
+    });
+
+    if (!allItems.length) {
       listEl.innerHTML = `<p class="empty-msg">אין מבחנים.</p>`;
       continue;
     }
 
-    listEl.innerHTML = items
-      .map((ex, i) => {
-        const date = escapeHtml(ex.date || "");
-        const time = escapeHtml(ex.time || "");
-        const subject = escapeHtml(ex.subject || "");
-        const topic = escapeHtml(ex.topic || "");
-        const classId = ex.classId || "";
-        const classLabel = classId && CLASS_LABELS[classId]
-          ? ` · כיתה ${CLASS_LABELS[classId]}`
-          : "";
+    listEl.innerHTML = allItems
+      .map((ex) => {
+        const classLabel = classIdToLabel(ex._classId);
+        const metaParts = [];
 
-        const meta =
-          (date || "") +
-          (time ? (date ? " · " : "") + time : "") +
-          classLabel;
+        if (ex.date) metaParts.push(escapeHtml(ex.date));
+        if (ex.time) metaParts.push(escapeHtml(ex.time));
+        if (classLabel) metaParts.push("כיתה " + escapeHtml(classLabel));
+
+        const metaText = metaParts.join(" · ");
 
         return `
         <div class="admin-item">
           <div class="admin-item-main">
-            <strong>${subject}</strong>
-            <span class="admin-item-meta">${meta}</span>
+            <strong>${escapeHtml(ex.subject || "")}</strong>
+            <span class="admin-item-meta">
+              ${metaText}
+            </span>
           </div>
-          <div class="admin-item-body">${topic}</div>
-          <button class="admin-remove" data-type="exam" data-grade="${g}" data-index="${i}">מחיקה</button>
+          <div class="admin-item-body">${escapeHtml(ex.topic || "")}</div>
+          <button class="admin-remove"
+                  data-type="exam"
+                  data-grade="${g}"
+                  data-class-id="${ex._classId}"
+                  data-index="${ex._index}">
+            מחיקה
+          </button>
         </div>
       `;
       })
       .join("");
   }
-}
-
-async function saveExamsGrade(grade) {
-  const refDoc = doc(db, "exams", grade);
-  await setDoc(refDoc, { items: examsData[grade] });
 }
 
 function setupExamForms() {
@@ -343,12 +383,21 @@ function setupExamForms() {
         return;
       }
 
-      // שומרים גם classId ו-imageUrl (גם אם כרגע לא מוצג בדף התלמידים)
-      examsData[g].push({ date, time, subject, topic, classId, imageUrl });
+      if (!examsData[g]) examsData[g] = {};
+      if (!examsData[g][classId]) examsData[g][classId] = [];
+
+      examsData[g][classId].push({
+        date,
+        time,
+        subject,
+        topic,
+        classId,
+        imageUrl
+      });
 
       form.reset();
       renderExamsAdmin();
-      await saveExamsGrade(g);
+      await saveExamsClass(g, classId);
       alert("המבחן נשמר.");
     });
   }
@@ -383,7 +432,9 @@ function renderBoardAdmin() {
         </div>
         <div class="admin-item-body">${escapeHtml(b.body)}</div>
         ${imgHtml}
-        <button class="admin-remove" data-type="board" data-index="${i}">מחיקה</button>
+        <button class="admin-remove" data-type="board" data-index="${i}">
+          מחיקה
+        </button>
       </div>
     `;
     })
@@ -502,10 +553,12 @@ function fillSiteContentForm() {
     // FOOTER
     "footerText",
 
-    // IMAGES / THEME (אופציונלי)
+    // IMAGES
     "logoUrl",
     "heroImageUrl",
     "cardBgImageUrl",
+
+    // THEME / COLORS
     "primaryColor",
     "buttonColor",
     "cardBgColor",
@@ -608,9 +661,14 @@ function setupDeleteHandler() {
       renderNewsAdmin();
       await saveNewsGrade(grade);
     } else if (type === "exam") {
-      examsData[grade].splice(index, 1);
+      const classId = btn.dataset.classId;
+      if (!classId) return;
+
+      if (examsData[grade] && examsData[grade][classId]) {
+        examsData[grade][classId].splice(index, 1);
+      }
       renderExamsAdmin();
-      await saveExamsGrade(grade);
+      await saveExamsClass(grade, classId);
     } else if (type === "board") {
       boardData.splice(index, 1);
       renderBoardAdmin();
