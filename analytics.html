@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>אנליטיקות – יערת העמק</title>
+
+  <style>
+    body {
+      background: #020617;
+      color: #e5e7eb;
+      font-family: system-ui, sans-serif;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #38bdf8;
+      margin-bottom: 10px;
+    }
+    .status {
+      text-align: center;
+      margin-bottom: 15px;
+      font-size: 0.95rem;
+    }
+    .status.error {
+      color: #f97373;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      background: #0f172a;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #1f2937;
+      text-align: center;
+      font-size: 0.85rem;
+    }
+    th {
+      background: #020617;
+      color: #7dd3fc;
+    }
+    tr:hover {
+      background: #111827;
+    }
+    .filters {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    select {
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid #4b5563;
+      background: #020617;
+      color: #e5e7eb;
+      font-size: 0.85rem;
+      min-width: 140px;
+    }
+    .hidden {
+      display: none;
+    }
+    .btn-link {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid #38bdf8;
+      color: #38bdf8;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>אנליטיקות – צפיות בדפים</h1>
+  <div id="status" class="status">בודק הרשאות...</div>
+
+  <div id="filters" class="filters hidden">
+    <select id="filter-page">
+      <option value="">כל הדפים</option>
+    </select>
+
+    <select id="filter-date">
+      <option value="">כל התאריכים</option>
+    </select>
+  </div>
+
+  <table id="table" class="hidden">
+    <thead>
+      <tr>
+        <th>תאריך</th>
+        <th>דף</th>
+        <th>מספר צפיות</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script type="module">
+    import { db, auth } from "./firebase-config.js";
+    import {
+      collection,
+      getDocs,
+      query,
+      orderBy
+    } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+    import {
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+
+    const OWNER_EMAILS = ["Peretzinho23@gmail.com"];
+
+    const statusEl = document.getElementById("status");
+    const filtersEl = document.getElementById("filters");
+    const tableEl = document.getElementById("table");
+    const tbody = tableEl.querySelector("tbody");
+    const filterPage = document.getElementById("filter-page");
+    const filterDate = document.getElementById("filter-date");
+
+    let allRows = [];
+
+    function humanPageId(pageId) {
+      if (!pageId) return "-";
+      const map = {
+        "home": "דף הבית",
+        "class-exams": "דף מבחנים לפי כיתה",
+        "admin": "פאנל ניהול",
+        "logs": "לוגים"
+      };
+      return map[pageId] || pageId;
+    }
+
+    function renderOptions() {
+      const pages = new Set();
+      const dates = new Set();
+
+      allRows.forEach(r => {
+        if (r.pageId) pages.add(r.pageId);
+        if (r.dateKey) dates.add(r.dateKey);
+      });
+
+      // דפים
+      filterPage.innerHTML = `<option value="">כל הדפים</option>`;
+      Array.from(pages).sort().forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = p;
+        opt.textContent = humanPageId(p);
+        filterPage.appendChild(opt);
+      });
+
+      // תאריכים
+      filterDate.innerHTML = `<option value="">כל התאריכים</option>`;
+      Array.from(dates).sort().forEach(d => {
+        const opt = document.createElement("option");
+        opt.value = d;
+        opt.textContent = d;
+        filterDate.appendChild(opt);
+      });
+    }
+
+    function renderTable() {
+      let rows = [...allRows];
+
+      if (filterPage.value) {
+        rows = rows.filter(r => r.pageId === filterPage.value);
+      }
+      if (filterDate.value) {
+        rows = rows.filter(r => r.dateKey === filterDate.value);
+      }
+
+      tbody.innerHTML = "";
+
+      if (!rows.length) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td colspan="3">אין נתונים לתצוגה.</td>`;
+        tbody.appendChild(tr);
+        return;
+      }
+
+      rows.forEach(r => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${r.dateKey || "-"}</td>
+          <td>${humanPageId(r.pageId)}</td>
+          <td>${r.views ?? 0}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function loadAnalytics() {
+      const qViews = query(
+        collection(db, "analytics_pageViews"),
+        orderBy("dateKey", "desc")
+      );
+
+      const snap = await getDocs(qViews);
+      allRows = snap.docs.map(doc => doc.data());
+
+      renderOptions();
+      renderTable();
+
+      filtersEl.classList.remove("hidden");
+      tableEl.classList.remove("hidden");
+      statusEl.textContent = "נטען בהצלחה.";
+    }
+
+    filterPage.addEventListener("change", renderTable);
+    filterDate.addEventListener("change", renderTable);
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        statusEl.classList.add("error");
+        statusEl.innerHTML = `
+          אין לך גישה. התחבר דרך עמוד הניהול.<br>
+          <a class="btn-link" href="admin.html">לעמוד ההתחברות</a>
+        `;
+        return;
+      }
+
+      const email = (user.email || "").toLowerCase();
+      const allowed = OWNER_EMAILS.map(e => e.toLowerCase()).includes(email);
+
+      if (!allowed) {
+        statusEl.classList.add("error");
+        statusEl.textContent =
+          "המשתמש " + email + " אינו מורשה לצפות באנליטיקות.";
+        return;
+      }
+
+      statusEl.textContent = "נטען נתוני אנליטיקות...";
+      loadAnalytics().catch(err => {
+        console.error(err);
+        statusEl.classList.add("error");
+        statusEl.textContent = "שגיאה בטעינת הנתונים.";
+      });
+    });
+  </script>
+</body>
+</html>
