@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>לוח מבחנים לפי כיתה – יערת העמק</title>
+  <meta name="description" content="לוח מבחנים לפי כיתות בבית ספר יערת העמק. בחרתם כיתה וראו את כל המבחנים הקרובים והעתידיים לפי מקצוע ותאריך." />
+  <meta name="robots" content="index,follow" />
+
+  <link rel="icon" href="logo.png" />
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- צבע לדפדפנים -->
+  <meta name="theme-color" content="#0b1120" />
+
+  <!-- קנונית (אם תרצה) -->
+  <link rel="canonical" href="https://yaarathaemek.online/exams.html" />
+</head>
+
+<body data-page="class-exams">
+  <!-- HEADER -->
+  <header class="header-main">
+    <div class="container">
+      <nav class="nav">
+        <!-- צד שמאל: לוגו + כותרת -->
+        <div class="nav-left">
+          <div class="logo-circle">
+            <img
+              src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png"
+              alt="סמל בית הספר יערת העמק"
+              class="logo-img"
+              id="logo-img"
+            >
+          </div>
+
+          <div>
+            <div class="school-title-main">
+              לוח מבחנים לפי כיתה
+            </div>
+            <div class="school-title-sub">
+              <a href="index.html">חזרה לדף הבית</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- צד ימין: קישורים בסיסיים -->
+        <div class="nav-right">
+          <a href="index.html#home-exams">מבחנים</a>
+          <a href="index.html#home-news">חדשות</a>
+          <a href="index.html#grades">השכבות</a>
+          <a href="redirect-edu.html" class="personal-btn">למרחב האישי</a>
+        </div>
+
+        <!-- כפתור מצב כהה/בהיר (אותו כמו בדף הבית) -->
+        <button id="theme-toggle" class="theme-toggle" type="button">
+          🌙
+        </button>
+
+        <!-- המבורגר מובייל -->
+        <button
+          class="nav-toggle"
+          type="button"
+          aria-label="פתח תפריט"
+          aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- HERO קטן לדף מבחנים -->
+  <section class="hero hero-inner">
+    <div class="hero-overlay"></div>
+    <div class="container hero-content">
+      <div class="hero-text">
+        <h1 id="class-hero-title">מבחנים לפי כיתה</h1>
+        <p id="class-hero-subtitle">
+          הדף הזה מציג את לוח המבחנים של כיתה אחת בלבד.  
+          הגעתם לכאן דרך בחירת כיתה בדף הבית.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- תוכן הדף: לוח מבחנים לכיתה -->
+  <section id="class-exams-section" class="section-light">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title" id="class-exams-title">
+          לוח המבחנים לכיתה
+        </h2>
+        <p class="section-subtitle" id="class-exams-subtitle">
+          אם אינכם רואים מבחנים, ייתכן שעדיין לא הוזנו מבחנים לכיתה זו.
+        </p>
+      </div>
+
+      <!-- הודעת שגיאה / מידע (למקרה שפרמטר class חסר/לא תקין) -->
+      <div id="class-exams-error" class="card" style="display:none; text-align:center;">
+        <p>
+          לא זוהתה כיתה מתאימה.  
+          בדקו שהגעתם דרך דף הבית או השתמשו בקישור כמו:
+          <br />
+          <code>exams.html?class=z1</code>
+        </p>
+      </div>
+
+      <!-- רשימת המבחנים של הכיתה -->
+      <div id="class-exams-list" class="home-exams-list">
+        <!-- ימולא ע"י exams.js -->
+        <p class="empty-msg">טוען את המבחנים של הכיתה...</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- חזרה לראש הדף -->
+  <div id="to-top">↑</div>
+
+  <!-- נגישות + לוגיקת אתר כללית -->
+  <script src="accessibility.js"></script>
+  <script type="module" src="app.js"></script>
+
+  <!-- לוגיקת דף המבחנים לפי כיתה (נכתוב אחר כך) -->
+  <script type="module" src="exams.js"></script>
+</body>
+</html>

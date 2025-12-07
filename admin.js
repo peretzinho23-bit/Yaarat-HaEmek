@@ -20,6 +20,28 @@ import {
 
 const GRADES = ["z", "h", "t"];
 
+// תוויות לכיתות (לשימוש גם ברנדר)
+const CLASS_LABELS = {
+  z1: "ז1",
+  z2: "ז2",
+  z3: "ז3",
+  z4: "ז4",
+  z5: "ז5",
+
+  h1: "ח1",
+  h2: "ח2",
+  h3: "ח3",
+  h4: "ח4",
+  h5: "ח5",
+  h6: "ח6",
+
+  t1: "ט1",
+  t2: "ט2",
+  t3: "ט3",
+  t4: "ט4",
+  t5: "ט5"
+};
+
 let newsData = { z: [], h: [], t: [] };
 let examsData = { z: [], h: [], t: [] };
 let boardData = [];
@@ -32,29 +54,6 @@ function escapeHtml(str) {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
-}
-
-// המרת classId לטקסט יפה (ז1, ח3, ט5 וכו')
-function classIdToLabel(classId) {
-  const map = {
-    z1: "ז1",
-    z2: "ז2",
-    z3: "ז3",
-    z4: "ז4",
-    z5: "ז5",
-    h1: "ח1",
-    h2: "ח2",
-    h3: "ח3",
-    h4: "ח4",
-    h5: "ח5",
-    h6: "ח6",
-    t1: "ט1",
-    t2: "ט2",
-    t3: "ט3",
-    t4: "ט4",
-    t5: "ט5"
-  };
-  return map[classId] || "";
 }
 
 async function getDocSafe(pathArr, def) {
@@ -135,7 +134,7 @@ async function loadAllData() {
   // תוכן אתר
   await loadSiteContent();
 
-  // אופציונלי: האזנה בלייב לעדכונים
+  // האזנה בלייב לעדכונים
   subscribeRealtimeAdmin();
 }
 
@@ -200,9 +199,7 @@ function renderNewsAdmin() {
             </div>
             <div class="admin-item-body">${escapeHtml(n.body)}</div>
             ${imgHtml}
-            <button class="admin-remove" data-type="news" data-grade="${g}" data-index="${i}">
-              מחיקה
-            </button>
+            <button class="admin-remove" data-type="news" data-grade="${g}" data-index="${i}">מחיקה</button>
           </div>
         `;
       })
@@ -266,7 +263,7 @@ function setupNewsForms() {
       } catch (err) {
         console.error("שגיאה בהעלאת תמונה/שמירת חדשות:", err);
         alert(
-          "שגיאה בשמירת הידיעה:\נ" +
+          "שגיאה בשמירת הידיעה:\n" +
             (err.code ? err.code + " – " : "") +
             (err.message || JSON.stringify(err))
         );
@@ -275,7 +272,7 @@ function setupNewsForms() {
   }
 }
 
-/* ------------ EXAMS ------------ */
+/* ------------ EXAMS – עכשיו כולל כיתה ------------ */
 
 function renderExamsAdmin() {
   for (const g of GRADES) {
@@ -290,27 +287,28 @@ function renderExamsAdmin() {
 
     listEl.innerHTML = items
       .map((ex, i) => {
-        const classLabel = classIdToLabel(ex.classId);
-        const metaParts = [];
+        const date = escapeHtml(ex.date || "");
+        const time = escapeHtml(ex.time || "");
+        const subject = escapeHtml(ex.subject || "");
+        const topic = escapeHtml(ex.topic || "");
+        const classId = ex.classId || "";
+        const classLabel = classId && CLASS_LABELS[classId]
+          ? ` · כיתה ${CLASS_LABELS[classId]}`
+          : "";
 
-        if (ex.date) metaParts.push(escapeHtml(ex.date));
-        if (ex.time) metaParts.push(escapeHtml(ex.time));
-        if (classLabel) metaParts.push("כיתה " + escapeHtml(classLabel));
-
-        const metaText = metaParts.join(" · ");
+        const meta =
+          (date || "") +
+          (time ? (date ? " · " : "") + time : "") +
+          classLabel;
 
         return `
         <div class="admin-item">
           <div class="admin-item-main">
-            <strong>${escapeHtml(ex.subject)}</strong>
-            <span class="admin-item-meta">
-              ${metaText}
-            </span>
+            <strong>${subject}</strong>
+            <span class="admin-item-meta">${meta}</span>
           </div>
-          <div class="admin-item-body">${escapeHtml(ex.topic || "")}</div>
-          <button class="admin-remove" data-type="exam" data-grade="${g}" data-index="${i}">
-            מחיקה
-          </button>
+          <div class="admin-item-body">${topic}</div>
+          <button class="admin-remove" data-type="exam" data-grade="${g}" data-index="${i}">מחיקה</button>
         </div>
       `;
       })
@@ -336,13 +334,17 @@ function setupExamForms() {
       const subject = form.subject.value.trim();
       const topic = form.topic.value.trim();
       const classId = form.classId ? form.classId.value.trim() : "";
+      const imageUrl =
+        (form.imageUrl && form.imageUrl.value && form.imageUrl.value.trim()) ||
+        "";
 
       if (!date || !subject || !classId) {
         alert("חובה למלא תאריך, מקצוע וכיתה.");
         return;
       }
 
-      examsData[g].push({ date, time, subject, topic, classId });
+      // שומרים גם classId ו-imageUrl (גם אם כרגע לא מוצג בדף התלמידים)
+      examsData[g].push({ date, time, subject, topic, classId, imageUrl });
 
       form.reset();
       renderExamsAdmin();
@@ -381,9 +383,7 @@ function renderBoardAdmin() {
         </div>
         <div class="admin-item-body">${escapeHtml(b.body)}</div>
         ${imgHtml}
-        <button class="admin-remove" data-type="board" data-index="${i}">
-          מחיקה
-        </button>
+        <button class="admin-remove" data-type="board" data-index="${i}">מחיקה</button>
       </div>
     `;
     })
@@ -449,7 +449,7 @@ function setupBoardForm() {
   });
 }
 
-/* ------------ SITE CONTENT (about / home / contact / important / theming) ------------ */
+/* ------------ SITE CONTENT ------------ */
 
 async function loadSiteContent() {
   const data = await getDocSafe(["siteContent", "main"], {});
@@ -470,7 +470,7 @@ function fillSiteContentForm() {
     "aboutTitle",
     "aboutBody",
 
-    // IMPORTANT SECTION (חשוב לדעת)
+    // IMPORTANT SECTION
     "importantTitle",
     "importantSubtitle",
     "importantCard1Title",
@@ -502,12 +502,10 @@ function fillSiteContentForm() {
     // FOOTER
     "footerText",
 
-    // IMAGES (לוגו, הירו, רקעים וכו')
+    // IMAGES / THEME (אופציונלי)
     "logoUrl",
     "heroImageUrl",
     "cardBgImageUrl",
-
-    // THEME / COLORS
     "primaryColor",
     "buttonColor",
     "cardBgColor",
@@ -544,7 +542,7 @@ function setupSiteContentForm() {
   });
 }
 
-/* ------------ REGISTER REQUESTS (בקשות הרשמת אדמין) ------------ */
+/* ------------ REGISTER REQUESTS ------------ */
 
 function setupRegisterRequestForm() {
   const form = document.getElementById("register-request-form");
