@@ -30,6 +30,7 @@ const CLASS_IDS_BY_GRADE = {
 let newsData = { z: [], h: [], t: [] };
 // פה – כל שכבה היא מערך מבחנים (לא לפי כיתה).
 // בכל מבחן יש שדה classId.
+// עכשיו מבחנים לפי שכבה – מערך לכל שכבה, כל מבחן כולל classId
 let examsData = { z: [], h: [], t: [] };
 let boardData = [];
 let siteContent = {};
@@ -129,12 +130,13 @@ async function loadAllData() {
   }
   renderNewsAdmin();
 
-  // EXAMS – מסמך אחד לכל שכבה: exams / z,h,t
+  // מבחנים – מסמך אחד לכל שכבה (exams/z, exams/h, exams/t)
   for (const g of GRADES) {
     const res = await getDocSafe(["exams", g], { items: [] });
     examsData[g] = res.items || [];
   }
   renderExamsAdmin();
+
 
   // BOARD
   const b = await getDocSafe(["board", "general"], { items: [] });
@@ -160,7 +162,7 @@ function subscribeRealtimeAdmin() {
     });
   }
 
-  // EXAMS – לפי שכבה
+  // EXAMS – האזנה לכל שכבה
   for (const g of GRADES) {
     onSnapshot(doc(db, "exams", g), (snap) => {
       const data = snap.exists() ? snap.data() : { items: [] };
@@ -168,6 +170,7 @@ function subscribeRealtimeAdmin() {
       renderExamsAdmin();
     });
   }
+
 
   // BOARD
   onSnapshot(doc(db, "board", "general"), (snap) => {
@@ -286,10 +289,10 @@ function setupNewsForms() {
 
 /* ------------ EXAMS ------------ */
 
-// שמירת מסמך של שכבה (exams / z|h|t)
+// שמירת מסמך של שכבה (z / h / t)
 async function saveExamsGrade(grade) {
-  const refDoc = doc(db, "exams", grade);
   const items = examsData[grade] || [];
+  const refDoc = doc(db, "exams", grade);
   await setDoc(refDoc, { items });
 }
 
@@ -306,8 +309,8 @@ function renderExamsAdmin() {
     }
 
     listEl.innerHTML = items
-      .map((ex, idx) => {
-        const classLabel = classIdToLabel(ex.classId || "");
+      .map((ex, index) => {
+        const classLabel = classIdToLabel(ex.classId);
         const metaParts = [];
 
         if (ex.date) metaParts.push(escapeHtml(ex.date));
@@ -317,26 +320,25 @@ function renderExamsAdmin() {
         const metaText = metaParts.join(" · ");
 
         return `
-        <div class="admin-item">
-          <div class="admin-item-main">
-            <strong>${escapeHtml(ex.subject || "")}</strong>
-            <span class="admin-item-meta">
-              ${metaText}
-            </span>
+          <div class="admin-item">
+            <div class="admin-item-main">
+              <strong>${escapeHtml(ex.subject || "")}</strong>
+              <span class="admin-item-meta">${metaText}</span>
+            </div>
+            <div class="admin-item-body">${escapeHtml(ex.topic || "")}</div>
+            <button class="admin-remove"
+                    data-type="exam"
+                    data-grade="${g}"
+                    data-index="${index}">
+              מחיקה
+            </button>
           </div>
-          <div class="admin-item-body">${escapeHtml(ex.topic || "")}</div>
-          <button class="admin-remove"
-                  data-type="exam"
-                  data-grade="${g}"
-                  data-index="${idx}">
-            מחיקה
-          </button>
-        </div>
-      `;
+        `;
       })
       .join("");
   }
 }
+
 
 function setupExamForms() {
   for (const g of GRADES) {
@@ -641,11 +643,13 @@ function setupDeleteHandler() {
       newsData[grade].splice(index, 1);
       renderNewsAdmin();
       await saveNewsGrade(grade);
-    } else if (type === "exam") {
+        } else if (type === "exam") {
       if (!examsData[grade]) return;
+
       examsData[grade].splice(index, 1);
       renderExamsAdmin();
       await saveExamsGrade(grade);
+
     } else if (type === "board") {
       boardData.splice(index, 1);
       renderBoardAdmin();

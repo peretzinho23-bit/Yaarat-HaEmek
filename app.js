@@ -277,39 +277,41 @@ function renderHomeNews() {
 /* ------------ RENDER HOME EXAMS (עם מבחן הבא + מבחנים שהיו + ספירה לאחור) ------------ */
 
 function renderHomeExams() {
-    // מבטל הצגת מבחנים בכרטיסי השכבות בדף הבית
-
   GRADES.forEach((g) => {
     const listEl = document.getElementById(`home-exams-${g}`);
     if (!listEl) return;
 
     const rawItems = homeExams[g] || [];
 
-    // ממפים לאובייקטים עם Date (כולל time)
-    const itemsWithDates = rawItems
+    // לוקחים רק מבחנים "שכבתיים" – בלי classId, או classId מיוחד כמו 'grade' / 'all'
+    const gradeItems = rawItems.filter((ex) => {
+      if (!ex) return false;
+      const cid = (ex.classId || "").toLowerCase();
+      return !cid || cid === "grade" || cid === "all";
+    });
+
+    const itemsWithDates = gradeItems
       .map((ex) => ({
         ...ex,
-        _dateObj: parseExamDateToDateObj(ex.date, ex.time)
+        _dateObj: parseExamDateToDateObj(ex.date, ex.time),
       }))
-      .filter((ex) => ex._dateObj); // זורק מבחנים בלי תאריך תקין
+      .filter((ex) => ex._dateObj);
 
-    // אם אין אף מבחן – משאירים את הקופסה ריקה (בלי טקסט ״אין מבחנים״)
     if (!itemsWithDates.length) {
-      listEl.innerHTML = "";
-      return; // חשוב!!
+      listEl.innerHTML = `<p class="empty-msg">אין מבחנים קרובים לשכבה זו.</p>`;
+      return;
     }
 
-    // מיון לפי תאריך מהקרוב לרחוק
+    // מיון לפי תאריך
     itemsWithDates.sort((a, b) => a._dateObj - b._dateObj);
 
     const now = new Date();
-
     const upcoming = itemsWithDates.filter((ex) => ex._dateObj >= now);
     const past = itemsWithDates.filter((ex) => ex._dateObj < now);
 
     let html = "";
 
-    // מבחן הבא עם ספירה לאחור
+    // מבחן הבא + ספירה לאחור
     if (upcoming.length) {
       const next = upcoming[0];
       const ts = next._dateObj.getTime();
@@ -322,15 +324,11 @@ function renderHomeExams() {
                 next,
                 next._dateObj
               )}</span>
-              <span class="home-exam-subject">${escapeHtml(
-                next.subject
-              )}</span>
+              <span class="home-exam-subject">${escapeHtml(next.subject)}</span>
             </div>
             ${
               next.topic
-                ? `<div class="home-exam-topic">${escapeHtml(
-                    next.topic
-                  )}</div>`
+                ? `<div class="home-exam-topic">${escapeHtml(next.topic)}</div>`
                 : ""
             }
             <div class="home-exam-countdown" data-exam-timestamp="${ts}"></div>
@@ -351,15 +349,11 @@ function renderHomeExams() {
                     ex,
                     ex._dateObj
                   )}</span>
-                  <span class="home-exam-subject">${escapeHtml(
-                    ex.subject
-                  )}</span>
+                  <span class="home-exam-subject">${escapeHtml(ex.subject)}</span>
                 </div>
                 ${
                   ex.topic
-                    ? `<div class="home-exam-topic">${escapeHtml(
-                        ex.topic
-                      )}</div>`
+                    ? `<div class="home-exam-topic">${escapeHtml(ex.topic)}</div>`
                     : ""
                 }
                 <div class="home-exam-countdown" data-exam-timestamp="${ts2}"></div>
@@ -369,9 +363,11 @@ function renderHomeExams() {
           .join("");
         html += `</div>`;
       }
+    } else {
+      html += `<p class="empty-msg">אין מבחנים קרובים לשכבה זו.</p>`;
     }
 
-    // מבחנים שהיו (בלי ספירה לאחור)
+    // מבחנים שהיו
     if (past.length) {
       html += `
         <div class="home-exam-past-block">
@@ -386,15 +382,11 @@ function renderHomeExams() {
                   ex,
                   ex._dateObj
                 )}</span>
-                <span class="home-exam-subject">${escapeHtml(
-                  ex.subject
-                )}</span>
+                <span class="home-exam-subject">${escapeHtml(ex.subject)}</span>
               </div>
               ${
                 ex.topic
-                  ? `<div class="home-exam-topic">${escapeHtml(
-                      ex.topic
-                    )}</div>`
+                  ? `<div class="home-exam-topic">${escapeHtml(ex.topic)}</div>`
                   : ""
               }
             </article>
@@ -407,10 +399,11 @@ function renderHomeExams() {
     listEl.innerHTML = html;
   });
 
-  // מפעיל ספירה לאחור למי שיש data-exam-timestamp
+  // ספירה לאחור
   updateExamCountdownElements();
   startExamCountdownLoop();
 }
+
 
 
 /* ------------ RENDER HOME BOARD ------------ */
