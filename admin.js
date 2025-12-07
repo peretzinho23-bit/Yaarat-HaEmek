@@ -20,7 +20,7 @@ import {
 
 const GRADES = ["z", "h", "t"];
 
-// כיתות לכל שכבה – חשוב שיהיה בדיוק כמו באדמין ובאתר
+// כיתות לכל שכבה – חייב להיות תואם לאתר
 const CLASS_IDS_BY_GRADE = {
   z: ["z1", "z2", "z3", "z4", "z5"],
   h: ["h1", "h2", "h3", "h4", "h5", "h6"],
@@ -28,8 +28,7 @@ const CLASS_IDS_BY_GRADE = {
 };
 
 let newsData = { z: [], h: [], t: [] };
-// עכשיו מבחנים לפי שכבה -> כיתה -> מערך מבחנים
-// examsData.z.z1 = [...] וכן הלאה
+// examsData.z.z1 = [...] וכו'
 let examsData = { z: {}, h: {}, t: {} };
 let boardData = [];
 let siteContent = {};
@@ -71,6 +70,42 @@ async function getDocSafe(pathArr, def) {
   const snap = await getDoc(refDoc);
   if (!snap.exists()) return def;
   return snap.data() || def;
+}
+
+/* ------------ עזר למבנה מבחנים ------------ */
+
+// מפזר מערך מבחנים של שכבה (items) אל examsData[grade][classId]
+function distributeGradeItemsToState(grade, items) {
+  examsData[grade] = {};
+  const classIds = CLASS_IDS_BY_GRADE[grade] || [];
+
+  // אתחול ריק לכל כיתה
+  classIds.forEach((cid) => {
+    examsData[grade][cid] = [];
+  });
+
+  (items || []).forEach((ex) => {
+    const cid = ex.classId;
+    if (!cid) return;
+    if (!examsData[grade][cid]) examsData[grade][cid] = [];
+    examsData[grade][cid].push(ex);
+  });
+}
+
+// מחזיר מערך items לשכבה – מאחד את כל הכיתות
+function buildGradeItemsFromState(grade) {
+  const byClass = examsData[grade] || {};
+  const classIds = CLASS_IDS_BY_GRADE[grade] || [];
+  const res = [];
+
+  classIds.forEach((cid) => {
+    const arr = byClass[cid] || [];
+    arr.forEach((ex) => {
+      res.push(ex);
+    });
+  });
+
+  return res;
 }
 
 /* ------------ auth ------------ */
@@ -129,14 +164,11 @@ async function loadAllData() {
   }
   renderNewsAdmin();
 
-  // מבחנים – קורא לכל כיתה בנפרד
+  // מבחנים – עכשיו דוקומנט אחד לכל שכבה (z/h/t)
   for (const g of GRADES) {
-    examsData[g] = {};
-    const classIds = CLASS_IDS_BY_GRADE[g] || [];
-    for (const classId of classIds) {
-      const res = await getDocSafe(["exams", classId], { items: [] });
-      examsData[g][classId] = res.items || [];
-    }
+    const res = await getDocSafe(["exams", g], { items: [] });
+    const items = res.items || [];
+    distributeGradeItemsToState(g, items);
   }
   renderExamsAdmin();
 
@@ -164,17 +196,14 @@ function subscribeRealtimeAdmin() {
     });
   }
 
-  // EXAMS – האזנה לכל כיתה
+  // EXAMS – האזנה לדוקומנט של כל שכבה (z/h/t)
   for (const g of GRADES) {
-    const classIds = CLASS_IDS_BY_GRADE[g] || [];
-    for (const classId of classIds) {
-      onSnapshot(doc(db, "exams", classId), (snap) => {
-        const data = snap.exists() ? snap.data() : { items: [] };
-        if (!examsData[g]) examsData[g] = {};
-        examsData[g][classId] = data.items || [];
-        renderExamsAdmin();
-      });
-    }
+    onSnapshot(doc(db, "exams", g), (snap) => {
+      const data = snap.exists() ? snap.data() : { items: [] };
+      const items = data.items || [];
+      distributeGradeItemsToState(g, items);
+      renderExamsAdmin();
+    });
   }
 
   // BOARD
@@ -294,10 +323,10 @@ function setupNewsForms() {
 
 /* ------------ EXAMS ------------ */
 
-// שמירת מסמך של כיתה ספציפית
-async function saveExamsClass(grade, classId) {
-  const items = (examsData[grade] && examsData[grade][classId]) || [];
-  const refDoc = doc(db, "exams", classId);
+// שמירת כל המבחנים של שכבה אחת לתוך exams/{grade}
+async function saveExamsGrade(grade) {
+  const items = buildGradeItemsFromState(grade);
+  const refDoc = doc(db, "exams", grade);
   await setDoc(refDoc, { items });
 }
 
@@ -397,7 +426,7 @@ function setupExamForms() {
 
       form.reset();
       renderExamsAdmin();
-      await saveExamsClass(g, classId);
+      await saveExamsGrade(g);
       alert("המבחן נשמר.");
     });
   }
@@ -668,7 +697,7 @@ function setupDeleteHandler() {
         examsData[grade][classId].splice(index, 1);
       }
       renderExamsAdmin();
-      await saveExamsClass(grade, classId);
+      await saveExamsGrade(grade);
     } else if (type === "board") {
       boardData.splice(index, 1);
       renderBoardAdmin();
