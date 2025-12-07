@@ -277,7 +277,8 @@ function renderHomeNews() {
 /* ------------ RENDER HOME EXAMS (עם מבחן הבא + מבחנים שהיו + ספירה לאחור) ------------ */
 
 function renderHomeExams() {
-  
+    // מבטל הצגת מבחנים בכרטיסי השכבות בדף הבית
+
   GRADES.forEach((g) => {
     const listEl = document.getElementById(`home-exams-${g}`);
     if (!listEl) return;
