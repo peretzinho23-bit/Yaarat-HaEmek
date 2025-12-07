@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>לוג מערכת – מבחנים</title>
+  <title>לוג מערכת – האתר</title>
 
   <style>
     body {
@@ -102,13 +102,23 @@
 
 <body>
 
-  <h1>מערכת לוגים – שינויים במבחנים</h1>
+  <h1>מערכת לוגים – כל השינויים באתר</h1>
   <div id="status" class="status">בודק הרשאות...</div>
 
   <div id="filters" class="filters hidden">
+    <select id="filter-entity">
+      <option value="">כל הסוגים</option>
+      <option value="exam">מבחנים</option>
+      <option value="news">חדשות</option>
+      <option value="board">לוח מודעות</option>
+      <option value="siteContent">תוכן אתר</option>
+      <option value="adminRequest">בקשות אדמין</option>
+    </select>
+
     <select id="filter-action">
       <option value="">כל הפעולות</option>
       <option value="create">יצירה</option>
+      <option value="update">עדכון</option>
       <option value="delete">מחיקה</option>
     </select>
 
@@ -123,12 +133,12 @@
   <table id="logs-table" class="hidden">
     <thead>
       <tr>
+        <th>סוג</th>
         <th>פעולה</th>
         <th>שכבה</th>
         <th>כיתה</th>
-        <th>מקצוע</th>
-        <th>תאריך המבחן</th>
-        <th>נושא</th>
+        <th>כותרת / מקצוע</th>
+        <th>תאריך המבחן / מידע</th>
         <th>מנהל שביצע</th>
         <th>זמן פעולה</th>
       </tr>
@@ -149,15 +159,15 @@
       onAuthStateChanged
     } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
-    // 🔒 רק המיילים פה יכולים לראות לוגים
-    // תחליף פה לכתובת המייל שלך בפיירבייס
+    // 🔒 רק אתה יכול לראות את הלוגים
     const OWNER_EMAILS = [
-      "YOUR_EMAIL_HERE@example.com"
+      "Peretzinho23@gmail.com"
     ];
 
     const tableBody = document.querySelector("#logs-table tbody");
     const filterAction = document.getElementById("filter-action");
     const filterGrade = document.getElementById("filter-grade");
+    const filterEntity = document.getElementById("filter-entity");
     const statusEl = document.getElementById("status");
     const filtersEl = document.getElementById("filters");
     const tableEl = document.getElementById("logs-table");
@@ -168,6 +178,24 @@
       if (!ts || !ts.toDate) return "";
       const d = ts.toDate();
       return d.toLocaleDateString("he-IL") + " " + d.toLocaleTimeString("he-IL");
+    }
+
+    function humanEntity(entity) {
+      switch (entity) {
+        case "exam": return "מבחן";
+        case "news": return "חדשות";
+        case "board": return "לוח מודעות";
+        case "siteContent": return "תוכן אתר";
+        case "adminRequest": return "בקשת אדמין";
+        default: return entity || "-";
+      }
+    }
+
+    function humanAction(action) {
+      if (action === "create") return "יצירה";
+      if (action === "update") return "עדכון";
+      if (action === "delete") return "מחיקה";
+      return action || "-";
     }
 
     function renderLogs(logs) {
@@ -183,17 +211,29 @@
       logs.forEach((log) => {
         const tr = document.createElement("tr");
 
-        const actionText = log.action === "create" ? "יצירה" :
-                           log.action === "delete" ? "מחיקה" :
-                           (log.action || "-");
+        // מיפוי לשדות הגיוניים
+        const entityText = humanEntity(log.entity);
+        const actionText = humanAction(log.action);
+
+        const mainLabel = log.subject || "-";
+        const extraInfo =
+          log.entity === "exam"
+            ? (log.date || "-")
+            : log.entity === "news" || log.entity === "board"
+              ? (log.topic ? String(log.topic).slice(0, 40) + (String(log.topic).length > 40 ? "..." : "") : "-")
+              : log.entity === "siteContent"
+                ? "עדכון תוכן האתר"
+                : log.entity === "adminRequest"
+                  ? (log.topic ? String(log.topic).slice(0, 40) + (String(log.topic).length > 40 ? "..." : "") : "-")
+                  : (log.date || "-");
 
         tr.innerHTML = `
+          <td>${entityText}</td>
           <td class="action-${log.action || ""}">${actionText}</td>
           <td>${log.grade || "-"}</td>
           <td>${log.classId || "-"}</td>
-          <td>${log.subject || "-"}</td>
-          <td>${log.date || "-"}</td>
-          <td>${log.topic || "-"}</td>
+          <td>${mainLabel}</td>
+          <td>${extraInfo}</td>
           <td>${log.adminEmail || "-"}</td>
           <td>${formatTimestamp(log.createdAt)}</td>
         `;
@@ -204,6 +244,10 @@
 
     function applyFilters() {
       let filtered = [...allLogs];
+
+      if (filterEntity.value) {
+        filtered = filtered.filter((l) => l.entity === filterEntity.value);
+      }
 
       if (filterAction.value) {
         filtered = filtered.filter((l) => l.action === filterAction.value);
@@ -228,7 +272,7 @@
       });
     }
 
-    // הגנה – רק משתמש מחובר *וברשימת OWNER_EMAILS* רואה לוגים
+    // הגנה – רק אתה (OWNER) יכול לראות
     onAuthStateChanged(auth, (user) => {
       if (!user) {
         statusEl.classList.add("error");
@@ -267,6 +311,7 @@
 
     filterAction.addEventListener("change", applyFilters);
     filterGrade.addEventListener("change", applyFilters);
+    filterEntity.addEventListener("change", applyFilters);
   </script>
 
 </body>

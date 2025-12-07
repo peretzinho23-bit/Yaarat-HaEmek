@@ -36,20 +36,25 @@ let examsData = { z: [], h: [], t: [] };
 let boardData = [];
 let siteContent = {};
 
-/* ------------ LOGS – לוג שינויים למבחנים ------------ */
-
-async function logExamChange(action, examData) {
+/* ------------ LOGS – לוג כללי לכל הדברים ------------ */
+/**
+ * action: "create" | "update" | "delete"
+ * entity: "exam" | "news" | "board" | "siteContent" | "adminRequest" | ...
+ * payload: אובייקט עם כל שדות הרלוונטיים
+ */
+async function logSystemChange(action, entity, payload = {}) {
   try {
-    const logsRef = collection(db, "exams_logs");
+    const logsRef = collection(db, "exams_logs"); // משתמשים באותה קולקציה
     await addDoc(logsRef, {
-      action, // "create" / "delete"
-      grade: examData.grade || null,
-      classId: examData.classId || null,
-      subject: examData.subject || null,
-      date: examData.date || null,
-      time: examData.time || null,
-      topic: examData.topic || null,
-      itemsCount: examData.itemsCount ?? null,
+      action,
+      entity,                           // exam/news/board/siteContent/...
+      grade: payload.grade || null,
+      classId: payload.classId || null,
+      subject: payload.subject || null, // exam.subject / news.title / board.title
+      date: payload.date || null,
+      time: payload.time || null,
+      topic: payload.topic || null,     // exam.topic / news.body / board.body
+      itemsCount: payload.itemsCount ?? null,
 
       adminUid: auth.currentUser ? auth.currentUser.uid : null,
       adminEmail: auth.currentUser ? auth.currentUser.email : null,
@@ -57,7 +62,7 @@ async function logExamChange(action, examData) {
       createdAt: serverTimestamp()
     });
   } catch (err) {
-    console.error("שגיאה בלוג של המבחנים:", err);
+    console.error("שגיאה בלוג של המערכת:", err);
   }
 }
 
@@ -285,17 +290,28 @@ function setupNewsForms() {
           finalImageUrl = await getDownloadURL(fileRef);
         }
 
-        newsData[g].push({
+        const newItem = {
           title,
           meta,
           body,
           imageUrl: finalImageUrl,
           color
-        });
+        };
+
+        newsData[g].push(newItem);
 
         form.reset();
         renderNewsAdmin();
         await saveNewsGrade(g);
+
+        // לוג – חדשות נוספו
+        await logSystemChange("create", "news", {
+          grade: g,
+          subject: newItem.title,
+          topic: newItem.body,
+          itemsCount: newsData[g].length
+        });
+
         alert("הידיעה נשמרה.");
       } catch (err) {
         console.error("שגיאה בהעלאת תמונה/שמירת חדשות:", err);
@@ -406,8 +422,8 @@ function setupExamForms() {
         renderExamsAdmin();
         await saveExamsGrade(g);
 
-        // לוג יצירה
-        await logExamChange("create", {
+        // לוג – מבחן חדש
+        await logSystemChange("create", "exam", {
           grade: g,
           classId: newExam.classId,
           subject: newExam.subject,
@@ -500,17 +516,27 @@ function setupBoardForm() {
         finalImageUrl = await getDownloadURL(fileRef);
       }
 
-      boardData.push({
+      const newBoardItem = {
         title,
         meta,
         body,
         imageUrl: finalImageUrl,
         color
-      });
+      };
+
+      boardData.push(newBoardItem);
 
       form.reset();
       renderBoardAdmin();
       await saveBoard();
+
+      // לוג – מודעה חדשה בלוח
+      await logSystemChange("create", "board", {
+        subject: newBoardItem.title,
+        topic: newBoardItem.body,
+        itemsCount: boardData.length
+      });
+
       alert("המודעה נשמרה.");
     } catch (err) {
       console.error("שגיאה בהעלאת תמונה/שמירת מודעה:", err);
@@ -610,6 +636,12 @@ function setupSiteContentForm() {
     const refDoc = doc(db, "siteContent", "main");
     await setDoc(refDoc, siteContent);
 
+    // לוג – עדכון תוכן אתר
+    await logSystemChange("update", "siteContent", {
+      subject: "siteContent",
+      topic: "עדכון תוכן האתר"
+    });
+
     alert("תוכן האתר נשמר בהצלחה.");
   });
 }
@@ -647,6 +679,12 @@ function setupRegisterRequestForm() {
         createdAt: new Date().toISOString()
       });
 
+      // לוג – בקשת אדמין חדשה
+      await logSystemChange("create", "adminRequest", {
+        subject: fullName,
+        topic: message
+      });
+
       form.reset();
       if (statusEl) {
         statusEl.textContent = "הבקשה נשלחה. לאחר אישור ידני תקבלו גישה.";
@@ -676,22 +714,30 @@ function setupDeleteHandler() {
     if (!confirm("למחוק את הפריט הזה?")) return;
 
     if (type === "news") {
+      const deletedNews = newsData[grade][index];
       newsData[grade].splice(index, 1);
       renderNewsAdmin();
       await saveNewsGrade(grade);
+
+      if (deletedNews) {
+        await logSystemChange("delete", "news", {
+          grade,
+          subject: deletedNews.title,
+          topic: deletedNews.body,
+          itemsCount: newsData[grade].length
+        });
+      }
     } else if (type === "exam") {
       if (!examsData[grade]) return;
 
-      // שומרים את המבחן לפני מחיקה בשביל הלוג
       const deletedExam = examsData[grade][index];
 
       examsData[grade].splice(index, 1);
       renderExamsAdmin();
       await saveExamsGrade(grade);
 
-      // לוג מחיקה
       if (deletedExam) {
-        await logExamChange("delete", {
+        await logSystemChange("delete", "exam", {
           grade,
           classId: deletedExam.classId,
           subject: deletedExam.subject,
@@ -702,9 +748,18 @@ function setupDeleteHandler() {
         });
       }
     } else if (type === "board") {
+      const deletedBoard = boardData[index];
       boardData.splice(index, 1);
       renderBoardAdmin();
       await saveBoard();
+
+      if (deletedBoard) {
+        await logSystemChange("delete", "board", {
+          subject: deletedBoard.title,
+          topic: deletedBoard.body,
+          itemsCount: boardData.length
+        });
+      }
     }
   });
 }
