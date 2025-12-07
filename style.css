@@ -1566,3 +1566,7 @@ body.theme-light .grade-hero p {
   color: #ffffff !important;
 }
 
+a.personal-area-btn span,
+.personal-area-btn span {
+  color: #ffffff !important;
+}
