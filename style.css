@@ -1570,3 +1570,13 @@ a.personal-area-btn span,
 .personal-area-btn span {
   color: #ffffff !important;
 }
+/* --- תיקון לייט מוד לדפי שכבות --- */
+body.light-mode .grade-hero {
+  background: #f5f8ff !important; /* רקע בהיר */
+  color: #0d1b2a !important; /* טקסט כהה */
+}
+
+body.light-mode .grade-hero h1,
+body.light-mode .grade-hero p {
+  color: #0d1b2a !important;
+}
