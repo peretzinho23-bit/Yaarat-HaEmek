@@ -297,8 +297,12 @@ function renderHomeExams() {
       }))
       .filter((ex) => ex._dateObj);
 
-    if (!itemsWithDates.length) {
-      listEl.innerHTML = `<p class="empty-msg">אין מבחנים קרובים לשכבה זו.</p>`;
+     if (!itemsWithDates.length) {
+      listEl.innerHTML = `
+        <p class="empty-msg">
+          כדי לראות את לוח המבחנים – בחרו את הכיתה שלכם למעלה.
+        </p>
+      `;
       return;
     }
 
@@ -364,7 +368,7 @@ function renderHomeExams() {
         html += `</div>`;
       }
     } else {
-      html += `<p class="empty-msg">אין מבחנים קרובים לשכבה זו.</p>`;
+      html += `<p class="empty-msg">  כדי לראות את לוח המבחנים – בחרו את הכיתה שלכם למעלה.</p>`;
     }
 
     // מבחנים שהיו
