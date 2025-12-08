@@ -285,37 +285,43 @@
     } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
     // ----- פרמטרים מה-URL -----
-    const params = new URLSearchParams(window.location.search);
-    const grade = (params.get("grade") || "").toLowerCase();   // z / h / t
-    const classId = (params.get("class") || "").toLowerCase(); // z1 / h3 / t5 ...
+    const params  = new URLSearchParams(window.location.search);
+    const grade   = (params.get("grade") || "").toLowerCase();   // z / h / t
+    const classId = (params.get("class") || "").toLowerCase();   // z1 / h1 / h4 / t5 ...
 
-const CLASS_IDS_BY_GRADE = {
-  z: ["z1", "z2", "z3", "z4", "z5"],
+    // איזה כיתות קיימות בכל שכבה
+    const CLASS_IDS_BY_GRADE = {
+      z: ["z1", "z2", "z3", "z4", "z5"],
 
-  // שכבת ח' – רק הכיתות שקיימות
-  h: ["h1", "h4", "h5", "h6"],
+      // שכבת ח' – רק הכיתות שקיימות
+      h: ["h1", "h4", "h5", "h6"],
 
-  t: ["t1", "t2", "t3", "t4", "t5"]
-};
+      t: ["t1", "t2", "t3", "t4", "t5"]
+    };
 
+    // עבור בדיקה נוחה
+    const VALID_CLASSES = CLASS_IDS_BY_GRADE;
 
-function classIdToLabel(id) {
-  const map = {
-    z1: "ז1", z2: "ז2", z3: "ז3", z4: "ז4", z5: "ז5",
+    const GRADE_LABEL = {
+      z: "שכבת ז׳",
+      h: "שכבת ח׳",
+      t: "שכבת ט׳"
+    };
 
-    // שכבת ח' – התצוגות החדשות
-    h1: "ח1/7",
-    h4: "ח4/8",
-    h5: "ח5/9",
-    h6: "ח6/10",
+    function classIdToLabel(id) {
+      const map = {
+        z1: "ז1",   z2: "ז2",   z3: "ז3",   z4: "ז4",   z5: "ז5",
 
-    t1: "ט1", t2: "ט2", t3: "ט3", t4: "ט4", t5: "ט5"
-  };
-  return map[id] || id;
-}
+        // שכבת ח' – התצוגות החדשות
+        h1: "ח1/7",
+        h4: "ח4/8",
+        h5: "ח5/9",
+        h6: "ח6/10",
 
-
-
+        t1: "ט1",   t2: "ט2",   t3: "ט3",   t4: "ט4",   t5: "ט5"
+      };
+      return map[id] || id;
+    }
 
     // ===== פונקציות תאריך + ספירה לאחור =====
 
@@ -340,9 +346,9 @@ function classIdToLabel(id) {
       // פורמט ישראלי DD/MM/YY או DD/MM/YYYY
       const matchIL = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/);
       if (matchIL) {
-        let day = Number(matchIL[1]);
+        let day   = Number(matchIL[1]);
         let month = Number(matchIL[2]);
-        let year = Number(matchIL[3]);
+        let year  = Number(matchIL[3]);
         if (year < 100) year = 2000 + year;
         return new Date(year, month - 1, day, hh, mm);
       }
@@ -360,9 +366,9 @@ function classIdToLabel(id) {
 
     function formatLocalDate(d) {
       try {
-        const day = String(d.getDate()).padStart(2, "0");
+        const day   = String(d.getDate()).padStart(2, "0");
         const month = String(d.getMonth() + 1).padStart(2, "0");
-        const year = d.getFullYear();
+        const year  = d.getFullYear();
         return `${day}.${month}.${year}`;
       } catch {
         return "";
@@ -395,14 +401,14 @@ function classIdToLabel(id) {
         }
 
         const totalSeconds = Math.floor(diff / 1000);
-        const days = Math.floor(totalSeconds / (24 * 3600));
-        const hours = Math.floor((totalSeconds % (24 * 3600)) / 3600);
+        const days    = Math.floor(totalSeconds / (24 * 3600));
+        const hours   = Math.floor((totalSeconds % (24 * 3600)) / 3600);
         const minutes = Math.floor((totalSeconds % 3600) / 60);
         const seconds = totalSeconds % 60;
 
         const parts = [];
-        if (days > 0) parts.push(`${days} ימים`);
-        if (hours > 0) parts.push(`${hours} שעות`);
+        if (days > 0)    parts.push(`${days} ימים`);
+        if (hours > 0)   parts.push(`${hours} שעות`);
         if (minutes > 0) parts.push(`${minutes} דקות`);
         parts.push(`${seconds} שניות`);
 
@@ -418,10 +424,10 @@ function classIdToLabel(id) {
     // ===== טעינת המבחנים לכיתה – בזמן אמת =====
 
     function loadClassExams() {
-      const listEl = document.getElementById("class-exams-list");
-      const titleEl = document.getElementById("class-title");
+      const listEl     = document.getElementById("class-exams-list");
+      const titleEl    = document.getElementById("class-title");
       const subtitleEl = document.getElementById("class-subtitle");
-      const chipLabel = document.getElementById("class-chip-label");
+      const chipLabel  = document.getElementById("class-chip-label");
 
       // בדיקת פרמטרים
       if (
@@ -442,8 +448,10 @@ function classIdToLabel(id) {
       const classLabel = classIdToLabel(classId);
       const gradeLabel = GRADE_LABEL[grade] || "";
 
-      titleEl.textContent = `מבחנים · כיתה ${classLabel}`;
-      subtitleEl.textContent = `כל המבחנים הקרובים של כיתה ${classLabel} (${gradeLabel}).`;
+      titleEl.textContent =
+        `מבחנים · כיתה ${classLabel}`;
+      subtitleEl.textContent =
+        `כל המבחנים הקרובים של כיתה ${classLabel} (${gradeLabel}).`;
       if (chipLabel) chipLabel.textContent = classLabel;
 
       // מצב טעינה ראשוני
@@ -457,7 +465,7 @@ function classIdToLabel(id) {
         onSnapshot(
           refDoc,
           (snap) => {
-            const data = snap.exists() ? snap.data() : { items: [] };
+            const data     = snap.exists() ? snap.data() : { items: [] };
             const allExams = data.items || [];
 
             const forClass = allExams
@@ -485,10 +493,10 @@ function classIdToLabel(id) {
 
             forClass.forEach((ex) => {
               const dObj = ex._dateObj;
-              const ts = dObj.getTime();
+              const ts   = dObj.getTime();
 
-              const day = String(dObj.getDate()).padStart(2, "0");
-              const month = String(dObj.getMonth() + 1).padStart(2, "0");
+              const day       = String(dObj.getDate()).padStart(2, "0");
+              const month     = String(dObj.getMonth() + 1).padStart(2, "0");
               const yearShort = String(dObj.getFullYear()).slice(-2);
 
               const card = document.createElement("div");
