@@ -11,21 +11,23 @@ import {
   limit
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
-const LOGS_COLLECTION = "analytics_logs";
+// IMPORTANT: use the same collection name as in Firestore rules
+// your rules allow writes to analytics_pageViews
+const LOGS_COLLECTION = "analytics_pageViews";
 const logsRef = collection(db, LOGS_COLLECTION);
 
-/* ========= 1. לוג כניסות מכל האתר (לא בדשבורד) ========= */
+/* ========= 1. Log page views from all pages (except dashboard itself) ========= */
 
 async function logPageView() {
   try {
     const path = window.location.pathname + window.location.search;
     const page = document.body.dataset.page || null;   // index / exams-class / admin / analytics-dashboard...
-    const grade = document.body.dataset.grade || null; // z / h / t אם יש
+    const grade = document.body.dataset.grade || null; // z / h / t if exists
     const usp = new URLSearchParams(window.location.search);
     const classId =
       usp.get("class") ||
       document.body.dataset.classId ||
-      null; // z1/h3/t5 אם יש
+      null; // z1/h3/t5 if exists
 
     await addDoc(logsRef, {
       path,
@@ -42,7 +44,7 @@ async function logPageView() {
   }
 }
 
-/* ========= 2. דשבורד אנליטיקות ========= */
+/* ========= 2. Analytics dashboard ========= */
 
 function safeGetDate(ts) {
   if (!ts) return null;
@@ -127,7 +129,6 @@ async function loadAnalyticsDashboard() {
   if (statusEl) statusEl.textContent = "טוען נתוני אנליטיקות...";
 
   try {
-    // שולפים עד 5000 כניסות אחרונות (מספיק בגדול)
     const qLogs = query(
       logsRef,
       orderBy("createdAt", "desc"),
@@ -193,13 +194,11 @@ async function loadAnalyticsDashboard() {
     const uniquePages = byPage.size;
     const uniqueClasses = byClass.size;
 
-    // סטטיסטיקות עליונות (כרטיסים)
     setText("analytics-total-visits", totalVisits);
     setText("analytics-today-visits", todayVisits);
     setText("analytics-unique-pages", uniquePages);
     setText("analytics-unique-classes", uniqueClasses);
 
-    // טופ 10 דפים
     renderTopList(
       "analytics-top-pages",
       byPage,
@@ -207,7 +206,6 @@ async function loadAnalyticsDashboard() {
       (path) => path || "(לא ידוע)"
     );
 
-    // טופ כיתות
     renderTopList(
       "analytics-top-classes",
       byClass,
@@ -222,7 +220,6 @@ async function loadAnalyticsDashboard() {
       }
     );
 
-    // לפי שכבה
     renderTopList(
       "analytics-top-grades",
       byGrade,
@@ -233,7 +230,6 @@ async function loadAnalyticsDashboard() {
       }
     );
 
-    // טבלת שעות
     renderHourlyTable("analytics-by-hour", byHour);
 
     if (statusEl) statusEl.textContent = `נטענו ${logs.length} לוגים אחרונים.`;
@@ -252,10 +248,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const pageType = document.body.dataset.page || "";
 
   if (pageType === "analytics-dashboard") {
-    // דף הדשבורד
+    // dashboard page
     loadAnalyticsDashboard();
   } else {
-    // כל שאר הדפים – רק לוגים
+    // all other pages – only log
     logPageView();
   }
 });
