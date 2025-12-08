@@ -12,7 +12,7 @@
   <style>
     /* ===== עיצוב דף מבחני כיתה ===== */
 
-    /* ברירת מחדל – בלי צבע, נלקח מה-theme הכללי */
+    /* ברירת מחדל – הצבעים מגיעים מה־theme הכללי */
     body[data-page="class-exams"] {
     }
 
@@ -22,7 +22,7 @@
       color: #e5f0ff;
     }
 
-    /* לייט מוד – רקע בהיר כמו שאר האתר */
+    /* לייט מוד – רקע בהיר */
     html[data-theme="light"] body[data-page="class-exams"] {
       background: #eef3fb;
       color: #0b1120;
@@ -97,7 +97,7 @@
       align-items: center;
     }
 
-    /* לייט מוד – כרטיס לבן נקי */
+    /* לייט מוד – כרטיס לבן */
     html[data-theme="light"] .exam-card {
       background: #ffffff;
       color: #0f172a;
@@ -123,7 +123,7 @@
       margin-top: 4px;
     }
 
-    /* טקסטים בכרטיס בלייט מוד – אפור כהה */
+    /* טקסטים בלייט מוד */
     html[data-theme="light"] .exam-meta,
     html[data-theme="light"] .exam-topic {
       color: #4b5563;
@@ -370,12 +370,12 @@
     }
 
     function updateExamCountdownElements() {
-      const els = document.querySelectorAll("[data-exam-timestamp]");
+      const els = document.querySelectorAll("[data-class-exam-timestamp]");
       if (!els.length) return;
       const now = Date.now();
 
       els.forEach((el) => {
-        const ts = Number(el.dataset.examTimestamp);
+        const ts = Number(el.dataset.classExamTimestamp);
         if (!ts || Number.isNaN(ts)) {
           el.textContent = "";
           return;
@@ -500,7 +500,7 @@
                 <div class="exam-topic">
                   ${ex.topic || "ללא תיאור מפורט."}
                 </div>
-                <div class="home-exam-countdown" data-exam-timestamp="${ts}"></div>
+                <div class="class-exam-countdown" data-class-exam-timestamp="${ts}"></div>
               `;
               listEl.appendChild(card);
             });
