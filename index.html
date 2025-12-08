@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
+  <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2563eb">
+
   <!-- בסיס חובה -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -47,6 +50,20 @@
 
 <body data-page="home">
   <script type="module" src="analytics.js"></script>
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker
+        .register("service-worker.js")
+        .then(() => {
+          console.log("Service Worker registered ✅");
+        })
+        .catch((err) => {
+          console.error("Service Worker registration failed:", err);
+        });
+    });
+  }
+</script>
 
   <!-- HEADER -->
   <header class="header-main">
