@@ -149,7 +149,7 @@ function updateExamCountdownElements() {
 
     parts.push(`${seconds} שניות`);
 
-    el.textContent = `ספירה לאחור: ${parts.join(" · ")}`;
+    el.textContent = ` המבחן בעוד: ${parts.join(" · ")}`;
   });
 }
 
