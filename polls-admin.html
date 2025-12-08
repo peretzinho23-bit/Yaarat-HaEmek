@@ -1,111 +1,75 @@
-<!DOCTYPE html>
-<html lang="he" dir="rtl">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ניהול סקרים – יערת העמק</title>
-
-  <!-- אותם סטיילים של האתר -->
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="admin.css" />
-</head>
-<body>
-  <header class="header-main">
-    <div class="container">
-      <nav class="nav">
-        <div class="nav-left">
-          <div class="logo-circle">
-            <span>יערת<br>העמק</span>
-          </div>
-          <div>
-            <div class="school-title-main">ניהול סקרים · יערת העמק</div>
-            <div class="school-title-sub">
-              <a href="admin.html">⬅ חזרה ללוח הניהול הראשי</a>
-            </div>
-          </div>
-        </div>
-      </nav>
-    </div>
-  </header>
-
-  <section>
-    <div class="container">
-
-      <div class="section-header">
-        <h2 class="section-title">ניהול סקרים לתלמידים</h2>
+        <!-- POLLS -->
+        <h3 class="section-title" style="font-size:1.2rem;margin-bottom:10px;">סקרים לתלמידים</h3>
         <p class="section-subtitle">
-          יצירת סקרים שיופיעו בדף "סקרים" וב"סקר השבוע", צפייה בכמות ההצבעות, הפעלה/השהיה ומחיקה.
+          יצירת סקרים שיופיעו בדף "סקרים" וב"סקר השבוע". אפשר לראות כמה הצביעו לכל אפשרות,
+          להפעיל / להשהות סקר ולמחוק אותו.
         </p>
-      </div>
 
-      <div class="admin-columns">
-        <div class="card">
-          <h3>יצירת סקר חדש</h3>
-
-          <form id="poll-form" class="admin-form">
-            <div class="admin-form-row">
-              <label>שאלה לסקר</label>
-              <input
-                type="text"
-                name="question"
-                placeholder="לדוגמה: מה אתם מעדיפים בבוקר — שיעור חופשי או פעילות חברתית?"
-                required
-              />
+        <div class="admin-columns">
+          <div class="card polls-admin-card">
+            <div class="polls-admin-header">
+              <div>
+                <h3>ניהול סקרים</h3>
+                <p class="polls-admin-sub">
+                  יצירת סקר חדש, צפייה בתוצאות והפעלה/הפסקה של סקרים פעילים.
+                </p>
+              </div>
+              <div class="polls-admin-badge">
+                🎯 סקר פעיל אחד יוצג לתלמידים
+              </div>
             </div>
 
-            <div class="admin-form-row">
-              <label>אפשרות 1</label>
-              <input type="text" name="option1" placeholder="אפשרות 1" required />
+            <!-- טופס יצירת סקר -->
+            <form id="poll-form" class="admin-form polls-form">
+              <div class="polls-form-row polls-form-row-full">
+                <label>שאלה לסקר</label>
+                <input
+                  type="text"
+                  name="question"
+                  placeholder="לדוגמה: מה אתם מעדיפים בבוקר — שיעור חופשי או פעילות חברתית?"
+                  required
+                />
+              </div>
+
+              <div class="polls-form-row">
+                <div>
+                  <label>אפשרות 1</label>
+                  <input type="text" name="option1" placeholder="אפשרות 1" required />
+                </div>
+                <div>
+                  <label>אפשרות 2</label>
+                  <input type="text" name="option2" placeholder="אפשרות 2" required />
+                </div>
+              </div>
+
+              <div class="polls-form-row">
+                <div>
+                  <label>אפשרות 3 (לא חובה)</label>
+                  <input type="text" name="option3" placeholder="אפשרות 3" />
+                </div>
+                <div>
+                  <label>אפשרות 4 (לא חובה)</label>
+                  <input type="text" name="option4" placeholder="אפשרות 4" />
+                </div>
+              </div>
+
+              <div class="polls-form-row polls-form-row-full polls-form-footer">
+                <label class="polls-checkbox">
+                  <input type="checkbox" name="isActive" checked />
+                  <span>הסקר פעיל (מופיע לתלמידים)</span>
+                </label>
+
+                <button type="submit" class="btn-primary">
+                  ➕ יצירת סקר חדש
+                </button>
+              </div>
+            </form>
+
+            <hr class="polls-divider">
+
+            <!-- רשימת סקרים קיימים -->
+            <div id="admin-polls" class="admin-list polls-admin-list">
+              <p class="empty-msg">אין סקרים עדיין. לאחר יצירת סקר ראשון, הוא יופיע כאן.</p>
             </div>
-
-            <div class="admin-form-row">
-              <label>אפשרות 2</label>
-              <input type="text" name="option2" placeholder="אפשרות 2" required />
-            </div>
-
-            <div class="admin-form-row">
-              <label>אפשרות 3 (לא חובה)</label>
-              <input type="text" name="option3" placeholder="אפשרות 3" />
-            </div>
-
-            <div class="admin-form-row">
-              <label>אפשרות 4 (לא חובה)</label>
-              <input type="text" name="option4" placeholder="אפשרות 4" />
-            </div>
-
-            <div class="admin-form-row">
-              <label>
-                <input type="checkbox" name="isActive" checked />
-                הסקר פעיל (מופיע לתלמידים)
-              </label>
-            </div>
-
-            <button type="submit" class="btn-primary">
-              ➕ יצירת סקר
-            </button>
-          </form>
-        </div>
-      </div>
-
-      <br>
-
-      <h3 class="section-title" style="font-size:1.2rem;margin-bottom:10px;">סקרים קיימים</h3>
-      <p class="section-subtitle">
-        כאן תוכל לראות כמה הצביעו לכל אפשרות, להפעיל/להשבית סקר ולמחוק אותו.
-      </p>
-
-      <div class="admin-columns">
-        <div class="card">
-          <div id="admin-polls" class="admin-list">
-            <p class="empty-msg">טוען סקרים...</p>
           </div>
         </div>
-      </div>
-
-    </div>
-  </section>
-
-  <script type="module" src="polls-admin.js?v=1"></script>
-  <script src="accessibility.js"></script>
-</body>
-</html>
