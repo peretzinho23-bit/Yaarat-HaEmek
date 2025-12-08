@@ -24,6 +24,8 @@ import {
   getDownloadURL
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-storage.js";
 
+console.log("🔥 NEW ADMIN.JS LOADED");
+
 const GRADES = ["z", "h", "t"];
 
 // כיתות לכל שכבה
