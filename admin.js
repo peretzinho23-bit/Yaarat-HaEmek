@@ -238,12 +238,11 @@ function renderNewsAdmin() {
 
     listEl.innerHTML = items
       .map((n, i) => {
-        const imgHtml = n.imageUrl
-          ? `<div style="margin-top:6px;">
-               <img src="${escapeHtml(n.imageUrl)}"
-                    style="max-width:100%;border-radius:8px;border:1px solid #1e293b;">
-             </div>`
-          : "";
+       const imgHtml = n.imageUrl
+  ? `<div class="admin-image-wrapper">
+       <img src="${escapeHtml(n.imageUrl)}" class="admin-image">
+     </div>`
+  : "";
 
         const colorStyle = n.color ? ` style="color:${escapeHtml(n.color)};"` : "";
 
@@ -709,12 +708,12 @@ function renderBoardAdmin() {
   listEl.innerHTML = boardData
     .map((b, i) => {
       const colorStyle = b.color ? ` style="color:${escapeHtml(b.color)}"` : "";
-      const imgHtml = b.imageUrl
-        ? `<div style="margin-top:6px;">
-             <img src="${escapeHtml(b.imageUrl)}"
-                  style="max-width:100%;border-radius:8px;border:1px solid #1e293b;">
-           </div>`
-        : "";
+const imgHtml = b.imageUrl
+  ? `<div class="admin-image-wrapper">
+       <img src="${escapeHtml(b.imageUrl)}" class="admin-image">
+     </div>`
+  : "";
+
 
       return `
       <div class="admin-item"${colorStyle}>

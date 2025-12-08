@@ -1677,3 +1677,17 @@ html[data-theme="light"] .class-links-row a:hover {
     justify-content: center;
   }
 }
+/* תמונות בתוך כרטיסים באדמין – חדשות / לוח מודעות וכו' */
+.admin-image-wrapper {
+  margin-top: 6px;
+}
+
+.admin-image {
+  display: block;
+  max-width: 100%;
+  width: 100%;          /* שיישב יפה ברוחב הכרטיס */
+  max-height: 220px;    /* כמה גובה מקסימלי שאתה רוצה */
+  object-fit: cover;    /* חותך יפה במקום למעוך */
+  border-radius: 12px;
+  border: 1px solid #1e293b;
+}
