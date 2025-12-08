@@ -1699,3 +1699,82 @@ html[data-theme="light"] .class-links-row a:hover {
   object-fit: cover;
   border-radius: 10px;
 }
+/* =========================
+   POLLS PAGE – LIGHT MODE
+   ========================= */
+
+/* כדי שזה יתפוס, אחד מאלה חייב להיות על ה-body:
+   body.light-mode או body.theme-light או data-theme="light"
+   (כנראה יש לך light-mode – השאר זה גיבוי)
+*/
+
+body.light-mode .polls-main-card,
+body.theme-light .polls-main-card,
+body[data-theme="light"] .polls-main-card {
+  background: #ffffff;
+  color: #0f172a;
+  border-radius: 28px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.10);
+}
+
+body.light-mode .polls-stats-card,
+body.theme-light .polls-stats-card,
+body[data-theme="light"] .polls-stats-card {
+  background: #f9fafb;
+  color: #0f172a;
+  border-radius: 24px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 16px 35px rgba(15, 23, 42, 0.06);
+}
+
+/* כותרת/טקסטים בתוך כרטיס הראשי */
+body.light-mode .polls-page-title,
+body.theme-light .polls-page-title,
+body[data-theme="light"] .polls-page-title {
+  color: #0f172a;
+}
+
+body.light-mode .polls-page-subtitle,
+body.theme-light .polls-page-subtitle,
+body[data-theme="light"] .polls-page-subtitle {
+  color: #4b5563;
+}
+
+/* טקסט קטן/לייבלים בתוך הסטטיסטיקות */
+body.light-mode .polls-stat-label,
+body.theme-light .polls-stat-label,
+body[data-theme="light"] .polls-stat-label {
+  color: #6b7280;
+}
+
+/* הצבע של המספרים הגדולים */
+body.light-mode .polls-stat-value,
+body.theme-light .polls-stat-value,
+body[data-theme="light"] .polls-stat-value {
+  color: #111827;
+}
+
+/* כפתורים בסקר – שילוב עדין יותר ללייט מוד */
+body.light-mode .polls-primary-btn,
+body.theme-light .polls-primary-btn,
+body[data-theme="light"] .polls-primary-btn {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #f9fafb;
+  border-color: transparent;
+}
+
+body.light-mode .polls-secondary-btn,
+body.theme-light .polls-secondary-btn,
+body[data-theme="light"] .polls-secondary-btn {
+  background: #ffffff;
+  color: #111827;
+  border: 1px solid #d1d5db;
+}
+
+/* הרקע של כל האזור של דף הסקרים בלייט */
+body.light-mode .polls-layout,
+body.theme-light .polls-layout,
+body[data-theme="light"] .polls-layout {
+  background: radial-gradient(circle at top left, #e0f2fe, #eef2ff 45%, #f9fafb 100%);
+}
