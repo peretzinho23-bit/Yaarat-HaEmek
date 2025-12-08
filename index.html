@@ -528,7 +528,7 @@ function showUpdateBanner(sw) {
     </div>
   </section>
 
-  <!-- מבחנים קרובים -->
+    <!-- מבחנים קרובים -->
   <section id="home-exams" class="section-light">
     <div class="container">
       <div class="section-header">
@@ -563,13 +563,16 @@ function showUpdateBanner(sw) {
           <p style="font-size:0.85rem; margin-top:4px;">
             בחרו את כיתתכם כדי לראות את כל המבחנים הקרובים:
           </p>
-<div class="grades-buttons" style="margin:10px 0 14px;">
-  <a href="exams.html?grade=h&class=h1" class="grade-btn">ח1/7</a>
-  <a href="exams.html?grade=h&class=h4" class="grade-btn">ח4/8</a>
-  <a href="exams.html?grade=h&class=h5" class="grade-btn">ח5/9</a>
-  <a href="exams.html?grade=h&class=h6" class="grade-btn">ח6/10</a>
-</div>
-
+          <div class="grades-buttons" style="margin:10px 0 14px;">
+            <a href="exams.html?grade=h&class=h1" class="grade-btn">ח1/7</a>
+            <a href="exams.html?grade=h&class=h4" class="grade-btn">ח4/8</a>
+            <a href="exams.html?grade=h&class=h5" class="grade-btn">ח5/9</a>
+            <a href="exams.html?grade=h&class=h6" class="grade-btn">ח6/10</a>
+          </div>
+          <div id="home-exams-h" class="home-exams-list">
+            <!-- app.js ימלא מבחנים לשכבת ח' -->
+          </div>
+        </div>
 
         <!-- ט -->
         <div class="grade-card">
@@ -589,6 +592,7 @@ function showUpdateBanner(sw) {
       </div>
     </div>
   </section>
+
 
   <!-- GRADES -->
   <section id="grades" class="section-dark-strong">
