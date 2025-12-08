@@ -1136,9 +1136,10 @@ document.addEventListener("DOMContentLoaded", () => {
   setupNewsForms();
   setupExamForms();
   setupBoardForm();
-  setupPollForm();
+  setupPollForm();      // ← זה חשוב
   setupDeleteHandler();
   setupSiteContentForm();
   setupGradeFilter();
   setupRegisterRequestForm();
 });
+
