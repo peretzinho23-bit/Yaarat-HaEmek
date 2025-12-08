@@ -1741,3 +1741,6 @@ html[data-theme="light"] .class-links-row a:hover {
   border: 1px solid #d1d5db;
   box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
 }
+#home-exams h2.section-title {
+  white-space: nowrap;
+}
