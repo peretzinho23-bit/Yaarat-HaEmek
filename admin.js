@@ -8,6 +8,9 @@ import {
   onSnapshot,
   collection,
   addDoc,
+  getDocs,
+  deleteDoc,
+  updateDoc,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 import {
@@ -35,25 +38,29 @@ let newsData = { z: [], h: [], t: [] };
 let examsData = { z: [], h: [], t: [] };
 let boardData = [];
 let siteContent = {};
+let pollsData = [];
+
+// קולקציה של סקרים
+const pollsCollectionRef = collection(db, "polls");
 
 /* ------------ LOGS – לוג כללי לכל הדברים ------------ */
 /**
  * action: "create" | "update" | "delete"
- * entity: "exam" | "news" | "board" | "siteContent" | "adminRequest" | ...
+ * entity: "exam" | "news" | "board" | "siteContent" | "adminRequest" | "poll" | ...
  * payload: אובייקט עם כל שדות הרלוונטיים
  */
 async function logSystemChange(action, entity, payload = {}) {
   try {
-    const logsRef = collection(db, "exams_logs"); // משתמשים באותה קולקציה
+    const logsRef = collection(db, "exams_logs");
     await addDoc(logsRef, {
       action,
-      entity,                           // exam/news/board/siteContent/...
+      entity, // exam/news/board/siteContent/...
       grade: payload.grade || null,
       classId: payload.classId || null,
-      subject: payload.subject || null, // exam.subject / news.title / board.title
+      subject: payload.subject || null,
       date: payload.date || null,
       time: payload.time || null,
-      topic: payload.topic || null,     // exam.topic / news.body / board.body
+      topic: payload.topic || null,
       itemsCount: payload.itemsCount ?? null,
 
       adminUid: auth.currentUser ? auth.currentUser.uid : null,
@@ -173,6 +180,9 @@ async function loadAllData() {
   boardData = b.items || [];
   renderBoardAdmin();
 
+  // POLLS
+  await loadPolls();
+
   // תוכן אתר
   await loadSiteContent();
 
@@ -207,6 +217,9 @@ function subscribeRealtimeAdmin() {
     boardData = data.items || [];
     renderBoardAdmin();
   });
+
+  // POLLS – לא חייב realtime, אבל אפשר אם תרצה:
+  // onSnapshot(collection(db, "polls"), (snap) => { ... })
 }
 
 /* ------------ NEWS ------------ */
@@ -484,9 +497,6 @@ function renderExamsAdmin() {
   }
 }
 
-
-
-
 function setupExamForms() {
   for (const g of GRADES) {
     const form = document.getElementById(`exams-form-${g}`);
@@ -550,6 +560,145 @@ function setupExamForms() {
       }
     });
   }
+}
+
+/* ------------ POLLS (סקרים) ------------ */
+
+async function loadPolls() {
+  const listEl = document.getElementById("admin-polls");
+  try {
+    const snap = await getDocs(pollsCollectionRef);
+    pollsData = [];
+    snap.forEach((docSnap) => {
+      pollsData.push({
+        id: docSnap.id,
+        ...docSnap.data()
+      });
+    });
+    renderPollsAdmin();
+  } catch (err) {
+    console.error("שגיאה בטעינת סקרים:", err);
+    if (listEl) {
+      listEl.innerHTML =
+        `<p class="empty-msg">שגיאה בטעינת הסקרים. בדוק את ה-console.</p>`;
+    }
+  }
+}
+
+function renderPollsAdmin() {
+  const listEl = document.getElementById("admin-polls");
+  if (!listEl) return;
+
+  if (!pollsData.length) {
+    listEl.innerHTML = `<p class="empty-msg">אין סקרים עדיין.</p>`;
+    return;
+  }
+
+  listEl.innerHTML = pollsData
+    .map((poll) => {
+      const totalVotes = (poll.options || []).reduce(
+        (sum, opt) => sum + (opt.votes || 0),
+        0
+      );
+
+      const optionsHtml = (poll.options || [])
+        .map((opt) => {
+          const votes = opt.votes || 0;
+          const percent =
+            totalVotes > 0 ? Math.round((votes / totalVotes) * 100) : 0;
+
+          return `
+            <div class="poll-option-row">
+              <span class="poll-option-text">${escapeHtml(opt.text || "")}</span>
+              <span class="poll-option-votes">
+                ${votes} קולות (${percent}%)
+              </span>
+            </div>
+          `;
+        })
+        .join("");
+
+      return `
+        <div class="admin-item">
+          <div class="admin-item-main">
+            <strong>${escapeHtml(poll.question || "")}</strong>
+            <span class="admin-item-meta">
+              ${poll.isActive ? "פעיל ✅" : "מושבת ⛔️"} · ${totalVotes} קולות
+            </span>
+          </div>
+          <div class="admin-item-body">
+            ${optionsHtml}
+          </div>
+          <div class="admin-item-actions">
+            <button
+              class="admin-remove"
+              data-type="poll"
+              data-id="${poll.id}"
+            >
+              מחיקת סקר
+            </button>
+            <button
+              class="admin-toggle-poll"
+              data-id="${poll.id}"
+              data-active="${poll.isActive ? "1" : "0"}"
+            >
+              ${poll.isActive ? "הפוך ללא פעיל" : "הפוך לפעיל"}
+            </button>
+          </div>
+        </div>
+      `;
+    })
+    .join("");
+}
+
+function setupPollForm() {
+  const form = document.getElementById("poll-form");
+  if (!form) return;
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const question = form.question.value.trim();
+    const opt1 = form.option1.value.trim();
+    const opt2 = form.option2.value.trim();
+    const opt3 = form.option3.value.trim();
+    const opt4 = form.option4.value.trim();
+    const isActive = form.isActive.checked;
+
+    if (!question || !opt1 || !opt2) {
+      alert("חובה למלא שאלה + לפחות שתי אפשרויות.");
+      return;
+    }
+
+    const options = [];
+    if (opt1) options.push({ id: "a", text: opt1, votes: 0 });
+    if (opt2) options.push({ id: "b", text: opt2, votes: 0 });
+    if (opt3) options.push({ id: "c", text: opt3, votes: 0 });
+    if (opt4) options.push({ id: "d", text: opt4, votes: 0 });
+
+    try {
+      const docRef = await addDoc(pollsCollectionRef, {
+        question,
+        options,
+        isActive,
+        createdAt: serverTimestamp()
+      });
+
+      await logSystemChange("create", "poll", {
+        subject: question,
+        itemsCount: options.length
+      });
+
+      form.reset();
+      form.isActive.checked = true;
+
+      await loadPolls();
+      alert("הסקר נוצר בהצלחה.");
+    } catch (err) {
+      console.error("שגיאה ביצירת סקר:", err);
+      alert("שגיאה ביצירת הסקר. בדוק console.");
+    }
+  });
 }
 
 /* ------------ BOARD ------------ */
@@ -810,10 +959,37 @@ function setupRegisterRequestForm() {
   });
 }
 
-/* ------------ DELETE HANDLER ------------ */
+/* ------------ DELETE + TOGGLE HANDLER ------------ */
 
 function setupDeleteHandler() {
   document.addEventListener("click", async (e) => {
+    // כפתור שינוי מצב סקר (פעיל / לא פעיל)
+    const toggleBtn = e.target.closest(".admin-toggle-poll");
+    if (toggleBtn) {
+      const pollId = toggleBtn.dataset.id;
+      const isActiveNow = toggleBtn.dataset.active === "1";
+      if (!pollId) return;
+
+      try {
+        await updateDoc(doc(db, "polls", pollId), {
+          isActive: !isActiveNow
+        });
+
+        const poll = pollsData.find((p) => p.id === pollId);
+        await logSystemChange("update", "poll", {
+          subject: poll ? poll.question : null,
+          topic: !isActiveNow ? "הופעל" : "הופסק"
+        });
+
+        await loadPolls();
+      } catch (err) {
+        console.error("שגיאה בעדכון סטטוס סקר:", err);
+        alert("שגיאה בעדכון סטטוס הסקר.");
+      }
+      return;
+    }
+
+    // כפתור מחיקה כללי
     const btn = e.target.closest(".admin-remove");
     if (!btn) return;
 
@@ -870,6 +1046,25 @@ function setupDeleteHandler() {
           itemsCount: boardData.length
         });
       }
+    } else if (type === "poll") {
+      const pollId = btn.dataset.id;
+      if (!pollId) return;
+
+      const deletedPoll = pollsData.find((p) => p.id === pollId);
+
+      try {
+        await deleteDoc(doc(db, "polls", pollId));
+        await loadPolls();
+
+        await logSystemChange("delete", "poll", {
+          subject: deletedPoll ? deletedPoll.question : null
+        });
+
+        alert("הסקר נמחק.");
+      } catch (err) {
+        console.error("שגיאה במחיקת סקר:", err);
+        alert("שגיאה במחיקת הסקר.");
+      }
     }
   });
 }
@@ -920,6 +1115,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupNewsForms();
   setupExamForms();
   setupBoardForm();
+  setupPollForm();
   setupDeleteHandler();
   setupSiteContentForm();
   setupGradeFilter();

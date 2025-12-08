@@ -333,6 +333,56 @@
             </form>
           </div>
         </div>
+<section class="admin-section" id="polls-section">
+  <h2>סקרים לתלמידים</h2>
+  <p class="admin-section-subtitle">
+    כאן אתה יוצר סקרים לתלמידים. כל סקר מופיע בדף "סקרים" באתר.
+  </p>
+
+  <!-- טופס יצירת סקר -->
+  <form id="poll-form" class="admin-form">
+    <div class="admin-form-row">
+      <label>שאלה לסקר</label>
+      <input type="text" name="question" placeholder="לדוגמה: מה אתם מעדיפים במועצת תלמידים?" required />
+    </div>
+
+    <div class="admin-form-row">
+      <label>אפשרות 1</label>
+      <input type="text" name="option1" placeholder="אפשרות 1" required />
+    </div>
+
+    <div class="admin-form-row">
+      <label>אפשרות 2</label>
+      <input type="text" name="option2" placeholder="אפשרות 2" required />
+    </div>
+
+    <div class="admin-form-row">
+      <label>אפשרות 3 (לא חובה)</label>
+      <input type="text" name="option3" placeholder="אפשרות 3" />
+    </div>
+
+    <div class="admin-form-row">
+      <label>אפשרות 4 (לא חובה)</label>
+      <input type="text" name="option4" placeholder="אפשרות 4" />
+    </div>
+
+    <div class="admin-form-row">
+      <label>
+        <input type="checkbox" name="isActive" checked />
+        הסקר פעיל (מופיע לתלמידים)
+      </label>
+    </div>
+
+    <button type="submit" class="btn-primary">
+      ➕ יצירת סקר
+    </button>
+  </form>
+
+  <hr style="margin: 20px 0; opacity: 0.3;">
+
+  <!-- רשימת סקרים קיימים -->
+  <div id="admin-polls"></div>
+</section>
 
         <br><br>
 

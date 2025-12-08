@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>סקרים לתלמידים – יערת העמק</title>
+
+  <link rel="icon" href="logo.png" />
+  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    /* ========= דף סקרים – ייעודי ========= */
+
+    body[data-page="polls"] {
+      background: radial-gradient(circle at top, #1f2937 0, #020617 55%, #000 100%);
+      color: #e5f0ff;
+    }
+
+    .polls-page-wrapper {
+      padding-top: 90px;
+      min-height: 100vh;
+    }
+
+    .polls-hero {
+      padding: 24px 0 8px;
+    }
+
+    .polls-hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 2.4fr) minmax(0, 1.6fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    @media (max-width: 900px) {
+      .polls-hero-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .polls-hero-main {
+      border-radius: 28px;
+      padding: 20px 20px 18px;
+      background:
+        radial-gradient(circle at top right, rgba(56, 189, 248, 0.18), transparent 55%),
+        radial-gradient(circle at bottom left, rgba(96, 165, 250, 0.15), transparent 55%),
+        rgba(15, 23, 42, 0.93);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.9);
+    }
+
+    .polls-hero-title-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .polls-badge {
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.7);
+      color: #7dd3fc;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .polls-hero-title {
+      font-size: 1.7rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .polls-hero-subtitle {
+      margin-top: 4px;
+      font-size: 0.95rem;
+      color: #cbd5f5;
+      max-width: 520px;
+      line-height: 1.6;
+    }
+
+    .polls-hero-actions {
+      margin-top: 12px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary-glow {
+      border-radius: 999px;
+      padding: 10px 18px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: #ecfdf5;
+      box-shadow: 0 0 0 1px rgba(22, 163, 74, 0.7),
+        0 18px 40px rgba(22, 163, 74, 0.55);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+
+    .btn-primary-glow span {
+      font-size: 1rem;
+    }
+
+    .btn-soft {
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: rgba(15, 23, 42, 0.8);
+      color: #e5e7eb;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .polls-hero-meta {
+      margin-top: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+
+    .polls-chip {
+      border-radius: 999px;
+      padding: 4px 10px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: rgba(15, 23, 42, 0.85);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .polls-chip strong {
+      color: #e5f0ff;
+    }
+
+    .polls-hero-stats {
+      border-radius: 24px;
+      padding: 16px 16px 14px;
+      background: rgba(15, 23, 42, 0.96);
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.8);
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    @media (max-width: 500px) {
+      .polls-hero-stats {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .stat-card {
+      border-radius: 18px;
+      padding: 10px 12px;
+      background: radial-gradient(circle at top, rgba(59, 130, 246, 0.28), transparent 60%);
+      border: 1px solid rgba(96, 165, 250, 0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .stat-card.secondary {
+      background: radial-gradient(circle at top, rgba(22, 163, 74, 0.28), transparent 60%);
+      border-color: rgba(34, 197, 94, 0.7);
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: #bfdbfe;
+    }
+
+    .stat-value {
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+
+    .stat-sub {
+      font-size: 0.7rem;
+      color: #9ca3af;
+    }
+
+    /* ===== רשימת סקרים ===== */
+
+    .polls-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 10px 0 14px;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .polls-filter-group {
+      display: inline-flex;
+      border-radius: 999px;
+      padding: 3px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.8);
+      gap: 4px;
+    }
+
+    .polls-filter-btn {
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      border: none;
+      background: transparent;
+      color: #cbd5f5;
+      cursor: pointer;
+    }
+
+    .polls-filter-btn.active {
+      background: linear-gradient(135deg, #38bdf8, #6366f1);
+      color: #eff6ff;
+      box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.9);
+    }
+
+    .polls-caption {
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+
+    .polls-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 40px;
+    }
+
+    .poll-card {
+      border-radius: 22px;
+      padding: 14px 16px 12px;
+      background: rgba(15, 23, 42, 0.96);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.85);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .poll-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .poll-question {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .poll-meta {
+      font-size: 0.75rem;
+      color: #9ca3af;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .poll-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .poll-status-pill {
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      border: 1px solid rgba(56, 189, 248, 0.7);
+      background: rgba(56, 189, 248, 0.14);
+      color: #bae6fd;
+      white-space: nowrap;
+    }
+
+    .poll-status-pill.closed {
+      border-color: rgba(248, 113, 113, 0.7);
+      background: rgba(248, 113, 113, 0.12);
+      color: #fecaca;
+    }
+
+    .poll-options {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .poll-option-row {
+      border-radius: 999px;
+      padding: 6px 8px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(51, 65, 85, 0.9);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .poll-option-btn {
+      flex: 1;
+      border-radius: 999px;
+      padding: 6px 10px;
+      border: none;
+      background: transparent;
+      color: #e5e7eb;
+      text-align: right;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .poll-option-btn.disabled {
+      cursor: default;
+    }
+
+    .poll-option-label {
+      position: relative;
+      z-index: 1;
+    }
+
+    .poll-option-bar {
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(56, 189, 248, 0.2), rgba(59, 130, 246, 0.6));
+      transform-origin: right center;
+      transform: scaleX(0);
+      opacity: 0;
+      transition: transform 0.25s ease-out, opacity 0.12s ease-out;
+    }
+
+    .poll-option-bar.visible {
+      transform: scaleX(1);
+      opacity: 1;
+    }
+
+    .poll-option-votes {
+      position: relative;
+      z-index: 1;
+      font-size: 0.75rem;
+      color: #dbeafe;
+      white-space: nowrap;
+    }
+
+    .poll-cta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      color: #9ca3af;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .poll-cta-row strong {
+      color: #e5f0ff;
+    }
+
+    .poll-locked {
+      color: #fca5a5;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .poll-empty-msg {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #9ca3af;
+      padding: 18px 0;
+    }
+
+    .polls-note {
+      font-size: 0.75rem;
+      color: #6b7280;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .polls-note strong {
+      color: #e5f0ff;
+    }
+  </style>
+</head>
+
+<body data-page="polls">
+  <!-- אנליטיקות -->
+  <script type="module" src="analytics.js"></script>
+
+  <!-- HEADER כמו בשאר האתר -->
+  <header class="header-main">
+    <div class="container">
+      <nav class="nav">
+        <div class="nav-left">
+          <div class="logo-circle">
+            <img
+              src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png"
+              alt="סמל בית הספר יערת העמק"
+              class="logo-img"
+              id="logo-img"
+            >
+          </div>
+
+          <div>
+            <div class="school-title-main">
+              סקרים לתלמידים – יערת העמק
+            </div>
+            <div class="school-title-sub">
+              תבחרו, תצביעו – והקול של השכבה משפיע.
+            </div>
+          </div>
+        </div>
+
+        <div class="nav-right">
+          <a href="index.html#home-news">חדשות</a>
+          <a href="index.html#home-exams">מבחנים</a>
+          <a href="index.html#grades">השכבות</a>
+          <a href="polls.html" class="active">סקרים</a>
+          <a href="index.html#contact">יצירת קשר</a>
+          <a href="redirect-edu.html" class="personal-btn">למרחב האישי</a>
+          <a href="admin.html" class="btn-outline">Admin</a>
+        </div>
+
+        <button id="theme-toggle" class="theme-toggle" type="button">
+          🌙
+        </button>
+
+        <button
+          class="nav-toggle"
+          type="button"
+          aria-label="פתח תפריט"
+          aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="polls-page-wrapper">
+    <section class="polls-hero">
+      <div class="container">
+        <div class="polls-hero-grid">
+          <div class="polls-hero-main">
+            <div class="polls-hero-title-row">
+              <div class="polls-badge">
+                <span>✨</span>
+                <span>תלמידים מצביעים, הנהלה מקשיבה</span>
+              </div>
+            </div>
+
+            <h1 class="polls-hero-title">סקרי תלמידים – דעתכם קובעת</h1>
+            <p class="polls-hero-subtitle">
+              בכל רגע יכול להיפתח סקר חדש: על טיולים, ימי שיא, תלבושת, שעה אפקטיבית,
+              רעיונות לשיפור בית הספר ועוד. בחרו תשובה, הצביעו, ותראו בזמן אמת איך
+              שאר התלמידים חושבים.
+            </p>
+
+            <div class="polls-hero-actions">
+              <a href="#polls-list" class="btn-primary-glow">
+                <span>🚀</span>
+                <span>לקפיצה ישר לסקרים הפעילים</span>
+              </a>
+
+              <button id="show-all-polls" class="btn-soft" type="button">
+                <span>📊</span>
+                <span>הצג גם סקרים ישנים</span>
+              </button>
+            </div>
+
+            <div class="polls-hero-meta">
+              <span class="polls-chip">
+                <span>🧑‍🎓</span>
+                <strong>לכל תלמידי ז'-ט'</strong>
+              </span>
+              <span class="polls-chip">
+                <span>⏱️</span>
+                הצבעה מהירה, תוצאה בזמן אמת
+              </span>
+            </div>
+          </div>
+
+          <aside class="polls-hero-stats">
+            <div class="stat-card">
+              <div class="stat-label">סקרים פעילים כרגע</div>
+              <div class="stat-value" id="stats-active-polls">0</div>
+              <div class="stat-sub">סקרים שפתוחים להצבעה</div>
+            </div>
+            <div class="stat-card secondary">
+              <div class="stat-label">מספר הצבעות כולל</div>
+              <div class="stat-value" id="stats-total-votes">0</div>
+              <div class="stat-sub">כמה הצבעות בוצעו בסך הכול</div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section id="polls-section">
+      <div class="container">
+        <div class="polls-toolbar">
+          <div class="polls-filter-group">
+            <button
+              type="button"
+              class="polls-filter-btn active"
+              id="filter-active"
+            >
+              רק סקרים פתוחים
+            </button>
+            <button
+              type="button"
+              class="polls-filter-btn"
+              id="filter-all"
+            >
+              כל הסקרים
+            </button>
+          </div>
+
+          <div class="polls-caption">
+            אם אתה רואה 🔒 – כבר הצבעת בסקר הזה מהמכשיר הזה.
+          </div>
+        </div>
+
+        <div id="polls-list" class="polls-list">
+          <!-- ממולא דרך JS -->
+        </div>
+
+        <p class="polls-note">
+          <strong>חשוב לדעת:</strong> ההצבעה נשמרת רק לפי המכשיר / דפדפן (localStorage),
+          ולא בתור זיהוי אישי. מורה באדמין יכול לפתוח ולסגור סקרים חדשים בכל רגע.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p id="footer-text">
+        © כל הזכויות שמורות לבית ספר יערת העמק – סקרי תלמידים
+      </p>
+    </div>
+  </footer>
+
+  <div id="to-top">↑</div>
+
+  <script src="accessibility.js"></script>
+
+  <!-- JS – טעינת סקרים, הצבעה, תצוגת תוצאות -->
+  <script type="module">
+    import { db } from "./firebase-config.js";
+    import {
+      collection,
+      onSnapshot,
+      doc,
+      getDoc,
+      updateDoc
+    } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+    const pollsColRef = collection(db, "polls");
+
+    let pollsRaw = [];
+    let showOnlyActive = true;
+    let localVotes = {};
+    const LOCAL_KEY = "yaarat_polls_votes";
+
+    const pollsListEl = document.getElementById("polls-list");
+    const activeStatsEl = document.getElementById("stats-active-polls");
+    const totalVotesStatsEl = document.getElementById("stats-total-votes");
+
+    const filterActiveBtn = document.getElementById("filter-active");
+    const filterAllBtn = document.getElementById("filter-all");
+    const showAllHeroBtn = document.getElementById("show-all-polls");
+
+    function loadLocalVotes() {
+      try {
+        const raw = localStorage.getItem(LOCAL_KEY);
+        if (!raw) {
+          localVotes = {};
+          return;
+        }
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === "object") {
+          localVotes = parsed;
+        } else {
+          localVotes = {};
+        }
+      } catch {
+        localVotes = {};
+      }
+    }
+
+    function saveLocalVotes() {
+      try {
+        localStorage.setItem(LOCAL_KEY, JSON.stringify(localVotes));
+      } catch {
+        // אם localStorage חסום – נתעלם
+      }
+    }
+
+    function calcStats() {
+      let activeCount = 0;
+      let totalVotes = 0;
+
+      pollsRaw.forEach((poll) => {
+        if (poll.isActive) activeCount++;
+        const pollVotes = (poll.options || []).reduce(
+          (sum, opt) => sum + (opt.votes || 0),
+          0
+        );
+        totalVotes += pollVotes;
+      });
+
+      if (activeStatsEl) activeStatsEl.textContent = String(activeCount);
+      if (totalVotesStatsEl) totalVotesStatsEl.textContent = String(totalVotes);
+    }
+
+    function renderPolls() {
+      if (!pollsListEl) return;
+
+      const pollsToShow = showOnlyActive
+        ? pollsRaw.filter((p) => p.isActive)
+        : pollsRaw.slice().sort((a, b) => {
+            const aActive = a.isActive ? 1 : 0;
+            const bActive = b.isActive ? 1 : 0;
+            if (aActive !== bActive) return bActive - aActive;
+            return 0;
+          });
+
+      if (!pollsToShow.length) {
+        pollsListEl.innerHTML = `
+          <p class="poll-empty-msg">
+            כרגע אין סקרים להצבעה. חכו קצת – מועצת תלמידים/צוות יעלו סקר חדש 😉
+          </p>
+        `;
+        return;
+      }
+
+      pollsListEl.innerHTML = "";
+      pollsToShow.forEach((poll) => {
+        const card = createPollCard(poll);
+        pollsListEl.appendChild(card);
+      });
+    }
+
+    function createPollCard(poll) {
+      const card = document.createElement("article");
+      card.className = "poll-card";
+
+      const totalVotes = (poll.options || []).reduce(
+        (sum, opt) => sum + (opt.votes || 0),
+        0
+      );
+      const alreadyVotedOptionId = localVotes[poll.id] || null;
+      const isClosed = !poll.isActive;
+
+      // כותרת + סטטוס
+      const headerRow = document.createElement("div");
+      headerRow.className = "poll-header-row";
+
+      const left = document.createElement("div");
+      const qEl = document.createElement("div");
+      qEl.className = "poll-question";
+      qEl.textContent = poll.question || "סקר ללא שאלה?";
+
+      const meta = document.createElement("div");
+      meta.className = "poll-meta";
+      const votesSpan = document.createElement("span");
+      votesSpan.textContent = totalVotes + " הצבעות עד עכשיו";
+      meta.appendChild(votesSpan);
+
+      left.appendChild(qEl);
+      left.appendChild(meta);
+
+      const right = document.createElement("div");
+
+      const statusPill = document.createElement("div");
+      statusPill.className = "poll-status-pill" + (isClosed ? " closed" : "");
+      statusPill.textContent = isClosed ? "סקר נסגר" : "סקר פעיל";
+
+      right.appendChild(statusPill);
+
+      headerRow.appendChild(left);
+      headerRow.appendChild(right);
+
+      // אופציות
+      const optionsContainer = document.createElement("div");
+      optionsContainer.className = "poll-options";
+
+      (poll.options || []).forEach((opt) => {
+        const row = document.createElement("div");
+        row.className = "poll-option-row";
+
+        const bar = document.createElement("div");
+        bar.className = "poll-option-bar";
+
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "poll-option-btn";
+
+        const labelSpan = document.createElement("span");
+        labelSpan.className = "poll-option-label";
+        labelSpan.textContent = opt.text || "";
+
+        const votesSpan = document.createElement("span");
+        votesSpan.className = "poll-option-votes";
+
+        const votes = opt.votes || 0;
+        const percent =
+          totalVotes > 0 ? Math.round((votes / totalVotes) * 100) : 0;
+
+        votesSpan.textContent =
+          totalVotes === 0 ? "0 קולות" : `${votes} קולות (${percent}%)`;
+
+        btn.appendChild(labelSpan);
+        btn.appendChild(votesSpan);
+
+        const canVote = poll.isActive && !alreadyVotedOptionId;
+
+        if (!canVote) {
+          btn.classList.add("disabled");
+        }
+
+        if (!canVote && totalVotes > 0) {
+          bar.style.transformOrigin = "right center";
+          bar.style.transform = "scaleX(" + Math.max(percent / 100, 0.05) + ")";
+          bar.classList.add("visible");
+        }
+
+        if (canVote) {
+          btn.addEventListener("click", () => {
+            handleVote(poll.id, opt.id);
+          });
+        }
+
+        row.appendChild(bar);
+        row.appendChild(btn);
+        optionsContainer.appendChild(row);
+      });
+
+      // שורה תחתונה
+      const footerRow = document.createElement("div");
+      footerRow.className = "poll-cta-row";
+
+      const leftSide = document.createElement("div");
+      if (alreadyVotedOptionId) {
+        const selected = (poll.options || []).find(
+          (o) => o.id === alreadyVotedOptionId
+        );
+        leftSide.innerHTML = `
+          כבר הצבעת בסקר הזה ל:
+          <strong>${selected ? selected.text : "אפשרות לא ידועה"}</strong>
+        `;
+      } else if (!poll.isActive) {
+        leftSide.innerHTML =
+          '<span class="poll-locked">🔒 הסקר נסגר – הצבעות חדשות לא אפשריות.</span>';
+      } else {
+        leftSide.textContent = "בחר אפשרות ולחץ – ההצבעה נספרת מיד.";
+      }
+
+      const rightSide = document.createElement("div");
+      if (alreadyVotedOptionId) {
+        rightSide.innerHTML =
+          '<span class="poll-locked">🔒 הצבעת כבר מהמכשיר הזה</span>';
+      } else if (!poll.isActive) {
+        rightSide.textContent = "אפשר לראות את התוצאות, אבל לא להצביע.";
+      } else {
+        rightSide.textContent = "אפשר להצביע פעם אחת בלבד מהמכשיר הזה.";
+      }
+
+      footerRow.appendChild(leftSide);
+      footerRow.appendChild(rightSide);
+
+      card.appendChild(headerRow);
+      card.appendChild(optionsContainer);
+      card.appendChild(footerRow);
+
+      return card;
+    }
+
+    async function handleVote(pollId, optionId) {
+      loadLocalVotes();
+      if (localVotes[pollId]) {
+        alert("כבר הצבעת בסקר הזה מהמכשיר הזה.");
+        return;
+      }
+
+      try {
+        const pollRef = doc(db, "polls", pollId);
+        const snap = await getDoc(pollRef);
+        if (!snap.exists()) {
+          alert("הסקר כבר לא קיים.");
+          return;
+        }
+
+        const data = snap.data();
+        if (!data.isActive) {
+          alert("הסקר נסגר – אי אפשר להצביע.");
+          return;
+        }
+
+        const options = data.options || [];
+        const idx = options.findIndex((o) => o.id === optionId);
+        if (idx === -1) {
+          alert("האפשרות כבר לא זמינה.");
+          return;
+        }
+
+        const newOptions = options.map((opt) => {
+          if (opt.id === optionId) {
+            return {
+              ...opt,
+              votes: (opt.votes || 0) + 1
+            };
+          }
+          return opt;
+        });
+
+        await updateDoc(pollRef, { options: newOptions });
+
+        localVotes[pollId] = optionId;
+        saveLocalVotes();
+
+        // נשען על onSnapshot שיעדכן את התצוגה בזמן אמת
+      } catch (err) {
+        console.error("שגיאה בהצבעה:", err);
+        alert("הייתה בעיה בזמן ההצבעה. נסו שוב.");
+      }
+    }
+
+    // ===== אירועים על פילטרים =====
+
+    function setFilterMode(onlyActive) {
+      showOnlyActive = onlyActive;
+      if (onlyActive) {
+        filterActiveBtn.classList.add("active");
+        filterAllBtn.classList.remove("active");
+      } else {
+        filterActiveBtn.classList.remove("active");
+        filterAllBtn.classList.add("active");
+      }
+      renderPolls();
+    }
+
+    if (filterActiveBtn && filterAllBtn) {
+      filterActiveBtn.addEventListener("click", () => setFilterMode(true));
+      filterAllBtn.addEventListener("click", () => setFilterMode(false));
+    }
+
+    if (showAllHeroBtn) {
+      showAllHeroBtn.addEventListener("click", () => {
+        setFilterMode(false);
+        const target = document.getElementById("polls-section");
+        if (target) {
+          target.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      });
+    }
+
+    // ===== התחלה – מאזין בזמן אמת =====
+    loadLocalVotes();
+
+    onSnapshot(
+      pollsColRef,
+      (snap) => {
+        pollsRaw = [];
+        snap.forEach((docSnap) => {
+          pollsRaw.push({
+            id: docSnap.id,
+            ...docSnap.data()
+          });
+        });
+        calcStats();
+        renderPolls();
+      },
+      (err) => {
+        console.error("שגיאה בטעינת סקרים בזמן אמת:", err);
+        if (pollsListEl) {
+          pollsListEl.innerHTML =
+            '<p class="poll-empty-msg">שגיאה בטעינת הסקרים. נסו לרענן את הדף.</p>';
+        }
+      }
+    );
+  </script>
+
+  <!-- app.js בשביל מצב כהה / תפריט מובייל וכו' -->
+  <script type="module" src="app.js"></script>
+</body>
+</html>
