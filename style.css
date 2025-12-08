@@ -1744,3 +1744,9 @@ html[data-theme="light"] .class-links-row a:hover {
 #home-exams h2.section-title {
   white-space: nowrap;
 }
+/* תיקון שבירת שורה בכותרות "מבחנים · שכבת X" */
+.exams-grade-card .section-title,
+.exams-grade-card h2.section-title,
+.exams-grade-card h3.section-title {
+  white-space: nowrap !important;
+}
