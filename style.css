@@ -1691,3 +1691,11 @@ html[data-theme="light"] .class-links-row a:hover {
   border-radius: 12px;
   border: 1px solid #1e293b;
 }
+.card img,
+.admin-item img {
+  max-width: 100%;
+  height: auto;
+  max-height: 260px; /* כדי שלא יהיו ענקיות */
+  object-fit: cover;
+  border-radius: 10px;
+}
