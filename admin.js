@@ -31,9 +31,10 @@ const GRADES = ["z", "h", "t"];
 // כיתות לכל שכבה
 const CLASS_IDS_BY_GRADE = {
   z: ["z1", "z2", "z3", "z4", "z5"],
-  h: ["h1", "h2", "h3", "h4", "h5", "h6"],
+  h: ["h1", "h4", "h5", "h6"],  // ← רק הכיתות שקיימות
   t: ["t1", "t2", "t3", "t4", "t5"]
 };
+
 
 let newsData = { z: [], h: [], t: [] };
 let examsData = { z: [], h: [], t: [] };
