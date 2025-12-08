@@ -83,10 +83,27 @@
           </p>
         </div>
 
-        <!-- כפתור לאנליטיקות -->
-        <a href="analytics.html" target="_blank" class="btn-outline" style="display:inline-block;margin-bottom:20px;">
-          אנליטיקות
-        </a>
+                <!-- כפתורי ניהול מהירים -->
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;">
+          <a
+            href="analytics.html"
+            target="_blank"
+            class="btn-outline"
+            style="display:inline-block;padding:8px 16px;border-radius:999px;"
+          >
+            📈 אנליטיקות
+          </a>
+
+          <button
+            type="button"
+            class="btn-outline"
+            style="padding:8px 16px;border-radius:999px;cursor:pointer;"
+            onclick="(function(){var s=document.getElementById('admin-polls-section'); if(s){s.scrollIntoView({behavior:'smooth',block:'start'});} })();"
+          >
+            📊 ניהול סקרים
+          </button>
+        </div>
+
 
         <!-- NEWS -->
         <h3 class="section-title" style="font-size:1.2rem;margin-bottom:10px;">חדשות לפי שכבות</h3>
