@@ -242,8 +242,8 @@ function renderHomeNews() {
             <article class="home-news-item home-news-item-with-image"${colorStyle}>
               <div class="home-news-image-wrap">
                 <img src="${escapeHtml(n.imageUrl)}" alt="${escapeHtml(
-            n.title || ""
-          )}" />
+                  n.title || ""
+                )}" />
               </div>
               <div class="home-news-text">
                 <h4 class="home-news-title">${escapeHtml(n.title)}</h4>
@@ -404,8 +404,6 @@ function renderHomeExams() {
   startExamCountdownLoop();
 }
 
-
-
 /* ------------ RENDER HOME BOARD ------------ */
 
 function renderHomeBoard() {
@@ -424,8 +422,8 @@ function renderHomeBoard() {
         ? `
           <div class="board-item-image">
             <img src="${escapeHtml(b.imageUrl)}" alt="${escapeHtml(
-            b.title || ""
-          )}">
+              b.title || ""
+            )}">
           </div>
         `
         : "";
@@ -468,8 +466,8 @@ function renderGradeNews(grade) {
           <article class="home-news-item home-news-item-with-image"${colorStyle}>
             <div class="home-news-image-wrap">
               <img src="${escapeHtml(n.imageUrl)}" alt="${escapeHtml(
-          n.title || ""
-        )}" />
+                n.title || ""
+              )}" />
             </div>
             <div class="home-news-text">
               <h4 class="home-news-title">${escapeHtml(n.title)}</h4>
@@ -563,8 +561,8 @@ function renderGradeBoard() {
         ? `
         <div class="board-item-image">
           <img src="${escapeHtml(b.imageUrl)}" alt="${escapeHtml(
-          b.title || ""
-        )}">
+            b.title || ""
+          )}">
         </div>
       `
         : "";
@@ -736,19 +734,33 @@ function setupMobileNav() {
   const navToggle = document.querySelector(".nav-toggle");
   const navRight = document.querySelector(".nav-right");
 
-  // סוגר תפריט אחרי לחיצה על לינק
-  if (navRight) {
-    navRight.querySelectorAll("a").forEach((link) => {
-      link.addEventListener("click", () => {
-        navRight.classList.remove("open");
-        navToggle?.classList.remove("open");
-        navToggle?.setAttribute("aria-expanded", "false");
-        document.body.classList.remove("nav-open");
-      });
-    });
+  if (!navToggle || !navRight) return;
+
+  // אם אנחנו בדף הבית – דואגים שהתפריט יכלול גם "סקרים" וגם "תיבת בקשות"
+  const pageType = document.body.dataset.page || "";
+  if (pageType === "home") {
+    navRight.innerHTML = `
+      <a href="#about">אודות</a>
+      <a href="#home-news">חדשות</a>
+      <a href="#home-exams">מבחנים</a>
+      <a href="#grades">השכבות</a>
+      <a href="polls.html">סקרים</a>
+      <a href="#requests">תיבת בקשות</a>
+      <a href="#contact">יצירת קשר</a>
+      <a href="redirect-edu.html" class="personal-btn">למרחב האישי</a>
+      <a href="admin.html" class="btn-outline">Admin</a>
+    `;
   }
 
-  if (!navToggle || !navRight) return;
+  // סוגר תפריט אחרי לחיצה על לינק
+  navRight.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", () => {
+      navRight.classList.remove("open");
+      navToggle.classList.remove("open");
+      navToggle.setAttribute("aria-expanded", "false");
+      document.body.classList.remove("nav-open");
+    });
+  });
 
   function applyNavVisibility() {
     if (window.innerWidth > 900) {
