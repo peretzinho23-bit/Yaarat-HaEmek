@@ -210,7 +210,7 @@ function subscribeRealtimeAdmin() {
     renderBoardAdmin();
   });
 
-  // POLLS
+  // POLLS – בזמן אמת
   onSnapshot(pollsCollectionRef, (snap) => {
     pollsData = [];
     snap.forEach((docSnap) => {
@@ -221,6 +221,7 @@ function subscribeRealtimeAdmin() {
     });
     renderPollsAdmin();
   });
+
 }
 
 /* ------------ NEWS ------------ */
@@ -554,6 +555,8 @@ function setupExamForms() {
 
 /* ------------ POLLS (סקרים) ------------ */
 
+/* ------------ POLLS (סקרים) ------------ */
+
 async function loadPolls() {
   const listEl = document.getElementById("admin-polls");
   try {
@@ -643,10 +646,7 @@ function renderPollsAdmin() {
 
 function setupPollForm() {
   const form = document.getElementById("poll-form");
-  if (!form) {
-    console.warn("poll-form not found in DOM");
-    return;
-  }
+  if (!form) return;
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -693,6 +693,7 @@ function setupPollForm() {
     }
   });
 }
+
 
 /* ------------ BOARD ------------ */
 
@@ -1089,18 +1090,18 @@ function setupGradeFilter() {
 
 /* ------------ MAIN INIT ------------ */
 
-function initAdmin() {
-  console.log("admin.js initAdmin()");
+document.addEventListener("DOMContentLoaded", () => {
   initAuth();
   setupNewsForms();
   setupExamForms();
   setupBoardForm();
-  setupPollForm();
+  setupPollForm();        // ← חשוב
   setupDeleteHandler();
   setupSiteContentForm();
   setupGradeFilter();
   setupRegisterRequestForm();
-}
+});
+
 
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initAdmin);

@@ -1,163 +1,163 @@
-// polls.js – הצגת סקרים לתלמידים
+// polls.js – סקר השבוע בדף התלמידים
 
 import { db } from "./firebase-config.js";
 import {
   collection,
+  query,
+  where,
+  orderBy,
+  limit,
   getDocs,
   doc,
-  getDoc,
-  setDoc
+  updateDoc
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
 const pollsCol = collection(db, "polls");
-const pollsListEl = document.getElementById("polls-list");
+let activePoll = null;
 
-// מזהה "אנונימי" של התלמיד (localStorage, לא באמת משתמש)
-function getLocalUserId() {
-  const key = "yaarat_user_id";
-  let id = localStorage.getItem(key);
-  if (!id) {
-    id = "u_" + Math.random().toString(36).slice(2);
-    localStorage.setItem(key, id);
-  }
-  return id;
+function escapeHtml(str) {
+  return String(str || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
 }
 
-async function loadPolls() {
+async function loadWeeklyPoll() {
+  const box = document.getElementById("poll-box");
+  if (!box) return;
+
   try {
-    pollsListEl.innerHTML = `<p class="class-empty-msg">טוען סקרים...</p>`;
+    // לוקח את הסקר הפעיל האחרון
+    const q = query(
+      pollsCol,
+      where("isActive", "==", true),
+      orderBy("createdAt", "desc"),
+      limit(1)
+    );
+    const snap = await getDocs(q);
 
-    const snap = await getDocs(pollsCol);
-    const polls = [];
-    snap.forEach((docSnap) => {
-      const data = docSnap.data();
-      if (data.isActive) {
-        polls.push({
-          id: docSnap.id,
-          ...data
-        });
-      }
-    });
-
-    if (!polls.length) {
-      pollsListEl.innerHTML =
-        `<p class="class-empty-msg">כרגע אין סקרים פעילים.</p>`;
+    if (snap.empty) {
+      box.innerHTML = `<p class="empty-msg">כרגע אין סקר פעיל.</p>`;
       return;
     }
 
-    pollsListEl.innerHTML = "";
+    const docSnap = snap.docs[0];
+    activePoll = { id: docSnap.id, ...docSnap.data() };
 
-    polls.forEach((poll) => {
-      const totalVotes = (poll.options || []).reduce(
-        (sum, opt) => sum + (opt.votes || 0),
-        0
-      );
+    renderPoll(box);
+  } catch (err) {
+    console.error("שגיאה בטעינת סקר השבוע:", err);
+    box.innerHTML = `<p class="empty-msg">שגיאה בטעינת הסקר.</p>`;
+  }
+}
 
-      const optionsHtml = (poll.options || [])
-        .map((opt, idx) => {
-          const votes = opt.votes || 0;
-          const percent =
-            totalVotes > 0 ? Math.round((votes / totalVotes) * 100) : 0;
+function renderPoll(box) {
+  if (!activePoll) {
+    box.innerHTML = `<p class="empty-msg">אין סקר פעיל.</p>`;
+    return;
+  }
 
-          return `
-            <button
-              class="poll-option-btn"
-              data-poll-id="${poll.id}"
-              data-index="${idx}"
-            >
-              <span>${opt.text}</span>
-              <span class="poll-option-meta">
-                ${votes} קולות (${percent}%)
-              </span>
-            </button>
-          `;
-        })
-        .join("");
+  const votedKey = "poll_voted_" + activePoll.id;
+  const alreadyVoted = localStorage.getItem(votedKey) === "1";
 
-      const card = document.createElement("div");
-      card.className = "exam-card"; // שימוש בעיצוב קיים
-      card.innerHTML = `
-        <div>
-          <div class="exam-main-title">${poll.question}</div>
-          <div class="exam-meta">
-            ${totalVotes} קולות בסה"כ
-          </div>
-        </div>
-        <div class="exam-topic">
-          ${optionsHtml}
+  const optionsHtml = (activePoll.options || [])
+    .map(
+      (opt) => `
+      <label class="poll-option">
+        <input type="radio" name="pollOption" value="${escapeHtml(opt.id)}" ${
+        alreadyVoted ? "disabled" : ""
+      } />
+        <span>${escapeHtml(opt.text || "")}</span>
+      </label>
+    `
+    )
+    .join("");
+
+  const totalVotes = (activePoll.options || []).reduce(
+    (sum, o) => sum + (o.votes || 0),
+    0
+  );
+
+  const resultsHtml = (activePoll.options || [])
+    .map((opt) => {
+      const votes = opt.votes || 0;
+      const percent =
+        totalVotes > 0 ? Math.round((votes / totalVotes) * 100) : 0;
+      return `
+        <div class="poll-result-row">
+          <span>${escapeHtml(opt.text || "")}</span>
+          <span>${votes} קולות (${percent}%)</span>
         </div>
       `;
-      pollsListEl.appendChild(card);
-    });
-  } catch (err) {
-    console.error("שגיאה בטעינת סקרים:", err);
-    pollsListEl.innerHTML =
-      `<p class="class-empty-msg">אירעה שגיאה בטעינת הסקרים. נסו מאוחר יותר.</p>`;
+    })
+    .join("");
+
+  box.innerHTML = `
+    <h3 style="margin-bottom:10px;">${escapeHtml(activePoll.question || "")}</h3>
+
+    <div id="poll-form-area">
+      ${optionsHtml}
+
+      ${
+        alreadyVoted
+          ? `<p class="section-subtitle" style="margin-top:12px;">כבר הצבעת 😊</p>`
+          : `<button id="poll-vote-btn" class="btn-primary" style="margin-top:12px;">הצבעה</button>`
+      }
+    </div>
+
+    <hr style="margin:18px 0; opacity:0.25;">
+
+    <div>
+      <p class="section-subtitle" style="margin-bottom:6px;">
+        תוצאות עדכניות · סה"כ ${totalVotes} קולות
+      </p>
+      ${resultsHtml}
+    </div>
+  `;
+
+  if (!alreadyVoted) {
+    const btn = document.getElementById("poll-vote-btn");
+    if (btn) {
+      btn.addEventListener("click", handleVote);
+    }
   }
 }
 
-async function handleVote(pollId, optionIndex) {
+async function handleVote() {
+  if (!activePoll) return;
+
+  const box = document.getElementById("poll-box");
+  const radios = document.querySelectorAll('input[name="pollOption"]');
+  let chosen = null;
+  radios.forEach((r) => {
+    if (r.checked) chosen = r.value;
+  });
+
+  if (!chosen) {
+    alert("בחר אפשרות לפני ההצבעה.");
+    return;
+  }
+
   try {
-    const userId = getLocalUserId();
+    const updatedOptions = (activePoll.options || []).map((opt) =>
+      opt.id === chosen
+        ? { ...opt, votes: (opt.votes || 0) + 1 }
+        : { ...opt }
+    );
 
-    // נשמור בקולקציה נפרדת מי הצביע למה כדי לא לאפשר אלף הצבעות מאותו מחשב
-    const votedDocRef = doc(db, "pollVotes", `${pollId}_${userId}`);
-    const votedSnap = await getDoc(votedDocRef);
-    if (votedSnap.exists()) {
-      alert("כבר הצבעת בסקר הזה.");
-      return;
-    }
-
-    const pollDocRef = doc(db, "polls", pollId);
-    const pollSnap = await getDoc(pollDocRef);
-    if (!pollSnap.exists()) {
-      alert("הסקר כבר לא קיים.");
-      return;
-    }
-
-    const poll = pollSnap.data();
-    if (!poll.isActive) {
-      alert("הסקר כבר לא פעיל.");
-      return;
-    }
-
-    const options = poll.options || [];
-    if (!options[optionIndex]) {
-      alert("שגיאה באפשרות.");
-      return;
-    }
-
-    options[optionIndex].votes = (options[optionIndex].votes || 0) + 1;
-
-    await setDoc(pollDocRef, {
-      ...poll,
-      options
+    await updateDoc(doc(db, "polls", activePoll.id), {
+      options: updatedOptions
     });
 
-    await setDoc(votedDocRef, {
-      pollId,
-      userId,
-      votedAt: new Date().toISOString()
-    });
+    activePoll.options = updatedOptions;
 
-    await loadPolls();
+    localStorage.setItem("poll_voted_" + activePoll.id, "1");
+
+    renderPoll(box);
   } catch (err) {
-    console.error("שגיאה בהצבעה:", err);
-    alert("שגיאה בהצבעה. נסו שוב.");
+    console.error("שגיאה בהצבעה לסקר:", err);
+    alert("שגיאה בהצבעה. נסו שוב מאוחר יותר.");
   }
 }
 
-document.addEventListener("click", (e) => {
-  const btn = e.target.closest(".poll-option-btn");
-  if (!btn) return;
-
-  const pollId = btn.dataset.pollId;
-  const index = Number(btn.dataset.index);
-  if (!pollId || Number.isNaN(index)) return;
-
-  handleVote(pollId, index);
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-  loadPolls();
-});
+document.addEventListener("DOMContentLoaded", loadWeeklyPoll);
