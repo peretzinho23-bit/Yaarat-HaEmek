@@ -1103,9 +1103,9 @@ function initAdmin() {
   setupRegisterRequestForm();
 }
 
-// לוודא שה־init רץ תמיד, גם אם DOMContentLoaded כבר קרה
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initAdmin);
 } else {
   initAdmin();
 }
+
