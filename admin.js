@@ -218,8 +218,17 @@ function subscribeRealtimeAdmin() {
     renderBoardAdmin();
   });
 
-  // POLLS – לא חייב realtime, אבל אפשר אם תרצה:
-  // onSnapshot(collection(db, "polls"), (snap) => { ... })
+  // POLLS – בזמן אמת
+  onSnapshot(pollsCollectionRef, (snap) => {
+    pollsData = [];
+    snap.forEach((docSnap) => {
+      pollsData.push({
+        id: docSnap.id,
+        ...docSnap.data()
+      });
+    });
+    renderPollsAdmin();
+  });
 }
 
 /* ------------ NEWS ------------ */
@@ -821,6 +830,10 @@ function fillSiteContentForm() {
     "homeHeroTitle",
     "homeHeroSubtitle",
 
+    // HERO SIDE
+    "heroSideTitle",
+    "heroSideList",
+
     // ABOUT
     "aboutTitle",
     "aboutBody",
@@ -834,6 +847,14 @@ function fillSiteContentForm() {
     "importantCard2Body",
     "importantCard3Title",
     "importantCard3Body",
+
+    // HOME SECTIONS TITLES
+    "homeNewsTitle",
+    "homeNewsSubtitle",
+    "boardTitle",
+    "boardSubtitle",
+    "homeExamsTitle",
+    "homeExamsSubtitle",
 
     // GRADES SECTION
     "gradesSectionTitle",
@@ -857,12 +878,12 @@ function fillSiteContentForm() {
     // FOOTER
     "footerText",
 
-    // IMAGES
+    // IMAGES (אם תוסיף בעתיד לשדות בטופס)
     "logoUrl",
     "heroImageUrl",
     "cardBgImageUrl",
 
-    // THEME / COLORS
+    // THEME / COLORS (אם תוסיף בטופס)
     "primaryColor",
     "buttonColor",
     "cardBgColor",
