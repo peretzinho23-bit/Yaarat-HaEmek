@@ -2,7 +2,7 @@
 <html lang="he" dir="rtl">
 <head>
   <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#2563eb">
+  <meta name="theme-color" content="#2563eb">
 
   <!-- בסיס חובה -->
   <meta charset="UTF-8" />
@@ -46,24 +46,143 @@
 
   <link rel="icon" href="logo.png" />
   <link rel="stylesheet" href="style.css" />
+
+  <!-- ===== סקר השבוע – סטיילים למיני-סקר בעמוד הבית ===== -->
+  <style>
+    #home-poll-mini {
+      padding-top: 32px;
+      padding-bottom: 32px;
+    }
+
+    .home-poll-card {
+      border-radius: 24px;
+      padding: 18px 18px 14px;
+      background: rgba(15, 23, 42, 0.96);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.85);
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .home-poll-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .home-poll-badge {
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      background: rgba(56, 189, 248, 0.14);
+      border: 1px solid rgba(56, 189, 248, 0.7);
+      color: #bae6fd;
+    }
+
+    .home-poll-status-text {
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+
+    .home-poll-body {
+      margin-bottom: 10px;
+    }
+
+    .home-poll-question {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #e5f0ff;
+    }
+
+    .home-poll-options {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .home-poll-option {
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(51, 65, 85, 0.9);
+      font-size: 0.85rem;
+      color: #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .home-poll-option-label {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .home-poll-option-votes {
+      font-size: 0.75rem;
+      color: #cbd5f5;
+      white-space: nowrap;
+    }
+
+    .home-poll-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 0.8rem;
+    }
+
+    .home-poll-votes {
+      color: #9ca3af;
+    }
+
+    .home-poll-link {
+      font-size: 0.8rem;
+      color: #7dd3fc;
+      text-decoration: none;
+      border-radius: 999px;
+      padding: 6px 10px;
+      border: 1px solid rgba(56, 189, 248, 0.7);
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .home-poll-link:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 640px) {
+      .home-poll-card {
+        padding: 16px 14px 12px;
+      }
+    }
+  </style>
 </head>
 
 <body data-page="home">
   <script type="module" src="analytics.js"></script>
-<script>
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker
-        .register("service-worker.js")
-        .then(() => {
-          console.log("Service Worker registered ✅");
-        })
-        .catch((err) => {
-          console.error("Service Worker registration failed:", err);
-        });
-    });
-  }
-</script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker
+          .register("service-worker.js")
+          .then(() => {
+            console.log("Service Worker registered ✅");
+          })
+          .catch((err) => {
+            console.error("Service Worker registration failed:", err);
+          });
+      });
+    }
+  </script>
 
   <!-- HEADER -->
   <header class="header-main">
@@ -296,6 +415,45 @@
     </div>
   </section>
 
+  <!-- סקר השבוע – מיני סקר בעמוד הבית -->
+  <section id="home-poll-mini" class="section-light">
+    <div class="container">
+      <div class="home-section-header section-header">
+        <h2 class="section-title">🗳️ סקר השבוע</h2>
+        <p class="section-subtitle">
+          בוחרים, מצביעים, ורואים בזמן אמת איך שאר השכבה חושבת.
+        </p>
+      </div>
+
+      <div class="home-poll-card">
+        <div class="home-poll-header">
+          <div class="home-poll-badge">סקר פעיל</div>
+          <div id="home-poll-status" class="home-poll-status-text">
+            טוען את הסקר הפעיל...
+          </div>
+        </div>
+
+        <div class="home-poll-body">
+          <div id="home-poll-question" class="home-poll-question">
+            ...
+          </div>
+
+          <ul id="home-poll-options" class="home-poll-options">
+            <!-- ממולא דרך JS -->
+          </ul>
+        </div>
+
+        <div class="home-poll-footer">
+          <span id="home-poll-votes" class="home-poll-votes">0 הצבעות עד עכשיו</span>
+
+          <a href="polls.html" class="home-poll-link">
+            לכל הסקרים ולהצבעה מלאה →
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- מבחנים קרובים -->
   <section id="home-exams" class="section-light">
     <div class="container">
@@ -425,12 +583,13 @@
       </div>
     </div>
   </section>
-<a href="polls.html" class="card-link">
-  <div class="home-card special">
-    <h3>🗳️ סקר השבוע</h3>
-    <p>הצטרפו להצבעה על נושא חם בבית הספר.</p>
-  </div>
-</a>
+
+  <a href="polls.html" class="card-link">
+    <div class="home-card special">
+      <h3>🗳️ סקר השבוע</h3>
+      <p>הצטרפו להצבעה על נושא חם בבית הספר.</p>
+    </div>
+  </a>
 
   <!-- CONTACT -->
   <section id="contact" class="section-light">
@@ -474,6 +633,9 @@
   <div id="to-top">↑</div>
 
   <script src="accessibility.js"></script>
+
+  <!-- מיני סקר – סקר השבוע -->
+  <script type="module" src="home-poll-mini.js"></script>
 
   <!-- לוגיקת Firebase / אתר -->
   <script type="module" src="app.js"></script>
