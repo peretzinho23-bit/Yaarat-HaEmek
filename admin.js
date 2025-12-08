@@ -221,7 +221,6 @@ function subscribeRealtimeAdmin() {
     });
     renderPollsAdmin();
   });
-
 }
 
 /* ------------ NEWS ------------ */
@@ -239,11 +238,11 @@ function renderNewsAdmin() {
 
     listEl.innerHTML = items
       .map((n, i) => {
-       const imgHtml = n.imageUrl
-  ? `<div class="admin-image-wrapper">
-       <img src="${escapeHtml(n.imageUrl)}" class="admin-image">
-     </div>`
-  : "";
+        const imgHtml = n.imageUrl
+          ? `<div class="admin-image-wrapper">
+               <img src="${escapeHtml(n.imageUrl)}" class="admin-image">
+             </div>`
+          : "";
 
         const colorStyle = n.color ? ` style="color:${escapeHtml(n.color)};"` : "";
 
@@ -384,6 +383,7 @@ function renderExamsAdmin() {
     const parts = [];
     const classIdsForGrade = CLASS_IDS_BY_GRADE[g] || [];
 
+    // קודם – לפי כיתות מוכרות (ז1, ז2 וכו')
     classIdsForGrade.forEach((classId) => {
       let examsForClass = items
         .map((ex, index) => ({
@@ -419,7 +419,10 @@ function renderExamsAdmin() {
         const metaText = metaParts.join(" · ");
 
         parts.push(`
-          <div class="admin-item">
+          <div
+            class="admin-item admin-exam-item"
+            data-class-id="${escapeHtml(ex.classId || "")}"
+          >
             <div class="admin-item-main">
               <strong>${escapeHtml(ex.subject || "")}</strong>
               <span class="admin-item-meta">${metaText}</span>
@@ -436,6 +439,7 @@ function renderExamsAdmin() {
       });
     });
 
+    // מבחנים שלא משויכים לכיתה מוכרת
     const knownIdsSet = new Set(classIdsForGrade);
     let unassigned = items
       .map((ex, index) => ({
@@ -443,7 +447,9 @@ function renderExamsAdmin() {
         _index: index,
         _dateObj: parseDateForSort(ex.date)
       }))
-      .filter((ex) => !knownIdsSet.has(String(ex.classId).toLowerCase()));
+      .filter(
+        (ex) => !knownIdsSet.has(String(ex.classId || "").toLowerCase())
+      );
 
     if (unassigned.length) {
       unassigned.sort((a, b) => {
@@ -468,7 +474,10 @@ function renderExamsAdmin() {
         const metaText = metaParts.join(" · ");
 
         parts.push(`
-          <div class="admin-item">
+          <div
+            class="admin-item admin-exam-item"
+            data-class-id="${escapeHtml(ex.classId || "")}"
+          >
             <div class="admin-item-main">
               <strong>${escapeHtml(ex.subject || "")}</strong>
               <span class="admin-item-meta">${metaText}</span>
@@ -552,8 +561,6 @@ function setupExamForms() {
     });
   }
 }
-
-/* ------------ POLLS (סקרים) ------------ */
 
 /* ------------ POLLS (סקרים) ------------ */
 
@@ -694,7 +701,6 @@ function setupPollForm() {
   });
 }
 
-
 /* ------------ BOARD ------------ */
 
 function renderBoardAdmin() {
@@ -709,24 +715,25 @@ function renderBoardAdmin() {
   listEl.innerHTML = boardData
     .map((b, i) => {
       const colorStyle = b.color ? ` style="color:${escapeHtml(b.color)}"` : "";
-const imgHtml = b.imageUrl
-  ? `<div class="admin-image-wrapper">
-       <img src="${escapeHtml(b.imageUrl)}" class="admin-image">
-     </div>`
-  : "";
-
+      const imgHtml = b.imageUrl
+        ? `<div class="admin-image-wrapper">
+             <img src="${escapeHtml(b.imageUrl)}" class="admin-image">
+           </div>`
+        : "";
 
       return `
-      <div class="admin-item"${colorStyle}>
-        <div class="admin-item-main">
-          <strong>${escapeHtml(b.title)}</strong>
-          <span class="admin-item-meta">${escapeHtml(b.meta || "")}</span>
+        <div class="admin-item"${colorStyle}>
+          <div class="admin-item-main">
+            <strong>${escapeHtml(b.title)}</strong>
+            <span class="admin-item-meta">${escapeHtml(b.meta || "")}</span>
+          </div>
+          <div class="admin-item-body">${escapeHtml(b.body)}</div>
+          ${imgHtml}
+          <button class="admin-remove" data-type="board" data-index="${i}">
+            מחיקה
+          </button>
         </div>
-        <div class="admin-item-body">${escapeHtml(b.body)}</div>
-        ${imgHtml}
-        <button class="admin-remove" data-type="board" data-index="${i}">מחיקה</button>
-      </div>
-    `;
+      `;
     })
     .join("");
 }
@@ -1095,127 +1102,9 @@ document.addEventListener("DOMContentLoaded", () => {
   setupNewsForms();
   setupExamForms();
   setupBoardForm();
-  setupPollForm();        // ← חשוב
+  setupPollForm();
   setupDeleteHandler();
   setupSiteContentForm();
   setupGradeFilter();
   setupRegisterRequestForm();
 });
-
-
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", initAdmin);
-} else {
-  initAdmin();
-}
-// ===== Exams class filters in admin panel =====
-
-function setupExamClassFilters() {
-  const configs = [
-    {
-      grade: "z",
-      containerId: "admin-exams-z",
-      classes: ["ז1", "ז2", "ז3", "ז4", "ז5"]
-    },
-    {
-      grade: "h",
-      containerId: "admin-exams-h",
-      classes: ["ח1", "ח2", "ח3", "ח4", "ח5", "ח6"]
-    },
-    {
-      grade: "t",
-      containerId: "admin-exams-t",
-      classes: ["ט1", "ט2", "ט3", "ט4", "ט5"]
-    }
-  ];
-
-  configs.forEach(setupFilterForGrade);
-}
-
-function setupFilterForGrade(cfg) {
-  const container = document.getElementById(cfg.containerId);
-  if (!container) return;
-
-  // מחפש את ה-card שמכיל את הרשימה
-  const card = container.closest(".card");
-  if (!card) return;
-
-  // יוצר שורת כפתורים
-  const bar = document.createElement("div");
-  bar.className = "admin-class-filter";
-
-  const allBtn = document.createElement("button");
-  allBtn.textContent = "כל הכיתות";
-  allBtn.dataset.classFilter = "all";
-  allBtn.classList.add("active");
-  bar.appendChild(allBtn);
-
-  cfg.classes.forEach((cls) => {
-    const btn = document.createElement("button");
-    btn.textContent = cls;
-    btn.dataset.classFilter = cls;
-    bar.appendChild(btn);
-  });
-
-  // מוסיף את הפילטר לפני רשימת המבחנים
-  card.insertBefore(bar, container);
-
-  // לוגיקת סינון
-  bar.addEventListener("click", (e) => {
-    if (e.target.tagName !== "BUTTON") return;
-
-    const value = e.target.dataset.classFilter;
-    bar.querySelectorAll("button").forEach((b) =>
-      b.classList.toggle("active", b === e.target)
-    );
-
-    const items = Array.from(container.children);
-
-    items.forEach((el) => {
-      // משאירים אלמנטים שאין להם classId (למקרה שיש הודעות ריקות וכו')
-      const classId = el.dataset.classId;
-      if (!classId || value === "all") {
-        el.style.display = "";
-      } else {
-        el.style.display = classId === value ? "" : "none";
-      }
-    });
-  });
-
-  // Observer שמחפש מבחנים חדשים ומזהה את הכיתה לפי הטקסט
-  const observer = new MutationObserver((mutations) => {
-    mutations.forEach((m) => {
-      m.addedNodes.forEach((node) => {
-        if (!(node instanceof HTMLElement)) return;
-        tagExamClass(node, cfg.grade);
-      });
-    });
-  });
-
-  observer.observe(container, { childList: true });
-}
-
-// מנסה להבין מאיזה טקסט הכיתה ולשמור ב-data-class-id
-function tagExamClass(el, grade) {
-  const text = el.textContent || "";
-  let match;
-
-  if (grade === "z") {
-    match = text.match(/ז[1-5]/);
-  } else if (grade === "h") {
-    match = text.match(/ח[1-6]/);
-  } else if (grade === "t") {
-    match = text.match(/ט[1-5]/);
-  }
-
-  if (match) {
-    el.dataset.classId = match[0]; // לדוגמה "ז1"
-  }
-}
-
-// לוודא שזה רץ אחרי שהעמוד נטען
-document.addEventListener("DOMContentLoaded", () => {
-  // נותן ל-admin.js קצת זמן לטעון את המבחנים, ואז בונה פילטרים
-  setTimeout(setupExamClassFilters, 800);
-});
-
