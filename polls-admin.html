@@ -1,75 +1,150 @@
-        <!-- POLLS -->
-        <h3 class="section-title" style="font-size:1.2rem;margin-bottom:10px;">סקרים לתלמידים</h3>
-        <p class="section-subtitle">
-          יצירת סקרים שיופיעו בדף "סקרים" וב"סקר השבוע". אפשר לראות כמה הצביעו לכל אפשרות,
-          להפעיל / להשהות סקר ולמחוק אותו.
-        </p>
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <div class="admin-columns">
-          <div class="card polls-admin-card">
-            <div class="polls-admin-header">
-              <div>
-                <h3>ניהול סקרים</h3>
-                <p class="polls-admin-sub">
-                  יצירת סקר חדש, צפייה בתוצאות והפעלה/הפסקה של סקרים פעילים.
-                </p>
-              </div>
-              <div class="polls-admin-badge">
-                🎯 סקר פעיל אחד יוצג לתלמידים
-              </div>
-            </div>
+  <title>ניהול סקרים – יערת העמק</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
 
-            <!-- טופס יצירת סקר -->
-            <form id="poll-form" class="admin-form polls-form">
-              <div class="polls-form-row polls-form-row-full">
-                <label>שאלה לסקר</label>
-                <input
-                  type="text"
-                  name="question"
-                  placeholder="לדוגמה: מה אתם מעדיפים בבוקר — שיעור חופשי או פעילות חברתית?"
-                  required
-                />
-              </div>
+<body>
+  <script type="module" src="analytics.js"></script>
 
-              <div class="polls-form-row">
-                <div>
-                  <label>אפשרות 1</label>
-                  <input type="text" name="option1" placeholder="אפשרות 1" required />
-                </div>
-                <div>
-                  <label>אפשרות 2</label>
-                  <input type="text" name="option2" placeholder="אפשרות 2" required />
-                </div>
-              </div>
+  <!-- HEADER -->
+  <header class="header-main">
+    <div class="container">
+      <nav class="nav">
+        <div class="nav-left">
+          <div class="logo-circle">
+            <span>יערת<br>העמק</span>
+          </div>
 
-              <div class="polls-form-row">
-                <div>
-                  <label>אפשרות 3 (לא חובה)</label>
-                  <input type="text" name="option3" placeholder="אפשרות 3" />
-                </div>
-                <div>
-                  <label>אפשרות 4 (לא חובה)</label>
-                  <input type="text" name="option4" placeholder="אפשרות 4" />
-                </div>
-              </div>
-
-              <div class="polls-form-row polls-form-row-full polls-form-footer">
-                <label class="polls-checkbox">
-                  <input type="checkbox" name="isActive" checked />
-                  <span>הסקר פעיל (מופיע לתלמידים)</span>
-                </label>
-
-                <button type="submit" class="btn-primary">
-                  ➕ יצירת סקר חדש
-                </button>
-              </div>
-            </form>
-
-            <hr class="polls-divider">
-
-            <!-- רשימת סקרים קיימים -->
-            <div id="admin-polls" class="admin-list polls-admin-list">
-              <p class="empty-msg">אין סקרים עדיין. לאחר יצירת סקר ראשון, הוא יופיע כאן.</p>
+          <div>
+            <div class="school-title-main">לוח ניהול סקרים · יערת העמק</div>
+            <div class="school-title-sub">
+              <a href="admin.html">חזרה ללוח הניהול הראשי</a>
             </div>
           </div>
         </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="section-light">
+    <div class="container">
+      <p
+        id="auth-status"
+        style="text-align:center;margin-top:18px;margin-bottom:10px;font-size:0.9rem;"
+      >
+        בודק סטטוס התחברות...
+      </p>
+
+      <!-- LOGIN -->
+      <section id="login-section">
+        <div class="section-header">
+          <h2 class="section-title">התחברות אדמין</h2>
+          <p class="section-subtitle">כניסה למנהלי המערכת בלבד</p>
+        </div>
+
+        <form id="login-form" style="max-width:360px;margin:0 auto;">
+          <label>אימייל</label>
+          <input type="email" name="email" required />
+
+          <label>סיסמה</label>
+          <input type="password" name="password" required />
+
+          <button type="submit" style="width:100%;margin-top:10px;">
+            כניסה
+          </button>
+        </form>
+      </section>
+
+      <!-- POLLS ADMIN -->
+      <section id="polls-admin-section" style="display:none;margin-top:20px;">
+        <div class="section-header">
+          <h2 class="section-title">ניהול סקרים לתלמידים</h2>
+          <p class="section-subtitle">
+            יצירת סקר חדש, צפייה בתוצאות, הפעלה / השהיה של סקרים ואיפוס הצבעות.
+          </p>
+        </div>
+
+        <div class="card polls-admin-card">
+          <div
+            style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;"
+          >
+            <div>
+              <h3 style="margin-bottom:4px;">סקר חדש</h3>
+              <p class="polls-admin-sub" style="font-size:0.85rem;opacity:0.85;">
+                הסקר יוצג בדף "סקרים" וב"סקר השבוע" (הסקר הפעיל האחרון).
+              </p>
+            </div>
+            <button id="logout-btn" class="btn-outline" type="button">
+              יציאה מהמערכת
+            </button>
+          </div>
+
+          <form id="poll-form" class="polls-form">
+            <label>שאלה</label>
+            <input
+              type="text"
+              name="question"
+              placeholder="לדוגמה: מהו יום הפעילות המועדף עליכם?"
+              required
+            />
+
+            <div class="polls-form-row">
+              <div>
+                <label>אפשרות 1</label>
+                <input type="text" name="option1" placeholder="אפשרות 1" required />
+              </div>
+              <div>
+                <label>אפשרות 2</label>
+                <input type="text" name="option2" placeholder="אפשרות 2" required />
+              </div>
+            </div>
+
+            <div class="polls-form-row">
+              <div>
+                <label>אפשרות 3 (לא חובה)</label>
+                <input type="text" name="option3" placeholder="אפשרות 3" />
+              </div>
+              <div>
+                <label>אפשרות 4 (לא חובה)</label>
+                <input type="text" name="option4" placeholder="אפשרות 4" />
+              </div>
+            </div>
+
+            <div
+              style="display:flex;align-items:center;gap:8px;margin:8px 0 14px;"
+            >
+              <input type="checkbox" id="isActive" name="isActive" checked />
+              <label for="isActive" style="margin:0;font-size:0.9rem;">
+                להפוך את הסקר לפעיל
+              </label>
+            </div>
+
+            <button type="submit" class="btn">
+              ➕ יצירת סקר חדש
+            </button>
+          </form>
+
+          <hr
+            style="margin:18px 0;border:none;border-top:1px solid rgba(148,163,184,0.4);"
+          />
+
+          <h3 style="margin-bottom:8px;">סקרים קיימים</h3>
+          <div id="admin-polls" class="admin-list polls-admin-list">
+            <p class="empty-msg">
+              אין סקרים עדיין. לאחר יצירת סקר ראשון, הוא יופיע כאן.
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script type="module" src="polls-admin.js"></script>
+</body>
+</html>

@@ -1,219 +1,338 @@
-// polls-admin.js – לוח ניהול סקרים נפרד
+// polls-admin.js – לוח ניהול סקרים חדש
 
-import { db } from "./firebase-config.js";
+import { db, auth } from "./firebase-config.js";
 import {
   collection,
-  getDocs,
   addDoc,
   deleteDoc,
   updateDoc,
   onSnapshot,
-  doc,
-  serverTimestamp
+  serverTimestamp,
+  doc
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+import {
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
-const pollsCollectionRef = collection(db, "polls");
+const pollsColRef = collection(db, "polls");
+
+// ===== DOM =====
+const authStatusEl = document.getElementById("auth-status");
+const loginSectionEl = document.getElementById("login-section");
+const loginFormEl = document.getElementById("login-form");
+const pollsSectionEl = document.getElementById("polls-admin-section");
+const logoutBtnEl = document.getElementById("logout-btn");
+
+const pollFormEl = document.getElementById("poll-form");
+const pollsListEl = document.getElementById("admin-polls");
+
 let pollsData = [];
+let unsubscribePolls = null;
 
-// ===== helpers =====
-function escapeHtml(str) {
-  return String(str || "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+// ===== AUTH =====
+
+function setLoggedOutUI() {
+  if (authStatusEl) {
+    authStatusEl.textContent = "יש להתחבר כדי לנהל את הסקרים.";
+  }
+  if (loginSectionEl) loginSectionEl.style.display = "block";
+  if (pollsSectionEl) pollsSectionEl.style.display = "none";
 }
 
-// ===== render =====
-function renderPollsAdmin() {
-  const listEl = document.getElementById("admin-polls");
-  if (!listEl) return;
+function setLoggedInUI(user) {
+  if (authStatusEl) {
+    authStatusEl.textContent = `מחובר כ: ${user.email || "מנהל"}`;
+  }
+  if (loginSectionEl) loginSectionEl.style.display = "none";
+  if (pollsSectionEl) pollsSectionEl.style.display = "block";
+}
 
-  if (!pollsData.length) {
-    listEl.innerHTML = `<p class="empty-msg">אין סקרים עדיין.</p>`;
+async function handleLoginSubmit(evt) {
+  evt.preventDefault();
+  if (!loginFormEl) return;
+
+  const email = loginFormEl.email.value.trim();
+  const password = loginFormEl.password.value.trim();
+
+  if (!email || !password) {
+    alert("יש למלא אימייל וסיסמה.");
     return;
   }
 
-  listEl.innerHTML = pollsData
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    loginFormEl.reset();
+  } catch (err) {
+    console.error("שגיאה בהתחברות:", err);
+    alert("התחברות נכשלה. בדוק אימייל וסיסמה.");
+  }
+}
+
+async function handleLogoutClick() {
+  try {
+    await signOut(auth);
+  } catch (err) {
+    console.error("שגיאה בהתנתקות:", err);
+  }
+}
+
+function setupAuth() {
+  if (loginFormEl) {
+    loginFormEl.addEventListener("submit", handleLoginSubmit);
+  }
+  if (logoutBtnEl) {
+    logoutBtnEl.addEventListener("click", handleLogoutClick);
+  }
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      setLoggedInUI(user);
+      subscribeRealtimePolls();
+    } else {
+      setLoggedOutUI();
+      if (unsubscribePolls) {
+        unsubscribePolls();
+        unsubscribePolls = null;
+      }
+    }
+  });
+}
+
+// ===== POLLS LOGIC =====
+
+function calcTotalVotes(poll) {
+  if (!poll || !Array.isArray(poll.options)) return 0;
+  return poll.options.reduce((sum, opt) => sum + (opt.votes || 0), 0);
+}
+
+function renderPolls() {
+  if (!pollsListEl) return;
+
+  if (!pollsData.length) {
+    pollsListEl.innerHTML =
+      '<p class="empty-msg">אין סקרים עדיין. לאחר יצירת סקר ראשון, הוא יופיע כאן.</p>';
+    return;
+  }
+
+  const html = pollsData
     .map((poll) => {
-      const totalVotes = (poll.options || []).reduce(
-        (sum, opt) => sum + (opt.votes || 0),
-        0
-      );
+      const totalVotes = calcTotalVotes(poll);
+      const createdAt =
+        poll.createdAt && typeof poll.createdAt.toDate === "function"
+          ? poll.createdAt.toDate()
+          : null;
+      const createdStr = createdAt
+        ? createdAt.toLocaleDateString("he-IL", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric"
+          })
+        : "—";
+
+      const statusLabel = poll.isActive ? "פעיל" : "מושהה";
 
       const optionsHtml = (poll.options || [])
-        .map((opt) => {
+        .map((opt, idx) => {
           const votes = opt.votes || 0;
-          const percent =
-            totalVotes > 0 ? Math.round((votes / totalVotes) * 100) : 0;
-
+          const text = opt.text || "";
           return `
-            <div class="poll-option-row">
-              <span class="poll-option-text">${escapeHtml(opt.text || "")}</span>
-              <span class="poll-option-votes">
-                ${votes} קולות (${percent}%)
-              </span>
-            </div>
+            <li>
+              <strong>${idx + 1}.</strong>
+              <span>${text}</span>
+              <span style="opacity:0.8;">(${votes} קולות)</span>
+            </li>
           `;
         })
         .join("");
 
+      const question = poll.question || "";
+
       return `
-        <div class="admin-item">
+        <div class="admin-item" data-poll-id="${poll.id}">
           <div class="admin-item-main">
-            <strong>${escapeHtml(poll.question || "")}</strong>
-            <span class="admin-item-meta">
-              ${poll.isActive ? "פעיל ✅" : "מושבת ⛔️"} · ${totalVotes} קולות
-            </span>
+            <div>
+              <div style="font-weight:700;margin-bottom:4px;">${question}</div>
+              <div style="font-size:0.8rem;opacity:0.8;">
+                נוצר בתאריך ${createdStr} · מצב: ${statusLabel} · סה"כ קולות: ${totalVotes}
+              </div>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;">
+              <button class="btn-outline" data-action="toggle" data-id="${poll.id}">
+                ${poll.isActive ? "השהיית סקר" : "הפיכת סקר לפעיל"}
+              </button>
+              <button class="btn-outline" data-action="reset" data-id="${poll.id}">
+                איפוס הצבעות
+              </button>
+              <button class="admin-remove" data-action="delete" data-id="${poll.id}">
+                מחיקת סקר
+              </button>
+            </div>
           </div>
-
-          <div class="admin-item-body">
+          <ul style="margin-top:6px;font-size:0.85rem;display:flex;flex-direction:column;gap:2px;">
             ${optionsHtml}
-          </div>
-
-          <div class="admin-item-actions">
-            <button
-              class="admin-remove"
-              data-type="poll"
-              data-id="${poll.id}"
-            >
-              מחיקת סקר
-            </button>
-            <button
-              class="admin-toggle-poll"
-              data-id="${poll.id}"
-              data-active="${poll.isActive ? "1" : "0"}"
-            >
-              ${poll.isActive ? "הפוך ללא פעיל" : "הפוך לפעיל"}
-            </button>
-          </div>
+          </ul>
         </div>
       `;
     })
     .join("");
+
+  pollsListEl.innerHTML = html;
 }
 
-// ===== load & realtime =====
-async function loadPollsOnce() {
-  const listEl = document.getElementById("admin-polls");
+async function handlePollFormSubmit(evt) {
+  evt.preventDefault();
+  if (!pollFormEl) return;
+
+  const form = pollFormEl;
+  const question = form.question.value.trim();
+  const opt1 = form.option1.value.trim();
+  const opt2 = form.option2.value.trim();
+  const opt3 = form.option3.value.trim();
+  const opt4 = form.option4.value.trim();
+  const isActive = form.isActive.checked;
+
+  if (!question || !opt1 || !opt2) {
+    alert("חובה למלא שאלה + לפחות שתי אפשרויות.");
+    return;
+  }
+
+  const options = [];
+  if (opt1) options.push({ id: "a", text: opt1, votes: 0 });
+  if (opt2) options.push({ id: "b", text: opt2, votes: 0 });
+  if (opt3) options.push({ id: "c", text: opt3, votes: 0 });
+  if (opt4) options.push({ id: "d", text: opt4, votes: 0 });
+
   try {
-    const snap = await getDocs(pollsCollectionRef);
-    pollsData = [];
-    snap.forEach((docSnap) => {
-      pollsData.push({
-        id: docSnap.id,
-        ...docSnap.data()
-      });
+    await addDoc(pollsColRef, {
+      question,
+      options,
+      isActive,
+      createdAt: serverTimestamp()
     });
-    renderPollsAdmin();
+
+    form.reset();
+    form.isActive.checked = true;
   } catch (err) {
-    console.error("שגיאה בטעינת סקרים:", err);
-    if (listEl) {
-      listEl.innerHTML =
-        `<p class="empty-msg">שגיאה בטעינת הסקרים. בדוק את ה-console.</p>`;
-    }
+    console.error("שגיאה ביצירת סקר:", err);
+    alert("שגיאה ביצירת סקר חדש.");
   }
 }
 
+function setupPollForm() {
+  if (!pollFormEl) return;
+  pollFormEl.addEventListener("submit", handlePollFormSubmit);
+}
+
+async function togglePollActive(pollId) {
+  const poll = pollsData.find((p) => p.id === pollId);
+  if (!poll) return;
+
+  try {
+    await updateDoc(doc(pollsColRef, pollId), {
+      isActive: !poll.isActive
+    });
+  } catch (err) {
+    console.error("שגיאה בשינוי סטטוס סקר:", err);
+    alert("שגיאה בשינוי סטטוס הסקר.");
+  }
+}
+
+async function resetPollVotes(pollId) {
+  const poll = pollsData.find((p) => p.id === pollId);
+  if (!poll) return;
+
+  const confirmReset = confirm(
+    "לאפס את כל ההצבעות לסקר הזה? אי אפשר לבטל לאחר מכן."
+  );
+  if (!confirmReset) return;
+
+  const newOptions = (poll.options || []).map((opt) => ({
+    ...opt,
+    votes: 0
+  }));
+
+  try {
+    await updateDoc(doc(pollsColRef, pollId), {
+      options: newOptions
+    });
+  } catch (err) {
+    console.error("שגיאה באיפוס הצבעות:", err);
+    alert("שגיאה באיפוס הצבעות.");
+  }
+}
+
+async function deletePoll(pollId) {
+  const confirmDelete = confirm("למחוק את הסקר הזה? אי אפשר לבטל.");
+  if (!confirmDelete) return;
+
+  try {
+    await deleteDoc(doc(pollsColRef, pollId));
+  } catch (err) {
+    console.error("שגיאה במחיקת סקר:", err);
+    alert("שגיאה במחיקת הסקר.");
+  }
+}
+
+function setupPollsListEvents() {
+  if (!pollsListEl) return;
+
+  pollsListEl.addEventListener("click", (evt) => {
+    const btn = evt.target.closest("[data-action]");
+    if (!btn) return;
+
+    const action = btn.getAttribute("data-action");
+    const id = btn.getAttribute("data-id");
+    if (!id) return;
+
+    if (action === "toggle") {
+      togglePollActive(id);
+    } else if (action === "reset") {
+      resetPollVotes(id);
+    } else if (action === "delete") {
+      deletePoll(id);
+    }
+  });
+}
+
 function subscribeRealtimePolls() {
-  onSnapshot(pollsCollectionRef, (snap) => {
-    pollsData = [];
-    snap.forEach((docSnap) => {
-      pollsData.push({
+  if (unsubscribePolls) {
+    unsubscribePolls();
+  }
+
+  unsubscribePolls = onSnapshot(
+    pollsColRef,
+    (snap) => {
+      pollsData = snap.docs.map((docSnap) => ({
         id: docSnap.id,
         ...docSnap.data()
-      });
-    });
-    renderPollsAdmin();
-  });
-}
+      }));
 
-// ===== form =====
-function setupPollForm() {
-  const form = document.getElementById("poll-form");
-  if (!form) return;
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const question = form.question.value.trim();
-    const opt1 = form.option1.value.trim();
-    const opt2 = form.option2.value.trim();
-    const opt3 = form.option3.value.trim();
-    const opt4 = form.option4.value.trim();
-    const isActive = form.isActive.checked;
-
-    if (!question || !opt1 || !opt2) {
-      alert("חובה למלא שאלה + לפחות שתי אפשרויות.");
-      return;
-    }
-
-    const options = [];
-    if (opt1) options.push({ id: "a", text: opt1, votes: 0 });
-    if (opt2) options.push({ id: "b", text: opt2, votes: 0 });
-    if (opt3) options.push({ id: "c", text: opt3, votes: 0 });
-    if (opt4) options.push({ id: "d", text: opt4, votes: 0 });
-
-    try {
-      await addDoc(pollsCollectionRef, {
-        question,
-        options,
-        isActive,
-        createdAt: serverTimestamp()
+      // ממיינים לפי createdAt מהחדש לישן
+      pollsData.sort((a, b) => {
+        const ta =
+          a.createdAt && typeof a.createdAt.toDate === "function"
+            ? a.createdAt.toDate().getTime()
+            : 0;
+        const tb =
+          b.createdAt && typeof b.createdAt.toDate === "function"
+            ? b.createdAt.toDate().getTime()
+            : 0;
+        return tb - ta;
       });
 
-      form.reset();
-      form.isActive.checked = true;
-      alert("הסקר נוצר בהצלחה.");
-    } catch (err) {
-      console.error("שגיאה ביצירת סקר:", err);
-      alert("שגיאה ביצירת הסקר. בדוק console.");
+      renderPolls();
+    },
+    (err) => {
+      console.error("שגיאה בטעינת סקרים:", err);
     }
-  });
+  );
 }
 
-// ===== delete / toggle buttons =====
-function setupButtonsHandler() {
-  document.addEventListener("click", async (e) => {
-    // toggle active
-    const toggleBtn = e.target.closest(".admin-toggle-poll");
-    if (toggleBtn) {
-      const pollId = toggleBtn.dataset.id;
-      const isActiveNow = toggleBtn.dataset.active === "1";
-      if (!pollId) return;
-
-      try {
-        await updateDoc(doc(db, "polls", pollId), {
-          isActive: !isActiveNow
-        });
-      } catch (err) {
-        console.error("שגיאה בעדכון סטטוס סקר:", err);
-        alert("שגיאה בעדכון סטטוס הסקר.");
-      }
-      return;
-    }
-
-    // delete
-    const delBtn = e.target.closest(".admin-remove");
-    if (!delBtn) return;
-
-    const pollId = delBtn.dataset.id;
-    if (!pollId) return;
-    if (!confirm("למחוק את הסקר הזה?")) return;
-
-    try {
-      await deleteDoc(doc(db, "polls", pollId));
-      alert("הסקר נמחק.");
-    } catch (err) {
-      console.error("שגיאה במחיקת סקר:", err);
-      alert("שגיאה במחיקת הסקר.");
-    }
-  });
-}
-
-// ===== main =====
+// ===== MAIN =====
 document.addEventListener("DOMContentLoaded", () => {
+  setupAuth();
   setupPollForm();
-  setupButtonsHandler();
-  loadPollsOnce();
-  subscribeRealtimePolls();
+  setupPollsListEvents();
 });
