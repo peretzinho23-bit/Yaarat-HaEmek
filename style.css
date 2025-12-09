@@ -2180,3 +2180,17 @@ html[data-theme="light"] .board-slider-controls button {
     min-height: 360px !important;
   }
 }
+/* ===== POLLS – לייט מוד לבן לגמרי ===== */
+html[data-theme="light"] .polls-main-card,
+html[data-theme="light"] .polls-stat-card {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border-radius: 24px !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.10) !important;
+}
+
+/* רקע האזור של הסקרים בלייט – קצת אפור בהיר עדין */
+html[data-theme="light"] body[data-page="polls"] {
+  background: #eef3fb !important;
+}
