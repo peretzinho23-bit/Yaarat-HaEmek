@@ -1,4 +1,4 @@
-// home-poll-mini.js – סקר השבוע בעמוד הבית
+// home-poll-mini.js – סקר השבוע בדף הבית
 
 import { db } from "./firebase-config.js";
 import {
@@ -8,116 +8,105 @@ import {
 
 const pollsColRef = collection(db, "polls");
 
-const questionEl = document.getElementById("home-poll-question");
-const optionsEl = document.getElementById("home-poll-options");
+const rootEl = document.getElementById("home-poll-root");
 const statusEl = document.getElementById("home-poll-status");
-const votesEl = document.getElementById("home-poll-votes");
+const totalEl = document.getElementById("home-poll-total");
 
-function renderNoPoll() {
-  if (statusEl)
-    statusEl.textContent = "כרגע אין סקר פעיל. כשייפתח סקר חדש – הוא יופיע כאן.";
-  if (questionEl)
-    questionEl.textContent = "אין כרגע סקר פעיל להצבעה.";
-  if (optionsEl)
-    optionsEl.innerHTML = "";
-  if (votesEl)
-    votesEl.textContent = "0 הצבעות עד עכשיו";
+function getTotalVotes(poll) {
+  return (poll.options || []).reduce(
+    (sum, opt) => sum + (opt.votes || 0),
+    0
+  );
 }
 
-function renderPoll(poll) {
-  if (!poll) {
-    renderNoPoll();
-    return;
+function renderEmpty() {
+  if (statusEl) statusEl.textContent = "אין כרגע סקר פעיל";
+  if (rootEl) {
+    rootEl.innerHTML = `
+      <p class="empty-msg">
+        כרגע אין סקר פעיל. אפשר להיכנס לעמוד הסקרים כדי לראות סקרים קודמים 🙂
+      </p>
+    `;
   }
-
-  const options = poll.options || [];
-  const totalVotes = options.reduce((sum, opt) => sum + (opt.votes || 0), 0);
-
-  if (statusEl)
-    statusEl.textContent = "הסקר הפעיל ביותר מהמערכת.";
-
-  if (questionEl)
-    questionEl.textContent = poll.question || "סקר ללא שאלה";
-
-  if (votesEl)
-    votesEl.textContent = `${totalVotes} הצבעות עד עכשיו`;
-
-  if (!optionsEl) return;
-
-  optionsEl.innerHTML = "";
-
-  // מציגים עד 4 אפשרויות (אם יש יותר – זה כבר לשם בדף הסקרים המלא)
-  options.slice(0, 4).forEach((opt) => {
-    const li = document.createElement("li");
-    li.className = "home-poll-option";
-
-    const label = document.createElement("span");
-    label.className = "home-poll-option-label";
-    label.textContent = opt.text || "";
-
-    const votes = opt.votes || 0;
-    const percent =
-      totalVotes > 0 ? Math.round((votes / totalVotes) * 100) : 0;
-
-    const votesSpan = document.createElement("span");
-    votesSpan.className = "home-poll-option-votes";
-    votesSpan.textContent =
-      totalVotes === 0
-        ? "0 קולות"
-        : `${votes} קולות (${percent}%)`;
-
-    li.appendChild(label);
-    li.appendChild(votesSpan);
-    optionsEl.appendChild(li);
-  });
-
-  // אם יש יותר מ־4 אפשרויות – נוסיף שורה קטנה
-  if (options.length > 4) {
-    const li = document.createElement("li");
-    li.className = "home-poll-option";
-    li.style.opacity = "0.75";
-
-    const span = document.createElement("span");
-    span.className = "home-poll-option-label";
-    span.textContent = `ועוד ${options.length - 4} אפשרויות נוספות...`;
-
-    li.appendChild(span);
-    optionsEl.appendChild(li);
-  }
+  if (totalEl) totalEl.textContent = "0\u00A0הצבעות עד עכשיו";
 }
 
-// מאזין לכל קולקציית הסקרים ובוחר את הפעיל הכי חדש
+function renderMiniPoll(poll) {
+  const totalVotes = getTotalVotes(poll);
+
+  if (statusEl) statusEl.textContent = "סקר פעיל כרגע";
+
+  if (totalEl) {
+    totalEl.textContent = `${totalVotes}\u00A0הצבעות עד עכשיו`;
+  }
+
+  if (!rootEl) return;
+
+  const options = (poll.options || []).slice(0, 3); // מציגים עד 3 תשובות בדף הבית
+
+  const optionsHtml = options
+    .map(opt => {
+      const votes = opt.votes || 0;
+      const percent =
+        totalVotes > 0 ? Math.round((votes / totalVotes) * 100) : 0;
+      return `
+        <li class="home-poll-option">
+          <span class="home-poll-option-label">${opt.text || ""}</span>
+          <span class="home-poll-option-votes">
+            ${votes}\u00A0קולות (${percent}%)
+          </span>
+        </li>
+      `;
+    })
+    .join("");
+
+  rootEl.innerHTML = `
+    <div class="home-poll-question">
+      <div class="home-poll-question-text">
+        ${poll.question || "סקר ללא כותרת"}
+      </div>
+    </div>
+    <ul class="home-poll-options">
+      ${optionsHtml || `<li class="home-poll-option">אין עדיין תשובות מוגדרות לסקר הזה.</li>`}
+    </ul>
+  `;
+}
+
+// מאזין בזמן אמת לסקרים
 onSnapshot(
   pollsColRef,
   (snap) => {
-    let latestActive = null;
-
-    snap.forEach((docSnap) => {
-      const data = docSnap.data();
-      if (!data.isActive) return;
-
-      let ts = 0;
-      if (data.createdAt && typeof data.createdAt.toMillis === "function") {
-        ts = data.createdAt.toMillis();
-      }
-
-      if (!latestActive || ts > latestActive._ts) {
-        latestActive = {
-          id: docSnap.id,
-          _ts: ts,
-          ...data
-        };
-      }
+    const polls = [];
+    snap.forEach(docSnap => {
+      polls.push({
+        id: docSnap.id,
+        ...docSnap.data()
+      });
     });
 
-    if (!latestActive) {
-      renderNoPoll();
-    } else {
-      renderPoll(latestActive);
+    // רק סקרים פעילים
+    const activePolls = polls.filter(p => p.isActive);
+
+    if (!activePolls.length) {
+      renderEmpty();
+      return;
     }
+
+    // לוקחים את הסקר עם הכי הרבה הצבעות (ה"ראשי")
+    activePolls.sort((a, b) => getTotalVotes(b) - getTotalVotes(a));
+    const featured = activePolls[0];
+
+    renderMiniPoll(featured);
   },
   (err) => {
-    console.error("שגיאה בטעינת סקר השבוע:", err);
-    renderNoPoll();
+    console.error("שגיאה בטעינת סקר הבית:", err);
+    if (rootEl) {
+      rootEl.innerHTML = `
+        <p class="empty-msg">
+          הייתה בעיה בטעינת הסקר. נסו לרענן את הדף.
+        </p>
+      `;
+    }
+    if (statusEl) statusEl.textContent = "שגיאה בטעינת הסקר";
   }
 );

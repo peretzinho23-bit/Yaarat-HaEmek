@@ -762,7 +762,7 @@
       const meta = document.createElement("div");
       meta.className = "poll-meta";
       const votesSpan = document.createElement("span");
-      votesSpan.textContent = totalVotes + " הצבעות עד עכשיו";
+votesSpan.textContent = `${totalVotes}\u00A0הצבעות עד עכשיו`;
       meta.appendChild(votesSpan);
 
       left.appendChild(qEl);
