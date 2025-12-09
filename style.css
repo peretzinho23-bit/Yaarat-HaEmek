@@ -1750,3 +1750,60 @@ html[data-theme="light"] .class-links-row a:hover {
 .exams-grade-card h3.section-title {
   white-space: nowrap !important;
 }
+.news-slider {
+  position: relative;
+  border-radius: 18px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.news-slider-inner {
+  position: relative;
+  width: 100%;
+  height: 210px;
+}
+
+.news-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.news-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.news-slide.active {
+  opacity: 1;
+}
+
+.news-slider-nav {
+  position: absolute;
+  inset: auto 8px 8px 8px;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.news-slider-btn {
+  pointer-events: auto;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.8);
+  background: rgba(15, 23, 42, 0.85);
+  color: #e5f0ff;
+  padding: 3px 10px;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+html[data-theme="light"] .news-slider-btn {
+  background: rgba(255, 255, 255, 0.9);
+  color: #0f172a;
+  border-color: #cbd5e1;
+}

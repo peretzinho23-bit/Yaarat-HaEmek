@@ -35,7 +35,6 @@ const CLASS_IDS_BY_GRADE = {
   t: ["t1", "t2", "t3", "t4", "t5"]
 };
 
-
 let newsData = { z: [], h: [], t: [] };
 let examsData = { z: [], h: [], t: [] };
 let boardData = [];
@@ -85,12 +84,12 @@ function classIdToLabel(classId) {
     z3: "ז3",
     z4: "ז4",
     z5: "ז5",
-    h1: "ח1",
-    h2: "ח2",
-    h3: "ח3",
-    h4: "ח4",
-    h5: "ח5",
-    h6: "ח6",
+
+    h1: "ח1/7",
+    h4: "ח4/8",
+    h5: "ח5/9",
+    h6: "ח6/10",
+
     t1: "ט1",
     t2: "ט2",
     t3: "ט3",
@@ -241,11 +240,27 @@ function renderNewsAdmin() {
 
     listEl.innerHTML = items
       .map((n, i) => {
-        const imgHtml = n.imageUrl
-          ? `<div class="admin-image-wrapper">
-               <img src="${escapeHtml(n.imageUrl)}" class="admin-image">
-             </div>`
-          : "";
+        // תמונות: תומך גם ב-imageUrls (מערך) וגם ב-imageUrl יחיד
+        const images = Array.isArray(n.imageUrls) && n.imageUrls.length
+          ? n.imageUrls
+          : (n.imageUrl ? [n.imageUrl] : []);
+
+        let imgHtml = "";
+        if (images.length) {
+          imgHtml = `
+            <div class="admin-images-row">
+              ${images
+                .slice(0, 2) // עד 2 תמונות לתצוגה באדמין
+                .map(
+                  (url) => `
+                <div class="admin-image-wrapper">
+                  <img src="${escapeHtml(url)}" class="admin-image">
+                </div>`
+                )
+                .join("")}
+            </div>
+          `;
+        }
 
         const colorStyle = n.color ? ` style="color:${escapeHtml(n.color)};"` : "";
 
@@ -272,6 +287,7 @@ async function saveNewsGrade(grade) {
   await setDoc(refDoc, { items: newsData[grade] });
 }
 
+// ⬇⬇⬇ פה שיניתי – טופס חדשות תומך בכמה תמונות (עד 2) ⬇⬇⬇
 function setupNewsForms() {
   for (const g of GRADES) {
     const form = document.getElementById(`news-form-${g}`);
@@ -288,8 +304,12 @@ function setupNewsForms() {
       const color =
         (form.color && form.color.value && form.color.value.trim()) || "#ffffff";
 
+      // חשוב: בשם input בקובץ HTML – imageFile
+      // אם תוסיף multiple ב-HTML, פה אוטומטית יתמוך בכמה קבצים.
       const fileInput = form.imageFile;
-      const file = fileInput && fileInput.files && fileInput.files[0];
+      const files = fileInput && fileInput.files
+        ? Array.from(fileInput.files)
+        : [];
 
       if (!title || !body) {
         alert("חובה למלא לפחות כותרת ותוכן.");
@@ -297,21 +317,32 @@ function setupNewsForms() {
       }
 
       try {
-        let finalImageUrl = manualImageUrl;
+        const imageUrls = [];
 
-        if (file) {
+        // קודם – אם המשתמש שם URL ידני
+        if (manualImageUrl) {
+          imageUrls.push(manualImageUrl);
+        }
+
+        // עכשיו מעלים קבצים (ניקח עד 2 כדי שלא יעוף עליך)
+        for (let i = 0; i < files.length && i < 2; i++) {
+          const file = files[i];
           const filePath = `news/${g}/${Date.now()}_${file.name}`;
           const fileRef = ref(storage, filePath);
           await uploadBytes(fileRef, file);
-          finalImageUrl = await getDownloadURL(fileRef);
+          const url = await getDownloadURL(fileRef);
+          imageUrls.push(url);
         }
 
         const newItem = {
           title,
           meta,
           body,
-          imageUrl: finalImageUrl,
-          color
+          color,
+          // לשמירה על תאימות – התמונה הראשונה
+          imageUrl: imageUrls[0] || "",
+          // השדה החדש – כל התמונות
+          imageUrls
         };
 
         newsData[g].push(newItem);
@@ -329,7 +360,7 @@ function setupNewsForms() {
 
         alert("הידיעה נשמרה.");
       } catch (err) {
-        console.error("שגיאה בהעלאת תמונה/שמירת חדשות:", err);
+        console.error("שגיאה בהעלאת תמונות/שמירת חדשות:", err);
         alert(
           "שגיאה בשמירת הידיעה:\n" +
             (err.code ? err.code + " – " : "") +

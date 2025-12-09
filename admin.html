@@ -107,7 +107,7 @@
 
         <!-- NEWS -->
         <h3 class="section-title" style="font-size:1.2rem;margin-bottom:10px;">חדשות לפי שכבות</h3>
-        <p class="section-subtitle">ניתן להוסיף קישור לתמונה, להעלות תמונה ולצבע טקסט (אופציונלי).</p>
+        <p class="section-subtitle">ניתן להוסיף עד שתי תמונות לידיעה (קישורים או קבצים) + צבע טקסט (אופציונלי).</p>
 
         <div class="admin-columns">
           <!-- NEWS Z -->
@@ -123,12 +123,19 @@
                 <label>מידע קצר (תאריך/אירוע)</label>
                 <input name="meta" />
 
-                <label>קישור לתמונה (אופציונלי)</label>
+                <!-- תמונה 1 -->
+                <label>קישור לתמונה 1 (אופציונלי)</label>
                 <input name="imageUrl" placeholder="https://..." />
 
-                <!-- העלאת תמונה מקובץ -->
-                <label>תמונה מקובץ (אופציונלי)</label>
+                <label>תמונה 1 מקובץ (אופציונלי)</label>
                 <input type="file" name="imageFile" accept="image/*" />
+
+                <!-- תמונה 2 -->
+                <label>קישור לתמונה 2 (אופציונלי)</label>
+                <input name="imageUrl2" placeholder="https://..." />
+
+                <label>תמונה 2 מקובץ (אופציונלי)</label>
+                <input type="file" name="imageFile2" accept="image/*" />
 
                 <label>צבע הטקסט (אופציונלי)</label>
                 <input type="color" name="color" value="#ffffff" />
@@ -154,11 +161,19 @@
                 <label>מידע קצר (תאריך/אירוע)</label>
                 <input name="meta" />
 
-                <label>קישור לתמונה (אופציונלי)</label>
+                <!-- תמונה 1 -->
+                <label>קישור לתמונה 1 (אופציונלי)</label>
                 <input name="imageUrl" placeholder="https://..." />
 
-                <label>תמונה מקובץ (אופציונלי)</label>
+                <label>תמונה 1 מקובץ (אופציונלי)</label>
                 <input type="file" name="imageFile" accept="image/*" />
+
+                <!-- תמונה 2 -->
+                <label>קישור לתמונה 2 (אופציונלי)</label>
+                <input name="imageUrl2" placeholder="https://..." />
+
+                <label>תמונה 2 מקובץ (אופציונלי)</label>
+                <input type="file" name="imageFile2" accept="image/*" />
 
                 <label>צבע הטקסט (אופציונלי)</label>
                 <input type="color" name="color" value="#ffffff" />
@@ -184,11 +199,19 @@
                 <label>מידע קצר (תאריך/אירוע)</label>
                 <input name="meta" />
 
-                <label>קישור לתמונה (אופציונלי)</label>
+                <!-- תמונה 1 -->
+                <label>קישור לתמונה 1 (אופציונלי)</label>
                 <input name="imageUrl" placeholder="https://..." />
 
-                <label>תמונה מקובץ (אופציונלי)</label>
+                <label>תמונה 1 מקובץ (אופציונלי)</label>
                 <input type="file" name="imageFile" accept="image/*" />
+
+                <!-- תמונה 2 -->
+                <label>קישור לתמונה 2 (אופציונלי)</label>
+                <input name="imageUrl2" placeholder="https://..." />
+
+                <label>תמונה 2 מקובץ (אופציונלי)</label>
+                <input type="file" name="imageFile2" accept="image/*" />
 
                 <label>צבע הטקסט (אופציונלי)</label>
                 <input type="color" name="color" value="#ffffff" />
@@ -264,14 +287,12 @@
 
                 <label>כיתה</label>
                 <select name="classId" required>
-  <option value="">בחר כיתה</option>
-
-  <option value="h1">ח1/7</option>
-  <option value="h4">ח4/8</option>
-  <option value="h5">ח5/9</option>
-  <option value="h6">ח6/10</option>
-</select>
-
+                  <option value="">בחר כיתה</option>
+                  <option value="h1">ח1/7</option>
+                  <option value="h4">ח4/8</option>
+                  <option value="h5">ח5/9</option>
+                  <option value="h6">ח6/10</option>
+                </select>
 
                 <label>נושא המבחן</label>
                 <textarea name="topic"></textarea>
@@ -515,7 +536,7 @@
     </div> <!-- /.container -->
   </section>
 
-<script type="module" src="admin.js?v=7"></script>
+  <script type="module" src="admin.js?v=7"></script>
   <script src="accessibility.js"></script>
 </body>
 </html>

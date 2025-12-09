@@ -234,16 +234,32 @@ function renderHomeNews() {
     listEl.innerHTML = items
       .slice(0, 3)
       .map((n) => {
-        const hasImage = !!n.imageUrl;
+        // 🔥 תמיכה בכמה תמונות: imageUrls (מערך) או imageUrl יחיד
+        const images = Array.isArray(n.imageUrls) && n.imageUrls.length
+          ? n.imageUrls
+          : (n.imageUrl ? [n.imageUrl] : []);
+
+        const hasImages = images.length > 0;
         const colorStyle = n.color ? ` style="color:${escapeHtml(n.color)}"` : "";
 
-        if (hasImage) {
+        if (hasImages) {
+          const imgsHtml = images
+            .slice(0, 2) // עד 2 תמונות
+            .map(
+              (url) => `
+                <div class="home-news-image-wrap-multi">
+                  <img src="${escapeHtml(url)}" alt="${escapeHtml(
+                    n.title || ""
+                  )}" />
+                </div>
+              `
+            )
+            .join("");
+
           return `
             <article class="home-news-item home-news-item-with-image"${colorStyle}>
-              <div class="home-news-image-wrap">
-                <img src="${escapeHtml(n.imageUrl)}" alt="${escapeHtml(
-                  n.title || ""
-                )}" />
+              <div class="home-news-images-row">
+                ${imgsHtml}
               </div>
               <div class="home-news-text">
                 <h4 class="home-news-title">${escapeHtml(n.title)}</h4>
@@ -297,7 +313,7 @@ function renderHomeExams() {
       }))
       .filter((ex) => ex._dateObj);
 
-     if (!itemsWithDates.length) {
+    if (!itemsWithDates.length) {
       listEl.innerHTML = `
         <p class="empty-msg">
           כדי לראות את לוח המבחנים – בחרו את הכיתה שלכם למעלה.
@@ -462,16 +478,30 @@ function renderGradeNews(grade) {
 
   listEl.innerHTML = items
     .map((n) => {
-      const hasImage = !!n.imageUrl;
+      const images = Array.isArray(n.imageUrls) && n.imageUrls.length
+        ? n.imageUrls
+        : (n.imageUrl ? [n.imageUrl] : []);
+      const hasImages = images.length > 0;
       const colorStyle = n.color ? ` style="color:${escapeHtml(n.color)}"` : "";
 
-      if (hasImage) {
+      if (hasImages) {
+        const imgsHtml = images
+          .slice(0, 2)
+          .map(
+            (url) => `
+              <div class="home-news-image-wrap-multi">
+                <img src="${escapeHtml(url)}" alt="${escapeHtml(
+                  n.title || ""
+                )}" />
+              </div>
+            `
+          )
+          .join("");
+
         return `
           <article class="home-news-item home-news-item-with-image"${colorStyle}>
-            <div class="home-news-image-wrap">
-              <img src="${escapeHtml(n.imageUrl)}" alt="${escapeHtml(
-                n.title || ""
-              )}" />
+            <div class="home-news-images-row">
+              ${imgsHtml}
             </div>
             <div class="home-news-text">
               <h4 class="home-news-title">${escapeHtml(n.title)}</h4>
@@ -515,7 +545,6 @@ function renderGradeExams(grade) {
     .filter((ex) => ex._dateObj);
 
   if (!itemsWithDates.length) {
-    // גם בדף שכבה – אם אין מבחנים, פשוט לא מציגים כלום
     listEl.innerHTML = "";
     return;
   }
@@ -740,7 +769,6 @@ function setupMobileNav() {
 
   if (!navToggle || !navRight) return;
 
-  // אם אנחנו בדף הבית – דואגים שהתפריט יכלול גם "סקרים" וגם "תיבת בקשות"
   const pageType = document.body.dataset.page || "";
   if (pageType === "home") {
     navRight.innerHTML = `
@@ -756,7 +784,6 @@ function setupMobileNav() {
     `;
   }
 
-  // סוגר תפריט אחרי לחיצה על לינק
   navRight.querySelectorAll("a").forEach((link) => {
     link.addEventListener("click", () => {
       navRight.classList.remove("open");
@@ -822,13 +849,11 @@ function setupScrollToTop() {
 document.addEventListener("DOMContentLoaded", () => {
   const grade = document.body.dataset.grade;
 
-  // אם יש data-grade → דף שכבה (z / h / t)
   if (grade) {
     loadGradePage(grade);
     return;
   }
 
-  // אחרת – זה דף הבית
   loadHomeDataOnce();
   subscribeRealtimeHome();
   loadSiteContentForHome();
