@@ -801,12 +801,15 @@ votesSpan.textContent = `${totalVotes}\u00A0הצבעות עד עכשיו`;
         const votesSpan = document.createElement("span");
         votesSpan.className = "poll-option-votes";
 
-        const votes = opt.votes || 0;
-        const percent =
-          totalVotes > 0 ? Math.round((votes / totalVotes) * 100) : 0;
+       const votes = opt.votes || 0;
+const percent =
+  totalVotes > 0 ? Math.round((votes / totalVotes) * 100) : 0;
 
-        votesSpan.textContent =
-          totalVotes === 0 ? "0 קולות" : `${votes} קולות (${percent}%)`;
+// רווח ברור בין המספר למילה "קולות"
+votesSpan.textContent =
+  totalVotes === 0
+    ? "0 קולות"
+    : `${votes} קולות (${percent}%)`;
 
         btn.appendChild(labelSpan);
         btn.appendChild(votesSpan);
