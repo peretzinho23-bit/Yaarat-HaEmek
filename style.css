@@ -2082,3 +2082,101 @@ html[data-theme="light"] .board-slider-controls button {
     margin-top: 10px !important;
   }
 }
+/* === HERO FINAL OVERRIDE – גם לייט, גם דארק, גם מובייל === */
+
+.hero-home::before,
+.hero-home::after {
+  content: none !important;
+}
+
+/* קופסת הירו הכללית */
+.hero.hero-home {
+  position: relative !important;
+  width: 100% !important;
+  min-height: 340px !important;
+  display: flex !important;
+  align-items: flex-end !important;
+  overflow: hidden !important;
+}
+
+/* הסליידר כרקע מלא שממשיך לזוז */
+.hero.hero-home .hero-slides {
+  position: absolute !important;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 0 !important;
+}
+
+.hero.hero-home .hero-slide {
+  position: absolute !important;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  background-size: cover !important;
+  background-position: center !important;
+}
+
+/* שכבת כהות מעל הרקע */
+.hero.hero-home .hero-overlay {
+  position: absolute !important;
+  inset: 0;
+  z-index: 1 !important;
+  background: linear-gradient(
+    to bottom,
+    rgba(15,23,42,0.45),
+    rgba(15,23,42,0.88)
+  ) !important;
+}
+
+/* התוכן (יחד צומחים וכו') – תמיד מעל */
+.hero.hero-home > .container.hero-content {
+  position: relative !important;
+  z-index: 2 !important;
+  width: 100% !important;
+  padding: 16px 16px 28px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+}
+
+/* הקופסה של הטקסט בהירו */
+.hero.hero-home .hero-text {
+  background: rgba(15, 23, 42, 0.82) !important;
+  color: #f9fafb !important;
+  padding: 12px 14px !important;
+  border-radius: 14px !important;
+}
+
+/* לייט מוד – קופסה לבנה, טקסט שחור */
+:root[data-theme="light"] .hero.hero-home .hero-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.75),
+    rgba(255,255,255,0.98)
+  ) !important;
+}
+
+:root[data-theme="light"] .hero.hero-home .hero-text {
+  background: rgba(255,255,255,0.92) !important;
+  color: #0f172a !important;
+}
+
+/* בדסקטופ – טקסט + כרטיס צד אחד ליד השני */
+@media (min-width: 900px) {
+  .hero.hero-home > .container.hero-content {
+    flex-direction: row !important;
+    align-items: center !important;
+  }
+
+  .hero.hero-home .hero-text {
+    max-width: 520px !important;
+  }
+}
+
+/* במובייל – אותו לוק כמו ששלחת, רק על התמונה */
+@media (max-width: 640px) {
+  .hero.hero-home {
+    min-height: 360px !important;
+  }
+}
