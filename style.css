@@ -1883,3 +1883,57 @@ html[data-theme="light"] .board-slider-controls button {
     padding-bottom: 24px;
   }
 }
+/* ===== FIX HERO במובייל – טקסט על הסליידר, לא מעליו ===== */
+
+.hero.hero-home {
+  position: relative !important;
+  width: 100% !important;
+  min-height: 280px !important;
+  overflow: hidden !important;
+}
+
+/* הסליידר – תמיד כרקע שמתפרס על כל הסקשן */
+.hero.hero-home .hero-slides {
+  position: absolute !important;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 0 !important;
+}
+
+/* כל סלייד ממלא את הגובה של ההירו */
+.hero.hero-home .hero-slide {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* שכבת ההכהיה מעל הסליידר */
+.hero.hero-home .hero-overlay {
+  position: absolute !important;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1 !important;
+}
+
+/* התוכן (יחד צומחים וכו') מעל הכול */
+.hero.hero-home > .container.hero-content {
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+/* במובייל – קצת יותר קומפקטי אבל עדיין על התמונה */
+@media (max-width: 768px) {
+  .hero.hero-home {
+    min-height: 260px !important;
+  }
+
+  .hero.hero-home > .container.hero-content {
+    padding-top: 24px;
+    padding-bottom: 24px;
+  }
+}
