@@ -498,12 +498,13 @@
           </div>
 
           <div>
-    <div class="school-title-sub">
-  תבחרו, תצביעו – והקול של השכבה משפיע.<br>
-  <a href="index.html">חזרה למסך הבית</a>
-</div>
-
-
+            <div class="school-title-main">
+              סקרים לתלמידים – יערת העמק
+            </div>
+            <div class="school-title-sub">
+              תבחרו, תצביעו – והקול של השכבה משפיע.<br>
+              <a href="index.html">חזרה למסך הבית</a>
+            </div>
           </div>
         </div>
 
@@ -761,9 +762,9 @@
 
       const meta = document.createElement("div");
       meta.className = "poll-meta";
-      const votesSpan = document.createElement("span");
-votesSpan.textContent = `${totalVotes}\u00A0הצבעות עד עכשיו`;
-      meta.appendChild(votesSpan);
+      const votesSpanHeader = document.createElement("span");
+      votesSpanHeader.innerHTML = `<span dir="ltr">${totalVotes}</span>&nbsp;הצבעות עד עכשיו`;
+      meta.appendChild(votesSpanHeader);
 
       left.appendChild(qEl);
       left.appendChild(meta);
@@ -801,16 +802,21 @@ votesSpan.textContent = `${totalVotes}\u00A0הצבעות עד עכשיו`;
         const votesSpan = document.createElement("span");
         votesSpan.className = "poll-option-votes";
 
-       const votes = opt.votes || 0;
-const percent =
-  totalVotes > 0 ? Math.round((votes / totalVotes) * 100) : 0;
+        const votes = opt.votes || 0;
+        const percent =
+          totalVotes > 0 ? Math.round((votes / totalVotes) * 100) : 0;
 
-// רווח ברור בין המספר למילה "קולות"
-votesSpan.textContent =
-  totalVotes === 0
-    ? "0 קולות"
-    : `${votes} קולות (${percent}%)`;
-
+        // הצגת "מספר קולות (אחוז%)" עם רווחים תקינים ב-RTL
+        if (totalVotes === 0) {
+          votesSpan.innerHTML = `
+            <span dir="ltr">${votes}</span>&nbsp;<span>קולות</span>
+          `;
+        } else {
+          votesSpan.innerHTML = `
+            <span dir="ltr">${votes}</span>&nbsp;<span>קולות</span>
+            &nbsp;(<span dir="ltr">${percent}%</span>)
+          `;
+        }
 
         btn.appendChild(labelSpan);
         btn.appendChild(votesSpan);
