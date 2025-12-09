@@ -808,21 +808,13 @@ function setupBoardForm() {
     const title = form.title.value.trim();
     const meta = form.meta.value.trim();
     const body = form.body.value.trim();
+    const manualImageUrl =
+      (form.imageUrl && form.imageUrl.value && form.imageUrl.value.trim()) || "";
     const color =
       (form.color && form.color.value && form.color.value.trim()) || "#ffffff";
 
-    // קישורי תמונות ידניים
-    const manualImageUrl1 =
-      (form.imageUrl && form.imageUrl.value && form.imageUrl.value.trim()) || "";
-    const manualImageUrl2 =
-      (form.imageUrl2 && form.imageUrl2.value && form.imageUrl2.value.trim()) || "";
-    const manualImageUrl3 =
-      (form.imageUrl3 && form.imageUrl3.value && form.imageUrl3.value.trim()) || "";
-
-    // קבצי תמונה
-    const file1 = form.imageFile && form.imageFile.files && form.imageFile.files[0];
-    const file2 = form.imageFile2 && form.imageFile2.files && form.imageFile2.files[0];
-    const file3 = form.imageFile3 && form.imageFile3.files && form.imageFile3.files[0];
+    const fileInput = form.imageFile;
+    const file = fileInput && fileInput.files && fileInput.files[0];
 
     if (!title || !body) {
       alert("חובה למלא כותרת ותוכן.");
@@ -830,42 +822,21 @@ function setupBoardForm() {
     }
 
     try {
-      let finalImageUrl1 = manualImageUrl1;
-      let finalImageUrl2 = manualImageUrl2;
-      let finalImageUrl3 = manualImageUrl3;
+      let finalImageUrl = manualImageUrl;
 
-      // העלאה לתמונה 1
-      if (file1) {
-        const filePath = `board/${Date.now()}_1_${file1.name}`;
+      if (file) {
+        const filePath = `board/${Date.now()}_${file.name}`;
         const fileRef = ref(storage, filePath);
-        await uploadBytes(fileRef, file1);
-        finalImageUrl1 = await getDownloadURL(fileRef);
-      }
-
-      // העלאה לתמונה 2
-      if (file2) {
-        const filePath = `board/${Date.now()}_2_${file2.name}`;
-        const fileRef = ref(storage, filePath);
-        await uploadBytes(fileRef, file2);
-        finalImageUrl2 = await getDownloadURL(fileRef);
-      }
-
-      // העלאה לתמונה 3
-      if (file3) {
-        const filePath = `board/${Date.now()}_3_${file3.name}`;
-        const fileRef = ref(storage, filePath);
-        await uploadBytes(fileRef, file3);
-        finalImageUrl3 = await getDownloadURL(fileRef);
+        await uploadBytes(fileRef, file);
+        finalImageUrl = await getDownloadURL(fileRef);
       }
 
       const newBoardItem = {
         title,
         meta,
         body,
-        color,
-        imageUrl: finalImageUrl1 || "",
-        imageUrl2: finalImageUrl2 || "",
-        imageUrl3: finalImageUrl3 || ""
+        imageUrl: finalImageUrl,
+        color
       };
 
       boardData.push(newBoardItem);
@@ -887,7 +858,6 @@ function setupBoardForm() {
     }
   });
 }
-
 
 /* ------------ SITE CONTENT ------------ */
 
