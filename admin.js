@@ -749,11 +749,31 @@ function renderBoardAdmin() {
   listEl.innerHTML = boardData
     .map((b, i) => {
       const colorStyle = b.color ? ` style="color:${escapeHtml(b.color)}"` : "";
-      const imgHtml = b.imageUrl
-        ? `<div class="admin-image-wrapper">
-             <img src="${escapeHtml(b.imageUrl)}" class="admin-image">
-           </div>`
-        : "";
+
+      const imgs = [];
+      if (b.imageUrl) {
+        imgs.push(`
+          <div class="admin-image-wrapper">
+            <img src="${escapeHtml(b.imageUrl)}" class="admin-image">
+          </div>
+        `);
+      }
+      if (b.imageUrl2) {
+        imgs.push(`
+          <div class="admin-image-wrapper">
+            <img src="${escapeHtml(b.imageUrl2)}" class="admin-image">
+          </div>
+        `);
+      }
+      if (b.imageUrl3) {
+        imgs.push(`
+          <div class="admin-image-wrapper">
+            <img src="${escapeHtml(b.imageUrl3)}" class="admin-image">
+          </div>
+        `);
+      }
+
+      const imgsHtml = imgs.join("");
 
       return `
         <div class="admin-item"${colorStyle}>
@@ -762,7 +782,7 @@ function renderBoardAdmin() {
             <span class="admin-item-meta">${escapeHtml(b.meta || "")}</span>
           </div>
           <div class="admin-item-body">${escapeHtml(b.body)}</div>
-          ${imgHtml}
+          ${imgsHtml}
           <button class="admin-remove" data-type="board" data-index="${i}">
             מחיקה
           </button>
@@ -771,6 +791,7 @@ function renderBoardAdmin() {
     })
     .join("");
 }
+
 
 async function saveBoard() {
   const refDoc = doc(db, "board", "general");
@@ -787,13 +808,21 @@ function setupBoardForm() {
     const title = form.title.value.trim();
     const meta = form.meta.value.trim();
     const body = form.body.value.trim();
-    const manualImageUrl =
-      (form.imageUrl && form.imageUrl.value && form.imageUrl.value.trim()) || "";
     const color =
       (form.color && form.color.value && form.color.value.trim()) || "#ffffff";
 
-    const fileInput = form.imageFile;
-    const file = fileInput && fileInput.files && fileInput.files[0];
+    // קישורי תמונות ידניים
+    const manualImageUrl1 =
+      (form.imageUrl && form.imageUrl.value && form.imageUrl.value.trim()) || "";
+    const manualImageUrl2 =
+      (form.imageUrl2 && form.imageUrl2.value && form.imageUrl2.value.trim()) || "";
+    const manualImageUrl3 =
+      (form.imageUrl3 && form.imageUrl3.value && form.imageUrl3.value.trim()) || "";
+
+    // קבצי תמונה
+    const file1 = form.imageFile && form.imageFile.files && form.imageFile.files[0];
+    const file2 = form.imageFile2 && form.imageFile2.files && form.imageFile2.files[0];
+    const file3 = form.imageFile3 && form.imageFile3.files && form.imageFile3.files[0];
 
     if (!title || !body) {
       alert("חובה למלא כותרת ותוכן.");
@@ -801,21 +830,42 @@ function setupBoardForm() {
     }
 
     try {
-      let finalImageUrl = manualImageUrl;
+      let finalImageUrl1 = manualImageUrl1;
+      let finalImageUrl2 = manualImageUrl2;
+      let finalImageUrl3 = manualImageUrl3;
 
-      if (file) {
-        const filePath = `board/${Date.now()}_${file.name}`;
+      // העלאה לתמונה 1
+      if (file1) {
+        const filePath = `board/${Date.now()}_1_${file1.name}`;
         const fileRef = ref(storage, filePath);
-        await uploadBytes(fileRef, file);
-        finalImageUrl = await getDownloadURL(fileRef);
+        await uploadBytes(fileRef, file1);
+        finalImageUrl1 = await getDownloadURL(fileRef);
+      }
+
+      // העלאה לתמונה 2
+      if (file2) {
+        const filePath = `board/${Date.now()}_2_${file2.name}`;
+        const fileRef = ref(storage, filePath);
+        await uploadBytes(fileRef, file2);
+        finalImageUrl2 = await getDownloadURL(fileRef);
+      }
+
+      // העלאה לתמונה 3
+      if (file3) {
+        const filePath = `board/${Date.now()}_3_${file3.name}`;
+        const fileRef = ref(storage, filePath);
+        await uploadBytes(fileRef, file3);
+        finalImageUrl3 = await getDownloadURL(fileRef);
       }
 
       const newBoardItem = {
         title,
         meta,
         body,
-        imageUrl: finalImageUrl,
-        color
+        color,
+        imageUrl: finalImageUrl1 || "",
+        imageUrl2: finalImageUrl2 || "",
+        imageUrl3: finalImageUrl3 || ""
       };
 
       boardData.push(newBoardItem);
@@ -837,6 +887,7 @@ function setupBoardForm() {
     }
   });
 }
+
 
 /* ------------ SITE CONTENT ------------ */
 

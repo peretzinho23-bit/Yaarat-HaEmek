@@ -438,15 +438,31 @@ function renderHomeBoard() {
   listEl.innerHTML = boardData
     .map((b) => {
       const colorStyle = b.color ? ` style="color:${escapeHtml(b.color)}"` : "";
-      const imgHtml = b.imageUrl
-        ? `
+
+      const imgs = [];
+      if (b.imageUrl) {
+        imgs.push(`
           <div class="board-item-image">
-            <img src="${escapeHtml(b.imageUrl)}" alt="${escapeHtml(
-              b.title || ""
-            )}">
+            <img src="${escapeHtml(b.imageUrl)}" alt="${escapeHtml(b.title || "")}">
           </div>
-        `
-        : "";
+        `);
+      }
+      if (b.imageUrl2) {
+        imgs.push(`
+          <div class="board-item-image">
+            <img src="${escapeHtml(b.imageUrl2)}" alt="${escapeHtml(b.title || "")}">
+          </div>
+        `);
+      }
+      if (b.imageUrl3) {
+        imgs.push(`
+          <div class="board-item-image">
+            <img src="${escapeHtml(b.imageUrl3)}" alt="${escapeHtml(b.title || "")}">
+          </div>
+        `);
+      }
+
+      const imgsHtml = imgs.join("");
 
       return `
         <article class="board-item"${colorStyle}>
@@ -457,12 +473,13 @@ function renderHomeBoard() {
               : ""
           }
           <div class="board-item-body">${escapeHtml(b.body)}</div>
-          ${imgHtml}
+          ${imgsHtml}
         </article>
       `;
     })
     .join("");
 }
+
 
 /* ------------ GRADE PAGES (NEWS / EXAMS / BOARD) ------------ */
 
@@ -590,15 +607,31 @@ function renderGradeBoard() {
   listEl.innerHTML = boardData
     .map((b) => {
       const colorStyle = b.color ? ` style="color:${escapeHtml(b.color)}"` : "";
-      const imgHtml = b.imageUrl
-        ? `
-        <div class="board-item-image">
-          <img src="${escapeHtml(b.imageUrl)}" alt="${escapeHtml(
-            b.title || ""
-          )}">
-        </div>
-      `
-        : "";
+
+      const imgs = [];
+      if (b.imageUrl) {
+        imgs.push(`
+          <div class="board-item-image">
+            <img src="${escapeHtml(b.imageUrl)}" alt="${escapeHtml(b.title || "")}">
+          </div>
+        `);
+      }
+      if (b.imageUrl2) {
+        imgs.push(`
+          <div class="board-item-image">
+            <img src="${escapeHtml(b.imageUrl2)}" alt="${escapeHtml(b.title || "")}">
+          </div>
+        `);
+      }
+      if (b.imageUrl3) {
+        imgs.push(`
+          <div class="board-item-image">
+            <img src="${escapeHtml(b.imageUrl3)}" alt="${escapeHtml(b.title || "")}">
+          </div>
+        `);
+      }
+
+      const imgsHtml = imgs.join("");
 
       return `
         <article class="board-item"${colorStyle}>
@@ -609,12 +642,13 @@ function renderGradeBoard() {
               : ""
           }
           <div class="board-item-body">${escapeHtml(b.body)}</div>
-          ${imgHtml}
+          ${imgsHtml}
         </article>
       `;
     })
     .join("");
 }
+
 
 async function loadGradePage(grade) {
   try {

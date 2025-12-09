@@ -352,28 +352,43 @@
           <div class="card">
             <h3>מודעות כלליות</h3>
             <div id="admin-board" class="admin-list"></div>
+<form id="board-form">
+  <label>כותרת</label>
+  <input name="title" />
 
-            <form id="board-form">
-              <label>כותרת</label>
-              <input name="title" />
+  <label>מידע קצר (מי קהל היעד, תאריך וכו')</label>
+  <input name="meta" />
 
-              <label>מידע קצר (מי קהל היעד, תאריך וכו')</label>
-              <input name="meta" />
+  <label>צבע הטקסט (אופציונלי)</label>
+  <input type="color" name="color" value="#ffffff" />
 
-              <label>צבע הטקסט (אופציונלי)</label>
-              <input type="color" name="color" value="#ffffff" />
+  <!-- תמונה 1 -->
+  <label>קישור לתמונה 1 (אופציונלי)</label>
+  <input name="imageUrl" placeholder="https://..." />
 
-              <label>קישור לתמונה (אופציונלי)</label>
-              <input name="imageUrl" placeholder="https://..." />
+  <label>העלה קובץ תמונה 1 (אופציונלי)</label>
+  <input type="file" name="imageFile" accept="image/*" />
 
-              <label>העלה קובץ תמונה (אופציונלי)</label>
-              <input type="file" name="imageFile" accept="image/*" />
+  <!-- תמונה 2 -->
+  <label>קישור לתמונה 2 (אופציונלי)</label>
+  <input name="imageUrl2" placeholder="https://..." />
 
-              <label>תוכן המודעה</label>
-              <textarea name="body"></textarea>
+  <label>העלה קובץ תמונה 2 (אופציונלי)</label>
+  <input type="file" name="imageFile2" accept="image/*" />
 
-              <button type="submit">הוסף מודעה</button>
-            </form>
+  <!-- תמונה 3 -->
+  <label>קישור לתמונה 3 (אופציונלי)</label>
+  <input name="imageUrl3" placeholder="https://..." />
+
+  <label>העלה קובץ תמונה 3 (אופציונלי)</label>
+  <input type="file" name="imageFile3" accept="image/*" />
+
+  <label>תוכן המודעה</label>
+  <textarea name="body"></textarea>
+
+  <button type="submit">הוסף מודעה</button>
+</form>
+
           </div>
         </div>
 
