@@ -134,18 +134,21 @@ function renderPolls() {
       const statusLabel = poll.isActive ? "פעיל" : "מושהה";
 
       const optionsHtml = (poll.options || [])
-        .map((opt, idx) => {
-          const votes = opt.votes || 0;
-          const text = opt.text || "";
-          return `
-            <li>
-              <strong>${idx + 1}.</strong>
-              <span>${text}</span>
-              <span style="opacity:0.8;">(${votes} קולות)</span>
-            </li>
-          `;
-        })
-        .join("");
+  .map((opt, idx) => {
+    const votes = opt.votes || 0;
+    const text = opt.text || "";
+    return `
+      <li>
+        <strong>${idx + 1}.</strong>
+        <span>${text}</span>
+        <span style="opacity:0.8;">
+          (<span>${votes}</span>&nbsp;<span>קולות</span>)
+        </span>
+      </li>
+    `;
+  })
+  .join("");
+
 
       const question = poll.question || "";
 
