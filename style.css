@@ -2194,3 +2194,47 @@ html[data-theme="light"] .polls-stat-card {
 html[data-theme="light"] body[data-page="polls"] {
   background: #eef3fb !important;
 }
+.page-building {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at top, #1f2937, #020617);
+  color: #e5f0ff;
+}
+
+.building-card {
+  text-align: center;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  border-radius: 24px;
+  padding: 40px 32px;
+  max-width: 420px;
+  box-shadow: 0 30px 70px rgba(0,0,0,.6);
+}
+
+.building-icon {
+  font-size: 3rem;
+  margin-bottom: 12px;
+}
+
+.building-card h1 {
+  font-size: 1.6rem;
+  margin-bottom: 10px;
+}
+
+.building-card p {
+  font-size: 0.95rem;
+  opacity: 0.85;
+  margin-bottom: 22px;
+}
+
+.building-btn {
+  display: inline-block;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: #38bdf8;
+  color: #020617;
+  text-decoration: none;
+  font-weight: 600;
+}
