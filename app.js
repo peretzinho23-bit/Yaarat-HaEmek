@@ -462,6 +462,7 @@ function renderHomeBoard() {
         `);
       }
 
+      const hasMany = imgs.length > 1;
       const imgsHtml = imgs.join("");
 
       return `
@@ -473,13 +474,33 @@ function renderHomeBoard() {
               : ""
           }
           <div class="board-item-body">${escapeHtml(b.body)}</div>
-          ${imgsHtml}
+
+          ${
+            imgs.length
+              ? `
+              <div class="board-item-images" data-images-count="${imgs.length}">
+                ${imgsHtml}
+                ${
+                  hasMany
+                    ? `
+                      <div class="board-slider-controls">
+                        <button type="button" class="board-slider-prev">◀</button>
+                        <button type="button" class="board-slider-next">▶</button>
+                      </div>
+                    `
+                    : ""
+                }
+              </div>
+            `
+              : ""
+          }
         </article>
       `;
     })
     .join("");
-}
 
+  setupBoardSliders();
+}
 
 /* ------------ GRADE PAGES (NEWS / EXAMS / BOARD) ------------ */
 
@@ -631,6 +652,7 @@ function renderGradeBoard() {
         `);
       }
 
+      const hasMany = imgs.length > 1;
       const imgsHtml = imgs.join("");
 
       return `
@@ -642,13 +664,77 @@ function renderGradeBoard() {
               : ""
           }
           <div class="board-item-body">${escapeHtml(b.body)}</div>
-          ${imgsHtml}
+
+          ${
+            imgs.length
+              ? `
+              <div class="board-item-images" data-images-count="${imgs.length}">
+                ${imgsHtml}
+                ${
+                  hasMany
+                    ? `
+                      <div class="board-slider-controls">
+                        <button type="button" class="board-slider-prev">◀</button>
+                        <button type="button" class="board-slider-next">▶</button>
+                      </div>
+                    `
+                    : ""
+                }
+              </div>
+            `
+              : ""
+          }
         </article>
       `;
     })
     .join("");
+
+  setupBoardSliders();
 }
 
+/* ------------ SLIDER LOGIC FOR BOARD ------------ */
+
+function setupBoardSliders() {
+  const wrappers = document.querySelectorAll(".board-item-images");
+  if (!wrappers.length) return;
+
+  wrappers.forEach((wrap) => {
+    const imgs = Array.from(wrap.querySelectorAll(".board-item-image"));
+    if (!imgs.length) return;
+
+    let current = 0;
+
+    function showImage(idx) {
+      if (!imgs.length) return;
+      current = ((idx % imgs.length) + imgs.length) % imgs.length; // מודולו חיובי
+      imgs.forEach((img, i) => {
+        img.classList.toggle("active", i === current);
+      });
+    }
+
+    // מציגים את הראשונה
+    showImage(0);
+
+    const prevBtn = wrap.querySelector(".board-slider-prev");
+    const nextBtn = wrap.querySelector(".board-slider-next");
+
+    if (prevBtn) {
+      prevBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        showImage(current - 1);
+      });
+    }
+
+    if (nextBtn) {
+      nextBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        showImage(current + 1);
+      });
+    }
+  });
+}
+
+/* ------------ LOAD GRADE PAGE ------------ */
 
 async function loadGradePage(grade) {
   try {

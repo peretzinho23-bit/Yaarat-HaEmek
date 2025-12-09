@@ -1807,3 +1807,38 @@ html[data-theme="light"] .news-slider-btn {
   color: #0f172a;
   border-color: #cbd5e1;
 }
+/* === קרוסלה לתמונות בלוח מודעות === */
+.board-item-images {
+  margin-top: 8px;
+  position: relative;
+}
+
+.board-item-image {
+  display: none;
+}
+
+.board-item-image.active {
+  display: block;
+}
+
+.board-slider-controls {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.board-slider-controls button {
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  background: rgba(15, 23, 42, 0.85);
+  padding: 2px 10px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+/* לייט מוד */
+html[data-theme="light"] .board-slider-controls button {
+  background: #ffffff;
+  border-color: #cbd5e1;
+}
