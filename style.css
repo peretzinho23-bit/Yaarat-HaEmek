@@ -2015,3 +2015,70 @@ html[data-theme="light"] .board-slider-controls button {
     margin-top: 10px !important;
   }
 }
+/* ===== HERO במובייל גם בדארק מוד ===== */
+
+@media (max-width: 640px) {
+  :root[data-theme="dark"] .hero.hero-home {
+    position: relative !important;
+    width: 100% !important;
+    min-height: 360px !important;
+    overflow: hidden !important;
+    display: flex !important;
+    align-items: flex-end !important;
+  }
+
+  :root[data-theme="dark"] .hero.hero-home .hero-slides {
+    position: absolute !important;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 0 !important;
+  }
+
+  :root[data-theme="dark"] .hero.hero-home .hero-slide {
+    width: 100% !important;
+    height: 100% !important;
+    background-size: cover !important;
+    background-position: center !important;
+  }
+
+  :root[data-theme="dark"] .hero.hero-home .hero-overlay {
+    position: absolute !important;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1 !important;
+  }
+
+  :root[data-theme="dark"] .hero.hero-home > .container.hero-content {
+    position: relative !important;
+    z-index: 2 !important;
+    width: 100% !important;
+    padding: 16px 16px 24px !important;
+  }
+
+  :root[data-theme="dark"] .hero.hero-home .hero-text {
+    background: rgba(15, 23, 42, 0.85) !important;
+    color: #f9fafb !important;
+    padding: 12px 14px !important;
+    border-radius: 14px !important;
+  }
+
+  :root[data-theme="dark"] .hero.hero-home .hero-text h1 {
+    font-size: 1.3rem !important;
+    margin-bottom: 4px !important;
+  }
+
+  :root[data-theme="dark"] .hero.hero-home .hero-text p {
+    font-size: 0.9rem !important;
+    margin: 0 !important;
+  }
+
+  :root[data-theme="dark"] .hero.hero-home .hero-actions {
+    margin-top: 10px !important;
+  }
+}
