@@ -1842,3 +1842,44 @@ html[data-theme="light"] .board-slider-controls button {
   background: #ffffff;
   border-color: #cbd5e1;
 }
+/* ===== תיקון HERO – טקסט מעל סליידר ===== */
+
+.hero.hero-home {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* הסליידר תמיד כרקע מאחורה */
+.hero-home .hero-slides {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+/* ההכהיה נשארת מעל הסליידר */
+.hero-home .hero-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+/* כל התוכן (טקסט + כרטיס צדדי) מעל שניהם */
+.hero-home .hero-content {
+  position: relative;
+  z-index: 2;
+}
+
+/* במובייל – נותנים קצת גובה כדי שהתמונה והטקסט יהיו יחד */
+@media (max-width: 768px) {
+  .hero.hero-home {
+    min-height: 280px;
+  }
+
+  .hero-home .hero-content {
+    padding-top: 24px;
+    padding-bottom: 24px;
+  }
+}
