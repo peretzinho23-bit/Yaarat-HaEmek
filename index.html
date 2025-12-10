@@ -62,8 +62,6 @@
   <link rel="icon" href="logo.png" />
   <link rel="stylesheet" href="style.css" />
 
-
-  <!-- ===== סקר השבוע – סטיילים למיני-סקר בעמוד הבית ===== -->
   <!-- ===== סקר השבוע – סטיילים למיני-סקר בעמוד הבית ===== -->
   <style>
     #home-poll-mini {
@@ -181,7 +179,6 @@
       text-decoration: underline;
     }
 
-    /* ===== התאמות ללייט־מוד ===== */
     :root[data-theme="light"] .home-poll-card {
       background: #ffffff;
       border-color: rgba(15, 23, 42, 0.08);
@@ -230,6 +227,7 @@
   </style>
 
 </head>
+
 <div id="update-banner" style="
   display:none;
   position:fixed;
@@ -248,20 +246,15 @@
 </div>
 
 <script>
-// --- SERVICE WORKER UPDATE DETECTOR ---
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    // SW חדש השתלט → נטען מחדש
     window.location.reload();
   });
 
   navigator.serviceWorker.register('/service-worker.js')
     .then(reg => {
       if (!reg.waiting) return;
-
-      // אם כבר יש עדכון מוכן
       showUpdateBanner(reg.waiting);
-
       reg.waiting.addEventListener('statechange', (e) => {
         if (e.target.state === 'activated') {
           window.location.reload();
@@ -301,7 +294,6 @@ function showUpdateBanner(sw) {
   <header class="header-main">
     <div class="container">
       <nav class="nav">
-        <!-- צד שמאל: לוגו + כותרת -->
         <div class="nav-left">
           <div class="logo-circle">
             <img
@@ -313,7 +305,6 @@ function showUpdateBanner(sw) {
           </div>
 
           <div>
-            <!-- כותרת ראשית – מתעדכנת מהאדמין דרך siteContent -->
             <div class="school-title-main" id="home-hero-title">
               ברוכים הבאים ליערת העמק
             </div>
@@ -323,9 +314,8 @@ function showUpdateBanner(sw) {
           </div>
         </div>
 
-        <!-- צד ימין: תפריט -->
         <div class="nav-right">
-      <a href="about.html">אודות</a>
+          <a href="about.html">אודות</a>
           <a href="#home-news">חדשות</a>
           <a href="#home-exams">מבחנים</a>
           <a href="#grades">השכבות</a>
@@ -339,7 +329,6 @@ function showUpdateBanner(sw) {
           🌙
         </button>
 
-        <!-- כפתור תפריט מובייל -->
         <button
           class="nav-toggle"
           type="button"
@@ -355,7 +344,6 @@ function showUpdateBanner(sw) {
 
   <!-- HERO -->
   <section class="hero hero-home">
-    <!-- סליידר הרקע -->
     <div class="hero-slides">
       <div class="hero-slide"></div>
       <div class="hero-slide"></div>
@@ -373,7 +361,6 @@ function showUpdateBanner(sw) {
           סביבה חינוכית בטוחה, תומכת ומובילה. כל תלמיד ותלמידה – עולם ומלואו.
         </p>
 
-        <!-- פס "סטטוס מהיר" קטן -->
         <div class="hero-actions">
           <a href="#home-news" class="btn">חדשות ועדכונים</a>
           <a href="#home-exams" class="btn-outline">מבחנים קרובים</a>
@@ -395,7 +382,6 @@ function showUpdateBanner(sw) {
         </div>
       </div>
 
-      <!-- כרטיס צדדי -->
       <div class="hero-side-card">
         <h3 id="hero-side-title">מידע מהיר</h3>
         <ul id="hero-side-list">
@@ -412,13 +398,9 @@ function showUpdateBanner(sw) {
   <section id="about" class="section-light">
     <div class="container">
       <div class="section-header">
-        <!-- הכותרת והטקסט מתעדכנים מהאדמין -->
         <h2 id="about-title" class="section-title">אודות בית הספר</h2>
         <p id="about-body" class="section-subtitle">
-          יערת העמק היא חטיבת-ביניים ממלכתית במגדל העמק, המובילה חינוך ערכי, יוזמה וחדשנות.
-          בית הספר מעניק לתלמידיו מסגרת לימודית יציבה, צוות מורים מנוסה ברמה גבוהה, וסביבה
-          חינוכית שמקדמת מצוינות, אחריות אישית וקהילתיות. החטיבה פועלת בכיתות ז’-ט’, ומאמינה
-          בטיפוח תלמידים חושבים, מעורבים ובעלי ערכים — שמוכנים להוביל ולהצליח.
+          יערת העמק היא חטיבת-ביניים ממלכתית במגדל העמק, המובילה חינוך ערכי, יוזמה וחדשנות...
         </p>
       </div>
 
@@ -453,14 +435,14 @@ function showUpdateBanner(sw) {
         <div class="grade-card">
           <h3 id="important-card-1-title">💻 סביבת למידה דיגיטלית</h3>
           <p id="important-card-1-body" style="font-size:0.9rem;">
-            חלק גדול מהמידע והקבצים נמצא באתר – חדשות, מבחנים, וטפסים חשובים. שווה לבדוק כאן לפני ששואלים.
+            חלק גדול מהמידע והקבצים נמצא באתר – חדשות, מבחנים, וטפסים חשובים.
           </p>
         </div>
 
         <div class="grade-card">
           <h3 id="important-card-2-title">🤝 עם מי מדברים?</h3>
           <p id="important-card-2-body" style="font-size:0.9rem;">
-            יש קושי? מורה, מחנכת, יועצת או צוות הנהלה – כולם כאן כדי לעזור. לא נשארים עם בעיה לבד.
+            יש קושי? מורה, מחנכת, יועצת או צוות הנהלה – כולם כאן כדי לעזור.
           </p>
         </div>
 
@@ -474,39 +456,23 @@ function showUpdateBanner(sw) {
     </div>
   </section>
 
-  <!-- חדשות אחרונות -->
+  <!-- 🔵 חדשות – רק הכתבה האחרונה + כפתור לכל החדשות -->
   <section id="home-news" class="section-light">
     <div class="container">
       <div class="section-header">
         <h2 class="section-title" id="home-news-title">חדשות אחרונות</h2>
         <p class="section-subtitle" id="home-news-subtitle">
-          שלושת העדכונים האחרונים מכל שכבה – ישר מול העיניים של התלמידים.
+          הכתבה האחרונה שפורסמה באתר – ובכפתור למטה תוכלו לעבור לכל החדשות.
         </p>
       </div>
 
       <div class="home-grid">
         <div class="grade-card">
-          <h3>שכבת ז'</h3>
-          <div id="home-news-z" class="home-news-list">
-            <p class="empty-msg">אין עדיין חדשות לשכבת ז'.</p>
+          <h3>העדכון האחרון מבית הספר</h3>
+          <div id="home-news-latest" class="home-news-list">
+            <p class="empty-msg">אין עדיין חדשות באתר.</p>
           </div>
-          <a href="z.html" class="mini-link">לכל החדשות של ז'</a>
-        </div>
-
-        <div class="grade-card">
-          <h3>שכבת ח'</h3>
-          <div id="home-news-h" class="home-news-list">
-            <p class="empty-msg">אין עדיין חדשות לשכבת ח'.</p>
-          </div>
-          <a href="h.html" class="mini-link">לכל החדשות של ח'</a>
-        </div>
-
-        <div class="grade-card">
-          <h3>שכבת ט'</h3>
-          <div id="home-news-t" class="home-news-list">
-            <p class="empty-msg">אין עדיין חדשות לשכבת ט'.</p>
-          </div>
-          <a href="t.html" class="mini-link">לכל החדשות של ט'</a>
+          <a href="news.html" class="mini-link">לצפייה בכל החדשות »</a>
         </div>
       </div>
     </div>
@@ -521,7 +487,6 @@ function showUpdateBanner(sw) {
           הודעות חשובות, פעילויות ואירועים לבית הספר.
         </p>
       </div>
-<a href="news.html" class="btn-outline small">לכל החדשות »</a>
 
       <div id="home-board" class="home-board-list">
         <p class="empty-msg">אין מודעות כרגע.</p>
@@ -529,7 +494,7 @@ function showUpdateBanner(sw) {
     </div>
   </section>
 
-    <!-- מבחנים קרובים -->
+  <!-- מבחנים קרובים -->
   <section id="home-exams" class="section-light">
     <div class="container">
       <div class="section-header">
@@ -553,9 +518,7 @@ function showUpdateBanner(sw) {
             <a href="exams.html?grade=z&class=z4" class="grade-btn">ז4</a>
             <a href="exams.html?grade=z&class=z5" class="grade-btn">ז5</a>
           </div>
-          <div id="home-exams-z" class="home-exams-list">
-            <!-- app.js ידאג למבחנים / ספירה לאחור -->
-          </div>
+          <div id="home-exams-z" class="home-exams-list"></div>
         </div>
 
         <!-- ח -->
@@ -570,9 +533,7 @@ function showUpdateBanner(sw) {
             <a href="exams.html?grade=h&class=h5" class="grade-btn">ח5/9</a>
             <a href="exams.html?grade=h&class=h6" class="grade-btn">ח6/10</a>
           </div>
-          <div id="home-exams-h" class="home-exams-list">
-            <!-- app.js ימלא מבחנים לשכבת ח' -->
-          </div>
+          <div id="home-exams-h" class="home-exams-list"></div>
         </div>
 
         <!-- ט -->
@@ -593,7 +554,6 @@ function showUpdateBanner(sw) {
       </div>
     </div>
   </section>
-
 
   <!-- GRADES -->
   <section id="grades" class="section-dark-strong">
@@ -634,7 +594,7 @@ function showUpdateBanner(sw) {
     </div>
   </section>
 
-  <!-- WEEKLY POLL (HOME MINI POLL) -->
+  <!-- WEEKLY POLL -->
   <section id="home-poll-mini" class="section">
     <div class="container">
       <div class="home-poll-card">
@@ -698,15 +658,12 @@ function showUpdateBanner(sw) {
       </div>
 
       <div class="contact-flex">
-
-        <!-- תיבת יצירת קשר -->
         <div class="contact-box contact-info">
           <p>📞 טלפון: <span id="contact-phone">04-6440334</span></p>
           <p>✉️ אימייל: <span id="contact-email">school@example.com</span></p>
           <p>📍 כתובת: <span id="contact-address">רחוב לדוגמה 10, מגדל העמק</span></p>
         </div>
 
-        <!-- מפה -->
         <div class="contact-box map-container-small">
           <iframe
             src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d8626.962069771827!2d35.248568840191005!3d32.67741984975948!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x151c4d61e49b7fdf%3A0x844e2317b042759e!2z15HXmSLXoSDXmdei16jXqiDXlNei157XpyDXl9eYIteR!5e0!3m2!1siw!2sil!4v1764975107997!5m2!1siw!2sil"
@@ -714,7 +671,6 @@ function showUpdateBanner(sw) {
             loading="lazy">
           </iframe>
         </div>
-
       </div>
     </div>
   </section>
@@ -725,18 +681,11 @@ function showUpdateBanner(sw) {
     </div>
   </footer>
 
-  <!-- כפתור חזרה לראש הדף -->
   <div id="to-top">↑</div>
 
-  <!-- Firebase בסיס (לטובת המודולים שמייבאים אותו) -->
   <script type="module" src="firebase-config.js"></script>
-
   <script src="accessibility.js"></script>
-
-  <!-- מיני סקר – סקר השבוע -->
   <script type="module" src="home-poll-mini.js"></script>
-
-  <!-- לוגיקת Firebase / אתר -->
   <script type="module" src="app.js"></script>
 
 </body>
