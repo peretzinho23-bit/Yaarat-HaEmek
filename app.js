@@ -1127,8 +1127,8 @@ function setupMobileNav() {
 
   const pageType = document.body.dataset.page || "";
   if (pageType === "home") {
-    navRight.innerHTML = `
-      <a href="#about">אודות</a>
+  navRight.innerHTML = `
+      <a href="about.html">אודות</a>
       <a href="#home-news">חדשות</a>
       <a href="#home-exams">מבחנים</a>
       <a href="#grades">השכבות</a>
@@ -1137,8 +1137,9 @@ function setupMobileNav() {
       <a href="#contact">יצירת קשר</a>
       <a href="redirect-edu.html" class="personal-btn">למרחב האישי</a>
       <a href="admin.html" class="btn-outline">Admin</a>
-    `;
-  }
+  `;
+}
+
 
   navRight.querySelectorAll("a").forEach((link) => {
     link.addEventListener("click", () => {
