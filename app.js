@@ -196,13 +196,23 @@ async function loadHomeDataOnce() {
 }
 
 // לייב
+// לייב – גם לדף הבית וגם לדף כל החדשות
 function subscribeRealtimeHome() {
+  const isNewsPage = document.body.dataset.page === "news";
+
   // NEWS
   for (const g of GRADES) {
     onSnapshot(doc(db, "news", g), (snap) => {
       const data = snap.exists() ? snap.data() : { items: [] };
       homeNews[g] = data.items || [];
-      renderHomeNews();
+
+      if (isNewsPage) {
+        // בדף כל החדשות – מעדכן את הגריד
+        renderAllNewsPage();
+      } else {
+        // בדף הבית – מעדכן את התיבות של החדשות
+        renderHomeNews();
+      }
     });
   }
 
@@ -211,15 +221,26 @@ function subscribeRealtimeHome() {
     onSnapshot(doc(db, "exams", g), (snap) => {
       const data = snap.exists() ? snap.data() : { items: [] };
       homeExams[g] = data.items || [];
-      renderHomeExams();
+
+      if (!isNewsPage) {
+        // בדף הבית יש מבחנים; ב-news.html אין
+        renderHomeExams();
+      }
     });
   }
 
-  // BOARD
+  // BOARD (לוח מודעות)
   onSnapshot(doc(db, "board", "general"), (snap) => {
     const data = snap.exists() ? snap.data() : { items: [] };
     boardData = data.items || [];
-    renderHomeBoard();
+
+    if (isNewsPage) {
+      // בדף כל החדשות לוח מודעות מופיע בתוך הרשימה
+      renderAllNewsPage();
+    } else {
+      // בדף הבית – קופסה של לוח מודעות
+      renderHomeBoard();
+    }
   });
 }
 
@@ -1195,18 +1216,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // דף כל החדשות
   if (pageType === "news") {
-    await loadHomeDataOnce();
-    renderAllNewsPage();
-    initTheme();
-    setupMobileNav();
-    setupScrollToTop();
-    return;
-  }
-
-  // דף כתבה אחת
-  if (pageType === "article") {
-    await loadHomeDataOnce();  // ממלא homeNews + boardData
-    renderArticlePage();
+    await loadHomeDataOnce();      // ממלא homeNews ו-boardData
+    renderAllNewsPage();           // מצייר את כל החדשות
     initTheme();
     setupMobileNav();
     setupScrollToTop();
@@ -1222,3 +1233,4 @@ document.addEventListener("DOMContentLoaded", async () => {
   setupMobileNav();
   setupScrollToTop();
 });
+
