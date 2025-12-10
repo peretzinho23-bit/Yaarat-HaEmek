@@ -706,8 +706,6 @@ function renderHomeExams() {
   startExamCountdownLoop();
 }
 
-/* ------------ RENDER HOME BOARD ------------ */
-
 function renderHomeBoard() {
   const listEl = document.getElementById("home-board");
   if (!listEl) return;
@@ -717,72 +715,95 @@ function renderHomeBoard() {
     return;
   }
 
-  listEl.innerHTML = boardData
-    .map((b) => {
-      const colorStyle = b.color ? ` style="color:${escapeHtml(b.color)}"` : "";
+  // ✅ לוקחים את העדכנית ביותר – מניחים שהאחרונה במערך היא החדשה
+  const items = boardData.slice().reverse(); // חדשים קודם
+  const b = items[0];
 
-      const imgs = [];
-      if (b.imageUrl) {
-        imgs.push(`
-          <div class="board-item-image">
-            <img src="${escapeHtml(b.imageUrl)}" alt="${escapeHtml(b.title || "")}">
-          </div>
-        `);
+  const colorStyle = b.color ? ` style="color:${escapeHtml(b.color)}"` : "";
+
+  // 🕒 בניית שורת מטא (תאריך יחסי + תאריך רגיל + מטא רגילה)
+  const metaPieces = [];
+
+  if (b.date) {
+    const d = new Date(b.date);
+    if (!isNaN(d.getTime())) {
+      const rel = timeAgo(b.date);       // "לפני X ימים"
+      const abs = formatLocalDate(d);    // "DD.MM.YYYY"
+      if (rel && abs) {
+        metaPieces.push(`${rel} (${abs})`);
+      } else if (abs) {
+        metaPieces.push(abs);
       }
-      if (b.imageUrl2) {
-        imgs.push(`
-          <div class="board-item-image">
-            <img src="${escapeHtml(b.imageUrl2)}" alt="${escapeHtml(b.title || "")}">
+    }
+  }
+
+  if (b.meta) {
+    metaPieces.push(b.meta);
+  }
+
+  const metaHtml = metaPieces.length
+    ? `<div class="board-item-meta">${escapeHtml(metaPieces.join(" · "))}</div>`
+    : "";
+
+  // 🎨 תמונות (עד 3 כמו שהיה)
+  const imgs = [];
+  if (b.imageUrl) {
+    imgs.push(`
+      <div class="board-item-image">
+        <img src="${escapeHtml(b.imageUrl)}" alt="${escapeHtml(b.title || "")}">
+      </div>
+    `);
+  }
+  if (b.imageUrl2) {
+    imgs.push(`
+      <div class="board-item-image">
+        <img src="${escapeHtml(b.imageUrl2)}" alt="${escapeHtml(b.title || "")}">
+      </div>
+    `);
+  }
+  if (b.imageUrl3) {
+    imgs.push(`
+      <div class="board-item-image">
+        <img src="${escapeHtml(b.imageUrl3)}" alt="${escapeHtml(b.title || "")}">
+      </div>
+    `);
+  }
+
+  const hasMany = imgs.length > 1;
+  const imgsHtml = imgs.join("");
+
+  listEl.innerHTML = `
+    <article class="board-item"${colorStyle}>
+      <div class="board-item-title">${escapeHtml(b.title)}</div>
+      ${metaHtml}
+      <div class="board-item-body">${escapeHtml(b.body)}</div>
+
+      ${
+        imgs.length
+          ? `
+          <div class="board-item-images" data-images-count="${imgs.length}">
+            ${imgsHtml}
+            ${
+              hasMany
+                ? `
+                  <div class="board-slider-controls">
+                    <button type="button" class="board-slider-prev">◀</button>
+                    <button type="button" class="board-slider-next">▶</button>
+                  </div>
+                `
+                : ""
+            }
           </div>
-        `);
+        `
+          : ""
       }
-      if (b.imageUrl3) {
-        imgs.push(`
-          <div class="board-item-image">
-            <img src="${escapeHtml(b.imageUrl3)}" alt="${escapeHtml(b.title || "")}">
-          </div>
-        `);
-      }
+    </article>
+  `;
 
-      const hasMany = imgs.length > 1;
-      const imgsHtml = imgs.join("");
-
-      return `
-        <article class="board-item"${colorStyle}>
-          <div class="board-item-title">${escapeHtml(b.title)}</div>
-          ${
-            b.meta
-              ? `<div class="board-item-meta">${escapeHtml(b.meta)}</div>`
-              : ""
-          }
-          <div class="board-item-body">${escapeHtml(b.body)}</div>
-
-          ${
-            imgs.length
-              ? `
-              <div class="board-item-images" data-images-count="${imgs.length}">
-                ${imgsHtml}
-                ${
-                  hasMany
-                    ? `
-                      <div class="board-slider-controls">
-                        <button type="button" class="board-slider-prev">◀</button>
-                        <button type="button" class="board-slider-next">▶</button>
-                      </div>
-                    `
-                    : ""
-                }
-              </div>
-            `
-              : ""
-          }
-        </article>
-      `;
-    })
-    .join("");
-
+  // שומר לך את הסליידר אם יש כמה תמונות
   setupBoardSliders();
 }
+
 
 /* ------------ GRADE PAGES (NEWS / EXAMS / BOARD) ------------ */
 
