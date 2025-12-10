@@ -423,6 +423,90 @@ function renderAllNewsPage() {
     .join("");
 }
 
+function renderArticlePage() {
+  const container = document.getElementById("article-container");
+  if (!container) return;
+
+  const params = new URLSearchParams(window.location.search);
+  const articleId = params.get("id");
+
+  if (!articleId) {
+    container.innerHTML = `<p class="article-empty">לא נמצאה כתבה להצגה.</p>`;
+    return;
+  }
+
+  // מאחדים את כל החדשות מכל השכבות + לוח מודעות
+  const allItems = [];
+
+  for (const g of GRADES) {
+    const items = homeNews[g] || [];
+    items.forEach((item) => {
+      allItems.push({
+        ...item,
+        _grade: g,
+        _type: "news"
+      });
+    });
+  }
+
+  boardData.forEach((b) => {
+    allItems.push({
+      ...b,
+      _type: "board"
+    });
+  });
+
+  const article = allItems.find((x) => x.id === articleId);
+
+  if (!article) {
+    container.innerHTML = `<p class="article-empty">הכתבה שביקשת לא נמצאה.</p>`;
+    return;
+  }
+
+  // תמונות
+  const images = Array.isArray(article.imageUrls) && article.imageUrls.length
+    ? article.imageUrls
+    : (article.imageUrl ? [article.imageUrl] : []);
+
+  const gradeLabel = article._grade ? (GRADE_LABELS[article._grade] || "") : "";
+  const metaPieces = [];
+
+  if (article._type === "board") {
+    metaPieces.push("לוח מודעות");
+  } else if (gradeLabel) {
+    metaPieces.push(`שכבה ${gradeLabel}`);
+  }
+  if (article.meta) metaPieces.push(article.meta);
+
+  const metaHtml = metaPieces.length
+    ? `<div class="article-meta">${escapeHtml(metaPieces.join(" · "))}</div>`
+    : "";
+
+  const imagesHtml = images.length
+    ? `
+      <div class="article-images">
+        <img src="${escapeHtml(images[0])}" alt="${escapeHtml(article.title || "")}">
+      </div>
+    `
+    : "";
+
+  container.innerHTML = `
+    <article class="article-card">
+      <a href="news.html" class="article-back-link">« חזרה לכל החדשות</a>
+      <h1 class="article-title">${escapeHtml(article.title || "")}</h1>
+      ${metaHtml}
+      ${imagesHtml}
+      <div class="article-body">
+        ${escapeHtml(article.body || "")}
+      </div>
+    </article>
+  `;
+
+  // כותרת טאב
+  if (article.title) {
+    document.title = `${article.title} – יערת העמק`;
+  }
+}
 
 /* ------------ RENDER HOME EXAMS (עם מבחן הבא + מבחנים שהיו + ספירה לאחור) ------------ */
 
@@ -1112,8 +1196,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // דף כל החדשות
   if (pageType === "news") {
-    await loadHomeDataOnce();      // ממלא homeNews + boardData
-    renderAllNewsPage();           // מצייר את כל החדשות מכל המקורות
+    await loadHomeDataOnce();
+    renderAllNewsPage();
+    initTheme();
+    setupMobileNav();
+    setupScrollToTop();
+    return;
+  }
+
+  // דף כתבה אחת
+  if (pageType === "article") {
+    await loadHomeDataOnce();  // ממלא homeNews + boardData
+    renderArticlePage();
     initTheme();
     setupMobileNav();
     setupScrollToTop();

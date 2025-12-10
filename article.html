@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>כתבה – חטיבת הנעורים יערת העמק</title>
+
+  <link rel="icon" href="logo.png" />
+  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    .article-wrapper {
+      padding-top: 40px;
+      padding-bottom: 40px;
+    }
+
+    .article-card {
+      max-width: 900px;
+      margin: 0 auto;
+      border-radius: 24px;
+      padding: 20px 20px 24px;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.32);
+    }
+
+    html[data-theme="light"] .article-card {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+    }
+
+    html[data-theme="dark"] .article-card {
+      background: rgba(15, 23, 42, 0.97);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+    }
+
+    .article-back-link {
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: #16a34a;
+      text-decoration: none;
+    }
+
+    .article-back-link:hover {
+      text-decoration: underline;
+    }
+
+    .article-title {
+      font-size: 1.4rem;
+      margin-bottom: 6px;
+    }
+
+    .article-meta {
+      font-size: 0.85rem;
+      opacity: 0.8;
+      margin-bottom: 14px;
+    }
+
+    .article-images {
+      margin-bottom: 16px;
+    }
+
+    .article-images img {
+      width: 100%;
+      max-height: 420px;
+      border-radius: 18px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .article-body {
+      font-size: 0.95rem;
+      line-height: 1.8;
+      white-space: pre-line; /* שומר שורות חדשות בטקסט */
+    }
+
+    .article-empty {
+      text-align: center;
+      padding: 40px 0;
+      font-size: 1rem;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+
+<body data-page="article">
+  <!-- אנליטיקות -->
+  <script type="module" src="analytics.js"></script>
+
+  <!-- HEADER -->
+  <header class="header-main">
+    <div class="container">
+      <nav class="nav">
+        <div class="nav-left">
+          <div class="logo-circle">
+            <img
+              src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png"
+              alt="סמל בית הספר יערת העמק"
+              class="logo-img"
+              id="logo-img"
+            >
+          </div>
+
+          <div>
+            <div class="school-title-main">
+              חטיבת הנעורים – יערת העמק
+            </div>
+            <div class="school-title-sub">
+              סביבת למידה בטוחה, תומכת ומצמיחה – עבור כל תלמיד ותלמידה.
+            </div>
+          </div>
+        </div>
+
+        <div class="nav-right">
+          <a href="index.html#home-news">חדשות</a>
+          <a href="index.html#home-exams">מבחנים</a>
+          <a href="index.html#grades">השכבות</a>
+          <a href="polls.html">סקרים</a>
+          <a href="about.html">אודות</a>
+          <a href="index.html#contact">יצירת קשר</a>
+          <a href="redirect-edu.html" class="personal-btn">למרחב האישי</a>
+          <a href="admin.html" class="btn-outline">Admin</a>
+        </div>
+
+        <button id="theme-toggle" class="theme-toggle" type="button">
+          🌙
+        </button>
+
+        <button
+          class="nav-toggle"
+          type="button"
+          aria-label="פתח תפריט"
+          aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="about-wrapper article-wrapper">
+    <section class="about-section">
+      <div class="container">
+        <div id="article-container">
+          <!-- התוכן של הכתבה ייכנס לכאן מה-JS -->
+          <p class="article-empty">טוען כתבה...</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p id="footer-text">
+        © כל הזכויות שמורות לחטיבת הנעורים יערת העמק
+      </p>
+    </div>
+  </footer>
+
+  <div id="to-top">↑</div>
+
+  <script src="accessibility.js"></script>
+  <script type="module" src="app.js?v=8"></script>
+</body>
+</html>
