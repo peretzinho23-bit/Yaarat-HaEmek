@@ -401,6 +401,7 @@ function renderAllNewsPage() {
 
 
 
+
 function renderArticlePage() {
   const container = document.getElementById("article-container");
   if (!container) return;

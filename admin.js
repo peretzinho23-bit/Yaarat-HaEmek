@@ -31,7 +31,7 @@ const GRADES = ["z", "h", "t"];
 // כיתות לכל שכבה
 const CLASS_IDS_BY_GRADE = {
   z: ["z1", "z2", "z3", "z4", "z5"],
-  h: ["h1", "h4", "h5", "h6"],  // ← רק הכיתות שקיימות
+  h: ["h1", "h4", "h5", "h6"], // ← רק הכיתות שקיימות
   t: ["t1", "t2", "t3", "t4", "t5"]
 };
 
@@ -232,25 +232,39 @@ function renderNewsAdmin() {
     const listEl = document.getElementById(`admin-news-${g}`);
     if (!listEl) continue;
 
-    const items = newsData[g];
+    const items = newsData[g] || [];
+
     if (!items.length) {
       listEl.innerHTML = `<p class="empty-msg">אין חדשות.</p>`;
       continue;
     }
 
-    listEl.innerHTML = items
-      .map((n, i) => {
+    // מוסיפים אינדקס אמיתי לכל אייטם ואז מציגים מהחדש לישן
+    const itemsWithIndex = items.map((item, idx) => ({
+      ...item,
+      _index: idx
+    }));
+
+    const orderedForUi = itemsWithIndex.slice().reverse();
+
+    listEl.innerHTML = orderedForUi
+      .map((n) => {
+        const i = n._index;
+
         // תמונות: תומך גם ב-imageUrls (מערך) וגם ב-imageUrl יחיד
-        const images = Array.isArray(n.imageUrls) && n.imageUrls.length
-          ? n.imageUrls
-          : (n.imageUrl ? [n.imageUrl] : []);
+        const images =
+          Array.isArray(n.imageUrls) && n.imageUrls.length
+            ? n.imageUrls
+            : n.imageUrl
+            ? [n.imageUrl]
+            : [];
 
         let imgHtml = "";
         if (images.length) {
           imgHtml = `
             <div class="admin-images-row">
               ${images
-                .slice(0, 2) // עד 2 תמונות לתצוגה באדמין
+                .slice(0, 2)
                 .map(
                   (url) => `
                 <div class="admin-image-wrapper">
@@ -287,7 +301,7 @@ async function saveNewsGrade(grade) {
   await setDoc(refDoc, { items: newsData[grade] });
 }
 
-// ⬇⬇⬇ פה שיניתי – טופס חדשות תומך בכמה תמונות (עד 2) ⬇⬇⬇
+// ⬇⬇⬇ טופס חדשות – תומך בכמה תמונות (עד 2) ⬇⬇⬇
 function setupNewsForms() {
   for (const g of GRADES) {
     const form = document.getElementById(`news-form-${g}`);
@@ -300,16 +314,15 @@ function setupNewsForms() {
       const meta = form.meta.value.trim();
       const body = form.body.value.trim();
       const manualImageUrl =
-        (form.imageUrl && form.imageUrl.value && form.imageUrl.value.trim()) || "";
+        (form.imageUrl && form.imageUrl.value && form.imageUrl.value.trim()) ||
+        "";
       const color =
-        (form.color && form.color.value && form.color.value.trim()) || "#ffffff";
+        (form.color && form.color.value && form.color.value.trim()) ||
+        "#ffffff";
 
-      // חשוב: בשם input בקובץ HTML – imageFile
-      // אם תוסיף multiple ב-HTML, פה אוטומטית יתמוך בכמה קבצים.
       const fileInput = form.imageFile;
-      const files = fileInput && fileInput.files
-        ? Array.from(fileInput.files)
-        : [];
+      const files =
+        fileInput && fileInput.files ? Array.from(fileInput.files) : [];
 
       if (!title || !body) {
         alert("חובה למלא לפחות כותרת ותוכן.");
@@ -319,12 +332,10 @@ function setupNewsForms() {
       try {
         const imageUrls = [];
 
-        // קודם – אם המשתמש שם URL ידני
         if (manualImageUrl) {
           imageUrls.push(manualImageUrl);
         }
 
-        // עכשיו מעלים קבצים (ניקח עד 2 כדי שלא יעוף עליך)
         for (let i = 0; i < files.length && i < 2; i++) {
           const file = files[i];
           const filePath = `news/${g}/${Date.now()}_${file.name}`;
@@ -339,9 +350,7 @@ function setupNewsForms() {
           meta,
           body,
           color,
-          // לשמירה על תאימות – התמונה הראשונה
           imageUrl: imageUrls[0] || "",
-          // השדה החדש – כל התמונות
           imageUrls
         };
 
@@ -792,7 +801,6 @@ function renderBoardAdmin() {
     .join("");
 }
 
-
 async function saveBoard() {
   const refDoc = doc(db, "board", "general");
   await setDoc(refDoc, { items: boardData });
@@ -809,9 +817,11 @@ function setupBoardForm() {
     const meta = form.meta.value.trim();
     const body = form.body.value.trim();
     const manualImageUrl =
-      (form.imageUrl && form.imageUrl.value && form.imageUrl.value.trim()) || "";
+      (form.imageUrl && form.imageUrl.value && form.imageUrl.value.trim()) ||
+      "";
     const color =
-      (form.color && form.color.value && form.color.value.trim()) || "#ffffff";
+      (form.color && form.color.value && form.color.value.trim()) ||
+      "#ffffff";
 
     const fileInput = form.imageFile;
     const file = fileInput && fileInput.files && fileInput.files[0];
@@ -1042,7 +1052,9 @@ function setupDeleteHandler() {
     if (!confirm("למחוק את הפריט הזה?")) return;
 
     if (type === "news") {
+      if (!newsData[grade]) return;
       const deletedNews = newsData[grade][index];
+
       newsData[grade].splice(index, 1);
       renderNewsAdmin();
       await saveNewsGrade(grade);
