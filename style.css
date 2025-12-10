@@ -2316,3 +2316,24 @@ html[data-theme="light"] body[data-page="polls"] {
   margin: 0 auto;
   border-radius: 12px;
 }
+/* ==== לוגו עגול בכוח ==== */
+.logo-circle {
+  width: 60px !important;
+  height: 60px !important;
+  aspect-ratio: 1 / 1 !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #ffffff !important;
+  flex-shrink: 0 !important;
+}
+
+.logo-circle img,
+.logo-img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+}
