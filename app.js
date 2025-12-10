@@ -36,6 +36,22 @@ function shortenText(str, maxLen = 140) {
   if (s.length <= maxLen) return s;
   return s.slice(0, maxLen) + "…";
 }
+// ממיר כל ערך תאריך ל-Date (תומך גם ב-Firestore Timestamp)
+function toJsDate(raw) {
+  if (!raw) return null;
+
+  // Firestore Timestamp
+  if (typeof raw === "object" && typeof raw.toDate === "function") {
+    try {
+      return raw.toDate();
+    } catch {
+      return null;
+    }
+  }
+
+  const d = new Date(raw);
+  return isNaN(d.getTime()) ? null : d;
+}
 
 /* ------------ עזר למבחנים + ספירה לאחור ------------ */
 function timeAgo(dateStr) {
@@ -338,8 +354,6 @@ function renderHomeNews() {
   }
 }
 
-/* ------------ ALL NEWS PAGE (news.html) ------------ */
-
 function renderAllNewsPage() {
   const container = document.getElementById("all-news-list");
   if (!container) return;
@@ -374,7 +388,7 @@ function renderAllNewsPage() {
     return;
   }
 
-  // מהחדש לישן – לפי הסדר במערך (הכי אחרון שהוזן יהיה ראשון)
+  // מהחדש לישן
   const sorted = allItems.slice().reverse();
 
   container.innerHTML = sorted
@@ -397,17 +411,18 @@ function renderAllNewsPage() {
         metaPieces.push("לוח מודעות");
       }
 
-      // תאריך הכתבה – מתוך n.date (אם קיים)
-      if (n.date) {
-        const d = new Date(n.date);
-        if (!isNaN(d.getTime())) {
-          const rel = timeAgo(n.date);          // למשל: "לפני 3 ימים"
-          const abs = formatLocalDate(d);       // למשל: "10.12.2025"
-          if (rel && abs) {
-            metaPieces.push(`${rel} (${abs})`);
-          } else if (abs) {
-            metaPieces.push(abs);
-          }
+      // 🕒 תאריך – לוקח קודם כל createdAt ואם אין אז date
+      const rawDate = n.createdAt || n.date;
+      const d = toJsDate(rawDate);
+      if (d) {
+        const iso = d.toISOString();
+        const rel = timeAgo(iso);        // למשל: "לפני 3 שעות"
+        const abs = formatLocalDate(d);  // למשל: "10.12.2025"
+
+        if (rel && abs) {
+          metaPieces.push(`${rel} (${abs})`);
+        } else if (abs) {
+          metaPieces.push(abs);
         }
       }
 
@@ -417,7 +432,7 @@ function renderAllNewsPage() {
         ? `<div class="home-news-meta">${escapeHtml(metaPieces.join(" · "))}</div>`
         : "";
 
-      // קישור לכתבה המלאה לפי סוג
+      // לינק לכתבה
       const url =
         n._type === "board"
           ? `article.html?type=board&index=${n._index}`
@@ -425,7 +440,6 @@ function renderAllNewsPage() {
               n._grade
             )}&index=${n._index}`;
 
-      // טקסט מקוצר + "להמשך קריאה"
       const fullBody = n.body || "";
       const isLong = fullBody.length > 260;
       const shortBody = isLong

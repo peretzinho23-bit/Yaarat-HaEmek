@@ -220,6 +220,23 @@
       }
     }
 
+    // ממיר כל ערך תאריך ל- Date (תומך גם ב-Firestore Timestamp)
+    function toJsDate(raw) {
+      if (!raw) return null;
+
+      // Timestamp של פיירסטור
+      if (typeof raw === "object" && raw !== null && typeof raw.toDate === "function") {
+        try {
+          return raw.toDate();
+        } catch {
+          return null;
+        }
+      }
+
+      const d = new Date(raw);
+      return isNaN(d.getTime()) ? null : d;
+    }
+
     function getQueryParam(name) {
       const params = new URLSearchParams(window.location.search);
       return params.get(name);
@@ -275,17 +292,19 @@
           if (gradeLabel) metaPieces.push(`שכבה ${gradeLabel}`);
         }
 
-        // 🕒 תאריך הכתבה (אם קיים item.date)
-        if (item.date) {
-          const d = new Date(item.date);
-          if (!isNaN(d.getTime())) {
-            const rel = timeAgo(item.date);
-            const abs = formatLocalDate(d);
-            if (rel && abs) {
-              metaPieces.push(`${rel} (${abs})`);
-            } else if (abs) {
-              metaPieces.push(abs);
-            }
+        // 🕒 תאריך הכתבה: קודם createdAt, אם אין אז date
+        const rawDate = item.createdAt || item.date;
+        const d = toJsDate(rawDate);
+
+        if (d) {
+          const iso = d.toISOString();
+          const rel = timeAgo(iso);
+          const abs = formatLocalDate(d);
+
+          if (rel && abs) {
+            metaPieces.push(`${rel} (${abs})`);
+          } else if (abs) {
+            metaPieces.push(abs);
           }
         }
 
@@ -314,7 +333,7 @@
 
         // כותרת הטאב
         if (item.title) {
-          document.title = escapeHtml(item.title) + " – יערת העמק";
+          document.title = String(item.title) + " – יערת העמק";
         }
       } catch (err) {
         console.error("שגיאה בטעינת כתבה:", err);
