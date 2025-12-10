@@ -1,16 +1,16 @@
 // service-worker.js
-// חכם, לא ננעל על גרסה ישנה 😉
+// SW פשוט, עדכני, עובד טוב עם PWA 💙
 
-const CACHE_VERSION = "v5"; // כשתשנה קוד – תעלה ל-v6, v7 וכו'
+const CACHE_VERSION = "v6"; // אם אתה משנה SW - תעלה גרסה
 const CACHE_NAME = `yaarat-static-${CACHE_VERSION}`;
 
-// קבצים עיקריים שכדאי לשמור מראש (יעבוד גם אם לא תשים את כולם)
 const PRECACHE_URLS = [
-  "/",                 // root
+  "/",
   "/index.html",
+  "/news.html",
+  "/article.html",
   "/admin.html",
   "/polls.html",
-
   "/z.html",
   "/h.html",
   "/t.html",
@@ -29,46 +29,48 @@ const PRECACHE_URLS = [
   "/accessibility.js",
 
   "/manifest.json",
-  "/logo.png",
+  "/logo.png"
 ];
 
-// בזמן התקנה – שומר סטטי בסיסי
+// 🔹 התקנה – מנסה לעשות פריקאש, לא מתפוצץ אם משהו לא נטען
 self.addEventListener("install", (event) => {
   console.log("[SW] install", CACHE_NAME);
 
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(PRECACHE_URLS).catch((err) => {
+    (async () => {
+      try {
+        const cache = await caches.open(CACHE_NAME);
+        await cache.addAll(PRECACHE_URLS);
+      } catch (err) {
         console.warn("[SW] precache error (לא נורא אם חלק נופל):", err);
-      });
-    })
+      }
+    })()
   );
 
-  // לגרום ל-SW החדש להתקין כמה שיותר מהר
   self.skipWaiting();
 });
 
-// בזמן הפעלה – מוחק קאש ישן
+// 🔹 אקטיבציה – מנקה קאש ישן
 self.addEventListener("activate", (event) => {
   console.log("[SW] activate", CACHE_NAME);
 
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(
+    (async () => {
+      const keys = await caches.keys();
+      await Promise.all(
         keys.map((key) => {
           if (key !== CACHE_NAME && key.startsWith("yaarat-static-")) {
             console.log("[SW] deleting old cache:", key);
             return caches.delete(key);
           }
         })
-      )
-    )
+      );
+      await self.clients.claim();
+    })()
   );
-
-  self.clients.claim();
 });
 
-// פונקציה: האם הבקשה היא לדף HTML (ניווט)
+// האם הבקשה היא ניווט ל-HTML (עמוד)
 function isHtmlNavigationRequest(request) {
   return (
     request.mode === "navigate" ||
@@ -78,85 +80,85 @@ function isHtmlNavigationRequest(request) {
   );
 }
 
-// FETCH – לוגיקה חכמה
+// 🔹 FETCH – לוגיקה:
+// HTML → network first + fallback קאש
+// CSS/JS/תמונות → קאש קודם, אח"כ רשת
+// כל השאר → קאש או רשת
 self.addEventListener("fetch", (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // רק תחום האתר שלנו
-  if (url.origin !== self.location.origin) {
-    return;
-  }
+  // רק לדומיין שלנו
+  if (url.origin !== self.location.origin) return;
 
-  // 1) דפי HTML – NETWORK FIRST
+  // 1) דפי HTML
   if (isHtmlNavigationRequest(request)) {
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          // שומר ב-cache לגרסה הנוכחית
-          const resClone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(request, resClone);
-          });
-          return response;
-        })
-        .catch(() => {
-          // אין רשת? נחפש בקאש
-          return caches.match(request).then((cached) => {
-            if (cached) return cached;
-            // ניסיון אחרון – index.html
-            return caches.match("/index.html");
-          });
-        })
-    );
+    event.respondWith(handleHtmlRequest(request));
     return;
   }
 
-  // 2) CSS / JS / תמונות – STALE WHILE REVALIDATE
+  // 2) סטטיק – CSS / JS / תמונות / פונט
   if (
     request.destination === "style" ||
     request.destination === "script" ||
     request.destination === "image" ||
     request.destination === "font"
   ) {
-    event.respondWith(
-      caches.match(request).then((cached) => {
-        const networkFetch = fetch(request)
-          .then((response) => {
-            const resClone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(request, resClone);
-            });
-            return response;
-          })
-          .catch((err) => {
-            // אם אין רשת – מחזיר מהקאש אם יש
-            if (cached) return cached;
-            throw err;
-          });
-
-        // אם יש בקאש – מחזיר מהר, ומאחורה מעדכן
-        return cached || networkFetch;
-      })
-    );
+    event.respondWith(handleStaticRequest(request));
     return;
   }
 
-  // 3) שאר הדברים – נסה מהקאש, אחרת מהאינטרנט
-  event.respondWith(
-    caches.match(request).then((cached) => {
-      return (
-        cached ||
-        fetch(request).catch(() => {
-          // אם אין כלום – כלום :)
-          return new Response("Offline", { status: 503, statusText: "Offline" });
-        })
-      );
-    })
-  );
+  // 3) כל השאר – קודם קאש, אם אין אז רשת
+  event.respondWith(handleGenericRequest(request));
 });
-self.addEventListener('message', (event) => {
-  if (event.data.action === 'skipWaiting') {
+
+async function handleHtmlRequest(request) {
+  try {
+    const response = await fetch(request);
+    const cache = await caches.open(CACHE_NAME);
+    cache.put(request, response.clone());
+    return response;
+  } catch (err) {
+    // אין רשת – ננסה מהקאש
+    const cached = await caches.match(request);
+    if (cached) return cached;
+
+    // ניסיון אחרון – index.html
+    const fallback = await caches.match("/index.html");
+    if (fallback) return fallback;
+
+    return new Response("Offline", { status: 503, statusText: "Offline" });
+  }
+}
+
+async function handleStaticRequest(request) {
+  const cached = await caches.match(request);
+  const fetchPromise = fetch(request)
+    .then((response) => {
+      const resClone = response.clone();
+      caches.open(CACHE_NAME).then((cache) => cache.put(request, resClone));
+      return response;
+    })
+    .catch(() => cached || new Response("Offline", { status: 503 }));
+
+  // אם יש קאש – נחזיר אותו מהר, ובמקביל נעדכן מהאינטרנט
+  return cached || fetchPromise;
+}
+
+async function handleGenericRequest(request) {
+  const cached = await caches.match(request);
+  if (cached) return cached;
+
+  try {
+    return await fetch(request);
+  } catch {
+    return new Response("Offline", { status: 503, statusText: "Offline" });
+  }
+}
+
+// 🔹 קבלת הודעה מהדף (כדי לעשות skipWaiting בלחיצת כפתור)
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.action === "skipWaiting") {
     self.skipWaiting();
   }
 });
