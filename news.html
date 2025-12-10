@@ -1,6 +1,73 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
+    <style>
+  /* גריד של כרטיסי חדשות */
+  .all-news-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    margin-top: 18px;
+  }
+
+  /* כרטיס חדשות קטן */
+  .all-news-item {
+    border-radius: 18px;
+    padding: 10px 14px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.25);
+  }
+
+  html[data-theme="light"] .all-news-item {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+  }
+
+  html[data-theme="dark"] .all-news-item {
+    background: rgba(15, 23, 42, 0.96);
+    border: 1px solid rgba(148, 163, 184, 0.6);
+  }
+
+  .all-news-item .home-news-title {
+    font-size: 1rem;
+    margin-bottom: 4px;
+  }
+
+  .all-news-item .home-news-body {
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+
+  /* תמונה קטנה בכרטיס */
+  .all-news-item .home-news-images-row {
+    max-width: 120px;
+  }
+
+  .small-news-image img {
+    height: 80px;
+    object-fit: cover;
+  }
+
+  /* "להמשך קריאה" */
+  .news-details {
+    margin-top: 6px;
+    font-size: 0.8rem;
+  }
+
+  .news-details summary {
+    cursor: pointer;
+    color: #16a34a;
+    list-style: none;
+  }
+
+  .news-details summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .news-full {
+    margin-top: 4px;
+  }
+</style>
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 

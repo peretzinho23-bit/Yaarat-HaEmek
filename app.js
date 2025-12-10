@@ -303,26 +303,23 @@ function renderAllNewsPage() {
 
   const allItems = [];
 
-  // חדשות שכבות
+  // 🔹 חדשות לפי שכבות
   for (const g of GRADES) {
     const items = homeNews[g] || [];
-    items.forEach((item, idx) => {
+    items.forEach((item) => {
       allItems.push({
         ...item,
         _grade: g,
-        _type: "grade",
-        _order: idx
+        _type: "news"
       });
     });
   }
 
-  // חדשות לוח מודעות
-  (boardData || []).forEach((item, idx) => {
+  // 🔹 לוח מודעות – נכנס גם לדף החדשות
+  (boardData || []).forEach((item) => {
     allItems.push({
       ...item,
-      _grade: "board",
-      _type: "board",
-      _order: idx
+      _type: "board"
     });
   });
 
@@ -331,42 +328,68 @@ function renderAllNewsPage() {
     return;
   }
 
-  // מיון – פשוט מהחדש לישן לפי הסדר שבו נשמרו (המערכים)
+  // מהחדש לישן (בהנחה שהפריטים כבר מסודרים מהישן לחדש בפיירסטור)
   const sorted = allItems.slice().reverse();
 
   container.innerHTML = sorted
     .map((n) => {
-      const images = Array.isArray(n.imageUrls) && n.imageUrls.length
-        ? n.imageUrls
-        : (n.imageUrl ? [n.imageUrl] : []);
-      const hasImages = images.length > 0;
-      const colorStyle = n.color ? ` style="color:${escapeHtml(n.color)}"` : "";
+      // 🔹 כותרת
+      const title = n.title || (n._type === "board" ? "הודעה בלוח המודעות" : "עדכון");
 
-      let sourceLabel = "";
-      if (n._type === "board") {
-        sourceLabel = "לוח מודעות";
-      } else {
-        const gradeLabel = GRADE_LABELS[n._grade] || "";
-        if (gradeLabel) sourceLabel = `שכבה ${gradeLabel}`;
-      }
-
+      // 🔹 תגיות (שכבה / לוח מודעות / מטא)
       const metaPieces = [];
-      if (sourceLabel) metaPieces.push(sourceLabel);
-      if (n.meta) metaPieces.push(n.meta);
-
+      if (n._type === "board") {
+        metaPieces.push("לוח מודעות");
+      } else if (n._grade) {
+        const gl = GRADE_LABELS[n._grade] || "";
+        if (gl) metaPieces.push(`שכבה ${gl}`);
+      }
+      if (n.meta) {
+        metaPieces.push(n.meta);
+      }
       const metaHtml = metaPieces.length
         ? `<div class="home-news-meta">${escapeHtml(metaPieces.join(" · "))}</div>`
         : "";
 
+      // 🔹 תמונות – גם חדשות וגם לוח מודעות
+      let images = [];
+      if (Array.isArray(n.imageUrls) && n.imageUrls.length) {
+        images = n.imageUrls.slice();
+      } else if (n.imageUrl) {
+        images = [n.imageUrl];
+      }
+      if (n.imageUrl2) images.push(n.imageUrl2);
+      if (n.imageUrl3) images.push(n.imageUrl3);
+      images = images.slice(0, 2); // מקסימום 2
+
+      const hasImages = images.length > 0;
+
+      // 🔹 טקסט קצר + "להמשך קריאה"
+      const fullBody = String(n.body || "");
+      const maxLen = 150;
+      const isLong = fullBody.length > maxLen;
+      const shortBody = fullBody.slice(0, maxLen);
+
+      const shortHtml = escapeHtml(shortBody) + (isLong ? "…" : "");
+      const detailsHtml = isLong
+        ? `
+          <details class="news-details">
+            <summary>להמשך קריאה »</summary>
+            <div class="news-full">
+              ${escapeHtml(fullBody)}
+            </div>
+          </details>
+        `
+        : "";
+
+      const colorStyle = n.color ? ` style="color:${escapeHtml(n.color)}"` : "";
+
       if (hasImages) {
         const imgsHtml = images
-          .slice(0, 2)
           .map(
             (url) => `
               <div class="home-news-image-wrap-multi small-news-image">
-                <img src="${escapeHtml(url)}" alt="${escapeHtml(
-                  n.title || ""
-                )}" />
+                <img src="${escapeHtml(url)}" alt="${escapeHtml(title)}" />
               </div>
             `
           )
@@ -378,24 +401,28 @@ function renderAllNewsPage() {
               ${imgsHtml}
             </div>
             <div class="home-news-text">
-              <h4 class="home-news-title">${escapeHtml(n.title)}</h4>
+              <h4 class="home-news-title">${escapeHtml(title)}</h4>
               ${metaHtml}
-              <div class="home-news-body">${escapeHtml(n.body)}</div>
+              <div class="home-news-body">${shortHtml}</div>
+              ${detailsHtml}
             </div>
           </article>
         `;
       }
 
+      // בלי תמונה
       return `
         <article class="home-news-item all-news-item"${colorStyle}>
-          <h4 class="home-news-title">${escapeHtml(n.title)}</h4>
+          <h4 class="home-news-title">${escapeHtml(title)}</h4>
           ${metaHtml}
-          <div class="home-news-body">${escapeHtml(n.body)}</div>
+          <div class="home-news-body">${shortHtml}</div>
+          ${detailsHtml}
         </article>
       `;
     })
     .join("");
 }
+
 
 /* ------------ RENDER HOME EXAMS (עם מבחן הבא + מבחנים שהיו + ספירה לאחור) ------------ */
 
