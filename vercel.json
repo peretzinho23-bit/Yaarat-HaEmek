@@ -1,5 +1,11 @@
 {
+  "builds": [
+    { "src": "**/*", "use": "@vercel/static" }
+  ],
   "rewrites": [
-    { "source": "/google014e0d8fdc8f329c.html", "destination": "/google014e0d8fdc8f329c.html" }
+    {
+      "source": "/google014e0d8fdc8f329c.html",
+      "destination": "/google014e0d8fdc8f329c.html"
+    }
   ]
 }
