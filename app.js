@@ -715,37 +715,11 @@ function renderHomeBoard() {
     return;
   }
 
-  // ✅ לוקחים את העדכנית ביותר – מניחים שהאחרונה במערך היא החדשה
-  const items = boardData.slice().reverse(); // חדשים קודם
-  const b = items[0];
+  // ✅ לוקחים רק את המודעה האחרונה במערך
+  const b = boardData[boardData.length - 1];
 
   const colorStyle = b.color ? ` style="color:${escapeHtml(b.color)}"` : "";
 
-  // 🕒 בניית שורת מטא (תאריך יחסי + תאריך רגיל + מטא רגילה)
-  const metaPieces = [];
-
-  if (b.date) {
-    const d = new Date(b.date);
-    if (!isNaN(d.getTime())) {
-      const rel = timeAgo(b.date);       // "לפני X ימים"
-      const abs = formatLocalDate(d);    // "DD.MM.YYYY"
-      if (rel && abs) {
-        metaPieces.push(`${rel} (${abs})`);
-      } else if (abs) {
-        metaPieces.push(abs);
-      }
-    }
-  }
-
-  if (b.meta) {
-    metaPieces.push(b.meta);
-  }
-
-  const metaHtml = metaPieces.length
-    ? `<div class="board-item-meta">${escapeHtml(metaPieces.join(" · "))}</div>`
-    : "";
-
-  // 🎨 תמונות (עד 3 כמו שהיה)
   const imgs = [];
   if (b.imageUrl) {
     imgs.push(`
@@ -775,7 +749,11 @@ function renderHomeBoard() {
   listEl.innerHTML = `
     <article class="board-item"${colorStyle}>
       <div class="board-item-title">${escapeHtml(b.title)}</div>
-      ${metaHtml}
+      ${
+        b.meta
+          ? `<div class="board-item-meta">${escapeHtml(b.meta)}</div>`
+          : ""
+      }
       <div class="board-item-body">${escapeHtml(b.body)}</div>
 
       ${
@@ -800,200 +778,10 @@ function renderHomeBoard() {
     </article>
   `;
 
-  // שומר לך את הסליידר אם יש כמה תמונות
+  // אם יש כמה תמונות – שישאר הסליידר
   setupBoardSliders();
 }
 
-
-/* ------------ GRADE PAGES (NEWS / EXAMS / BOARD) ------------ */
-
-function renderGradeNews(grade) {
-  const listEl = document.getElementById("grade-news");
-  if (!listEl) return;
-
-  const items = homeNews[grade] || [];
-  if (!items.length) {
-    listEl.innerHTML = `<p class="empty-msg">אין חדשות בשכבה זו כרגע.</p>`;
-    return;
-  }
-
-  listEl.innerHTML = items
-    .map((n) => {
-      const images = Array.isArray(n.imageUrls) && n.imageUrls.length
-        ? n.imageUrls
-        : (n.imageUrl ? [n.imageUrl] : []);
-      const hasImages = images.length > 0;
-      const colorStyle = n.color ? ` style="color:${escapeHtml(n.color)}"` : "";
-
-      if (hasImages) {
-        const imgsHtml = images
-          .slice(0, 2)
-          .map(
-            (url) => `
-              <div class="home-news-image-wrap-multi">
-                <img src="${escapeHtml(url)}" alt="${escapeHtml(
-                  n.title || ""
-                )}" />
-              </div>
-            `
-          )
-          .join("");
-
-        return `
-          <article class="home-news-item home-news-item-with-image"${colorStyle}>
-            <div class="home-news-images-row">
-              ${imgsHtml}
-            </div>
-            <div class="home-news-text">
-              <h4 class="home-news-title">${escapeHtml(n.title)}</h4>
-              ${
-                n.meta
-                  ? `<div class="home-news-meta">${escapeHtml(n.meta)}</div>`
-                  : ""
-              }
-              <div class="home-news-body">${escapeHtml(n.body)}</div>
-            </div>
-          </article>
-        `;
-      }
-
-      return `
-        <article class="home-news-item"${colorStyle}>
-          <h4 class="home-news-title">${escapeHtml(n.title)}</h4>
-          ${
-            n.meta
-              ? `<div class="home-news-meta">${escapeHtml(n.meta)}</div>`
-              : ""
-          }
-          <div class="home-news-body">${escapeHtml(n.body)}</div>
-        </article>
-      `;
-    })
-    .join("");
-}
-
-function renderGradeExams(grade) {
-  const listEl = document.getElementById("grade-exams");
-  if (!listEl) return;
-
-  const rawItems = homeExams[grade] || [];
-
-  const itemsWithDates = rawItems
-    .map((ex) => ({
-      ...ex,
-      _dateObj: parseExamDateToDateObj(ex.date, ex.time)
-    }))
-    .filter((ex) => ex._dateObj);
-
-  if (!itemsWithDates.length) {
-    listEl.innerHTML = "";
-    return;
-  }
-
-  itemsWithDates.sort((a, b) => a._dateObj - b._dateObj);
-
-  listEl.innerHTML = itemsWithDates
-    .map((ex) => {
-      const ts = ex._dateObj.getTime();
-      return `
-        <article class="home-exam-item">
-          <div class="home-exam-top">
-            <span class="home-exam-date">${buildDateTimeLabel(
-              ex,
-              ex._dateObj
-            )}</span>
-            <span class="home-exam-subject">${escapeHtml(ex.subject)}</span>
-          </div>
-          ${
-            ex.topic
-              ? `<div class="home-exam-topic">${escapeHtml(ex.topic)}</div>`
-              : ""
-          }
-          <div class="home-exam-countdown" data-exam-timestamp="${ts}"></div>
-        </article>
-      `;
-    })
-    .join("");
-
-  updateExamCountdownElements();
-  startExamCountdownLoop();
-}
-
-function renderGradeBoard() {
-  const listEl = document.getElementById("board-list");
-  if (!listEl) return;
-
-  if (!boardData.length) {
-    listEl.innerHTML = `<p class="empty-msg">אין מודעות כרגע.</p>`;
-    return;
-  }
-
-  listEl.innerHTML = boardData
-    .map((b) => {
-      const colorStyle = b.color ? ` style="color:${escapeHtml(b.color)}"` : "";
-
-      const imgs = [];
-      if (b.imageUrl) {
-        imgs.push(`
-          <div class="board-item-image">
-            <img src="${escapeHtml(b.imageUrl)}" alt="${escapeHtml(b.title || "")}">
-          </div>
-        `);
-      }
-      if (b.imageUrl2) {
-        imgs.push(`
-          <div class="board-item-image">
-            <img src="${escapeHtml(b.imageUrl2)}" alt="${escapeHtml(b.title || "")}">
-          </div>
-        `);
-      }
-      if (b.imageUrl3) {
-        imgs.push(`
-          <div class="board-item-image">
-            <img src="${escapeHtml(b.imageUrl3)}" alt="${escapeHtml(b.title || "")}">
-          </div>
-        `);
-      }
-
-      const hasMany = imgs.length > 1;
-      const imgsHtml = imgs.join("");
-
-      return `
-        <article class="board-item"${colorStyle}>
-          <div class="board-item-title">${escapeHtml(b.title)}</div>
-          ${
-            b.meta
-              ? `<div class="board-item-meta">${escapeHtml(b.meta)}</div>`
-              : ""
-          }
-          <div class="board-item-body">${escapeHtml(b.body)}</div>
-
-          ${
-            imgs.length
-              ? `
-              <div class="board-item-images" data-images-count="${imgs.length}">
-                ${imgsHtml}
-                ${
-                  hasMany
-                    ? `
-                      <div class="board-slider-controls">
-                        <button type="button" class="board-slider-prev">◀</button>
-                        <button type="button" class="board-slider-next">▶</button>
-                      </div>
-                    `
-                    : ""
-                }
-              </div>
-            `
-              : ""
-          }
-        </article>
-      `;
-    })
-    .join("");
-
-  setupBoardSliders();
-}
 
 /* ------------ SLIDER LOGIC FOR BOARD ------------ */
 
