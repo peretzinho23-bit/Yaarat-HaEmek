@@ -303,70 +303,89 @@ function renderAllNewsPage() {
 
   const allItems = [];
 
-  // אוספים את כל החדשות מכל השכבות, כולל האינדקס שלהן במערך
+  // חדשות משכבות ז/ח/ט
   for (const g of GRADES) {
     const items = homeNews[g] || [];
     items.forEach((item, idx) => {
       allItems.push({
         ...item,
         _grade: g,
+        _source: "news",   // מאיפה זה הגיע
         _index: idx
       });
     });
   }
+
+  // מודעות מלוח המודעות – נכנסות גם ל"כל החדשות"
+  (boardData || []).forEach((b, idx) => {
+    allItems.push({
+      ...b,
+      _grade: "board",
+      _source: "board",
+      _index: idx
+    });
+  });
 
   if (!allItems.length) {
     container.innerHTML = `<p class="empty-msg">אין חדשות באתר כרגע.</p>`;
     return;
   }
 
-  // מהחדש לישן (בהנחה שהן נכנסות לפי סדר)
+  // מהחדש לישן – נניח שהאייטם האחרון ברשימה הוא הכי חדש
   const sorted = allItems.slice().reverse();
 
   container.innerHTML = sorted
     .map((n) => {
+      // תמונות
       const images = Array.isArray(n.imageUrls) && n.imageUrls.length
         ? n.imageUrls
         : (n.imageUrl ? [n.imageUrl] : []);
 
       const hasImages = images.length > 0;
       const colorStyle = n.color ? ` style="color:${escapeHtml(n.color)}"` : "";
-      const gradeLabel = GRADE_LABELS[n._grade] || "";
+
+      // טקסט "קטגוריה": שכבה / לוח מודעות
+      let gradeLabel = "";
+      if (n._source === "board") {
+        gradeLabel = "לוח מודעות";
+      } else {
+        const base = GRADE_LABELS[n._grade] || "";
+        if (base) gradeLabel = "שכבה " + base;
+      }
 
       const metaPieces = [];
-      if (gradeLabel) metaPieces.push(`שכבה ${gradeLabel}`);
+      if (gradeLabel) metaPieces.push(gradeLabel);
       if (n.meta) metaPieces.push(n.meta);
 
       const metaHtml = metaPieces.length
         ? `<div class="home-news-meta">${escapeHtml(metaPieces.join(" · "))}</div>`
         : "";
 
+      // תקציר לגוף הכתבה
       const fullBody = String(n.body || "");
-      const isLong = fullBody.length > 220;
-      const preview = isLong ? fullBody.slice(0, 220) + "..." : fullBody;
+      const shortBody =
+        fullBody.length > 220 ? fullBody.slice(0, 220) + "…" : fullBody;
 
-      const articleUrl =
-        `article.html?grade=${encodeURIComponent(n._grade)}&index=${encodeURIComponent(n._index)}`;
+      // קישור לכתבה מלאה
+      const qs = new URLSearchParams({
+        grade: n._grade || "",
+        index: String(n._index ?? 0),
+        source: n._source || "news"
+      }).toString();
 
-      const readMoreHtml = isLong
-        ? `
-          <div class="news-read-more-wrap">
-            <a class="news-read-more" href="${articleUrl}">
-              להמשך קריאה »
-            </a>
-          </div>
-        `
-        : "";
+      const readMoreLink = `
+        <div class="news-read-more">
+          <a href="article.html?${qs}">« להמשך קריאה</a>
+        </div>
+      `;
 
       if (hasImages) {
         const imgsHtml = images
           .slice(0, 2)
           .map(
             (url) => `
-              <div class="home-news-image-wrap-multi">
-                <img src="${escapeHtml(url)}" alt="${escapeHtml(
-                  n.title || ""
-                )}" />
+              <div class="home-news-image-wrap-multi small-news-image">
+                <img src="${escapeHtml(url)}" alt="${escapeHtml(n.title || "")}" />
               </div>
             `
           )
@@ -378,10 +397,10 @@ function renderAllNewsPage() {
               ${imgsHtml}
             </div>
             <div class="home-news-text">
-              <h4 class="home-news-title">${escapeHtml(n.title)}</h4>
+              <h4 class="home-news-title">${escapeHtml(n.title || "")}</h4>
               ${metaHtml}
-              <div class="home-news-body">${escapeHtml(preview)}</div>
-              ${readMoreHtml}
+              <div class="home-news-body">${escapeHtml(shortBody)}</div>
+              ${readMoreLink}
             </div>
           </article>
         `;
@@ -389,15 +408,16 @@ function renderAllNewsPage() {
 
       return `
         <article class="home-news-item all-news-item"${colorStyle}>
-          <h4 class="home-news-title">${escapeHtml(n.title)}</h4>
+          <h4 class="home-news-title">${escapeHtml(n.title || "")}</h4>
           ${metaHtml}
-          <div class="home-news-body">${escapeHtml(preview)}</div>
-          ${readMoreHtml}
+          <div class="home-news-body">${escapeHtml(shortBody)}</div>
+          ${readMoreLink}
         </article>
       `;
     })
     .join("");
 }
+
 
 
 
