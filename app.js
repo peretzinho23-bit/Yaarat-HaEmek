@@ -303,34 +303,24 @@ function renderAllNewsPage() {
 
   const allItems = [];
 
-  // 🔹 חדשות לפי שכבות
+  // אוספים את כל החדשות מכל השכבות, כולל האינדקס שלהן במערך
   for (const g of GRADES) {
     const items = homeNews[g] || [];
-    items.forEach((item, index) => {
+    items.forEach((item, idx) => {
       allItems.push({
         ...item,
-        _type: "news",
         _grade: g,
-        _index: index,
+        _index: idx
       });
     });
   }
-
-  // 🔹 לוח מודעות (board)
-  (boardData || []).forEach((item, index) => {
-    allItems.push({
-      ...item,
-      _type: "board",
-      _index: index,
-    });
-  });
 
   if (!allItems.length) {
     container.innerHTML = `<p class="empty-msg">אין חדשות באתר כרגע.</p>`;
     return;
   }
 
-  // מהחדש לישן
+  // מהחדש לישן (בהנחה שהן נכנסות לפי סדר)
   const sorted = allItems.slice().reverse();
 
   container.innerHTML = sorted
@@ -338,70 +328,77 @@ function renderAllNewsPage() {
       const images = Array.isArray(n.imageUrls) && n.imageUrls.length
         ? n.imageUrls
         : (n.imageUrl ? [n.imageUrl] : []);
+
       const hasImages = images.length > 0;
       const colorStyle = n.color ? ` style="color:${escapeHtml(n.color)}"` : "";
+      const gradeLabel = GRADE_LABELS[n._grade] || "";
 
-      // טקסט מטא – שכבה / לוח מודעות / מטא מהאובייקט
       const metaPieces = [];
-
-      if (n._type === "board") {
-        metaPieces.push("לוח מודעות");
-      } else if (n._type === "news" && n._grade && GRADE_LABELS[n._grade]) {
-        metaPieces.push(`שכבה ${GRADE_LABELS[n._grade]}`);
-      }
-
-      if (n.meta) {
-        metaPieces.push(n.meta);
-      }
+      if (gradeLabel) metaPieces.push(`שכבה ${gradeLabel}`);
+      if (n.meta) metaPieces.push(n.meta);
 
       const metaHtml = metaPieces.length
         ? `<div class="home-news-meta">${escapeHtml(metaPieces.join(" · "))}</div>`
         : "";
 
-      // 👇 קישור לעמוד כתבה מלאה
-      const query =
-        n._type === "board"
-          ? `type=board&index=${encodeURIComponent(n._index)}`
-          : `type=news&grade=${encodeURIComponent(
-              n._grade
-            )}&index=${encodeURIComponent(n._index)}`;
+      const fullBody = String(n.body || "");
+      const isLong = fullBody.length > 180;
+      const preview = isLong ? fullBody.slice(0, 180) + "..." : fullBody;
 
-      const readMoreHtml = `
-        <div class="news-read-more-wrap">
-          <a class="news-read-more" href="article.html?${query}">
-            להמשך קריאה »
-          </a>
-        </div>
-      `;
+      const articleUrl =
+        `article.html?grade=${encodeURIComponent(n._grade)}&index=${encodeURIComponent(n._index)}`;
 
-      const bodyPreview = n.body ? escapeHtml(n.body) : "";
-
-      const imagesHtml = hasImages
+      const readMoreHtml = isLong
         ? `
-          <div class="home-news-images-row">
-            <div class="home-news-image-wrap-multi">
-              <img src="${escapeHtml(images[0])}" alt="${escapeHtml(
-                n.title || ""
-              )}" />
-            </div>
+          <div class="news-read-more-wrap">
+            <a class="news-read-more" href="${articleUrl}">
+              להמשך קריאה »
+            </a>
           </div>
         `
         : "";
 
+      if (hasImages) {
+        const imgsHtml = images
+          .slice(0, 2)
+          .map(
+            (url) => `
+              <div class="home-news-image-wrap-multi">
+                <img src="${escapeHtml(url)}" alt="${escapeHtml(
+                  n.title || ""
+                )}" />
+              </div>
+            `
+          )
+          .join("");
+
+        return `
+          <article class="home-news-item all-news-item home-news-item-with-image"${colorStyle}>
+            <div class="home-news-images-row">
+              ${imgsHtml}
+            </div>
+            <div class="home-news-text">
+              <h4 class="home-news-title">${escapeHtml(n.title)}</h4>
+              ${metaHtml}
+              <div class="home-news-body">${escapeHtml(preview)}</div>
+              ${readMoreHtml}
+            </div>
+          </article>
+        `;
+      }
+
       return `
         <article class="home-news-item all-news-item"${colorStyle}>
-          ${imagesHtml}
-          <div class="home-news-text">
-            <h4 class="home-news-title">${escapeHtml(n.title || "")}</h4>
-            ${metaHtml}
-            <div class="home-news-body">${bodyPreview}</div>
-            ${readMoreHtml}
-          </div>
+          <h4 class="home-news-title">${escapeHtml(n.title)}</h4>
+          ${metaHtml}
+          <div class="home-news-body">${escapeHtml(preview)}</div>
+          ${readMoreHtml}
         </article>
       `;
     })
     .join("");
 }
+
 
 
 function renderArticlePage() {
