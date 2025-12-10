@@ -4,83 +4,88 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>כתבה – חטיבת הנעורים יערת העמק</title>
+  <title>כתבה מלאה – חטיבת הנעורים יערת העמק</title>
 
   <link rel="icon" href="logo.png" />
   <link rel="stylesheet" href="style.css" />
 
   <style>
-    .article-wrapper {
-      padding-top: 40px;
-      padding-bottom: 40px;
+    .article-wrapper-card {
+      border-radius: 20px;
+      padding: 18px 20px;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.35);
+      margin-top: 18px;
     }
 
-    .article-card {
-      max-width: 900px;
-      margin: 0 auto;
-      border-radius: 24px;
-      padding: 20px 20px 24px;
-      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.32);
-    }
-
-    html[data-theme="light"] .article-card {
+    html[data-theme="light"] .article-wrapper-card {
       background: #ffffff;
       border: 1px solid #e5e7eb;
     }
 
-    html[data-theme="dark"] .article-card {
-      background: rgba(15, 23, 42, 0.97);
+    html[data-theme="dark"] .article-wrapper-card {
+      background: rgba(15, 23, 42, 0.96);
       border: 1px solid rgba(148, 163, 184, 0.6);
     }
 
-    .article-back-link {
-      font-size: 0.85rem;
+    .article-images {
+      margin-bottom: 14px;
+    }
+
+    .article-image-wrap {
+      width: 100%;
       margin-bottom: 10px;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      color: #16a34a;
-      text-decoration: none;
     }
 
-    .article-back-link:hover {
-      text-decoration: underline;
+    .article-image-wrap img {
+      width: 100%;
+      max-height: 420px;
+      object-fit: cover;
+      border-radius: 16px;
+      display: block;
     }
 
-    .article-title {
+    .article-title-main {
       font-size: 1.4rem;
+      font-weight: 700;
       margin-bottom: 6px;
     }
 
     .article-meta {
       font-size: 0.85rem;
       opacity: 0.8;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
 
-    .article-images {
-      margin-bottom: 16px;
-    }
-
-    .article-images img {
-      width: 100%;
-      max-height: 420px;
-      border-radius: 18px;
-      object-fit: cover;
-      display: block;
-    }
-
-    .article-body {
+    .article-body-full {
       font-size: 0.95rem;
-      line-height: 1.8;
-      white-space: pre-line; /* שומר שורות חדשות בטקסט */
+      line-height: 1.7;
+      white-space: normal;
     }
 
-    .article-empty {
-      text-align: center;
-      padding: 40px 0;
-      font-size: 1rem;
-      opacity: 0.8;
+    .article-back-wrap {
+      margin-top: 16px;
+    }
+
+    .article-back-link {
+      font-size: 0.9rem;
+      text-decoration: none;
+      border-radius: 999px;
+      padding: 6px 14px;
+      border: 1px solid #16a34a;
+    }
+
+    html[data-theme="light"] .article-back-link {
+      color: #15803d;
+      background: #ecfdf3;
+    }
+
+    html[data-theme="dark"] .article-back-link {
+      color: #bbf7d0;
+      background: rgba(22, 163, 74, 0.12);
+    }
+
+    .article-back-link:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
@@ -141,12 +146,22 @@
     </div>
   </header>
 
-  <main class="about-wrapper article-wrapper">
+  <main class="about-wrapper">
     <section class="about-section">
       <div class="container">
-        <div id="article-container">
-          <!-- התוכן של הכתבה ייכנס לכאן מה-JS -->
-          <p class="article-empty">טוען כתבה...</p>
+        <header class="about-section-header">
+          <h1 id="article-page-title" class="about-section-title">
+            כתבה מלאה
+          </h1>
+          <p id="article-page-meta" class="about-section-subtitle"></p>
+        </header>
+
+        <div id="article-root" class="article-wrapper-card">
+          <!-- הכתבה תוזרק לכאן ע"י JS -->
+        </div>
+
+        <div class="article-back-wrap">
+          <a href="news.html" class="article-back-link">← חזרה לכל החדשות</a>
         </div>
       </div>
     </section>
@@ -163,6 +178,111 @@
   <div id="to-top">↑</div>
 
   <script src="accessibility.js"></script>
+  <!-- app.js בשביל תאורה, תפריט נייד, פוטר וכו' -->
   <script type="module" src="app.js?v=8"></script>
+
+  <!-- סקריפט שמטעין את הכתבה עצמה -->
+  <script type="module">
+    import { db } from "./firebase-config.js";
+    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+    const GRADE_LABELS = { z: "ז׳", h: "ח׳", t: "ט׳" };
+
+    function escapeHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    async function loadArticle() {
+      const params = new URLSearchParams(window.location.search);
+      const type = params.get("type") || "news";   // news | board
+      const grade = params.get("grade");          // z/h/t (כשזה news)
+      const index = Number(params.get("index") || "0");
+
+      const titleEl = document.getElementById("article-page-title");
+      const metaEl  = document.getElementById("article-page-meta");
+      const rootEl  = document.getElementById("article-root");
+
+      if (!rootEl) return;
+
+      let item = null;
+
+      try {
+        if (type === "board") {
+          const snap = await getDoc(doc(db, "board", "general"));
+          const data = snap.exists() ? snap.data() : { items: [] };
+          item = data.items[index];
+        } else {
+          const g = grade || "z";
+          const snap = await getDoc(doc(db, "news", g));
+          const data = snap.exists() ? snap.data() : { items: [] };
+          item = data.items[index];
+        }
+      } catch (err) {
+        console.error("Error loading article:", err);
+      }
+
+      if (!item) {
+        if (titleEl) titleEl.textContent = "הכתבה לא נמצאה";
+        rootEl.innerHTML = `<p class="empty-msg">הכתבה שביקשת לא נמצאה. ייתכן שהקישור שגוי או שהפריט הוסר.</p>`;
+        return;
+      }
+
+      // כותרת
+      if (titleEl) {
+        titleEl.textContent = item.title || "חדשות מבית הספר";
+      }
+
+      // מטא
+      const metaPieces = [];
+      if (type === "board") {
+        metaPieces.push("לוח מודעות בית ספרי");
+      } else if (grade && GRADE_LABELS[grade]) {
+        metaPieces.push(`שכבה ${GRADE_LABELS[grade]}`);
+      }
+      if (item.meta) metaPieces.push(item.meta);
+
+      if (metaEl) {
+        metaEl.textContent = metaPieces.join(" · ");
+      }
+
+      // תמונות
+      const images = Array.isArray(item.imageUrls) && item.imageUrls.length
+        ? item.imageUrls
+        : (item.imageUrl ? [item.imageUrl] : []);
+      const hasImages = images.length > 0;
+
+      const imgsHtml = hasImages
+        ? `
+          <div class="article-images">
+            ${images.map(u => `
+              <div class="article-image-wrap">
+                <img src="${escapeHtml(u)}" alt="${escapeHtml(item.title || "")}">
+              </div>
+            `).join("")}
+          </div>
+        `
+        : "";
+
+      // טקסט גוף – שומר על מעברי שורה
+      const bodyHtml = (item.body || "")
+        .split("\n")
+        .map(line => escapeHtml(line))
+        .join("<br>");
+
+      rootEl.innerHTML = `
+        <h2 class="article-title-main">${escapeHtml(item.title || "")}</h2>
+        <div class="article-meta">${escapeHtml(metaPieces.join(" · "))}</div>
+        ${imgsHtml}
+        <div class="article-body-full">
+          ${bodyHtml}
+        </div>
+      `;
+    }
+
+    document.addEventListener("DOMContentLoaded", loadArticle);
+  </script>
 </body>
 </html>
