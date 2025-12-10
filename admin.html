@@ -7,6 +7,61 @@
   <title>לוח ניהול – יערת העמק</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="admin.css" />
+
+  <!-- התאמות ספציפיות לאדמין: תמונות קטנות + רשימות קומפקטיות -->
+  <style>
+    /* כרטיס אדמין כללי */
+    .admin-list .admin-item {
+      padding: 8px 10px;
+      margin-bottom: 8px;
+      border-radius: 12px;
+    }
+
+    /* שורת תמונות קטנה בחדשות / מודעות */
+    .admin-images-row {
+      display: flex;
+      gap: 6px;
+      margin-top: 4px;
+      flex-wrap: wrap;
+    }
+
+    .admin-image-wrapper {
+      width: 90px;
+      height: 70px;
+      flex: 0 0 auto;
+      overflow: hidden;
+      border-radius: 8px;
+    }
+
+    .admin-image-wrapper img.admin-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* טקסט קצר יותר כדי שלא ייקח חצי מסך */
+    .admin-item-body {
+      font-size: 0.9rem;
+      line-height: 1.45;
+      max-height: 6.5em;
+      overflow-y: auto;
+    }
+
+    /* כותרות מבחנים באדמין – קצת מרווח */
+    .admin-class-title {
+      font-size: 0.95rem;
+      margin-top: 10px;
+      margin-bottom: 4px;
+      opacity: 0.9;
+    }
+
+    .admin-exam-item {
+      border-radius: 10px;
+      padding: 6px 8px;
+      margin-bottom: 6px;
+    }
+  </style>
 </head>
 
 <body>
@@ -352,42 +407,43 @@
           <div class="card">
             <h3>מודעות כלליות</h3>
             <div id="admin-board" class="admin-list"></div>
-<form id="board-form">
-  <label>כותרת</label>
-  <input name="title" />
 
-  <label>מידע קצר (מי קהל היעד, תאריך וכו')</label>
-  <input name="meta" />
+            <form id="board-form">
+              <label>כותרת</label>
+              <input name="title" />
 
-  <label>צבע הטקסט (אופציונלי)</label>
-  <input type="color" name="color" value="#ffffff" />
+              <label>מידע קצר (מי קהל היעד, תאריך וכו')</label>
+              <input name="meta" />
 
-  <!-- תמונה 1 -->
-  <label>קישור לתמונה 1 (אופציונלי)</label>
-  <input name="imageUrl" placeholder="https://..." />
+              <label>צבע הטקסט (אופציונלי)</label>
+              <input type="color" name="color" value="#ffffff" />
 
-  <label>העלה קובץ תמונה 1 (אופציונלי)</label>
-  <input type="file" name="imageFile" accept="image/*" />
+              <!-- תמונה 1 -->
+              <label>קישור לתמונה 1 (אופציונלי)</label>
+              <input name="imageUrl" placeholder="https://..." />
 
-  <!-- תמונה 2 -->
-  <label>קישור לתמונה 2 (אופציונלי)</label>
-  <input name="imageUrl2" placeholder="https://..." />
+              <label>העלה קובץ תמונה 1 (אופציונלי)</label>
+              <input type="file" name="imageFile" accept="image/*" />
 
-  <label>העלה קובץ תמונה 2 (אופציונלי)</label>
-  <input type="file" name="imageFile2" accept="image/*" />
+              <!-- תמונה 2 -->
+              <label>קישור לתמונה 2 (אופציונלי)</label>
+              <input name="imageUrl2" placeholder="https://..." />
 
-  <!-- תמונה 3 -->
-  <label>קישור לתמונה 3 (אופציונלי)</label>
-  <input name="imageUrl3" placeholder="https://..." />
+              <label>העלה קובץ תמונה 2 (אופציונלי)</label>
+              <input type="file" name="imageFile2" accept="image/*" />
 
-  <label>העלה קובץ תמונה 3 (אופציונלי)</label>
-  <input type="file" name="imageFile3" accept="image/*" />
+              <!-- תמונה 3 -->
+              <label>קישור לתמונה 3 (אופציונלי)</label>
+              <input name="imageUrl3" placeholder="https://..." />
 
-  <label>תוכן המודעה</label>
-  <textarea name="body"></textarea>
+              <label>העלה קובץ תמונה 3 (אופציונלי)</label>
+              <input type="file" name="imageFile3" accept="image/*" />
 
-  <button type="submit">הוסף מודעה</button>
-</form>
+              <label>תוכן המודעה</label>
+              <textarea name="body"></textarea>
+
+              <button type="submit">הוסף מודעה</button>
+            </form>
 
           </div>
         </div>
