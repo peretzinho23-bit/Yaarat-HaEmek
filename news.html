@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>כל החדשות – חטיבת הנעורים יערת העמק</title>
+
+  <link rel="icon" href="logo.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body data-page="news">
+  <!-- אנליטיקות -->
+  <script type="module" src="analytics.js"></script>
+
+  <!-- HEADER -->
+  <header class="header-main">
+    <div class="container">
+      <nav class="nav">
+        <div class="nav-left">
+          <div class="logo-circle">
+            <img
+              src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png"
+              alt="סמל בית הספר יערת העמק"
+              class="logo-img"
+              id="logo-img"
+            >
+          </div>
+
+          <div>
+            <div class="school-title-main">
+              חטיבת הנעורים – יערת העמק
+            </div>
+            <div class="school-title-sub">
+              סביבת למידה בטוחה, תומכת ומצמיחה – עבור כל תלמיד ותלמידה.
+            </div>
+          </div>
+        </div>
+
+        <div class="nav-right">
+          <a href="index.html#home-news">חדשות</a>
+          <a href="index.html#home-exams">מבחנים</a>
+          <a href="index.html#grades">השכבות</a>
+          <a href="polls.html">סקרים</a>
+          <a href="about.html">אודות</a>
+          <a href="index.html#contact">יצירת קשר</a>
+          <a href="redirect-edu.html" class="personal-btn">למרחב האישי</a>
+          <a href="admin.html" class="btn-outline">Admin</a>
+        </div>
+
+        <button id="theme-toggle" class="theme-toggle" type="button">
+          🌙
+        </button>
+
+        <button
+          class="nav-toggle"
+          type="button"
+          aria-label="פתח תפריט"
+          aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-wrapper">
+    <section class="section">
+      <div class="container">
+        <h1 class="section-title">כל החדשות מבית הספר</h1>
+        <p class="section-subtitle">
+          כאן אפשר לראות את כל העדכונים שפורסמו באתר – אירועים, טיולים, ימי שיא, הודעות חשובות ועוד.
+        </p>
+
+        <!-- לכאן יכנסו כל החדשות מה-JS -->
+        <div id="all-news-list" class="news-list all-news-list"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p id="footer-text">
+        © כל הזכויות שמורות לחטיבת הנעורים יערת העמק
+      </p>
+    </div>
+  </footer>
+
+  <div id="to-top">↑</div>
+
+  <script src="accessibility.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
