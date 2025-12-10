@@ -38,6 +38,23 @@ function shortenText(str, maxLen = 140) {
 }
 
 /* ------------ עזר למבחנים + ספירה לאחור ------------ */
+function timeAgo(dateStr) {
+  if (!dateStr) return "";
+
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return "";
+
+  const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+
+  if (seconds < 60) return "לפני רגע";
+  if (seconds < 3600) return `לפני ${Math.floor(seconds / 60)} דקות`;
+  if (seconds < 86400) return `לפני ${Math.floor(seconds / 3600)} שעות`;
+  if (seconds < 604800) return `לפני ${Math.floor(seconds / 86400)} ימים`;
+  if (seconds < 2592000) return `לפני ${Math.floor(seconds / 604800)} שבועות`;
+  if (seconds < 31536000) return `לפני ${Math.floor(seconds / 2592000)} חודשים`;
+
+  return `לפני ${Math.floor(seconds / 31536000)} שנים`;
+}
 
 // מזהה אינטרוואל גלובלי כדי שלא יווצרו מיליון אינטרוואלים
 let examCountdownIntervalId = null;
@@ -370,7 +387,7 @@ function renderAllNewsPage() {
 
       const colorStyle = n.color ? ` style="color:${escapeHtml(n.color)}"` : "";
 
-      // מטא (שכבה / לוח מודעות וכו')
+      // מטא (שכבה / לוח מודעות / תאריך)
       let metaPieces = [];
       if (n._type === "news") {
         const gradeLabel = GRADE_LABELS[n._grade] || "";
@@ -378,34 +395,27 @@ function renderAllNewsPage() {
       } else if (n._type === "board") {
         metaPieces.push("לוח מודעות");
       }
+
+      // 🕒 תאריך: "לפני X זמן (DD.MM.YYYY)"
+      if (n.date) {
+        const d = new Date(n.date);
+        if (!isNaN(d.getTime())) {
+          const rel = timeAgo(n.date);
+          const abs = formatLocalDate(d); // כבר קיים אצלך למבחנים
+          if (rel && abs) {
+            metaPieces.push(`${rel} (${abs})`);
+          } else if (abs) {
+            metaPieces.push(abs);
+          }
+        }
+      }
+
       if (n.meta) metaPieces.push(n.meta);
 
       const metaHtml = metaPieces.length
         ? `<div class="home-news-meta">${escapeHtml(metaPieces.join(" · "))}</div>`
         : "";
 
-      // קישור לכתבה – לפי סוג + שכבה + אינדקס
-      const url =
-        n._type === "board"
-          ? `article.html?type=board&index=${n._index}`
-          : `article.html?type=news&grade=${encodeURIComponent(
-              n._grade
-            )}&index=${n._index}`;
-
-      // טקסט מקוצר + "להמשך קריאה"
-      const fullBody = n.body || "";
-      const isLong = fullBody.length > 260;
-      const shortBody = isLong
-        ? escapeHtml(fullBody.slice(0, 260)) + "..."
-        : escapeHtml(fullBody);
-
-      const readMoreHtml = isLong
-        ? `
-          <div class="news-details">
-            <a class="read-more-link" href="${url}">להמשך קריאה »</a>
-          </div>
-        `
-        : "";
 
       const imagesHtml = hasImages
         ? `

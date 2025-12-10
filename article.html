@@ -191,6 +191,35 @@
         .replace(/>/g, "&gt;");
     }
 
+    // 🕒 כמה זמן עבר מאז התאריך
+    function timeAgo(dateStr) {
+      if (!dateStr) return "";
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return "";
+
+      const seconds = Math.floor((Date.now() - d.getTime()) / 1000);
+
+      if (seconds < 60) return "לפני רגע";
+      if (seconds < 3600) return `לפני ${Math.floor(seconds / 60)} דקות`;
+      if (seconds < 86400) return `לפני ${Math.floor(seconds / 3600)} שעות`;
+      if (seconds < 604800) return `לפני ${Math.floor(seconds / 86400)} ימים`;
+      if (seconds < 2592000) return `לפני ${Math.floor(seconds / 604800)} שבועות`;
+      if (seconds < 31536000) return `לפני ${Math.floor(seconds / 2592000)} חודשים`;
+      return `לפני ${Math.floor(seconds / 31536000)} שנים`;
+    }
+
+    // 📅 פורמט יפה ל־DD.MM.YYYY
+    function formatLocalDate(d) {
+      try {
+        const day = String(d.getDate()).padStart(2, "0");
+        const month = String(d.getMonth() + 1).padStart(2, "0");
+        const year = d.getFullYear();
+        return `${day}.${month}.${year}`;
+      } catch {
+        return "";
+      }
+    }
+
     function getQueryParam(name) {
       const params = new URLSearchParams(window.location.search);
       return params.get(name);
@@ -245,6 +274,21 @@
           const gradeLabel = GRADE_LABELS[grade] || "";
           if (gradeLabel) metaPieces.push(`שכבה ${gradeLabel}`);
         }
+
+        // 🕒 תאריך הכתבה (אם קיים item.date)
+        if (item.date) {
+          const d = new Date(item.date);
+          if (!isNaN(d.getTime())) {
+            const rel = timeAgo(item.date);
+            const abs = formatLocalDate(d);
+            if (rel && abs) {
+              metaPieces.push(`${rel} (${abs})`);
+            } else if (abs) {
+              metaPieces.push(abs);
+            }
+          }
+        }
+
         if (item.meta) metaPieces.push(item.meta);
 
         const metaHtml = metaPieces.length
@@ -267,6 +311,11 @@
           ${imagesHtml}
           <div class="article-body">${escapeHtml(item.body || "")}</div>
         `;
+
+        // כותרת הטאב
+        if (item.title) {
+          document.title = escapeHtml(item.title) + " – יערת העמק";
+        }
       } catch (err) {
         console.error("שגיאה בטעינת כתבה:", err);
         showNotFound(container);
