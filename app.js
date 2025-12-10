@@ -324,26 +324,26 @@ function renderAllNewsPage() {
 
   const allItems = [];
 
-  // חדשות משכבות ז/ח/ט
+  // חדשות לפי שכבות
   for (const g of GRADES) {
     const items = homeNews[g] || [];
-    items.forEach((item, idx) => {
+    items.forEach((item, index) => {
       allItems.push({
         ...item,
         _grade: g,
-        _source: "news",   // מאיפה זה הגיע
-        _index: idx
+        _index: index,
+        _type: "news"
       });
     });
   }
 
-  // מודעות מלוח המודעות – נכנסות גם ל"כל החדשות"
-  (boardData || []).forEach((b, idx) => {
+  // לוח מודעות
+  (boardData || []).forEach((item, index) => {
     allItems.push({
-      ...b,
+      ...item,
       _grade: "board",
-      _source: "board",
-      _index: idx
+      _index: index,
+      _type: "board"
     });
   });
 
@@ -352,7 +352,7 @@ function renderAllNewsPage() {
     return;
   }
 
-  // מהחדש לישן – נניח שהאייטם האחרון ברשימה הוא הכי חדש
+  // פשוט מהחדש לישן – לפי הסדר במערך
   const sorted = allItems.slice().reverse();
 
   container.innerHTML = sorted
@@ -361,83 +361,76 @@ function renderAllNewsPage() {
       const images = Array.isArray(n.imageUrls) && n.imageUrls.length
         ? n.imageUrls
         : (n.imageUrl ? [n.imageUrl] : []);
-
       const hasImages = images.length > 0;
+
       const colorStyle = n.color ? ` style="color:${escapeHtml(n.color)}"` : "";
 
-      // טקסט "קטגוריה": שכבה / לוח מודעות
-      let gradeLabel = "";
-      if (n._source === "board") {
-        gradeLabel = "לוח מודעות";
-      } else {
-        const base = GRADE_LABELS[n._grade] || "";
-        if (base) gradeLabel = "שכבה " + base;
+      // מטא (שכבה / לוח מודעות וכו')
+      let metaPieces = [];
+      if (n._type === "news") {
+        const gradeLabel = GRADE_LABELS[n._grade] || "";
+        if (gradeLabel) metaPieces.push(`שכבה ${gradeLabel}`);
+      } else if (n._type === "board") {
+        metaPieces.push("לוח מודעות");
       }
-
-      const metaPieces = [];
-      if (gradeLabel) metaPieces.push(gradeLabel);
       if (n.meta) metaPieces.push(n.meta);
 
       const metaHtml = metaPieces.length
         ? `<div class="home-news-meta">${escapeHtml(metaPieces.join(" · "))}</div>`
         : "";
 
-      // תקציר לגוף הכתבה
-      const fullBody = String(n.body || "");
-      const shortBody =
-        fullBody.length > 220 ? fullBody.slice(0, 220) + "…" : fullBody;
+      // קישור לכתבה – לפי סוג + שכבה + אינדקס
+      const url =
+        n._type === "board"
+          ? `article.html?type=board&index=${n._index}`
+          : `article.html?type=news&grade=${encodeURIComponent(
+              n._grade
+            )}&index=${n._index}`;
 
-      // קישור לכתבה מלאה
-      const qs = new URLSearchParams({
-        grade: n._grade || "",
-        index: String(n._index ?? 0),
-        source: n._source || "news"
-      }).toString();
+      // טקסט מקוצר + "להמשך קריאה"
+      const fullBody = n.body || "";
+      const isLong = fullBody.length > 260;
+      const shortBody = isLong
+        ? escapeHtml(fullBody.slice(0, 260)) + "..."
+        : escapeHtml(fullBody);
 
-      const readMoreLink = `
-        <div class="news-read-more">
-          <a href="article.html?${qs}">« להמשך קריאה</a>
-        </div>
-      `;
+      const readMoreHtml = isLong
+        ? `
+          <div class="news-details">
+            <a class="read-more-link" href="${url}">להמשך קריאה »</a>
+          </div>
+        `
+        : "";
 
-      if (hasImages) {
-        const imgsHtml = images
-          .slice(0, 2)
-          .map(
-            (url) => `
-              <div class="home-news-image-wrap-multi small-news-image">
-                <img src="${escapeHtml(url)}" alt="${escapeHtml(n.title || "")}" />
-              </div>
-            `
-          )
-          .join("");
-
-        return `
-          <article class="home-news-item all-news-item home-news-item-with-image"${colorStyle}>
-            <div class="home-news-images-row">
-              ${imgsHtml}
+      const imagesHtml = hasImages
+        ? `
+          <div class="home-news-images-row">
+            <div class="home-news-image-wrap-multi">
+              <img src="${escapeHtml(images[0])}" alt="${escapeHtml(
+                n.title || ""
+              )}">
             </div>
-            <div class="home-news-text">
-              <h4 class="home-news-title">${escapeHtml(n.title || "")}</h4>
-              ${metaHtml}
-              <div class="home-news-body">${escapeHtml(shortBody)}</div>
-              ${readMoreLink}
-            </div>
-          </article>
-        `;
-      }
+          </div>
+        `
+        : "";
 
       return `
         <article class="home-news-item all-news-item"${colorStyle}>
-          <h4 class="home-news-title">${escapeHtml(n.title || "")}</h4>
-          ${metaHtml}
-          <div class="home-news-body">${escapeHtml(shortBody)}</div>
-          ${readMoreLink}
+          ${imagesHtml}
+          <div class="home-news-text">
+            <h4 class="home-news-title">${escapeHtml(n.title || "")}</h4>
+            ${metaHtml}
+            <div class="home-news-body">
+              ${shortBody}
+              ${readMoreHtml}
+            </div>
+          </div>
         </article>
       `;
     })
     .join("");
 }
+
 
 
 
