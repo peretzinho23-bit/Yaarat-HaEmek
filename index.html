@@ -224,6 +224,19 @@
         padding: 16px 14px 12px;
       }
     }
+
+    /* ✅ להציג רק את המודעה האחרונה בעמוד הבית */
+    #home-news .home-board-list > *:not(:first-child) {
+      display: none !important;
+    }
+
+    /* ✅ לקצר טקסט של הכתבה האחרונה (שלא יגלול קילומטר) */
+    #home-news .home-board-list p {
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
   </style>
 
 </head>
@@ -456,40 +469,24 @@ function showUpdateBanner(sw) {
     </div>
   </section>
 
-  <!-- 🔵 חדשות – רק הכתבה האחרונה + כפתור לכל החדשות -->
+  <!-- 🔵 חדשות – הכתבה האחרונה מלוח המודעות -->
   <section id="home-news" class="section-light">
     <div class="container">
       <div class="section-header">
         <h2 class="section-title" id="home-news-title">חדשות אחרונות</h2>
         <p class="section-subtitle" id="home-news-subtitle">
-          הכתבה האחרונה שפורסמה באתר – ובכפתור למטה תוכלו לעבור לכל החדשות.
+          הכתבה האחרונה שפורסמה בלוח המודעות – ובכפתור למטה תוכלו לעבור לכל הכתבות.
         </p>
       </div>
 
       <div class="home-grid">
         <div class="grade-card">
           <h3>העדכון האחרון מבית הספר</h3>
-          <div id="home-news-latest" class="home-news-list">
+          <div id="home-board" class="home-board-list">
             <p class="empty-msg">אין עדיין חדשות באתר.</p>
           </div>
-          <a href="news.html" class="mini-link">לצפייה בכל החדשות »</a>
+          <a href="news.html" class="mini-link">לצפייה בכל החדשות והמודעות »</a>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- לוח מודעות -->
-  <section id="board" class="section-dark-strong">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title" id="board-title">לוח מודעות</h2>
-        <p class="section-subtitle" id="board-subtitle">
-          הודעות חשובות, פעילויות ואירועים לבית הספר.
-        </p>
-      </div>
-
-      <div id="home-board" class="home-board-list">
-        <p class="empty-msg">אין מודעות כרגע.</p>
       </div>
     </div>
   </section>

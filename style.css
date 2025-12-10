@@ -2302,39 +2302,20 @@ html[data-theme="light"] body[data-page="polls"] {
   background: #1d4ed8;
   transform: translateY(-2px);
 }
-/* כפתור "להמשך קריאה" */
-.news-read-more-wrap {
-  margin-top: 8px;
-}
-
-.news-read-more {
+.home-news-read-more {
   display: inline-block;
-  padding: 6px 14px;
-  border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-decoration: none;
-  transition: all 0.2s ease;
+  margin-top: 6px;
+  font-size: 0.85rem;
+  color: #16a34a;
 }
-
-/* LIGHT MODE */
-html[data-theme="light"] .news-read-more {
-  background: #16a34a;
-  color: #ffffff;
-  box-shadow: 0 4px 10px rgba(22, 163, 74, 0.25);
+.home-news-read-more:hover {
+  text-decoration: underline;
 }
-
-html[data-theme="light"] .news-read-more:hover {
-  background: #15803d;
-}
-
-/* DARK MODE */
-html[data-theme="dark"] .news-read-more {
-  background: rgba(34, 197, 94, 0.15);
-  color: #bbf7d0;
-  border: 1px solid rgba(34, 197, 94, 0.4);
-}
-
-html[data-theme="dark"] .news-read-more:hover {
-  background: rgba(34, 197, 94, 0.25);
+.news-article img,
+.home-board-list img {
+  max-width: 80%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  border-radius: 12px;
 }
