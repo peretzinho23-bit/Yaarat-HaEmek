@@ -66,6 +66,53 @@
   .news-full {
     margin-top: 4px;
   }
+/* כרטיס חדשות – מבנה כללי */
+.all-news-item {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* שורת התמונות – למעלה */
+.all-news-item .home-news-images-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* עטיפת תמונה */
+.all-news-item .home-news-image-wrap-multi {
+  width: 100%;
+}
+
+/* תמונה עצמה */
+.all-news-item .home-news-image-wrap-multi img {
+  width: 100%;
+  max-height: 220px;        /* 👈 זה הגודל הסביר */
+  object-fit: cover;
+  border-radius: 14px;
+}
+
+/* הטקסט מתחת לתמונה */
+.all-news-item .home-news-text {
+  width: 100%;
+}
+
+/* כותרת */
+.all-news-item .home-news-title {
+  font-size: 1.05rem;
+  margin-top: 4px;
+}
+
+/* גוף טקסט */
+.all-news-item .home-news-body {
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
 </style>
 
   <meta charset="UTF-8" />
