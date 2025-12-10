@@ -374,7 +374,7 @@ function renderAllNewsPage() {
     return;
   }
 
-  // פשוט מהחדש לישן – לפי הסדר במערך
+  // מהחדש לישן – לפי הסדר במערך (הכי אחרון שהוזן יהיה ראשון)
   const sorted = allItems.slice().reverse();
 
   container.innerHTML = sorted
@@ -388,7 +388,8 @@ function renderAllNewsPage() {
       const colorStyle = n.color ? ` style="color:${escapeHtml(n.color)}"` : "";
 
       // מטא (שכבה / לוח מודעות / תאריך)
-      let metaPieces = [];
+      const metaPieces = [];
+
       if (n._type === "news") {
         const gradeLabel = GRADE_LABELS[n._grade] || "";
         if (gradeLabel) metaPieces.push(`שכבה ${gradeLabel}`);
@@ -396,12 +397,12 @@ function renderAllNewsPage() {
         metaPieces.push("לוח מודעות");
       }
 
-      // 🕒 תאריך: "לפני X זמן (DD.MM.YYYY)"
+      // תאריך הכתבה – מתוך n.date (אם קיים)
       if (n.date) {
         const d = new Date(n.date);
         if (!isNaN(d.getTime())) {
-          const rel = timeAgo(n.date);
-          const abs = formatLocalDate(d); // כבר קיים אצלך למבחנים
+          const rel = timeAgo(n.date);          // למשל: "לפני 3 ימים"
+          const abs = formatLocalDate(d);       // למשל: "10.12.2025"
           if (rel && abs) {
             metaPieces.push(`${rel} (${abs})`);
           } else if (abs) {
@@ -416,6 +417,26 @@ function renderAllNewsPage() {
         ? `<div class="home-news-meta">${escapeHtml(metaPieces.join(" · "))}</div>`
         : "";
 
+      // קישור לכתבה המלאה לפי סוג
+      const url =
+        n._type === "board"
+          ? `article.html?type=board&index=${n._index}`
+          : `article.html?type=news&grade=${encodeURIComponent(
+              n._grade
+            )}&index=${n._index}`;
+
+      // טקסט מקוצר + "להמשך קריאה"
+      const fullBody = n.body || "";
+      const isLong = fullBody.length > 260;
+      const shortBody = isLong
+        ? escapeHtml(fullBody.slice(0, 260)) + "..."
+        : escapeHtml(fullBody);
+
+      const readMoreHtml = `
+        <div class="news-details">
+          <a class="read-more-link" href="${url}">להמשך קריאה »</a>
+        </div>
+      `;
 
       const imagesHtml = hasImages
         ? `
@@ -445,6 +466,7 @@ function renderAllNewsPage() {
     })
     .join("");
 }
+
 
 
 
