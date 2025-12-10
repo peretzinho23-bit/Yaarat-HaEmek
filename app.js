@@ -31,6 +31,11 @@ function escapeHtml(str) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
 }
+function shortenText(str, maxLen = 140) {
+  const s = String(str || "").trim();
+  if (s.length <= maxLen) return s;
+  return s.slice(0, maxLen) + "…";
+}
 
 /* ------------ עזר למבחנים + ספירה לאחור ------------ */
 
