@@ -10,6 +10,11 @@ import {
 /* ------------ CONSTS ------------ */
 
 const GRADES = ["z", "h", "t"];
+const GRADE_LABELS = {
+  z: "ז׳",
+  h: "ח׳",
+  t: "ט׳"
+};
 
 /* ------------ STATE ------------ */
 
@@ -288,6 +293,150 @@ function renderHomeNews() {
       })
       .join("");
   }
+}
+
+/* ------------ ALL NEWS PAGE (news.html) ------------ */
+
+function renderAllNewsPage() {
+  const container = document.getElementById("all-news-list");
+  if (!container) return;
+
+  const allItems = [];
+
+  // כל החדשות מכל השכבות
+  for (const g of GRADES) {
+    const items = homeNews[g] || [];
+    items.forEach((item) => {
+      allItems.push({
+        ...item,
+        _grade: g
+      });
+    });
+  }
+
+  const hasNews = allItems.length > 0;
+  const hasBoard = Array.isArray(boardData) && boardData.length > 0;
+
+  if (!hasNews && !hasBoard) {
+    container.innerHTML = `<p class="empty-msg">אין חדשות באתר כרגע.</p>`;
+    return;
+  }
+
+  let html = "";
+
+  if (hasNews) {
+    // מהחדש לישן
+    const sorted = allItems.slice().reverse();
+
+    const newsHtml = sorted
+      .map((n) => {
+        const images = Array.isArray(n.imageUrls) && n.imageUrls.length
+          ? n.imageUrls
+          : (n.imageUrl ? [n.imageUrl] : []);
+        const hasImages = images.length > 0;
+        const colorStyle = n.color ? ` style="color:${escapeHtml(n.color)}"` : "";
+        const gradeLabel = GRADE_LABELS[n._grade] || "";
+
+        const metaPieces = [];
+        if (gradeLabel) metaPieces.push(`שכבה ${gradeLabel}`);
+        if (n.meta) metaPieces.push(n.meta);
+
+        const metaHtml = metaPieces.length
+          ? `<div class="home-news-meta">${escapeHtml(metaPieces.join(" · "))}</div>`
+          : "";
+
+        if (hasImages) {
+          const imgsHtml = images
+            .slice(0, 2)
+            .map(
+              (url) => `
+                <div class="home-news-image-wrap-multi small-news-image">
+                  <img src="${escapeHtml(url)}" alt="${escapeHtml(
+                    n.title || ""
+                  )}" />
+                </div>
+              `
+            )
+            .join("");
+
+          return `
+            <article class="home-news-item all-news-item home-news-item-with-image"${colorStyle}>
+              <div class="home-news-images-row">
+                ${imgsHtml}
+              </div>
+              <div class="home-news-text">
+                <h4 class="home-news-title">${escapeHtml(n.title)}</h4>
+                ${metaHtml}
+                <div class="home-news-body">${escapeHtml(n.body)}</div>
+              </div>
+            </article>
+          `;
+        }
+
+        return `
+          <article class="home-news-item all-news-item"${colorStyle}>
+            <h4 class="home-news-title">${escapeHtml(n.title)}</h4>
+            ${metaHtml}
+            <div class="home-news-body">${escapeHtml(n.body)}</div>
+          </article>
+        `;
+      })
+      .join("");
+
+    html += `
+      <section class="all-news-section">
+        <h2 class="all-news-section-title">חדשות לפי שכבות</h2>
+        <div class="news-list all-news-list-inner">
+          ${newsHtml}
+        </div>
+      </section>
+    `;
+  }
+
+  // 🔔 כל העדכונים של לוח המודעות
+  if (hasBoard) {
+    const boardHtml = boardData
+      .map((b) => {
+        const colorStyle = b.color ? ` style="color:${escapeHtml(b.color)}"` : "";
+
+        // בחדשות – שומרים את זה קטן: רק תמונה אחת (הראשונה שקיימת)
+        const imageUrl = b.imageUrl || b.imageUrl2 || b.imageUrl3 || "";
+        const imgHtml = imageUrl
+          ? `
+            <div class="all-board-image">
+              <img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(b.title || "")}">
+            </div>
+          `
+          : "";
+
+        return `
+          <article class="board-item all-board-item"${colorStyle}>
+            <div class="board-item-header">
+              <div class="board-item-title">${escapeHtml(b.title || "")}</div>
+              ${
+                b.meta
+                  ? `<div class="board-item-meta small-meta">${escapeHtml(b.meta)}</div>`
+                  : ""
+              }
+            </div>
+            <div class="board-item-body small-body">${escapeHtml(b.body || "")}</div>
+            ${imgHtml}
+          </article>
+        `;
+      })
+      .join("");
+
+    html += `
+      <section class="all-news-section all-board-section">
+        <h2 class="all-news-section-title">עדכונים מלוח המודעות</h2>
+        <div class="all-board-list">
+          ${boardHtml}
+        </div>
+      </section>
+    `;
+  }
+
+  container.innerHTML = html;
 }
 
 /* ------------ RENDER HOME EXAMS (עם מבחן הבא + מבחנים שהיו + ספירה לאחור) ------------ */
@@ -881,7 +1030,7 @@ function initTheme() {
   });
 }
 
-/* ------------ NAV (MOBILE) ------------ */
+/* ------------ NAV (מובייל) ------------ */
 
 function setupMobileNav() {
   const navToggle = document.querySelector(".nav-toggle");
@@ -966,14 +1115,27 @@ function setupScrollToTop() {
 
 /* ------------ INIT ------------ */
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   const grade = document.body.dataset.grade;
+  const pageType = document.body.dataset.page || "";
 
+  // דף שכבה
   if (grade) {
-    loadGradePage(grade);
+    await loadGradePage(grade);
     return;
   }
 
+  // דף כל החדשות
+  if (pageType === "news") {
+    await loadHomeDataOnce();      // ממלא homeNews + boardData
+    renderAllNewsPage();           // מצייר חדשות + לוח מודעות
+    initTheme();
+    setupMobileNav();
+    setupScrollToTop();
+    return;
+  }
+
+  // דף הבית (ברירת מחדל)
   loadHomeDataOnce();
   subscribeRealtimeHome();
   loadSiteContentForHome();
