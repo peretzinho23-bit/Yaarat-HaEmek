@@ -342,8 +342,8 @@ function renderAllNewsPage() {
         : "";
 
       const fullBody = String(n.body || "");
-      const isLong = fullBody.length > 180;
-      const preview = isLong ? fullBody.slice(0, 180) + "..." : fullBody;
+      const isLong = fullBody.length > 220;
+      const preview = isLong ? fullBody.slice(0, 220) + "..." : fullBody;
 
       const articleUrl =
         `article.html?grade=${encodeURIComponent(n._grade)}&index=${encodeURIComponent(n._index)}`;
