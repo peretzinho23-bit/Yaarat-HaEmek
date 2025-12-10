@@ -1260,14 +1260,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   // דף כל החדשות
+    // דף כל החדשות
   if (pageType === "news") {
-    await loadHomeDataOnce();      // ממלא homeNews ו-boardData
-    renderAllNewsPage();           // מצייר את כל החדשות
+    await loadHomeDataOnce();      // טעינה ראשונית
+    renderAllNewsPage();           // ציור ראשוני
+    subscribeRealtimeHome();       // 🔥 חיבור ל-onSnapshot שירנדר שוב כשיש שינוי
     initTheme();
     setupMobileNav();
     setupScrollToTop();
     return;
   }
+
 
   // דף הבית (ברירת מחדל)
   loadHomeDataOnce();

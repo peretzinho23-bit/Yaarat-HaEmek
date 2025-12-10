@@ -346,13 +346,13 @@ function setupNewsForms() {
         }
 
         const newItem = {
-          title,
-          meta,
-          body,
-          color,
-          imageUrl: imageUrls[0] || "",
-          imageUrls
-        };
+  title,
+  body,
+  meta,
+  imageUrls, // או imageUrl
+  createdAt: new Date().toISOString()
+};
+
 
         newsData[g].push(newItem);
 
