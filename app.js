@@ -202,10 +202,6 @@ function startExamCountdownLoop() {
   examCountdownIntervalId = setInterval(updateExamCountdownElements, 1000);
 }
 
-/* ------------ LOAD HOME DATA (ONE SHOT) ------------ */
-
-/* ------------ LOAD HOME DATA (ONE SHOT) ------------ */
-
 async function loadHomeDataOnce() {
   try {
     // NEWS – לכל שכבה
@@ -222,16 +218,15 @@ async function loadHomeDataOnce() {
       homeExams[g] = data.items || [];
     }
 
-    // BOARD – לוח מודעות
+    // BOARD – לוח מודדות
     const boardSnap = await getDoc(doc(db, "board", "general"));
     const b = boardSnap.exists() ? boardSnap.data() : { items: [] };
     boardData = b.items || [];
 
-    // ▶ כאן חשוב: גם חדשות גדולות וגם מיני
     renderHomeNews();
-    renderHomeGradeNews();   // ✅ זה מה שהיה חסר
     renderHomeExams();
     renderHomeBoard();
+    renderHomeGradeNews();   // 👈 תוספת
   } catch (err) {
     console.error("שגיאה בטעינת הדף הראשי:", err);
   }
@@ -241,11 +236,11 @@ async function loadHomeDataOnce() {
 
 
 
+
 // לייב
 // לייב – גם לדף הבית וגם לדף כל החדשות
 function subscribeRealtimeHome() {
   const isNewsPage = document.body.dataset.page === "news";
-
   // NEWS
   for (const g of GRADES) {
     onSnapshot(doc(db, "news", g), (snap) => {
@@ -258,10 +253,11 @@ function subscribeRealtimeHome() {
       } else {
         // בדף הבית – מעדכן גם את החדשות הגדולות וגם את המיני
         renderHomeNews();
-        renderHomeGradeNews();   // ✅ הוספנו את זה
+        renderHomeGradeNews();   // 👈 חשוב!
       }
     });
   }
+
 
 
   // EXAMS
@@ -366,48 +362,57 @@ function renderHomeNews() {
 /* ------------ חדשות אחרונות לכל שכבה בעמוד הבית ------------ */
 
 function renderHomeGradeNews() {
-  console.log("renderHomeGradeNews()", homeNews); // 🔍 רק לדיבאג, אפשר להשאיר
+  console.log("renderHomeGradeNews()", homeNews); // רק לדיבאג, אפשר למחוק אחר כך
 
   for (const g of GRADES) {
-    // שם ה-ID חייב להתאים ל-index.html: home-news-z / h / t
-    const listEl = document.getElementById(`home-news-${g}`);
+    // שים לב לשם! home-grade-news- ולא home-news-
+    const listEl = document.getElementById(`home-grade-news-${g}`);
     if (!listEl) continue;
 
     const items = homeNews[g] || [];
 
+    // אין חדשות לשכבה הזאת
     if (!items.length) {
-      listEl.innerHTML = `<p class="home-news-empty">אין חדשות לשכבה זו.</p>`;
+      const gradeLabel = GRADE_LABELS[g] || "";
+      listEl.innerHTML = `
+        <p class="home-news-mini-empty">
+          אין עדיין חדשות לשכבת ${gradeLabel}.
+        </p>
+      `;
       continue;
     }
 
-    const latestIndex = items.length - 1;
-    const latest = items[latestIndex];
+    // לוקחים את הכתבה האחרונה במערך
+    const latest = items[items.length - 1];
 
-    const bodyShort = shortenText(latest.body || "", 90);
+    // תמונה ראשונה (imageUrls או imageUrl רגיל)
+    const images = Array.isArray(latest.imageUrls) && latest.imageUrls.length
+      ? latest.imageUrls
+      : (latest.imageUrl ? [latest.imageUrl] : []);
+    const thumbUrl = images[0] || "";
 
-    let metaPieces = [];
-    if (latest.date) {
-      const rel = timeAgo(latest.date);
-      if (rel) metaPieces.push(rel);
-    }
-    if (latest.meta) metaPieces.push(latest.meta);
+    const bodyShort = shortenText(latest.body || "", 80);
 
-    const metaHtml = metaPieces.length
-      ? `<div class="home-news-mini-meta">${escapeHtml(metaPieces.join(" · "))}</div>`
+    const thumbHtml = thumbUrl
+      ? `
+        <div class="home-news-mini-thumb-wrap">
+          <img src="${escapeHtml(thumbUrl)}"
+               alt="${escapeHtml(latest.title || "")}">
+        </div>
+      `
       : "";
-
-    const url = `article.html?type=news&grade=${encodeURIComponent(
-      g
-    )}&index=${latestIndex}`;
 
     listEl.innerHTML = `
       <article class="home-news-mini-item">
+        ${thumbHtml}
         <div class="home-news-mini-text">
-          <div class="home-news-mini-title">${escapeHtml(latest.title || "")}</div>
-          ${metaHtml}
-          <div class="home-news-mini-body">${escapeHtml(bodyShort)}</div>
+          <div class="home-news-mini-title">
+            ${escapeHtml(latest.title || "")}
+          </div>
+          <div class="home-news-mini-body">
+            ${escapeHtml(bodyShort)}
+          </div>
         </div>
-        <a class="home-news-mini-link" href="${url}">לכל הכתבה »</a>
       </article>
     `;
   }
