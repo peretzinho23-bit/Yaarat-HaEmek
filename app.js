@@ -226,9 +226,10 @@ async function loadHomeDataOnce() {
         boardData = b.items || [];
 
     renderHomeNews();
-    renderHomeGradeNews();   // ✅ הוספנו את זה
+    renderHomeGradeNews();   // זה
     renderHomeExams();
     renderHomeBoard();
+
   } catch (err) {
     console.error("שגיאה בטעינת הדף הראשי:", err);
   }
@@ -359,78 +360,51 @@ function renderHomeNews() {
 }
 /* ------------ חדשות אחרונות לכל שכבה בעמוד הבית ------------ */
 
-/* ------------ חדשות אחרונות לכל שכבה בעמוד הבית ------------ */
-
 function renderHomeGradeNews() {
   for (const g of GRADES) {
-    // שים לב: ה-ID הוא home-news-z / home-news-h / home-news-t
     const listEl = document.getElementById(`home-news-${g}`);
     if (!listEl) continue;
 
     const items = homeNews[g] || [];
 
+    // אם אין חדשות בכלל לשכבה
     if (!items.length) {
-      listEl.innerHTML = `<p class="home-news-empty">אין חדשות לשכבה זו.</p>`;
+      listEl.innerHTML = `<p class="home-news-mini-empty">אין חדשות לשכבה זו.</p>`;
       continue;
     }
 
-    // הכתבה האחרונה במערך + האינדקס שלה
-    const latestIndex = items.length - 1;
-    const latest = items[latestIndex];
+    // נניח שהחדשות החדשות ביותר נמצאות בתחילת המערך
+    const latest = items[0];
 
-    // תמונה – imageUrls (מערך) או imageUrl יחיד
+    // תמונה קטנה (אם קיימת)
     const images = Array.isArray(latest.imageUrls) && latest.imageUrls.length
       ? latest.imageUrls
       : (latest.imageUrl ? [latest.imageUrl] : []);
 
-    const hasImage = images.length > 0;
-    const imgHtml = hasImage
+    const thumbHtml = images.length
       ? `
-        <div class="home-news-mini-image">
-          <img src="${escapeHtml(images[0])}" alt="${escapeHtml(
-            latest.title || ""
-          )}">
+        <div class="home-news-mini-thumb-wrap">
+          <img src="${escapeHtml(images[0])}" alt="${escapeHtml(latest.title || "")}">
         </div>
       `
       : "";
 
-    // טקסט קצר
+    // טקסט מקוצר
     const bodyShort = shortenText(latest.body || "", 80);
-
-    // מטא – זמן + עוד טקסט אם יש
-    const metaPieces = [];
-    const rawDate = latest.createdAt || latest.date;
-    const d = toJsDate(rawDate);
-    if (d) {
-      const rel = timeAgo(d.toISOString());
-      if (rel) metaPieces.push(rel);
-    }
-    if (latest.meta) metaPieces.push(latest.meta);
-
-    const metaHtml = metaPieces.length
-      ? `<div class="home-news-mini-meta">${escapeHtml(metaPieces.join(" · "))}</div>`
-      : "";
-
-    // לינק ישיר לכתבה
-    const articleUrl = `article.html?type=news&grade=${encodeURIComponent(
-      g
-    )}&index=${latestIndex}`;
 
     listEl.innerHTML = `
       <article class="home-news-mini-item">
-        ${imgHtml}
-        <div class="home-news-mini-content">
+        ${thumbHtml}
+        <div class="home-news-mini-text">
           <div class="home-news-mini-title">${escapeHtml(latest.title || "")}</div>
-          ${metaHtml}
           <div class="home-news-mini-body">${escapeHtml(bodyShort)}</div>
-          <div class="home-news-mini-readmore">
-            <a href="${articleUrl}">לכל הכתבה »</a>
-          </div>
+          <a href="news.html" class="mini-link mini-link-inline">לכל הכתבה »</a>
         </div>
       </article>
     `;
   }
 }
+
 
 
 function renderAllNewsPage() {
