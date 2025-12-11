@@ -204,6 +204,8 @@ function startExamCountdownLoop() {
 
 /* ------------ LOAD HOME DATA (ONE SHOT) ------------ */
 
+/* ------------ LOAD HOME DATA (ONE SHOT) ------------ */
+
 async function loadHomeDataOnce() {
   try {
     // NEWS – לכל שכבה
@@ -225,15 +227,16 @@ async function loadHomeDataOnce() {
     const b = boardSnap.exists() ? boardSnap.data() : { items: [] };
     boardData = b.items || [];
 
-    // ⬇⬇⬇ כאן השינוי החשוב
+    // ▶ כאן חשוב: גם חדשות גדולות וגם מיני
     renderHomeNews();
-    renderHomeGradeNews();   // ✅ זה החדש
+    renderHomeGradeNews();   // ✅ זה מה שהיה חסר
     renderHomeExams();
     renderHomeBoard();
   } catch (err) {
     console.error("שגיאה בטעינת הדף הראשי:", err);
   }
 }
+
 
 
 
@@ -363,8 +366,10 @@ function renderHomeNews() {
 /* ------------ חדשות אחרונות לכל שכבה בעמוד הבית ------------ */
 
 function renderHomeGradeNews() {
+  console.log("renderHomeGradeNews()", homeNews); // 🔍 רק לדיבאג, אפשר להשאיר
+
   for (const g of GRADES) {
-    // ❗❗ השורה החשובה – שם ה-ID
+    // שם ה-ID חייב להתאים ל-index.html: home-news-z / h / t
     const listEl = document.getElementById(`home-news-${g}`);
     if (!listEl) continue;
 
@@ -375,7 +380,6 @@ function renderHomeGradeNews() {
       continue;
     }
 
-    // הכתבה האחרונה במערך
     const latestIndex = items.length - 1;
     const latest = items[latestIndex];
 
@@ -392,7 +396,6 @@ function renderHomeGradeNews() {
       ? `<div class="home-news-mini-meta">${escapeHtml(metaPieces.join(" · "))}</div>`
       : "";
 
-    // לינק לכל הכתבה
     const url = `article.html?type=news&grade=${encodeURIComponent(
       g
     )}&index=${latestIndex}`;
@@ -409,6 +412,7 @@ function renderHomeGradeNews() {
     `;
   }
 }
+
 
 
 
