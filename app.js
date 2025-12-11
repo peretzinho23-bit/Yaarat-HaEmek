@@ -359,9 +359,12 @@ function renderHomeNews() {
 }
 /* ------------ חדשות אחרונות לכל שכבה בעמוד הבית ------------ */
 
+/* ------------ חדשות אחרונות לכל שכבה בעמוד הבית ------------ */
+
 function renderHomeGradeNews() {
   for (const g of GRADES) {
-    const listEl = document.getElementById(`home-grade-news-${g}`);
+    // שים לב: ה-ID הוא home-news-z / home-news-h / home-news-t
+    const listEl = document.getElementById(`home-news-${g}`);
     if (!listEl) continue;
 
     const items = homeNews[g] || [];
@@ -371,10 +374,11 @@ function renderHomeGradeNews() {
       continue;
     }
 
-    // הכתבה האחרונה במערך
-    const latest = items[items.length - 1];
+    // הכתבה האחרונה במערך + האינדקס שלה
+    const latestIndex = items.length - 1;
+    const latest = items[latestIndex];
 
-    // תמונה – לוקח imageUrls (מערך) או imageUrl יחיד
+    // תמונה – imageUrls (מערך) או imageUrl יחיד
     const images = Array.isArray(latest.imageUrls) && latest.imageUrls.length
       ? latest.imageUrls
       : (latest.imageUrl ? [latest.imageUrl] : []);
@@ -390,24 +394,27 @@ function renderHomeGradeNews() {
       `
       : "";
 
-    // טקסט מקוצר
-    const bodyShort = shortenText(latest.body || "", 90);
+    // טקסט קצר
+    const bodyShort = shortenText(latest.body || "", 80);
 
-    // מטא: זמן + מטא חופשית
+    // מטא – זמן + עוד טקסט אם יש
     const metaPieces = [];
-
     const rawDate = latest.createdAt || latest.date;
     const d = toJsDate(rawDate);
     if (d) {
       const rel = timeAgo(d.toISOString());
       if (rel) metaPieces.push(rel);
     }
-
     if (latest.meta) metaPieces.push(latest.meta);
 
     const metaHtml = metaPieces.length
       ? `<div class="home-news-mini-meta">${escapeHtml(metaPieces.join(" · "))}</div>`
       : "";
+
+    // לינק ישיר לכתבה
+    const articleUrl = `article.html?type=news&grade=${encodeURIComponent(
+      g
+    )}&index=${latestIndex}`;
 
     listEl.innerHTML = `
       <article class="home-news-mini-item">
@@ -416,11 +423,15 @@ function renderHomeGradeNews() {
           <div class="home-news-mini-title">${escapeHtml(latest.title || "")}</div>
           ${metaHtml}
           <div class="home-news-mini-body">${escapeHtml(bodyShort)}</div>
+          <div class="home-news-mini-readmore">
+            <a href="${articleUrl}">לכל הכתבה »</a>
+          </div>
         </div>
       </article>
     `;
   }
 }
+
 
 function renderAllNewsPage() {
   const container = document.getElementById("all-news-list");
