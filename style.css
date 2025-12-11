@@ -2397,3 +2397,45 @@ html[data-theme="light"] body[data-page="polls"] {
   object-fit: cover !important;
   display: block !important;
 }
+.about-btn {
+  display: inline-block;
+  padding: 10px 20px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #2563eb;
+  border: 2px solid #2563eb;
+  border-radius: 12px;
+  background: white;
+  text-decoration: none;
+  transition: 0.25s ease;
+}
+
+.about-btn:hover {
+  background: #2563eb;
+  color: white;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+.back-btn-wrap {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.back-btn {
+  display: inline-block;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #2563eb;
+  border: 2px solid #2563eb;
+  border-radius: 10px;
+  background: white;
+  text-decoration: none;
+  transition: 0.25s ease;
+}
+
+.back-btn:hover {
+  background: #2563eb;
+  color: white;
+  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.25);
+  transform: translateY(-1px);
+}
