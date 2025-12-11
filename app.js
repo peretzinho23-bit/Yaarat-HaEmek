@@ -223,17 +223,17 @@ async function loadHomeDataOnce() {
     // BOARD – לוח מודעות
     const boardSnap = await getDoc(doc(db, "board", "general"));
     const b = boardSnap.exists() ? boardSnap.data() : { items: [] };
-    boardData = b.items || [];
+        boardData = b.items || [];
 
-       renderHomeNews();
+    renderHomeNews();
+    renderHomeGradeNews();   // ✅ הוספנו את זה
     renderHomeExams();
     renderHomeBoard();
-    renderHomeGradeNews(); // ✅ מוסיף: חדשות אחרונות לכל שכבה בעמוד הבית
-
   } catch (err) {
     console.error("שגיאה בטעינת הדף הראשי:", err);
   }
 }
+
 
 // לייב
 // לייב – גם לדף הבית וגם לדף כל החדשות
