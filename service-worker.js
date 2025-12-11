@@ -1,7 +1,7 @@
 // service-worker.js
 // SW פשוט, עדכני, עובד טוב עם PWA 💙
 
-const CACHE_VERSION = "v14"; // אם אתה משנה SW - תעלה גרסה
+const CACHE_VERSION = "v15"; // אם אתה משנה SW - תעלה גרסה
 const CACHE_NAME = `yaarat-static-${CACHE_VERSION}`;
 
 const PRECACHE_URLS = [

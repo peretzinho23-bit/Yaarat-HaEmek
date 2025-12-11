@@ -424,8 +424,9 @@ function showUpdateBanner(sw) {
 
     <div class="hero-overlay"></div>
 
-    <div class="container hero-content">
-      <div class="hero-text">
+    <div class="container hero-home-inner">
+      <!-- כותרת + טקסט + כפתורים -->
+      <div class="hero-home-header">
         <h1 id="hero-main-title">יחד צומחים ביערת העמק</h1>
         <p id="hero-main-body">
           סביבה חינוכית בטוחה, תומכת ומובילה. כל תלמיד ותלמידה – עולם ומלואו.
@@ -435,36 +436,41 @@ function showUpdateBanner(sw) {
           <a href="#home-news" class="btn">חדשות ועדכונים</a>
           <a href="#home-exams" class="btn-outline">מבחנים קרובים</a>
         </div>
+      </div>
 
-<!-- שני הריבועים מתחת לכותרת -->
-<div class="hero-home-top-cards">
-  <div class="grade-card">
-    <strong>🕒 שעות פעילות</strong>
-    <p style="font-size:0.85rem; margin-top:4px;">
-      א'–ה': 08:00–15:00 · ו': 08:00–12:00
-    </p>
-  </div>
-  <div class="grade-card">
-    <strong>📌 עדכון מהנהלת בית הספר</strong>
-    <p style="font-size:0.85rem; margin-top:4px;">
-      הודעות רשמיות יתעדכנו כאן ובאזור לוח המודעות.
-    </p>
-  </div>
-</div>
+      <!-- שורת שלושת הכרטיסים -->
+      <div class="hero-home-cards">
+        <!-- מידע מהיר -->
+        <div class="grade-card hero-quick-card">
+          <h3 id="hero-side-title">מידע מהיר</h3>
+          <ul id="hero-side-list">
+            <li>📍 מגדל העמק</li>
+            <li>🧑‍🎓 שכבות ז'–ט'</li>
+            <li>👩‍🏫 צוות חינוכי מסור</li>
+            <li>🤝 שיתופי פעולה קהילתיים</li>
+          </ul>
+        </div>
 
-<!-- כרטיס "מידע מהיר" נשאר בקוד אבל נסתיר אותו ב-CSS -->
-<div class="hero-side-card">
-  <h3 id="hero-side-title">מידע מהיר</h3>
-  <ul id="hero-side-list">
-    <li>📍 מגדל העמק</li>
-    <li>🧑‍🎓 שכבות ז'–ט'</li>
-    <li>👩‍🏫 צוות חינוכי מסור</li>
-    <li>🤝 שיתופי פעולה קהילתיים</li>
-  </ul>
-</div>
+        <!-- עדכון הנהלה -->
+        <div class="grade-card">
+          <h3>עדכון מהנהלת בית הספר</h3>
+          <p style="font-size:0.9rem; margin-top:4px;">
+            הודעות רשמיות יתעדכנו כאן ובאזור לוח המודעות.
+          </p>
+        </div>
 
+        <!-- שעות פעילות -->
+        <div class="grade-card">
+          <h3>שעות פעילות</h3>
+          <p style="font-size:0.9rem; margin-top:4px;">
+            א'–ה': 08:00–15:00 · ו': 08:00–12:00
+          </p>
+        </div>
+      </div>
     </div>
   </section>
+
+
 
   <!-- ABOUT -->
   <section id="about" class="section-light">
@@ -803,7 +809,7 @@ function showUpdateBanner(sw) {
   <script type="module" src="firebase-config.js"></script>
   <script src="accessibility.js"></script>
   <script type="module" src="home-poll-mini.js"></script>
-  <script type="module" src="app.js?v=23"></script>
+  <script type="module" src="app.js?v=24"></script>
 
 </body>
 </html>

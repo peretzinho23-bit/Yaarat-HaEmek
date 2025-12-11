@@ -243,9 +243,9 @@ button#theme-toggle:active {
 
 /* הירו של דף הבית */
 .hero.hero-home {
-  position: relative;
-  min-height: 360px;
-  padding: 40px 0 70px;
+  min-height: 340px;
+  padding-top: 40px;
+  padding-bottom: 40px;
 }
 
 /* סליידר רקע */
@@ -1969,14 +1969,81 @@ html[data-theme="light"] .board-slider-controls button {
 
 /* שכבת ההכהיה מעל הסליידר */
 .hero.hero-home .hero-overlay {
-  position: absolute !important;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 1 !important;
+  background: linear-gradient(
+    to bottom,
+    rgba(15,23,42,0.35) 0%,
+    rgba(15,23,42,0.22) 35%,
+    rgba(15,23,42,0.05) 65%,
+    rgba(15,23,42,0.40) 100%
+  );
+}
+.hero-home-inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.hero-home-header {
+  text-align: center;
+}
+.hero-home-header h1 {
+  margin-bottom: 8px;
+}
+.hero-home-header p {
+  margin-bottom: 14px;
+}
+.hero-home-header .hero-actions {
+  display: inline-flex;
+  gap: 10px;
 }
 
+/* שלושת הכרטיסים בשורה אחת */
+.hero-home-cards {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 1fr;
+  gap: 16px;
+  align-items: stretch;
+}
+
+/* הכרטיס של "מידע מהיר" – תוכן רשימה */
+.hero-quick-card ul {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  font-size: 0.9rem;
+}
+
+.hero-quick-card li + li {
+  margin-top: 4px;
+}
+
+/* מובייל / טאבלט – שלא יתפרק */
+@media (max-width: 1024px) {
+  .hero-home-cards {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .hero-quick-card {
+    grid-column: 1 / -1; /* תופס שורה מלאה */
+  }
+}
+
+@media (max-width: 768px) {
+  .hero.hero-home {
+    min-height: auto;
+    padding-top: 28px;
+    padding-bottom: 28px;
+  }
+
+  .hero-home-header .hero-actions {
+    flex-direction: column;
+  }
+
+  .hero-home-cards {
+    grid-template-columns: 1fr;
+  }
+}
 /* התוכן (יחד צומחים וכו') מעל הכול */
 .hero.hero-home > .container.hero-content {
   position: relative !important;
