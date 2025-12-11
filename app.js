@@ -195,6 +195,21 @@ function updateExamCountdownElements() {
     el.textContent = ` המבחן בעוד: ${parts.join(" · ")}`;
   });
 }
+const toTop = document.getElementById("to-top");
+
+if (toTop) {
+  window.addEventListener("scroll", () => {
+    if (window.scrollY > 400) {
+      toTop.classList.add("visible");
+    } else {
+      toTop.classList.remove("visible");
+    }
+  });
+
+  toTop.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+}
 
 // מפעיל אינטרוואל אחד גלובלי
 function startExamCountdownLoop() {
