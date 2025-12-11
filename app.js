@@ -241,22 +241,20 @@ async function loadHomeDataOnce() {
 // לייב – גם לדף הבית וגם לדף כל החדשות
 function subscribeRealtimeHome() {
   const isNewsPage = document.body.dataset.page === "news";
-  // NEWS
-  for (const g of GRADES) {
-    onSnapshot(doc(db, "news", g), (snap) => {
-      const data = snap.exists() ? snap.data() : { items: [] };
-      homeNews[g] = data.items || [];
+// NEWS
+for (const g of GRADES) {
+  onSnapshot(doc(db, "news", g), (snap) => {
+    const data = snap.exists() ? snap.data() : { items: [] };
+    homeNews[g] = data.items || [];
 
-      if (isNewsPage) {
-        // בדף כל החדשות – מעדכן את הגריד
-        renderAllNewsPage();
-      } else {
-        // בדף הבית – מעדכן גם את החדשות הגדולות וגם את המיני
-        renderHomeNews();
-        renderHomeGradeNews();   // 👈 חשוב!
-      }
-    });
-  }
+    if (isNewsPage) {
+      renderAllNewsPage();
+    } else {
+      renderHomeNews();
+      renderHomeGradeNews();   // ✔ זה חשוב – להשאיר
+    }
+  });
+}
 
 
 
