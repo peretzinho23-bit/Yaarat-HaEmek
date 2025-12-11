@@ -2416,26 +2416,100 @@ html[data-theme="light"] body[data-page="polls"] {
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 .back-btn-wrap {
-  text-align: center;
-  margin-top: 20px;
+  text-align: right;
+  margin: 20px 0;
 }
 
 .back-btn {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   padding: 8px 16px;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #2563eb;
-  border: 2px solid #2563eb;
-  border-radius: 10px;
-  background: white;
+  color: #1e293b;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
   text-decoration: none;
-  transition: 0.25s ease;
+  transition: 0.2s ease;
+}
+
+.back-btn::before {
+  content: "←";
+  font-size: 0.9rem;
+  opacity: 0.7;
 }
 
 .back-btn:hover {
-  background: #2563eb;
-  color: white;
-  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.25);
+  background: #e2e8f0;
+  border-color: #94a3b8;
+  transform: translateX(-3px);
+}
+/* מעטפת של הכפתור */
+.back-btn-wrap {
+  text-align: right;
+  margin: 20px 0;
+}
+
+/* הכפתור עצמו */
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 9px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+
+  text-decoration: none;
+  border-radius: 999px;
+
+  background: #f1f5f9;
+  color: #0f172a;
+  border: 1px solid #cbd5e1;
+
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease,
+    color 0.18s ease;
+}
+
+/* חץ קטן בתוך הכפתור (אופציונלי) */
+.back-btn::before {
+  content: "←";
+  font-size: 0.95rem;
+  margin-left: 4px;
+  opacity: 0.7;
+}
+
+/* ריחוף */
+.back-btn:hover {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.1);
   transform: translateY(-1px);
 }
+
+/* מצב לחיצה */
+.back-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+}
+
+/* 🌙 DARK MODE */
+:root[data-theme="dark"] .back-btn {
+  background: #0f172a;
+  color: #e5e7eb;
+  border-color: #475569;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.6);
+}
+
+:root[data-theme="dark"] .back-btn:hover {
+  background: #1e293b;
+  border-color: #64748b;
+}
+
