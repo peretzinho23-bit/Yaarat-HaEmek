@@ -2526,5 +2526,63 @@ html[data-theme="light"] body[data-page="polls"] {
   transform: translateY(0);
   box-shadow: 0 10px 25px rgba(37, 99, 235, 0.30);
 }
+/* ========== שדרוג הירו בדף הבית ========== */
+
+/* ההירו קצת פחות גבוה */
+.hero.hero-home {
+  min-height: 320px;
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+
+/* שהתמונה באמת תיראה – פחות שחור מעליה */
+.hero-home::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.38) 0%,
+    rgba(0,0,0,0.22) 35%,
+    rgba(0,0,0,0.00) 65%,
+    rgba(0,0,0,0.45) 100%
+  );
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* התוכן של ההירו – יושב יותר נורמלי */
+.hero-home .hero-content {
+  position: relative;
+  z-index: 2;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+/* שני הריבועים ליד הכותרת */
+.hero-home-top-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+/* להסתיר את כרטיס "מידע מהיר" כדי שישארו רק 2 ריבועים */
+.hero-home .hero-side-card {
+  display: none;
+}
+
+/* מובייל – הריבועים אחד מעל השני והירו בגובה רגיל */
+@media (max-width: 768px) {
+  .hero.hero-home {
+    min-height: auto;
+    padding-top: 28px;
+    padding-bottom: 28px;
+  }
+
+  .hero-home-top-cards {
+    grid-template-columns: 1fr;
+  }
+}
 
 

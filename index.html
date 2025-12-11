@@ -436,31 +436,33 @@ function showUpdateBanner(sw) {
           <a href="#home-exams" class="btn-outline">מבחנים קרובים</a>
         </div>
 
-        <div class="home-grid" style="margin-top:18px;">
-          <div class="grade-card">
-            <strong>🕒 שעות פעילות</strong>
-            <p style="font-size:0.85rem; margin-top:4px;">
-              א'–ה': 08:00–15:00 · ו': 08:00–12:00
-            </p>
-          </div>
-          <div class="grade-card">
-            <strong>📌 עדכון מהנהלת בית הספר</strong>
-            <p style="font-size:0.85rem; margin-top:4px;">
-              הודעות רשמיות יתעדכנו כאן ובאזור לוח המודעות.
-            </p>
-          </div>
-        </div>
-      </div>
+<!-- שני הריבועים מתחת לכותרת -->
+<div class="hero-home-top-cards">
+  <div class="grade-card">
+    <strong>🕒 שעות פעילות</strong>
+    <p style="font-size:0.85rem; margin-top:4px;">
+      א'–ה': 08:00–15:00 · ו': 08:00–12:00
+    </p>
+  </div>
+  <div class="grade-card">
+    <strong>📌 עדכון מהנהלת בית הספר</strong>
+    <p style="font-size:0.85rem; margin-top:4px;">
+      הודעות רשמיות יתעדכנו כאן ובאזור לוח המודעות.
+    </p>
+  </div>
+</div>
 
-      <div class="hero-side-card">
-        <h3 id="hero-side-title">מידע מהיר</h3>
-        <ul id="hero-side-list">
-          <li>📍 מגדל העמק</li>
-          <li>🧑‍🎓 שכבות ז'–ט'</li>
-          <li>👩‍🏫 צוות חינוכי מסור</li>
-          <li>🤝 שיתופי פעולה קהילתיים</li>
-        </ul>
-      </div>
+<!-- כרטיס "מידע מהיר" נשאר בקוד אבל נסתיר אותו ב-CSS -->
+<div class="hero-side-card">
+  <h3 id="hero-side-title">מידע מהיר</h3>
+  <ul id="hero-side-list">
+    <li>📍 מגדל העמק</li>
+    <li>🧑‍🎓 שכבות ז'–ט'</li>
+    <li>👩‍🏫 צוות חינוכי מסור</li>
+    <li>🤝 שיתופי פעולה קהילתיים</li>
+  </ul>
+</div>
+
     </div>
   </section>
 
@@ -801,7 +803,7 @@ function showUpdateBanner(sw) {
   <script type="module" src="firebase-config.js"></script>
   <script src="accessibility.js"></script>
   <script type="module" src="home-poll-mini.js"></script>
-  <script type="module" src="app.js?v=22"></script>
+  <script type="module" src="app.js?v=23"></script>
 
 </body>
 </html>
