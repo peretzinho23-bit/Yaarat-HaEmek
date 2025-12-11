@@ -556,6 +556,22 @@ body.page-loaded {
 #page-intro-overlay {
   pointer-events: none !important;
 }
+/* ✨ מעבר חלק בין לייט לדארק (וגם הובר נראה יותר יפה) */
+html,
+body,
+.header-main,
+.hero,
+.section-light,
+.section-dark-strong,
+.grade-card,
+.btn,
+.btn-outline {
+  transition:
+    background-color 0.35s ease,
+    color 0.35s ease,
+    border-color 0.35s ease,
+    box-shadow 0.35s ease;
+}
 
   </style>
 
@@ -1095,7 +1111,7 @@ document.addEventListener("DOMContentLoaded", () => {
 <script type="module" src="firebase-config.js"></script>
 <script src="accessibility.js"></script>
 <script type="module" src="home-poll-mini.js"></script>
-<script type="module" src="app.js?v=28"></script>
+<script type="module" src="app.js?v=29"></script>
 </body>
 </html>
 
