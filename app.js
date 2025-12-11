@@ -359,19 +359,15 @@ function renderHomeNews() {
       .join("");
   }
 }
-/* ------------ חדשות אחרונות לכל שכבה בעמוד הבית ------------ */
-
 function renderHomeGradeNews() {
-  console.log("renderHomeGradeNews()", homeNews); // רק לדיבאג, אפשר למחוק אחר כך
+  console.log("renderHomeGradeNews()", homeNews); // אפשר למחוק אח"כ
 
   for (const g of GRADES) {
-    // שים לב לשם! home-grade-news- ולא home-news-
     const listEl = document.getElementById(`home-grade-news-${g}`);
     if (!listEl) continue;
 
     const items = homeNews[g] || [];
 
-    // אין חדשות לשכבה הזאת
     if (!items.length) {
       const gradeLabel = GRADE_LABELS[g] || "";
       listEl.innerHTML = `
@@ -382,16 +378,26 @@ function renderHomeGradeNews() {
       continue;
     }
 
-    // לוקחים את הכתבה האחרונה במערך
-    const latest = items[items.length - 1];
+    // הכתבה האחרונה + האינדקס שלה במערך
+    const lastIndex = items.length - 1;
+    const latest = items[lastIndex];
 
-    // תמונה ראשונה (imageUrls או imageUrl רגיל)
+    // תמונה
     const images = Array.isArray(latest.imageUrls) && latest.imageUrls.length
       ? latest.imageUrls
       : (latest.imageUrl ? [latest.imageUrl] : []);
     const thumbUrl = images[0] || "";
 
-    const bodyShort = shortenText(latest.body || "", 80);
+    // טקסט מקוצר *בלי* שלוש נקודות
+    let bodyShort = String(latest.body || "").trim();
+    if (bodyShort.length > 80) {
+      bodyShort = bodyShort.slice(0, 80);
+    }
+
+    // קישור ישיר לכתבה המלאה
+    const url = `article.html?type=news&grade=${encodeURIComponent(
+      g
+    )}&index=${lastIndex}`;
 
     const thumbHtml = thumbUrl
       ? `
@@ -412,11 +418,13 @@ function renderHomeGradeNews() {
           <div class="home-news-mini-body">
             ${escapeHtml(bodyShort)}
           </div>
+          <a href="${url}" class="mini-link-inline">להמשך הקריאה »</a>
         </div>
       </article>
     `;
   }
 }
+
 
 
 
