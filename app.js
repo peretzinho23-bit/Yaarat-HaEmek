@@ -364,44 +364,47 @@ function renderHomeNews() {
 
 function renderHomeGradeNews() {
   for (const g of GRADES) {
+    // ❗❗ השורה החשובה – שם ה-ID
     const listEl = document.getElementById(`home-news-${g}`);
     if (!listEl) continue;
 
     const items = homeNews[g] || [];
 
-    // אם אין חדשות בכלל לשכבה
     if (!items.length) {
-      listEl.innerHTML = `<p class="home-news-mini-empty">אין חדשות לשכבה זו.</p>`;
+      listEl.innerHTML = `<p class="home-news-empty">אין חדשות לשכבה זו.</p>`;
       continue;
     }
 
-    // נניח שהחדשות החדשות ביותר נמצאות בתחילת המערך
-    const latest = items[0];
+    // הכתבה האחרונה במערך
+    const latestIndex = items.length - 1;
+    const latest = items[latestIndex];
 
-    // תמונה קטנה (אם קיימת)
-    const images = Array.isArray(latest.imageUrls) && latest.imageUrls.length
-      ? latest.imageUrls
-      : (latest.imageUrl ? [latest.imageUrl] : []);
+    const bodyShort = shortenText(latest.body || "", 90);
 
-    const thumbHtml = images.length
-      ? `
-        <div class="home-news-mini-thumb-wrap">
-          <img src="${escapeHtml(images[0])}" alt="${escapeHtml(latest.title || "")}">
-        </div>
-      `
+    let metaPieces = [];
+    if (latest.date) {
+      const rel = timeAgo(latest.date);
+      if (rel) metaPieces.push(rel);
+    }
+    if (latest.meta) metaPieces.push(latest.meta);
+
+    const metaHtml = metaPieces.length
+      ? `<div class="home-news-mini-meta">${escapeHtml(metaPieces.join(" · "))}</div>`
       : "";
 
-    // טקסט מקוצר
-    const bodyShort = shortenText(latest.body || "", 80);
+    // לינק לכל הכתבה
+    const url = `article.html?type=news&grade=${encodeURIComponent(
+      g
+    )}&index=${latestIndex}`;
 
     listEl.innerHTML = `
       <article class="home-news-mini-item">
-        ${thumbHtml}
         <div class="home-news-mini-text">
           <div class="home-news-mini-title">${escapeHtml(latest.title || "")}</div>
+          ${metaHtml}
           <div class="home-news-mini-body">${escapeHtml(bodyShort)}</div>
-          <a href="news.html" class="mini-link mini-link-inline">לכל הכתבה »</a>
         </div>
+        <a class="home-news-mini-link" href="${url}">לכל הכתבה »</a>
       </article>
     `;
   }
