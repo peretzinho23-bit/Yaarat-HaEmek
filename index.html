@@ -1004,7 +1004,7 @@ function showUpdateBanner(sw) {
   </section>
 
   <!-- REQUEST BOX -->
-  <section id="requests" class="section-light">
+<section id="requests" class="section-light reveal-on-scroll">
     <div class="container">
       <div class="section-header">
         <h2 class="section-title" id="requests-title">תיבת בקשות</h2>
@@ -1030,7 +1030,7 @@ function showUpdateBanner(sw) {
   </section>
 
   <!-- CONTACT -->
-  <section id="contact" class="section-light">
+<section id="contact" class="section-light reveal-on-scroll">
     <div class="container">
       <div class="section-header">
         <h2 class="section-title" id="contact-section-title">יצירת קשר</h2>
@@ -1065,10 +1065,36 @@ function showUpdateBanner(sw) {
 
   <div id="to-top">↑</div>
 
-  <script type="module" src="firebase-config.js"></script>
-  <script src="accessibility.js"></script>
-  <script type="module" src="home-poll-mini.js"></script>
-  <script type="module" src="app.js?v=25"></script>
+ <script>
+document.addEventListener("DOMContentLoaded", () => {
+  // כניסת עמוד (מה שעשינו קודם)
+  document.body.classList.add("page-loaded");
+
+  // ✨ Scroll Reveal לכל אלמנט עם המחלקה reveal-on-scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("is-visible");
+        observer.unobserve(entry.target); 
+      }
+    });
+  }, {
+    threshold: 0.15
+  });
+
+  document.querySelectorAll(".reveal-on-scroll").forEach((el) => {
+    observer.observe(el);
+  });
+});
+</script>
+
+<script type="module" src="firebase-config.js"></script>
+<script src="accessibility.js"></script>
+<script type="module" src="home-poll-mini.js"></script>
+<script type="module" src="app.js?v=24"></script>
+</body>
+</html>
+
 
 </body>
 </html>
