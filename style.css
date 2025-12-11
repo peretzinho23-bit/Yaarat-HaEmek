@@ -25,6 +25,27 @@ footer,
 .card,
 .grade-card,
 .nav,
+:root {
+  /* שקיפות לכרטיסים / סקשנים */
+  --surface-bg: rgba(15, 23, 42, 0.90);   /* ברירת מחדל – דארק */
+  --surface-border: rgba(148, 163, 184, 0.6);
+  --surface-shadow: 0 18px 40px rgba(15, 23, 42, 0.8);
+
+  /* רקע שקוף לנב-בר */
+  --nav-bg: rgba(15, 23, 42, 0.88);
+  --nav-border: rgba(148, 163, 184, 0.5);
+}
+
+/* 🔆 לייט מוד */
+:root[data-theme="light"] {
+  --surface-bg: rgba(255, 255, 255, 0.92);
+  --surface-border: rgba(148, 163, 184, 0.28);
+  --surface-shadow: 0 16px 40px rgba(15, 23, 42, 0.10);
+
+  --nav-bg: rgba(255, 255, 255, 0.92);
+  --nav-border: rgba(148, 163, 184, 0.25);
+}
+
 .hero-side-card {
   transition:
     background-color 0.35s ease,
@@ -56,13 +77,15 @@ button:focus-visible {
 /* ========== HEADER + NAV ========== */
 
 .header-main {
-  background: #020617;
   position: sticky;
   top: 0;
-  z-index: 20;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.18);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+  z-index: 50;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  background: var(--nav-bg);
+  border-bottom: 1px solid var(--nav-border);
 }
+
 
 .nav {
   display: flex;
@@ -2874,4 +2897,26 @@ body:not([data-page="home"]) .reveal-on-scroll {
   opacity: 1 !important;
   transform: none !important;
   filter: none !important;
+}
+.grade-card,
+.card,
+.request-box,
+.contact-box,
+.hero-side-card,
+.hero-quick-card {
+  background: var(--surface-bg);
+  border: 1px solid var(--surface-border);
+  box-shadow: var(--surface-shadow);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top, rgba(255,255,255,0.75), rgba(15,23,42,0.75));
+  pointer-events: none;
+}
+
+:root[data-theme="light"] .hero-overlay {
+  background: radial-gradient(circle at top, rgba(255,255,255,0.80), rgba(148,163,184,0.60));
 }
