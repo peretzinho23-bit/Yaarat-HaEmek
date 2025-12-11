@@ -2399,21 +2399,22 @@ html[data-theme="light"] body[data-page="polls"] {
 }
 .about-btn {
   display: inline-block;
-  padding: 10px 20px;
-  font-size: 0.95rem;
+  padding: 10px 28px;
+  border-radius: 14px;
+  background: #e8f0fe;          /* כחול בהיר מאוד */
+  color: #1e3a8a;               /* כחול כהה לטקסט */
+  font-size: 1rem;
   font-weight: 600;
-  color: #2563eb;
-  border: 2px solid #2563eb;
-  border-radius: 12px;
-  background: white;
   text-decoration: none;
   transition: 0.25s ease;
+  border: 1px solid #c7d8ff;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.06);
 }
 
+
 .about-btn:hover {
-  background: #2563eb;
-  color: white;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  background: #dce7ff;
+  transform: translateY(-2px);
 }
 .back-btn-wrap {
   text-align: right;
@@ -2537,11 +2538,13 @@ html[data-theme="light"] body[data-page="polls"] {
 
 /* DARK MODE */
 html[data-theme="dark"] .about-btn {
-  background: #1d4ed8;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.45);
+  background: #1e40af;
+  color: white;
+  border-color: rgba(255,255,255,0.15);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.55);
 }
 
 html[data-theme="dark"] .about-btn:hover {
-  background: #2563eb;
+  background: #3b82f6;
 }
 
