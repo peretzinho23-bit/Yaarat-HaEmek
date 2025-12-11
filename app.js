@@ -246,17 +246,17 @@ function subscribeRealtimeHome() {
       const data = snap.exists() ? snap.data() : { items: [] };
       homeNews[g] = data.items || [];
 
-            if (isNewsPage) {
+      if (isNewsPage) {
         // בדף כל החדשות – מעדכן את הגריד
         renderAllNewsPage();
       } else {
-        // בדף הבית – מעדכן גם את התיבות וגם את המיני-חדשות
+        // בדף הבית – מעדכן גם את החדשות הגדולות וגם את המיני
         renderHomeNews();
-        renderHomeGradeNews(); // ✅ פה החדשות האחרונות לשכבה
+        renderHomeGradeNews();   // ✅ הוספנו את זה
       }
-
     });
   }
+
 
   // EXAMS
   for (const g of GRADES) {
