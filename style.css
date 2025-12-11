@@ -2824,26 +2824,20 @@ body.page-loaded {
     transition: none !important;
   }
 }
-/* =====================================================
-   ✨ אנימציות גלילה – סקשנים עולים, פוקוסיים ופסיכיים ✨
-   ===================================================== */
-
-.reveal-on-scroll {
+/* ✨ אפקט גלילה – מוסתר בהתחלה רק בדף הבית */
+body[data-page="home"] .reveal-on-scroll {
   opacity: 0;
-  transform: translateY(40px);
-  filter: blur(4px);
-  transition:
-    opacity 0.9s ease-out,
-    transform 0.9s ease-out,
-    filter 0.9s ease-out;
+  transform: translateY(16px);
+  filter: blur(6px);
+  transition: opacity 0.6s ease, transform 0.6s ease, filter 0.6s ease;
 }
 
-/* כשהסקשן נכנס לפריים */
-.reveal-on-scroll.is-visible {
+body[data-page="home"] .reveal-on-scroll.is-visible {
   opacity: 1;
-  transform: translateY(0);
-  filter: blur(0);
+  transform: none;
+  filter: none;
 }
+
 
 /* קצת סטייל פנימי – הכרטיסים בתוך סקשן שנחשף יעלו גם הם יותר עדין */
 .reveal-on-scroll.is-visible .grade-card,
