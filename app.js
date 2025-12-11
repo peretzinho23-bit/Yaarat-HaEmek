@@ -371,15 +371,38 @@ function renderHomeGradeNews() {
       continue;
     }
 
+    // הכתבה האחרונה במערך
     const latest = items[items.length - 1];
 
+    // תמונה – לוקח imageUrls (מערך) או imageUrl יחיד
+    const images = Array.isArray(latest.imageUrls) && latest.imageUrls.length
+      ? latest.imageUrls
+      : (latest.imageUrl ? [latest.imageUrl] : []);
+
+    const hasImage = images.length > 0;
+    const imgHtml = hasImage
+      ? `
+        <div class="home-news-mini-image">
+          <img src="${escapeHtml(images[0])}" alt="${escapeHtml(
+            latest.title || ""
+          )}">
+        </div>
+      `
+      : "";
+
+    // טקסט מקוצר
     const bodyShort = shortenText(latest.body || "", 90);
 
-    let metaPieces = [];
-    if (latest.date) {
-      const rel = timeAgo(latest.date);
+    // מטא: זמן + מטא חופשית
+    const metaPieces = [];
+
+    const rawDate = latest.createdAt || latest.date;
+    const d = toJsDate(rawDate);
+    if (d) {
+      const rel = timeAgo(d.toISOString());
       if (rel) metaPieces.push(rel);
     }
+
     if (latest.meta) metaPieces.push(latest.meta);
 
     const metaHtml = metaPieces.length
@@ -388,9 +411,12 @@ function renderHomeGradeNews() {
 
     listEl.innerHTML = `
       <article class="home-news-mini-item">
-        <div class="home-news-mini-title">${escapeHtml(latest.title || "")}</div>
-        ${metaHtml}
-        <div class="home-news-mini-body">${escapeHtml(bodyShort)}</div>
+        ${imgHtml}
+        <div class="home-news-mini-content">
+          <div class="home-news-mini-title">${escapeHtml(latest.title || "")}</div>
+          ${metaHtml}
+          <div class="home-news-mini-body">${escapeHtml(bodyShort)}</div>
+        </div>
       </article>
     `;
   }
