@@ -2824,4 +2824,47 @@ body.page-loaded {
     transition: none !important;
   }
 }
+/* =====================================================
+   ✨ אנימציות גלילה – סקשנים עולים, פוקוסיים ופסיכיים ✨
+   ===================================================== */
+
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(40px);
+  filter: blur(4px);
+  transition:
+    opacity 0.9s ease-out,
+    transform 0.9s ease-out,
+    filter 0.9s ease-out;
+}
+
+/* כשהסקשן נכנס לפריים */
+.reveal-on-scroll.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+/* קצת סטייל פנימי – הכרטיסים בתוך סקשן שנחשף יעלו גם הם יותר עדין */
+.reveal-on-scroll.is-visible .grade-card,
+.reveal-on-scroll.is-visible .card,
+.reveal-on-scroll.is-visible .contact-box {
+  transition:
+    transform 0.6s ease-out,
+    box-shadow 0.6s ease-out;
+}
+
+.reveal-on-scroll.is-visible .grade-card:hover,
+.reveal-on-scroll.is-visible .card:hover,
+.reveal-on-scroll.is-visible .contact-box:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 40px rgba(15, 23, 42, 0.18);
+}
+
+/* לילה / יום – שהאפקט יישב יפה בשני המצבים */
+:root[data-theme="dark"] .reveal-on-scroll.is-visible .grade-card,
+:root[data-theme="dark"] .reveal-on-scroll.is-visible .card,
+:root[data-theme="dark"] .reveal-on-scroll.is-visible .contact-box {
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.55);
+}
 
