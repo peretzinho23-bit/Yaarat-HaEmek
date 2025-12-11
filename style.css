@@ -3036,3 +3036,23 @@ body:not([data-page="home"]) .reveal-on-scroll {
   transform: translateY(-2px);
   background: rgba(30, 64, 175, 0.98);
 }
+/* קו תחתון ארוך לכותרות */
+.section-title {
+  position: relative;
+  display: inline-block;
+  padding-bottom: 6px;
+}
+
+.section-title::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  height: 3px;
+
+  /* 👇 פה שחק עם האחוז */
+  width: 100%; /* 60% / 80% / 100% איך שאתה רוצה */
+
+  background: linear-gradient(90deg, #60a5fa, #7dd3fc, #93c5fd);
+  border-radius: 4px;
+}
