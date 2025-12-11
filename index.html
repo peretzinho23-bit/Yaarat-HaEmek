@@ -227,9 +227,8 @@
 
     /* ✅ להציג רק את המודעה האחרונה בעמוד הבית */
     #home-news .home-board-list > *:not(:first-child) {
-  display: none !important;
-}
-
+      display: none !important;
+    }
 
     /* ✅ לקצר טקסט של הכתבה האחרונה (שלא יגלול קילומטר) */
     #home-news .home-board-list p {
@@ -329,7 +328,7 @@ function showUpdateBanner(sw) {
         </div>
 
         <div class="nav-right">
-      <a href="about.html?v=4">אודות</a>
+          <a href="about.html?v=4">אודות</a>
           <a href="#home-news">חדשות</a>
           <a href="#home-exams">מבחנים</a>
           <a href="#grades">השכבות</a>
@@ -492,6 +491,42 @@ function showUpdateBanner(sw) {
     </div>
   </section>
 
+  <!-- 🔵 חדשות לפי שכבות – הכתבה האחרונה מכל שכבה -->
+  <section id="home-grade-news" class="section-light">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">חדשות לפי שכבות</h2>
+        <p class="section-subtitle">
+          הכתבה האחרונה שפורסמה בכל שכבה. לחיצה על "לכל החדשות" תפתח את עמוד החדשות המלא.
+        </p>
+      </div>
+
+      <div class="home-grid">
+        <!-- ז -->
+        <div class="grade-card">
+          <h3>שכבת ז׳</h3>
+          <div id="home-grade-news-z" class="home-news-mini"></div>
+        </div>
+
+        <!-- ח -->
+        <div class="grade-card">
+          <h3>שכבת ח׳</h3>
+          <div id="home-grade-news-h" class="home-news-mini"></div>
+        </div>
+
+        <!-- ט -->
+        <div class="grade-card">
+          <h3>שכבת ט׳</h3>
+          <div id="home-grade-news-t" class="home-news-mini"></div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px; text-align:left;">
+        <a href="news.html" class="mini-link">לכל החדשות »</a>
+      </div>
+    </div>
+  </section>
+
   <!-- מבחנים קרובים -->
   <section id="home-exams" class="section-light">
     <div class="container">
@@ -612,7 +647,7 @@ function showUpdateBanner(sw) {
             0 הצבעות עד עכשיו
           </span>
           <a href="polls.html" class="home-poll-link">
-            מעבר לכל הסקרים »
+            מעבר לכל הסקרים » 
           </a>
         </div>
       </div>
@@ -684,7 +719,7 @@ function showUpdateBanner(sw) {
   <script type="module" src="firebase-config.js"></script>
   <script src="accessibility.js"></script>
   <script type="module" src="home-poll-mini.js"></script>
-<script type="module" src="app.js?v=12"></script>
+  <script type="module" src="app.js?v=12"></script>
 
 </body>
 </html>

@@ -225,9 +225,11 @@ async function loadHomeDataOnce() {
     const b = boardSnap.exists() ? boardSnap.data() : { items: [] };
     boardData = b.items || [];
 
-    renderHomeNews();
+       renderHomeNews();
     renderHomeExams();
     renderHomeBoard();
+    renderHomeGradeNews(); // ✅ מוסיף: חדשות אחרונות לכל שכבה בעמוד הבית
+
   } catch (err) {
     console.error("שגיאה בטעינת הדף הראשי:", err);
   }
@@ -244,13 +246,15 @@ function subscribeRealtimeHome() {
       const data = snap.exists() ? snap.data() : { items: [] };
       homeNews[g] = data.items || [];
 
-      if (isNewsPage) {
+            if (isNewsPage) {
         // בדף כל החדשות – מעדכן את הגריד
         renderAllNewsPage();
       } else {
-        // בדף הבית – מעדכן את התיבות של החדשות
+        // בדף הבית – מעדכן גם את התיבות וגם את המיני-חדשות
         renderHomeNews();
+        renderHomeGradeNews(); // ✅ פה החדשות האחרונות לשכבה
       }
+
     });
   }
 
@@ -351,6 +355,44 @@ function renderHomeNews() {
         `;
       })
       .join("");
+  }
+}
+/* ------------ חדשות אחרונות לכל שכבה בעמוד הבית ------------ */
+
+function renderHomeGradeNews() {
+  for (const g of GRADES) {
+    const listEl = document.getElementById(`home-grade-news-${g}`);
+    if (!listEl) continue;
+
+    const items = homeNews[g] || [];
+
+    if (!items.length) {
+      listEl.innerHTML = `<p class="home-news-empty">אין חדשות לשכבה זו.</p>`;
+      continue;
+    }
+
+    const latest = items[items.length - 1];
+
+    const bodyShort = shortenText(latest.body || "", 90);
+
+    let metaPieces = [];
+    if (latest.date) {
+      const rel = timeAgo(latest.date);
+      if (rel) metaPieces.push(rel);
+    }
+    if (latest.meta) metaPieces.push(latest.meta);
+
+    const metaHtml = metaPieces.length
+      ? `<div class="home-news-mini-meta">${escapeHtml(metaPieces.join(" · "))}</div>`
+      : "";
+
+    listEl.innerHTML = `
+      <article class="home-news-mini-item">
+        <div class="home-news-mini-title">${escapeHtml(latest.title || "")}</div>
+        ${metaHtml}
+        <div class="home-news-mini-body">${escapeHtml(bodyShort)}</div>
+      </article>
+    `;
   }
 }
 

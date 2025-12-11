@@ -497,6 +497,30 @@ section {
   line-height: 1.4;
   white-space: pre-line;
 }
+.home-news-mini .home-news-empty {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.home-news-mini-item {
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.home-news-mini-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.home-news-mini-meta {
+  font-size: 0.78rem;
+  opacity: 0.8;
+  margin-bottom: 4px;
+}
+
+.home-news-mini-body {
+  font-size: 0.85rem;
+}
 
 /* מבחנים */
 .home-exam-item {
