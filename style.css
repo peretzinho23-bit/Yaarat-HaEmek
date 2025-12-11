@@ -2862,3 +2862,16 @@ body[data-page="home"] .reveal-on-scroll.is-visible {
   box-shadow: 0 14px 40px rgba(0, 0, 0, 0.55);
 }
 
+/* ✅ ביטול שקיפות / בלור בכל הדפים שהם לא דף הבית */
+body:not([data-page="home"]) {
+  opacity: 1 !important;
+  transform: none !important;
+  filter: none !important;
+}
+
+/* ✅ גם אלמנטים עם reveal-on-scroll יהיו תמיד גלויים בדפים אחרים */
+body:not([data-page="home"]) .reveal-on-scroll {
+  opacity: 1 !important;
+  transform: none !important;
+  filter: none !important;
+}
