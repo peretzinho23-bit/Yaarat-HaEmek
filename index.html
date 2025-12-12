@@ -572,6 +572,60 @@ body,
     border-color 0.35s ease,
     box-shadow 0.35s ease;
 }
+/* =========================
+   כפתור "לכל החדשות"
+========================= */
+
+.all-news-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 10px 18px;
+  margin-top: 12px;
+
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+
+  color: #2563eb;
+  background: #eff6ff;
+
+  border: 1px solid #bfdbfe;
+  border-radius: 999px;
+
+  transition: 
+    background 0.25s ease,
+    color 0.25s ease,
+    transform 0.2s ease,
+    box-shadow 0.25s ease;
+}
+
+/* חץ */
+.all-news-btn::before {
+  content: "📰";
+  font-size: 0.95rem;
+}
+
+/* Hover */
+.all-news-btn:hover {
+  background: #2563eb;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+}
+
+/* Dark mode */
+:root[data-theme="dark"] .all-news-btn {
+  background: rgba(37, 99, 235, 0.15);
+  color: #93c5fd;
+  border-color: rgba(37, 99, 235, 0.4);
+}
+
+:root[data-theme="dark"] .all-news-btn:hover {
+  background: #2563eb;
+  color: white;
+}
 
   </style>
 
@@ -836,7 +890,7 @@ function showUpdateBanner(sw) {
           <div id="home-board" class="home-board-list">
             <p class="empty-msg">אין עדיין חדשות באתר.</p>
           </div>
-          <a href="news.html" class="mini-link">לצפייה בכל החדשות והמודעות »</a>
+          <a href="news.html" class="all-news-btn">לצפייה בכל החדשות והמודעות »</a>
         </div>
       </div>
     </div>
@@ -1111,7 +1165,7 @@ document.addEventListener("DOMContentLoaded", () => {
 <script type="module" src="firebase-config.js"></script>
 <script src="accessibility.js"></script>
 <script type="module" src="home-poll-mini.js"></script>
-<script type="module" src="app.js?v=31"></script>
+<script type="module" src="app.js?v=32"></script>
 </body>
 </html>
 
