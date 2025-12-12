@@ -3133,115 +3133,28 @@ body:not([data-page="home"]) .reveal-on-scroll {
 :root[data-theme="light"] .btn-outline:hover {
   background: #eff6ff;
 }
+/* מעבר חלק בין מצבים */
+html, body, .grade-card, .card, header, .section-light, .section-dark-strong{
+  transition: background-color .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+/* ===== SAFE POLISH (add at end of style.css) ===== */
+
+/* רקע לייט מוד קצת יותר חי */
 :root[data-theme="light"] body{
-  background: radial-gradient(1200px 600px at 20% 0%, rgba(37,99,235,.10), transparent 55%),
-              radial-gradient(900px 500px at 80% 20%, rgba(14,165,233,.10), transparent 55%),
-              #f4f7ff;
-}
-.grade-card{
-  box-shadow: 0 10px 30px rgba(15,23,42,.08);
-}
-.grade-card:hover{
-  transform: translateY(-4px);
-  box-shadow: 0 18px 45px rgba(15,23,42,.14);
-}
-.grade-card{ transition: transform .25s ease, box-shadow .25s ease; }
-.section-title{
-  position: relative;
-  display: inline-block;
-  padding-bottom: 10px;
-}
-.section-title::after{
-  content:"";
-  position:absolute;
-  right:0;
-  bottom:0;
-  height:4px;
-  width:min(260px, 70vw);
-  border-radius: 999px;
-  background: linear-gradient(90deg, rgba(37,99,235,1), rgba(14,165,233,1));
-}
-.btn, .about-btn, .home-poll-link, .personal-btn{
-  border-radius: 999px !important;
-  box-shadow: 0 10px 25px rgba(37,99,235,.18);
-}
-.btn:hover, .about-btn:hover, .home-poll-link:hover, .personal-btn:hover{
-  transform: translateY(-2px);
-}
-.btn, .about-btn, .home-poll-link, .personal-btn{
-  transition: transform .2s ease, box-shadow .2s ease, background-color .25s ease, color .25s ease;
-}
-.header-main{
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  background: rgba(255,255,255,.72);
-  border-bottom: 1px solid rgba(15,23,42,.08);
-}
-:root[data-theme="dark"] .header-main{
-  background: rgba(2,6,23,.55);
-  border-bottom: 1px solid rgba(148,163,184,.18);
-}
-body::before{
-  content:"";
-  position: fixed;
-  inset: 0;
-  pointer-events:none;
-  opacity:.05;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
-}
-:root[data-theme="light"] .hero-home .hero-overlay{
-  background: linear-gradient(to bottom, rgba(255,255,255,.45), rgba(255,255,255,.70));
-}
-:root[data-theme="dark"] .hero-home .hero-overlay{
-  background: linear-gradient(to bottom, rgba(2,6,23,.35), rgba(2,6,23,.70));
-}
-.reveal-on-scroll{
-  opacity: 0;
-  transform: translateY(18px) scale(.98);
-  transition: opacity .6s ease, transform .6s cubic-bezier(.2,.8,.2,1);
-  will-change: transform, opacity;
-}
-.reveal-on-scroll.is-visible{
-  opacity: 1;
-  transform: translateY(0) scale(1);
-}
-/* ===== Fix: כל הקווים/מחיצות הקטנות יהיו באורך יפה ===== */
-
-/* HR רגיל */
-hr{
-  width: min(520px, 80vw);
-  height: 4px;
-  border: 0;
-  margin: 18px auto;
-  border-radius: 999px;
-  background: linear-gradient(90deg, rgba(37,99,235,1), rgba(14,165,233,1));
-  opacity: 1;
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(37,99,235,0.12), transparent 60%),
+    radial-gradient(900px 500px at 10% 10%, rgba(56,189,248,0.10), transparent 55%),
+    linear-gradient(180deg, #f8fbff, #f2f6ff);
 }
 
-/* מחיצות/קווים נפוצים בפרויקטים */
-.divider,
-.section-divider,
-.section-line,
-.title-line,
-.underline,
-.under-line,
-.line,
-.hr-line,
-.header-line,
-.section-header-line{
-  width: min(520px, 80vw) !important;
-  height: 4px !important;
-  margin: 16px auto !important;
-  border-radius: 999px !important;
-  background: linear-gradient(90deg, rgba(37,99,235,1), rgba(14,165,233,1)) !important;
-  border: 0 !important;
+/* טקסטים בלייט מוד יותר "חדים" */
+:root[data-theme="light"] .section-title,
+:root[data-theme="light"] h1,
+:root[data-theme="light"] h2,
+:root[data-theme="light"] h3{
+  color:#0f172a;
 }
-
-/* אם הקו יושב בתוך כרטיס/טור – שלא יידבק לצד */
-.grade-card .divider,
-.grade-card .section-divider,
-.grade-card .section-line,
-.grade-card .underline{
-  margin-left: auto !important;
-  margin-right: auto !important;
+:root[data-theme="light"] .section-subtitle,
+:root[data-theme="light"] p{
+  color:#334155;
 }
