@@ -3205,3 +3205,43 @@ body::before{
   opacity: 1;
   transform: translateY(0) scale(1);
 }
+/* ===== Fix: כל הקווים/מחיצות הקטנות יהיו באורך יפה ===== */
+
+/* HR רגיל */
+hr{
+  width: min(520px, 80vw);
+  height: 4px;
+  border: 0;
+  margin: 18px auto;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(37,99,235,1), rgba(14,165,233,1));
+  opacity: 1;
+}
+
+/* מחיצות/קווים נפוצים בפרויקטים */
+.divider,
+.section-divider,
+.section-line,
+.title-line,
+.underline,
+.under-line,
+.line,
+.hr-line,
+.header-line,
+.section-header-line{
+  width: min(520px, 80vw) !important;
+  height: 4px !important;
+  margin: 16px auto !important;
+  border-radius: 999px !important;
+  background: linear-gradient(90deg, rgba(37,99,235,1), rgba(14,165,233,1)) !important;
+  border: 0 !important;
+}
+
+/* אם הקו יושב בתוך כרטיס/טור – שלא יידבק לצד */
+.grade-card .divider,
+.grade-card .section-divider,
+.grade-card .section-line,
+.grade-card .underline{
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
