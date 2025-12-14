@@ -767,6 +767,79 @@ body,
   .nav-side { display: none !important; }
   .nav-center { margin: 0 auto; }
 }
+/* ===== MOBILE NAV FIX (חובה) ===== */
+@media (max-width: 900px) {
+
+  /* מסתירים את 5+5 במובייל */
+  .nav-side { display: none !important; }
+
+  /* לוגו באמצע */
+  .nav-centered {
+    position: relative !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    min-height: 64px;
+  }
+
+  /* המבורגר - חייב להופיע */
+  #nav-toggle.nav-toggle {
+    display: flex !important;
+    position: absolute !important;
+    right: 12px !important;   /* RTL */
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 9999 !important;
+  }
+
+  /* דארק מוד - בצד השני */
+  #theme-toggle.theme-toggle-btn {
+    display: inline-flex !important;
+    position: absolute !important;
+    left: 12px !important;    /* RTL */
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 9999 !important;
+  }
+
+  /* תפריט נפתח */
+  #nav-mobile.nav-mobile {
+    position: absolute !important;
+    top: calc(100% + 10px) !important;
+    right: 12px !important;
+    left: 12px !important;
+    z-index: 9999 !important;
+
+    background: #ffffff !important;
+    border: 1px solid rgba(37, 99, 235, 0.25) !important;
+    border-radius: 18px !important;
+    padding: 10px !important;
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18) !important;
+
+    display: none !important;
+  }
+
+  /* כשהוא פתוח */
+  #nav-mobile.nav-mobile.open {
+    display: block !important;
+  }
+
+  #nav-mobile.nav-mobile a {
+    display: block !important;
+    padding: 10px 12px !important;
+    border-radius: 12px !important;
+    border: 1px solid rgba(37, 99, 235, 0.12) !important;
+    color: #0f172a !important;
+    background: #ffffff !important;
+    margin-bottom: 8px !important;
+  }
+
+  #nav-mobile.nav-mobile a:hover {
+    background: #eff6ff !important;
+  }
+
+  #nav-mobile.nav-mobile a:last-child { margin-bottom: 0 !important; }
+}
 
   </style>
 
