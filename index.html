@@ -757,6 +757,16 @@ body,
     border: 1px solid rgba(37,99,235,0.2);
   }
 }
+/* מסתירים את פאנל המובייל בדסקטופ */
+@media (min-width: 901px) {
+  .nav-mobile-panel { display: none !important; }
+}
+
+/* במובייל מסתירים את ה-5+5 ומשאירים רק המבורגר+לוגו */
+@media (max-width: 900px) {
+  .nav-side { display: none !important; }
+  .nav-center { margin: 0 auto; }
+}
 
   </style>
 
@@ -822,6 +832,18 @@ function showUpdateBanner(sw) {
   });
 </script>
 
+<script>
+  const toggleBtn = document.querySelector(".nav-toggle");
+  const panel = document.querySelector(".nav-right");
+
+  if (toggleBtn && panel) {
+    toggleBtn.addEventListener("click", () => {
+      panel.classList.toggle("open");
+      toggleBtn.classList.toggle("open");
+    });
+  }
+</script>
+
 <body data-page="home">
   <script type="module" src="analytics.js"></script>
   <script>
@@ -837,15 +859,16 @@ function showUpdateBanner(sw) {
           });
       });
     }
+    
   </script>
 
 <!-- HEADER -->
 <header class="header-main">
   <div class="container">
-    <nav class="nav nav-centered">
+    <nav class="nav nav-centered" aria-label="ניווט ראשי">
 
       <!-- ימין (דסקטופ) -->
-      <div class="nav-side nav-right-links">
+      <div class="nav-side nav-right-links" aria-label="קישורים ימניים">
         <a href="index.html#home-news">חדשות</a>
         <a href="index.html#home-exams">מבחנים</a>
         <a href="index.html#grades">השכבות</a>
@@ -855,7 +878,7 @@ function showUpdateBanner(sw) {
 
       <!-- מרכז -->
       <div class="nav-center">
-        <a href="index.html" class="logo-circle">
+        <a href="index.html" class="logo-circle" aria-label="דף הבית">
           <img
             src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png"
             alt="סמל יערת העמק"
@@ -865,22 +888,35 @@ function showUpdateBanner(sw) {
       </div>
 
       <!-- שמאל (דסקטופ) -->
-      <div class="nav-side nav-left-links">
+      <div class="nav-side nav-left-links" aria-label="קישורים שמאליים">
         <a href="index.html#contact">יצירת קשר</a>
         <a href="news.html">כל החדשות</a>
         <a href="exams.html">כל המבחנים</a>
         <a href="redirect-edu.html" class="personal-btn">למרחב האישי</a>
         <a href="admin.html" class="btn-outline">Admin</a>
-        <button id="theme-toggle" class="theme-toggle-btn">🌙</button>
+
+        <button
+          id="theme-toggle"
+          class="theme-toggle-btn"
+          type="button"
+          aria-label="החלפת מצב תצוגה"
+        >🌙</button>
       </div>
 
       <!-- המבורגר (מובייל) -->
-      <button class="nav-toggle" id="nav-toggle" aria-label="פתח תפריט">
+      <button
+        class="nav-toggle"
+        id="nav-toggle"
+        type="button"
+        aria-label="פתח תפריט"
+        aria-controls="nav-mobile"
+        aria-expanded="false"
+      >
         <span></span><span></span><span></span>
       </button>
 
       <!-- תפריט מובייל -->
-      <div class="nav-mobile" id="nav-mobile">
+      <div class="nav-mobile" id="nav-mobile" aria-hidden="true">
         <a href="index.html#home-news">חדשות</a>
         <a href="index.html#home-exams">מבחנים</a>
         <a href="index.html#grades">השכבות</a>
@@ -896,6 +932,7 @@ function showUpdateBanner(sw) {
     </nav>
   </div>
 </header>
+
 
 
   <!-- HERO -->
@@ -1312,7 +1349,7 @@ document.addEventListener("DOMContentLoaded", () => {
 <script type="module" src="firebase-config.js"></script>
 <script src="accessibility.js"></script>
 <script type="module" src="home-poll-mini.js"></script>
-<script type="module" src="app.js?v=33"></script>
+<script type="module" src="app.js?v=34"></script>
 </body>
 </html>
 
