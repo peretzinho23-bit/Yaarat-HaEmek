@@ -26,6 +26,151 @@ import {
 
 console.log("🔥 NEW ADMIN.JS LOADED");
 
+// =============================
+// הרשאות אדמין (RBAC)
+// =============================
+// DEV שמותר לו הכל + גישה לדף dev.html
+const DEV_EMAILS = ["nadavp1119@gmail.com", "peretzinho23@gmail.com"].map((e) => e.toLowerCase());
+
+let currentPerms = null; // נטען אחרי התחברות
+
+function normalizeEmail(email) {
+  return String(email || "").trim().toLowerCase();
+}
+
+function buildPermsFromRole(role, allowedGrades = []) {
+  const r = String(role || "teacher").toLowerCase();
+
+  const base = {
+    role: r,
+    allowedGrades: Array.isArray(allowedGrades) ? allowedGrades : [],
+    can: {
+      news: true,
+      exams: true,
+      board: false,
+      siteContent: false,
+      polls: false,
+      logs: false,
+      dev: false
+    }
+  };
+
+  if (r === "gradelead" || r === "grade_lead" || r === "אחראי שכבה") {
+    base.role = "gradelead";
+    return base;
+  }
+
+  if (r === "counselor" || r === "יועץ" || r === "יועצת") {
+    base.role = "counselor";
+    base.can.board = true;
+    return base;
+  }
+
+  if (r === "principal" || r === "מנהל" || r === "מנהלת") {
+    base.role = "principal";
+    base.allowedGrades = ["z", "h", "t"];
+    base.can.board = true;
+    base.can.siteContent = true;
+    base.can.polls = true;
+    base.can.logs = true;
+    return base;
+  }
+
+  if (r === "dev") {
+    base.role = "dev";
+    base.allowedGrades = ["z", "h", "t"];
+    base.can.board = true;
+    base.can.siteContent = true;
+    base.can.polls = true;
+    base.can.logs = true;
+    base.can.dev = true;
+    return base;
+  }
+
+  // teacher (ברירת מחדל)
+  base.role = "teacher";
+  return base;
+}
+
+function gradeAllowed(grade) {
+  if (!currentPerms) return false;
+  return currentPerms.allowedGrades.includes(grade);
+}
+
+function applyPermissionsToUI() {
+  if (!currentPerms) return;
+
+  // hide grade sections not allowed
+  document.querySelectorAll(".admin-grade-section").forEach((sec) => {
+    const g = sec.getAttribute("data-grade");
+    if (!g) return;
+    sec.style.display = gradeAllowed(g) ? "" : "none";
+  });
+
+  // Board
+  const board = document.getElementById("admin-board");
+  if (board) {
+    const card = board.closest(".card") || board;
+    card.style.display = currentPerms.can.board ? "" : "none";
+  }
+
+  // Site content
+  const sc = document.getElementById("site-content-form");
+  if (sc) {
+    const card = sc.closest(".card") || sc;
+    card.style.display = currentPerms.can.siteContent ? "" : "none";
+  }
+
+  // Polls
+  const polls = document.getElementById("polls-section");
+  if (polls) polls.style.display = currentPerms.can.polls ? "" : "none";
+
+  // Logs
+  const logsBtn = document.getElementById("open-logs");
+  if (logsBtn) logsBtn.style.display = currentPerms.can.logs ? "" : "none";
+}
+
+async function loadAdminPermissions(user) {
+  const email = normalizeEmail(user?.email);
+
+  // DEV לפי אימייל - תמיד מאפשר
+  if (DEV_EMAILS.includes(email)) {
+    currentPerms = buildPermsFromRole("dev", ["z", "h", "t"]);
+
+    // ניצור doc אם אין עדיין (כדי שזה יהיה עקבי)
+    try {
+      const uref = doc(db, "adminUsers", user.uid);
+      const usnap = await getDoc(uref);
+      if (!usnap.exists()) {
+        await setDoc(uref, {
+          email,
+          fullName: "DEV",
+          role: "dev",
+          allowedGrades: ["z", "h", "t"],
+          createdAt: serverTimestamp(),
+          createdBy: email
+        });
+      }
+    } catch (e) {
+      console.warn("could not ensure dev adminUsers doc", e);
+    }
+
+    return currentPerms;
+  }
+
+  // משתמש רגיל: חייב להיות ברשימת adminUsers
+  const uref = doc(db, "adminUsers", user.uid);
+  const usnap = await getDoc(uref);
+  if (!usnap.exists()) {
+    currentPerms = null;
+    throw new Error("אין לך הרשאות לאדמין. פנה ל-DEV.");
+  }
+
+  const data = usnap.data() || {};
+  currentPerms = buildPermsFromRole(data.role || "teacher", data.allowedGrades || []);
+  return currentPerms;
+}
+
 const GRADES = ["z", "h", "t"];
 
 // כיתות לכל שכבה
@@ -46,6 +191,8 @@ const pollsCollectionRef = collection(db, "polls");
 
 /* ------------ LOGS – לוג כללי לכל הדברים ------------ */
 async function logSystemChange(action, entity, payload = {}) {
+  // לא כל תפקיד צריך לוגים
+  if (!currentPerms || !currentPerms.can || !currentPerms.can.logs) return;
   try {
     const logsRef = collection(db, "exams_logs");
     await addDoc(logsRef, {
@@ -138,13 +285,25 @@ function initAuth() {
     await signOut(auth);
   });
 
-  onAuthStateChanged(auth, (user) => {
+  onAuthStateChanged(auth, async (user) => {
     if (user) {
-      statusEl.textContent = "מחובר כ: " + (user.email || "");
-      loginSection.style.display = "none";
-      adminSection.style.display = "block";
-      loadAllData();
+      try {
+        // טעינת הרשאות + החלת UI
+        currentPerms = await loadAdminPermissions(user);
+        applyPermissionsToUI();
+
+        statusEl.textContent = "מחובר כ: " + (user.email || "");
+        loginSection.style.display = "none";
+        adminSection.style.display = "block";
+
+        await loadAllData();
+      } catch (err) {
+        console.error("Permission check failed:", err);
+        alert("אין לך הרשאה להיכנס לפאנל הניהול.");
+        await signOut(auth);
+      }
     } else {
+      currentPerms = null;
       statusEl.textContent = "לא מחובר";
       loginSection.style.display = "block";
       adminSection.style.display = "none";

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DEV · ניהול הרשאות</title>
+
+  <link rel="icon" href="logo.png" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="admin.css" />
+
+  <style>
+    .dev-wrap{max-width:1100px;margin:0 auto;}
+    .dev-grid{display:grid;grid-template-columns:1fr;gap:16px;}
+    @media (min-width: 980px){.dev-grid{grid-template-columns:1.2fr 0.8fr;}}
+    .pill{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;border:1px solid rgba(148,163,184,.45);background:rgba(255,255,255,.8);font-size:.85rem;}
+    html[data-theme="dark"] .pill{background:rgba(2,6,23,.55);}
+    .table{width:100%;border-collapse:separate;border-spacing:0 10px;}
+    .table th{font-size:.82rem;color:#64748b;text-align:right;padding:0 10px;}
+    .row{background:rgba(255,255,255,.92);border:1px solid rgba(148,163,184,.35);box-shadow:0 10px 25px rgba(15,23,42,.08);border-radius:16px;overflow:hidden;}
+    html[data-theme="dark"] .row{background:rgba(15,23,42,.7);border-color:rgba(148,163,184,.25);}
+    .row td{padding:10px;vertical-align:top;}
+    .small{font-size:.85rem;color:#475569;}
+    html[data-theme="dark"] .small{color:#cbd5e1;}
+    .actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-start;}
+    .select{width:100%;padding:10px;border-radius:12px;border:1px solid rgba(148,163,184,.45);background:rgba(255,255,255,.85);}
+    html[data-theme="dark"] .select{background:rgba(2,6,23,.55);color:#e5e7eb;}
+    .chkline{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:8px;}
+    .chkline label{display:flex;align-items:center;gap:6px;font-size:.9rem;}
+    .muted{color:#94a3b8;}
+  </style>
+</head>
+
+<body data-page="dev">
+
+  <header class="header-main">
+    <div class="container">
+      <nav class="nav" style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+        <a href="index.html" class="logo-circle" aria-label="דף הבית">
+          <img src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png" alt="סמל יערת העמק" class="logo-img" />
+        </a>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <span id="dev-status" class="pill">טוען...</span>
+          <button id="theme-toggle" class="theme-toggle-btn" type="button" aria-label="מצב כהה/בהיר">🌙</button>
+          <a class="btn-outline" href="admin.html">חזרה לאדמין</a>
+          <button id="dev-logout" class="btn" type="button">התנתקות</button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container dev-wrap" style="padding-top:18px;">
+
+    <!-- LOGIN -->
+    <section id="dev-login" class="card" style="max-width:520px;margin:0 auto;">
+      <h2 style="margin-bottom:8px;">כניסה ל-DEV</h2>
+      <p class="muted" style="margin-top:0;">רק לחשבונות DEV.</p>
+
+      <form id="dev-login-form" class="form">
+        <label>אימייל</label>
+        <input id="dev-email" type="email" required placeholder="dev@email.com" />
+
+        <label style="margin-top:10px;">סיסמה</label>
+        <input id="dev-password" type="password" required placeholder="••••••••" />
+
+        <button class="btn" type="submit" style="margin-top:14px; width:100%;">כניסה</button>
+      </form>
+      <p id="dev-login-msg" class="small" style="margin-top:10px;"></p>
+    </section>
+
+    <!-- CONTENT -->
+    <section id="dev-content" style="display:none;">
+      <div class="dev-grid">
+
+        <div class="card">
+          <h2 style="margin-top:0;">בקשות הרשמה לאדמין</h2>
+          <p class="small">כאן אתה מאשר / דוחה בקשות מ-<b>register</b>. אישור יוצר משתמש Authentication ושומר הרשאות.</p>
+          <div id="requests-empty" class="small" style="display:none;">אין בקשות ממתינות 🎉</div>
+          <div style="overflow:auto;">
+            <table class="table" aria-label="בקשות הרשמה">
+              <thead>
+                <tr>
+                  <th>אימייל</th>
+                  <th>פרטים</th>
+                  <th>הרשאות</th>
+                  <th>פעולות</th>
+                </tr>
+              </thead>
+              <tbody id="requests-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 style="margin-top:0;">משתמשים עם גישה</h2>
+          <p class="small">מחיקה כאן <b>מבטלת גישה</b> (מוחקת הרשאות), לא מוחקת את המשתמש מ-Auth.</p>
+          <div id="users-empty" class="small" style="display:none;">אין משתמשים (חוץ ממך) עדיין.</div>
+          <div id="users-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <script type="module" src="dev.js"></script>
+</body>
+</html>
