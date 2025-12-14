@@ -271,6 +271,53 @@ html[data-theme="dark"] #tt th:first-child{
   background: rgba(56,189,248,0.10);
   font-weight: 800;
 }
+/* ===== Class timetable (one real grid) ===== */
+.tt-wrap-table{overflow:auto;border-radius:16px}
+.tt-big{width:100%;border-collapse:separate;border-spacing:0;min-width:820px}
+
+.tt-big th,.tt-big td{
+  border:1px solid rgba(148,163,184,.28);
+  padding:10px;
+  text-align:right;
+  vertical-align:top;
+}
+
+.tt-big thead th{
+  position:sticky; top:0;
+  background: rgba(255,255,255,.75);
+  backdrop-filter: blur(8px);
+  font-weight:800;
+  z-index:2;
+}
+
+.tt-period{
+  font-weight:900;
+  background: rgba(56,189,248,.12);
+  width:76px;
+  position:sticky; right:0; /* RTL */
+  z-index:3;
+}
+
+.tt-td{min-height:64px}
+.tt-subject{font-weight:900; line-height:1.1}
+.tt-meta{opacity:.85; font-size:.9rem; margin-top:6px; display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+.tt-dot{opacity:.6}
+.tt-empty{opacity:.6}
+.tt-dash{font-weight:700; opacity:.6}
+
+/* dark mode */
+html[data-theme="dark"] .tt-big thead th{
+  background: rgba(15,23,42,.75);
+  color:#f8fafc;
+}
+html[data-theme="dark"] .tt-big td,
+html[data-theme="dark"] .tt-big th{
+  border-color: rgba(148,163,184,.18);
+  color:#e5e7eb;
+}
+html[data-theme="dark"] .tt-period{
+  background: rgba(56,189,248,.10);
+}
 
   </style>
 </head>

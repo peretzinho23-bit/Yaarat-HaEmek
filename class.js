@@ -164,55 +164,61 @@ function getCell(grid, dayKey, pIndex) {
   };
 }
 
-function renderTimetableSchedule(grid) {
+function renderTimetableFromGrid(grid) {
+  // grid = { sun:[{subject,teacher,room}..], mon:.. }
+
+  // שישה ימים + עמודת "שיעור"
   const thead = `
     <thead>
       <tr>
-        <th>שעה</th>
+        <th style="width:76px">שיעור</th>
         ${DAYS.map(d => `<th>${escapeHtml(d.label)}</th>`).join("")}
       </tr>
     </thead>
   `;
 
   const tbodyRows = PERIODS.map((p, pIndex) => {
-    const tds = DAYS.map(d => {
-      const limit = maxPeriodsForDay(d.key);
-      const disabled = (pIndex + 1) > limit;
+    const tds = DAYS.map((d) => {
+      const cell = (Array.isArray(grid?.[d.key]) ? grid[d.key][pIndex] : null) || {};
+      const subject = (cell.subject || "").trim();
+      const teacher = (cell.teacher || "").trim();
+      const room = (cell.room || "").trim();
 
-      if (disabled) return `<td class="tt-disabled">—</td>`;
+      const empty = !subject && !teacher && !room;
 
-      const cell = getCell(grid, d.key, pIndex);
-      const has = cell.subject || cell.teacher || cell.room;
-
-      if (!has) return `<td class="tt-empty"> </td>`; // ריק כמו בדוגמה שלך
-
+      // תא יפה: מקצוע בולט, מתחת מורה/חדר בשורה קטנה
       return `
-        <td>
-          <div class="tt-cellbox">
-            <div class="subj">${escapeHtml(cell.subject)}</div>
-            <div class="meta">
-              ${escapeHtml(cell.teacher)}
-              ${cell.room ? ` · ${escapeHtml(cell.room)}` : ""}
+        <td class="tt-td ${empty ? "tt-empty" : ""}">
+          ${empty ? `<div class="tt-dash">—</div>` : `
+            <div class="tt-subject">${escapeHtml(subject)}</div>
+            <div class="tt-meta">
+              ${teacher ? `<span>${escapeHtml(teacher)}</span>` : ""}
+              ${teacher && room ? `<span class="tt-dot">•</span>` : ""}
+              ${room ? `<span>${escapeHtml(room)}</span>` : ""}
             </div>
-          </div>
+          `}
         </td>
       `;
     }).join("");
 
-    return `<tr><td>${p}</td>${tds}</tr>`;
+    return `
+      <tr>
+        <td class="tt-period">${p}</td>
+        ${tds}
+      </tr>
+    `;
   }).join("");
 
   tt.innerHTML = `
-    <div class="tt-grid-wrap">
-      <div style="overflow:auto;">
-        <table class="tt-grid">
-          ${thead}
-          <tbody>${tbodyRows}</tbody>
-        </table>
-      </div>
+    <div class="tt-wrap-table">
+      <table class="tt-big">
+        ${thead}
+        <tbody>${tbodyRows}</tbody>
+      </table>
     </div>
   `;
 }
+
 
 
 // תמיכה גם בסכמה ישנה (days/rows) אם יש מסמכים ישנים
