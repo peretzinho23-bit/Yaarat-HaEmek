@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>דף כיתה – יערת העמק</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    /* ===== Page ===== */
+    .page-wrap{max-width:1100px;margin:0 auto;padding:18px}
+    .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+    .topbar .left{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .pill{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;border:1px solid rgba(148,163,184,.35);background:rgba(255,255,255,.06);text-decoration:none}
+    .cardx{border-radius:18px;border:1px solid rgba(148,163,184,.35);background:rgba(255,255,255,.06);padding:14px}
+    .grid{display:grid;grid-template-columns:1fr;gap:12px}
+    @media (min-width: 980px){.grid{grid-template-columns:1fr 1fr}}
+    .muted{opacity:.75}
+    .section-title2{font-size:1.15rem;margin:0 0 10px}
+    .chooser{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+    .chooser label{display:block;font-size:.9rem;opacity:.85;margin-bottom:6px}
+    .chooser select{min-width:200px;padding:10px;border-radius:14px;border:1px solid rgba(148,163,184,.35);background:rgba(0,0,0,.15);color:inherit}
+    .btn{cursor:pointer;padding:10px 14px;border-radius:14px;border:1px solid rgba(148,163,184,.35);background:rgba(255,255,255,.10);color:inherit}
+    .hide{display:none !important;}
+
+    /* ===== list items (ex/news) ===== */
+    .list .item{border:1px solid rgba(148,163,184,.25);border-radius:14px;padding:12px;margin-bottom:10px}
+    .item .meta{font-size:.9rem;opacity:.8;margin-top:2px}
+    .item .body{margin-top:8px;white-space:pre-wrap}
+    .item .imgs{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    .item .imgs img{width:min(260px,100%);border-radius:14px;border:1px solid rgba(148,163,184,.25);display:block}
+
+    /* ===== timetable table (if you render as table) ===== */
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:8px;border-bottom:1px solid rgba(148,163,184,.25);text-align:right}
+    .dayTitle{font-weight:700;margin:10px 0 6px}
+
+    /* ===== Header like INDEX ===== */
+    .nav.nav-centered{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px; padding: 10px 0; position: relative;
+    }
+    .nav-side{display:flex;gap:10px;align-items:center;flex:1}
+    .nav-right-links{justify-content:flex-start}
+    .nav-left-links{justify-content:flex-end}
+
+    .logo-circle{
+      width:60px;height:60px;border-radius:999px;overflow:hidden;
+      border:2px solid rgba(59,130,246,0.35);
+      background:rgba(255,255,255,0.9);
+      box-shadow:0 10px 25px rgba(15,23,42,0.12);
+      display:flex;align-items:center;justify-content:center;
+    }
+    html[data-theme="dark"] .logo-circle{
+      background:rgba(15,23,42,0.55);
+      border-color:rgba(56,189,248,0.35);
+    }
+    .logo-img{width:100%;height:100%;object-fit:cover;display:block}
+
+    .nav-side a{
+      padding:8px 14px;border-radius:999px;
+      background:rgba(255,255,255,0.92);
+      border:1px solid rgba(148,163,184,0.55);
+      color:#0f172a;
+      transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
+      box-shadow:0 8px 20px rgba(15,23,42,0.08);
+      font-size:.92rem;text-decoration:none;white-space:nowrap;
+    }
+    .nav-side a:hover{
+      transform:translateY(-1px);
+      box-shadow:0 12px 28px rgba(15,23,42,0.12);
+      background:#eff6ff;
+    }
+    html[data-theme="dark"] .nav-side a{
+      background:rgba(15,23,42,0.55);
+      color:#e5e7eb;
+      border-color:rgba(148,163,184,0.35);
+    }
+
+    .theme-toggle-btn{
+      all:unset;box-sizing:border-box;
+      width:44px;height:44px;border-radius:50%;
+      display:inline-flex;align-items:center;justify-content:center;
+      cursor:pointer;
+      border:1px solid rgba(148,163,184,0.6);
+      background:rgba(255,255,255,0.92);
+      box-shadow:0 8px 20px rgba(15,23,42,0.08);
+      font-size:1.4rem;z-index:50;
+    }
+    html[data-theme="dark"] .theme-toggle-btn{
+      background:rgba(15,23,42,0.9);
+      color:#f9fafb;
+    }
+
+    .nav-toggle{display:none}
+    .nav-mobile{display:none}
+
+    @media (max-width: 900px){
+      .nav-right-links,.nav-left-links{display:none !important}
+
+      .nav.nav-centered{justify-content:center !important;min-height:70px}
+
+      .nav-toggle{
+        display:flex !important;
+        position:absolute !important;
+        left:12px !important;
+        top:50% !important;
+        transform:translateY(-50%) !important;
+        flex-direction:column;gap:4px;
+        background:none;border:none;cursor:pointer;z-index:9999;
+      }
+      .nav-toggle span{width:22px;height:2px;background:#0f172a}
+      html[data-theme="dark"] .nav-toggle span{background:#e5e7eb}
+
+      #theme-toggle.theme-toggle-btn{
+        position:absolute !important;
+        right:12px !important;
+        top:50% !important;
+        transform:translateY(-50%) !important;
+        z-index:9999;
+      }
+
+      #nav-mobile.nav-mobile{
+        display:none;
+        position:absolute;
+        top:calc(100% + 10px);
+        left:12px;
+        width:min(230px, calc(100% - 24px));
+        background:rgba(255,255,255,0.98);
+        border:1px solid rgba(148,163,184,0.45);
+        border-radius:18px;
+        padding:10px;
+        box-shadow:0 18px 45px rgba(15,23,42,0.18);
+        z-index:9999;
+      }
+      html[data-theme="dark"] #nav-mobile.nav-mobile{
+        background:rgba(15,23,42,0.95);
+        border-color:rgba(148,163,184,0.35);
+      }
+      #nav-mobile.nav-mobile.open{display:block !important}
+
+      #nav-mobile.nav-mobile a{
+        display:block;
+        padding:10px 12px;
+        border-radius:12px;
+        margin:6px 0;
+        background:rgba(255,255,255,0.9);
+        border:1px solid rgba(148,163,184,0.45);
+        color:#0f172a;
+        text-decoration:none;
+      }
+      html[data-theme="dark"] #nav-mobile.nav-mobile a{
+        background:rgba(2,6,23,0.55);
+        border-color:rgba(148,163,184,0.25);
+        color:#e5e7eb;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="header-main">
+    <div class="container">
+      <nav class="nav nav-centered" aria-label="ניווט ראשי">
+
+        <div class="nav-side nav-right-links">
+          <a href="index.html">← דף הבית</a>
+          <a href="#chooser-card">בחירת כיתה</a>
+          <a href="#content">תוכן כיתה</a>
+        </div>
+
+        <div class="nav-center">
+          <a href="index.html" class="logo-circle" aria-label="דף הבית">
+            <img
+              src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png"
+              alt="סמל יערת העמק"
+              class="logo-img"
+            />
+          </a>
+        </div>
+
+        <div class="nav-side nav-left-links">
+          <a href="#tt-section">מערכת שעות</a>
+          <a href="#ex-section">מבחנים</a>
+          <a href="#news-section">חדשות</a>
+        </div>
+
+        <button id="theme-toggle" class="theme-toggle-btn" type="button" aria-label="מצב כהה/בהיר">🌙</button>
+
+        <button class="nav-toggle" id="nav-toggle" type="button" aria-label="פתח תפריט" aria-expanded="false" aria-controls="nav-mobile">
+          <span></span><span></span><span></span>
+        </button>
+
+        <div class="nav-mobile" id="nav-mobile" aria-hidden="true">
+          <a href="index.html">← דף הבית</a>
+          <a href="#chooser-card">בחירת כיתה</a>
+          <a href="#tt-section">מערכת שעות</a>
+          <a href="#ex-section">מבחנים</a>
+          <a href="#news-section">חדשות</a>
+        </div>
+
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-wrap">
+    <div class="topbar">
+      <div class="left">
+        <div class="pill" id="page-title">דף כיתה</div>
+        <div class="pill muted" id="page-sub">בחר כיתה כדי לראות חדשות, מבחנים ומערכת שעות</div>
+      </div>
+      <div class="pill" id="class-pill">לא נבחרה כיתה</div>
+    </div>
+
+    <section class="cardx" id="chooser-card">
+      <h2 class="section-title2">בחירת כיתה</h2>
+
+      <div class="chooser">
+        <div>
+          <label>שכבה</label>
+          <select id="gradeSel">
+            <option value="">בחר שכבה</option>
+            <option value="z">ז׳</option>
+            <option value="h">ח׳</option>
+            <option value="t">ט׳</option>
+          </select>
+        </div>
+
+        <div>
+          <label>כיתה</label>
+          <select id="classSel" disabled>
+            <option value="">בחר כיתה</option>
+          </select>
+        </div>
+
+        <button class="btn" id="goBtn" disabled>פתח דף כיתה</button>
+      </div>
+    </section>
+
+    <section id="content" class="hide">
+
+      <div class="grid" style="margin-top:12px;">
+        <div class="cardx" id="tt-section">
+          <h2 class="section-title2">📅 מערכת שעות</h2>
+          <div class="muted" id="ttStatus">טוען…</div>
+          <div id="tt"></div>
+        </div>
+
+        <div class="cardx" id="ex-section">
+          <h2 class="section-title2">📝 מבחנים לכיתה</h2>
+          <div class="muted" id="exStatus">טוען…</div>
+          <div id="ex" class="list"></div>
+        </div>
+      </div>
+
+      <div class="cardx" style="margin-top:12px;" id="news-section">
+        <h2 class="section-title2">📰 חדשות לכיתה</h2>
+        <div class="muted" id="newsStatus">טוען…</div>
+        <div id="news" class="list"></div>
+      </div>
+
+    </section>
+  </main>
+
+  <script>
+    // Theme toggle
+    (function () {
+      const btn = document.getElementById("theme-toggle");
+      if (!btn) return;
+
+      function applyTheme(theme) {
+        document.documentElement.setAttribute("data-theme", theme);
+        btn.textContent = theme === "dark" ? "🌙" : "☀️";
+        try { localStorage.setItem("theme", theme); } catch {}
+      }
+
+      let saved = "dark";
+      try { saved = localStorage.getItem("theme") || "dark"; } catch {}
+      applyTheme(saved);
+
+      btn.addEventListener("click", () => {
+        const cur = document.documentElement.getAttribute("data-theme") || "dark";
+        applyTheme(cur === "dark" ? "light" : "dark");
+      });
+    })();
+  </script>
+
+  <script>
+    // mobile menu
+    (function () {
+      const btn = document.getElementById("nav-toggle");
+      const menu = document.getElementById("nav-mobile");
+      if (!btn || !menu) return;
+
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const isOpen = menu.classList.toggle("open");
+        btn.setAttribute("aria-expanded", String(isOpen));
+        menu.setAttribute("aria-hidden", String(!isOpen));
+      });
+
+      menu.querySelectorAll("a").forEach((a) => {
+        a.addEventListener("click", () => {
+          menu.classList.remove("open");
+          btn.setAttribute("aria-expanded", "false");
+          menu.setAttribute("aria-hidden", "true");
+        });
+      });
+
+      document.addEventListener("click", (e) => {
+        if (menu.contains(e.target) || btn.contains(e.target)) return;
+        menu.classList.remove("open");
+        btn.setAttribute("aria-expanded", "false");
+        menu.setAttribute("aria-hidden", "true");
+      });
+    })();
+  </script>
+
+  <script type="module" src="class.js?v=2"></script>
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>מערכת שעות – אדמין</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="admin.css" />
+
+  <style>
+    .tt-wrap { max-width: 1100px; margin: 0 auto; }
+    .tt-top {
+      display:flex; gap:12px; flex-wrap:wrap; align-items:center;
+      justify-content:space-between; margin-bottom:12px;
+    }
+    .tt-actions { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+
+    .row-card{
+      border:1px solid rgba(148,163,184,0.25);
+      border-radius:18px;
+      padding:14px;
+      background: rgba(255,255,255,0.65);
+      box-shadow: 0 10px 28px rgba(15,23,42,0.08);
+    }
+    html[data-theme="dark"] .row-card{
+      background: rgba(15,23,42,0.55);
+      border-color: rgba(148,163,184,0.25);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.25);
+    }
+
+    .muted { opacity:0.85; font-size:0.92rem; line-height:1.5; }
+    .danger { color:#b91c1c; font-weight:800; }
+
+    /* Controls */
+    .ctrl-label{ display:flex; align-items:center; gap:8px; margin:0; }
+    .ctrl-label select{
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,0.35);
+      background: rgba(255,255,255,0.85);
+      color: inherit;
+      outline:none;
+    }
+    html[data-theme="dark"] .ctrl-label select{
+      background: rgba(2,6,23,0.35);
+      border-color: rgba(148,163,184,0.25);
+    }
+
+    /* Table */
+    .tt-table-wrap{
+      margin-top:12px;
+      overflow:auto;
+      border-radius:18px;
+      border:1px solid rgba(148,163,184,0.25);
+      background: rgba(255,255,255,0.6);
+      box-shadow: 0 12px 30px rgba(15,23,42,0.08);
+    }
+    html[data-theme="dark"] .tt-table-wrap{
+      background: rgba(2,6,23,0.35);
+      box-shadow: 0 18px 45px rgba(0,0,0,0.28);
+    }
+
+    .tt-table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      min-width: 920px; /* כדי שלא יימעך */
+    }
+    .tt-table th, .tt-table td{
+      border-bottom: 1px solid rgba(148,163,184,0.18);
+      border-left: 1px solid rgba(148,163,184,0.18);
+      padding:10px;
+      vertical-align: top;
+    }
+    .tt-table tr > *:first-child{ border-right: 1px solid rgba(148,163,184,0.18); }
+
+    .tt-table thead th{
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(8px);
+      font-weight:900;
+    }
+    html[data-theme="dark"] .tt-table thead th{
+      background: rgba(15,23,42,0.92);
+    }
+
+    .tt-table .day-col{
+      position: sticky;
+      right: 0;
+      z-index: 4;
+      font-weight:900;
+      white-space:nowrap;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(8px);
+    }
+    html[data-theme="dark"] .tt-table .day-col{
+      background: rgba(15,23,42,0.92);
+    }
+
+    .tt-head-num{
+      font-size:0.95rem;
+      opacity:0.95;
+      text-align:center;
+      white-space:nowrap;
+    }
+
+    .tt-cell{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .tt-cell input{
+      width:100%;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(148,163,184,0.30);
+      background: rgba(255,255,255,0.85);
+      outline:none;
+    }
+    .tt-cell input:focus{
+      border-color: rgba(37,99,235,0.55);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+    }
+    html[data-theme="dark"] .tt-cell input{
+      background: rgba(2,6,23,0.35);
+      border-color: rgba(148,163,184,0.22);
+      color: #e5e7eb;
+    }
+
+    .tt-hint{
+      font-size:0.82rem;
+      opacity:0.82;
+      margin-top:6px;
+    }
+  </style>
+</head>
+
+<body>
+  <header class="header-main">
+    <div class="container">
+      <nav class="nav">
+        <div class="nav-left">
+          <div class="logo-circle"><span>יערת<br>העמק</span></div>
+          <div>
+            <div class="school-title-main">מערכת שעות · אדמין</div>
+            <div class="school-title-sub">
+              <div class="back-btn-wrap">
+                <a href="admin.html" class="back-btn">← חזרה ללוח הניהול</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container tt-wrap">
+
+      <p id="auth-status" class="section-subtitle">בודק התחברות...</p>
+
+      <div id="login-section" class="row-card" style="display:none; max-width:420px; margin:0 auto;">
+        <h2 class="section-title" style="font-size:1.2rem;">התחברות</h2>
+        <form id="login-form">
+          <label>אימייל</label>
+          <input type="email" name="email" required />
+          <label>סיסמה</label>
+          <input type="password" name="password" required />
+          <button type="submit" style="width:100%; margin-top:10px;">כניסה</button>
+        </form>
+      </div>
+
+      <div id="panel" style="display:none;">
+        <div class="tt-top">
+          <div class="tt-actions">
+            <button id="logout-btn" class="btn-outline" type="button">התנתקות</button>
+
+            <label class="ctrl-label">
+              כיתה:
+              <select id="classId">
+                <option value="">בחר כיתה</option>
+                <optgroup label="ז׳">
+                  <option value="z1">ז1</option><option value="z2">ז2</option><option value="z3">ז3</option><option value="z4">ז4</option><option value="z5">ז5</option>
+                </optgroup>
+                <optgroup label="ח׳">
+                  <option value="h1">ח1/7</option><option value="h4">ח4/8</option><option value="h5">ח5/9</option><option value="h6">ח6/10</option>
+                </optgroup>
+                <optgroup label="ט׳">
+                  <option value="t1">ט1</option><option value="t2">ט2</option><option value="t3">ט3</option><option value="t4">ט4</option><option value="t5">ט5</option>
+                </optgroup>
+              </select>
+            </label>
+
+            <button id="load" class="btn-outline" type="button">טען מערכת</button>
+            <button id="save" class="btn" type="button">שמור מערכת</button>
+          </div>
+
+          <div class="muted" id="meta"></div>
+        </div>
+
+        <div class="row-card">
+          <div class="muted">
+            ימים: <b>ראשון–שישי</b> · שעות: <b>1–9</b><br>
+            כל תא: “מקצוע / מורה / כיתה (אופציונלי)”.
+            <div class="tt-hint">
+              טיפ: אם בשישי יש פחות שעות בפועל — פשוט תשאיר ריק אחרי מה שלא צריך.
+            </div>
+            <div class="danger" style="margin-top:8px;">
+              זה דף בדיקה – אם תרצה למחוק, תמחק רק את שני הקבצים האלה.
+            </div>
+          </div>
+        </div>
+
+        <div class="tt-table-wrap">
+          <table class="tt-table" id="table"></table>
+        </div>
+
+        <div id="msg" class="muted" style="margin-top:10px;"></div>
+      </div>
+
+    </div>
+  </section>
+
+  <script type="module" src="timetable-admin.js"></script>
+</body>
+</html>

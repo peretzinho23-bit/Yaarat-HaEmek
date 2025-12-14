@@ -387,6 +387,48 @@
   }
 }
 
+
+.home-class-card {
+  width: 100%;
+  max-width: 520px;
+  text-align: center;
+}
+.home-class-center {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.home-class-card h3 {
+  font-size: 1.4rem;
+}
+
+.home-class-card .section-subtitle {
+  opacity: 0.85;
+}
+.home-class-card { padding: 18px; }
+.home-class-row { justify-content: center; }
+
+/* בחירת כיתה - עיצוב נקי ומרוכז */
+.home-class-card{
+  max-width: 680px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 18px;
+}
+
+.home-class-row{
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.home-class-row .select{
+  min-width: 160px;
+}
+
   </style>
 </head>
 
@@ -612,39 +654,43 @@
       </div>
     </div>
   </section>
+<!-- בחירת כיתה (מרוכז ונקי) -->
+<section id="home-class-picker" class="section-light reveal-on-scroll">
+  <div class="container">
+    <div class="card home-class-card">
+      <h3 style="margin:0 0 8px;">בחירת כיתה</h3>
+      <p class="section-subtitle" style="margin-top:0;">
+        בחר שכבה ואז כיתה, ונעביר אותך לדף הכיתה.
+      </p>
 
-  <!-- חדשות לפי שכבות -->
-  <section id="home-grade-news" class="section-light reveal-on-scroll">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">חדשות לפי שכבות</h2>
-        <p class="section-subtitle">
-          הכתבה האחרונה שפורסמה בכל שכבה. לחיצה על "לכל החדשות" תפתח את עמוד החדשות המלא.
-        </p>
-      </div>
+      <div class="home-class-row">
+        <select id="home-grade" class="select">
+          <option value="">בחר שכבה</option>
+          <option value="z">ז׳</option>
+          <option value="h">ח׳</option>
+          <option value="t">ט׳</option>
+        </select>
 
-      <div class="home-grid">
-        <div class="grade-card">
-          <h3>שכבת ז׳</h3>
-          <div id="home-grade-news-z" class="home-news-mini"></div>
-        </div>
+        <select id="home-class" class="select" disabled>
+          <option value="">בחר כיתה</option>
+        </select>
 
-        <div class="grade-card">
-          <h3>שכבת ח׳</h3>
-          <div id="home-grade-news-h" class="home-news-mini"></div>
-        </div>
-
-        <div class="grade-card">
-          <h3>שכבת ט׳</h3>
-          <div id="home-grade-news-t" class="home-news-mini"></div>
-        </div>
-      </div>
-
-      <div style="margin-top:12px; text-align:left;">
-        <a href="news.html" class="all-news-btn">לכל החדשות »</a>
+        <button id="home-open-class" class="btn" type="button" disabled>
+          פתח דף כיתה
+        </button>
       </div>
     </div>
-  </section>
+  </div>
+</section>
+
+</div>
+
+</section>
+
+
+<script type="module" src="home-class-picker.js"></script>
+
+
 
   <!-- מבחנים -->
   <section id="home-exams" class="section-light reveal-on-scroll">
@@ -903,10 +949,12 @@
     }
   </script>
 
-  <script type="module" src="firebase-config.js"></script>
-  <script src="accessibility.js"></script>
-  <script type="module" src="home-poll-mini.js"></script>
-  <script type="module" src="app.js?v=37"></script>
+<script type="module" src="firebase-config.js"></script>
+<script src="accessibility.js"></script>
+<script type="module" src="home-poll-mini.js"></script>
+<script type="module" src="app.js?v=37"></script>
+<script type="module" src="home-class-picker.js"></script>
+
 
 </body>
 </html>

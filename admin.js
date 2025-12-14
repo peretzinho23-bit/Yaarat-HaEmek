@@ -270,7 +270,8 @@ function escapeHtml(str) {
   return String(str || "")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
 // classId -> label
@@ -280,7 +281,7 @@ function classIdToLabel(classId) {
     h1: "ח1/7", h4: "ח4/8", h5: "ח5/9", h6: "ח6/10",
     t1: "ט1", t2: "ט2", t3: "ט3", t4: "ט4", t5: "ט5"
   };
-  return map[classId] || "";
+  return map[String(classId || "").toLowerCase()] || "";
 }
 
 async function getDocSafe(pathArr, def) {
@@ -324,31 +325,38 @@ function initAuth() {
     await signOut(auth);
   });
 
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    try {
-      currentPerms = await loadAdminPermissions(user);
-      applyPermissionsToUI();
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      try {
+        currentPerms = await loadAdminPermissions(user);
+        applyPermissionsToUI();
 
-      // 👇👇👇 כאן בדיוק
-      const devBtn = document.getElementById("dev-btn");
-      if (devBtn) {
-        const role = String(currentPerms?.role || "").toLowerCase();
-        const canSeeDev = ["dev", "principal", "gradelead"].includes(role);
-        devBtn.style.display = canSeeDev ? "inline-block" : "none";
+        // realtime guard
+        startPermissionWatcher(user);
+
+        // 👇👇👇 כאן בדיוק
+        const devBtn = document.getElementById("dev-btn");
+        if (devBtn) {
+          const role = String(currentPerms?.role || "").toLowerCase();
+          const canSeeDev = ["dev", "principal", "gradelead"].includes(role);
+          devBtn.style.display = canSeeDev ? "inline-block" : "none";
+        }
+
+        statusEl.textContent = "מחובר כ: " + (user.email || "");
+        loginSection.style.display = "none";
+        adminSection.style.display = "block";
+        await loadAllData();
+      } catch (err) {
+        alert("אין לך הרשאה להיכנס לפאנל הניהול.");
+        await signOut(auth);
       }
-
-      statusEl.textContent = "מחובר כ: " + (user.email || "");
-      loginSection.style.display = "none";
-      adminSection.style.display = "block";
-      await loadAllData();
-    } catch (err) {
-      alert("אין לך הרשאה להיכנס לפאנל הניהול.");
-      await signOut(auth);
+    } else {
+      // לא מחובר
+      statusEl.textContent = "לא מחובר";
+      loginSection.style.display = "block";
+      adminSection.style.display = "none";
     }
-  }
-});
-
+  });
 }
 
 /* ------------ load everything ------------ */
@@ -441,19 +449,18 @@ function renderNewsAdmin() {
       .map((n) => {
         const i = n._index;
 
-        const images =
-          Array.isArray(n.imageUrls) && n.imageUrls.length
-            ? n.imageUrls
-            : n.imageUrl
-            ? [n.imageUrl]
-            : [];
+        // תמונות: תומך גם imageUrls וגם imageUrl/imageUrl2
+        const images = [];
+        if (Array.isArray(n.imageUrls)) images.push(...n.imageUrls.filter(Boolean));
+        if (n.imageUrl) images.push(n.imageUrl);
+        if (n.imageUrl2) images.push(n.imageUrl2);
+        const uniqueImages = [...new Set(images.map(x => String(x).trim()).filter(Boolean))].slice(0, 2);
 
         let imgHtml = "";
-        if (images.length) {
+        if (uniqueImages.length) {
           imgHtml = `
             <div class="admin-images-row">
-              ${images
-                .slice(0, 2)
+              ${uniqueImages
                 .map(
                   (url) => `
                 <div class="admin-image-wrapper">
@@ -466,15 +473,21 @@ function renderNewsAdmin() {
         }
 
         const colorStyle = n.color ? ` style="color:${escapeHtml(n.color)};"` : "";
+        const classLabel = n.classId ? classIdToLabel(String(n.classId).toLowerCase()) : "";
 
         return `
           <div class="admin-item"${colorStyle}>
             <div class="admin-item-main">
               <strong>${escapeHtml(n.title)}</strong>
-              <span class="admin-item-meta">${escapeHtml(n.meta || "")}</span>
+              <span class="admin-item-meta">
+                ${escapeHtml(n.meta || "")}
+                ${classLabel ? " · כיתה " + escapeHtml(classLabel) : ""}
+              </span>
             </div>
+
             <div class="admin-item-body">${escapeHtml(n.body)}</div>
             ${imgHtml}
+
             <button class="admin-remove" data-type="news" data-grade="${g}" data-index="${i}">
               מחיקה
             </button>
@@ -487,7 +500,7 @@ function renderNewsAdmin() {
 
 async function saveNewsGrade(grade) {
   const refDoc = doc(db, "news", grade);
-  await setDoc(refDoc, { items: newsData[grade] });
+  await setDoc(refDoc, { items: newsData[grade] }, { merge: true });
 }
 
 function setupNewsForms() {
@@ -498,17 +511,27 @@ function setupNewsForms() {
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const title = form.title.value.trim();
-      const meta = form.meta.value.trim();
-      const body = form.body.value.trim();
-      const manualImageUrl =
-        (form.imageUrl && form.imageUrl.value && form.imageUrl.value.trim()) || "";
-      const color =
-        (form.color && form.color.value && form.color.value.trim()) || "#ffffff";
+      const title = (form.title?.value || "").trim();
+      const meta = (form.meta?.value || "").trim();
+      const body = (form.body?.value || "").trim();
+      const classId = (form.classId?.value || "").trim().toLowerCase();
 
-      const fileInput = form.imageFile;
-      const files = fileInput && fileInput.files ? Array.from(fileInput.files) : [];
+      const imageUrl = (form.imageUrl?.value || "").trim();
+      const imageUrl2 = (form.imageUrl2?.value || "").trim();
 
+      const color = (form.color?.value || "").trim() || "#ffffff";
+
+      const file1 = form.imageFile?.files?.[0] || null;
+      const file2 = form.imageFile2?.files?.[0] || null;
+
+      if (!classId) {
+        alert("חובה לבחור כיתה.");
+        return;
+      }
+      if (!CLASS_IDS_BY_GRADE[g].includes(classId)) {
+        alert("כיתה לא חוקית לשכבה הזאת.");
+        return;
+      }
       if (!title || !body) {
         alert("חובה למלא לפחות כותרת ותוכן.");
         return;
@@ -517,46 +540,62 @@ function setupNewsForms() {
       try {
         const imageUrls = [];
 
-        if (manualImageUrl) imageUrls.push(manualImageUrl);
+        // קישורים ידניים (עד 2)
+        if (imageUrl) imageUrls.push(imageUrl);
+        if (imageUrl2) imageUrls.push(imageUrl2);
 
-        for (let i = 0; i < files.length && i < 2; i++) {
+        // העלאת קבצים (עד 2)
+        const files = [file1, file2].filter(Boolean);
+        for (let i = 0; i < files.length && imageUrls.length < 2; i++) {
           const file = files[i];
-          const filePath = `news/${g}/${Date.now()}_${file.name}`;
+          const safeName = String(file.name || "img").replace(/[^\w.\-]+/g, "_");
+          const filePath = `news/${g}/${classId}/${Date.now()}_${safeName}`;
           const fileRef = ref(storage, filePath);
           await uploadBytes(fileRef, file);
           const url = await getDownloadURL(fileRef);
           imageUrls.push(url);
         }
 
+        // ייחודיות + מקסימום 2
+        const finalImages = [...new Set(imageUrls.map(x => String(x).trim()).filter(Boolean))].slice(0, 2);
+
         const newItem = {
+          classId,            // ✅ הכי חשוב: חדשות לכיתה
           title,
-          body,
           meta,
-          imageUrls,
+          body,
+          color,
+          imageUrls: finalImages,
           createdAt: new Date().toISOString()
         };
 
+        if (!newsData[g]) newsData[g] = [];
         newsData[g].push(newItem);
 
         form.reset();
+        // נחזיר את הצבע לברירת מחדל כדי שלא “ייעלם”
+        if (form.color) form.color.value = "#ffffff";
+
         renderNewsAdmin();
         await saveNewsGrade(g);
 
         await logSystemChange("create", "news", {
           grade: g,
+          classId,
           subject: newItem.title,
           topic: newItem.body,
           itemsCount: newsData[g].length
         });
 
-        alert("הידיעה נשמרה.");
+        alert("הידיעה נשמרה ✅");
       } catch (err) {
         console.error("שגיאה בהעלאת תמונות/שמירת חדשות:", err);
-        alert("שגיאה בשמירת הידיעה:\n" + (err.message || JSON.stringify(err)));
+        alert("שגיאה בשמירת הידיעה:\n" + (err?.message || JSON.stringify(err)));
       }
     });
   }
 }
+
 
 /* ------------ EXAMS ------------ */
 
@@ -1060,6 +1099,7 @@ function setupDeleteHandler() {
       if (deletedNews) {
         await logSystemChange("delete", "news", {
           grade,
+          classId: deletedNews.classId || null,
           subject: deletedNews.title,
           topic: deletedNews.body,
           itemsCount: newsData[grade].length

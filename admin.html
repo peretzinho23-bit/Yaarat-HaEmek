@@ -177,121 +177,155 @@
         <p class="section-subtitle">ניתן להוסיף עד שתי תמונות לידיעה (קישורים או קבצים) + צבע טקסט (אופציונלי).
           אם בתוך החדשות אתם רואים חדשות נא לא למחוק.</p>
 
-        <div class="admin-columns">
-          <!-- NEWS Z -->
-          <section class="admin-grade-section" data-grade="z">
-            <div class="card">
-              <h3>שכבת ז'</h3>
-              <div id="admin-news-z" class="admin-list"></div>
-
-              <form id="news-form-z">
-                <label>כותרת</label>
-                <input name="title" />
-
-                <label>מידע קצר (תאריך/אירוע)</label>
-                <input name="meta" />
-
-                <!-- תמונה 1 -->
-                <label>קישור לתמונה 1 (אופציונלי)</label>
-                <input name="imageUrl" placeholder="https://..." />
-
-                <label>תמונה 1 מקובץ (אופציונלי)</label>
-                <input type="file" name="imageFile" accept="image/*" />
-
-                <!-- תמונה 2 -->
-                <label>קישור לתמונה 2 (אופציונלי)</label>
-                <input name="imageUrl2" placeholder="https://..." />
-
-                <label>תמונה 2 מקובץ (אופציונלי)</label>
-                <input type="file" name="imageFile2" accept="image/*" />
-
-                <label>צבע הטקסט (אופציונלי)</label>
-                <input type="color" name="color" value="#ffffff" />
-
-                <label>תוכן הידיעה</label>
-                <textarea name="body"></textarea>
-
-                <button type="submit">הוסף חדשות לז'</button>
+        utton>
               </form>
             </div>
           </section>
+        </div><div class="admin-columns">
+  <!-- NEWS Z -->
+  <section class="admin-grade-section" data-grade="z">
+    <div class="card">
+      <h3>שכבת ז'</h3>
+      <div id="admin-news-z" class="admin-list"></div>
 
-          <!-- NEWS H -->
-          <section class="admin-grade-section" data-grade="h">
-            <div class="card">
-              <h3>שכבת ח'</h3>
-              <div id="admin-news-h" class="admin-list"></div>
+      <form id="news-form-z">
+        <label>כיתה</label>
+        <select name="classId" required>
+          <option value="">בחר כיתה</option>
+          <option value="z1">ז1</option>
+          <option value="z2">ז2</option>
+          <option value="z3">ז3</option>
+          <option value="z4">ז4</option>
+          <option value="z5">ז5</option>
+        </select>
 
-              <form id="news-form-h">
-                <label>כותרת</label>
-                <input name="title" />
+        <label>כותרת</label>
+        <input name="title" />
 
-                <label>מידע קצר (תאריך/אירוע)</label>
-                <input name="meta" />
+        <label>מידע קצר (תאריך/אירוע)</label>
+        <input name="meta" />
 
-                <!-- תמונה 1 -->
-                <label>קישור לתמונה 1 (אופציונלי)</label>
-                <input name="imageUrl" placeholder="https://..." />
+        <!-- תמונה 1 -->
+        <label>קישור לתמונה 1 (אופציונלי)</label>
+        <input name="imageUrl" placeholder="https://..." />
 
-                <label>תמונה 1 מקובץ (אופציונלי)</label>
-                <input type="file" name="imageFile" accept="image/*" />
+        <label>תמונה 1 מקובץ (אופציונלי)</label>
+        <input type="file" name="imageFile" accept="image/*" />
 
-                <!-- תמונה 2 -->
-                <label>קישור לתמונה 2 (אופציונלי)</label>
-                <input name="imageUrl2" placeholder="https://..." />
+        <!-- תמונה 2 -->
+        <label>קישור לתמונה 2 (אופציונלי)</label>
+        <input name="imageUrl2" placeholder="https://..." />
 
-                <label>תמונה 2 מקובץ (אופציונלי)</label>
-                <input type="file" name="imageFile2" accept="image/*" />
+        <label>תמונה 2 מקובץ (אופציונלי)</label>
+        <input type="file" name="imageFile2" accept="image/*" />
 
-                <label>צבע הטקסט (אופציונלי)</label>
-                <input type="color" name="color" value="#ffffff" />
+        <label>צבע הטקסט (אופציונלי)</label>
+        <input type="color" name="color" value="#ffffff" />
 
-                <label>תוכן הידיעה</label>
-                <textarea name="body"></textarea>
+        <label>תוכן הידיעה</label>
+        <textarea name="body"></textarea>
 
-                <button type="submit">הוסף חדשות לח'</button>
-              </form>
-            </div>
-          </section>
+        <button type="submit">הוסף חדשות לז'</button>
+      </form>
+    </div>
+  </section>
 
-          <!-- NEWS T -->
-          <section class="admin-grade-section" data-grade="t">
-            <div class="card">
-              <h3>שכבת ט'</h3>
-              <div id="admin-news-t" class="admin-list"></div>
+  <!-- NEWS H -->
+  <section class="admin-grade-section" data-grade="h">
+    <div class="card">
+      <h3>שכבת ח'</h3>
+      <div id="admin-news-h" class="admin-list"></div>
 
-              <form id="news-form-t">
-                <label>כותרת</label>
-                <input name="title" />
+      <form id="news-form-h">
+        <label>כיתה</label>
+        <select name="classId" required>
+          <option value="">בחר כיתה</option>
+          <option value="h1">ח1/7</option>
+          <option value="h4">ח4/8</option>
+          <option value="h5">ח5/9</option>
+          <option value="h6">ח6/10</option>
+        </select>
 
-                <label>מידע קצר (תאריך/אירוע)</label>
-                <input name="meta" />
+        <label>כותרת</label>
+        <input name="title" />
 
-                <!-- תמונה 1 -->
-                <label>קישור לתמונה 1 (אופציונלי)</label>
-                <input name="imageUrl" placeholder="https://..." />
+        <label>מידע קצר (תאריך/אירוע)</label>
+        <input name="meta" />
 
-                <label>תמונה 1 מקובץ (אופציונלי)</label>
-                <input type="file" name="imageFile" accept="image/*" />
+        <!-- תמונה 1 -->
+        <label>קישור לתמונה 1 (אופציונלי)</label>
+        <input name="imageUrl" placeholder="https://..." />
 
-                <!-- תמונה 2 -->
-                <label>קישור לתמונה 2 (אופציונלי)</label>
-                <input name="imageUrl2" placeholder="https://..." />
+        <label>תמונה 1 מקובץ (אופציונלי)</label>
+        <input type="file" name="imageFile" accept="image/*" />
 
-                <label>תמונה 2 מקובץ (אופציונלי)</label>
-                <input type="file" name="imageFile2" accept="image/*" />
+        <!-- תמונה 2 -->
+        <label>קישור לתמונה 2 (אופציונלי)</label>
+        <input name="imageUrl2" placeholder="https://..." />
 
-                <label>צבע הטקסט (אופציונלי)</label>
-                <input type="color" name="color" value="#ffffff" />
+        <label>תמונה 2 מקובץ (אופציונלי)</label>
+        <input type="file" name="imageFile2" accept="image/*" />
 
-                <label>תוכן הידיעה</label>
-                <textarea name="body"></textarea>
+        <label>צבע הטקסט (אופציונלי)</label>
+        <input type="color" name="color" value="#ffffff" />
 
-                <button type="submit">הוסף חדשות לט'</button>
-              </form>
-            </div>
-          </section>
-        </div>
+        <label>תוכן הידיעה</label>
+        <textarea name="body"></textarea>
+
+        <button type="submit">הוסף חדשות לח'</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- NEWS T -->
+  <section class="admin-grade-section" data-grade="t">
+    <div class="card">
+      <h3>שכבת ט'</h3>
+      <div id="admin-news-t" class="admin-list"></div>
+
+      <form id="news-form-t">
+        <label>כיתה</label>
+        <select name="classId" required>
+          <option value="">בחר כיתה</option>
+          <option value="t1">ט1</option>
+          <option value="t2">ט2</option>
+          <option value="t3">ט3</option>
+          <option value="t4">ט4</option>
+          <option value="t5">ט5</option>
+        </select>
+
+        <label>כותרת</label>
+        <input name="title" />
+
+        <label>מידע קצר (תאריך/אירוע)</label>
+        <input name="meta" />
+
+        <!-- תמונה 1 -->
+        <label>קישור לתמונה 1 (אופציונלי)</label>
+        <input name="imageUrl" placeholder="https://..." />
+
+        <label>תמונה 1 מקובץ (אופציונלי)</label>
+        <input type="file" name="imageFile" accept="image/*" />
+
+        <!-- תמונה 2 -->
+        <label>קישור לתמונה 2 (אופציונלי)</label>
+        <input name="imageUrl2" placeholder="https://..." />
+
+        <label>תמונה 2 מקובץ (אופציונלי)</label>
+        <input type="file" name="imageFile2" accept="image/*" />
+
+        <label>צבע הטקסט (אופציונלי)</label>
+        <input type="color" name="color" value="#ffffff" />
+
+        <label>תוכן הידיעה</label>
+        <textarea name="body"></textarea>
+
+        <button type="submit">הוסף חדשות לט'</button>
+      </form>
+    </div>
+  </section>
+</div>
+
 
         <br><br>
 
