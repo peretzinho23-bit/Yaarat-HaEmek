@@ -869,6 +869,190 @@ body,
   }
 }
 
+/* ===== Nav centered layout ===== */
+.nav.nav-centered{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding: 10px 0;
+  position: relative;
+}
+
+.nav-side{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  flex: 1;
+}
+
+.nav-right-links{ justify-content:flex-start; }
+.nav-left-links{ justify-content:flex-end; }
+
+.nav-center{
+  flex: 0 0 auto;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* לוגו קצת יותר גדול */
+.logo-circle{
+  width: 54px;
+  height: 54px;
+  border-radius: 999px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  border: 2px solid rgba(59,130,246,0.35);
+  background: rgba(255,255,255,0.9);
+  box-shadow: 0 10px 25px rgba(15,23,42,0.12);
+}
+
+html[data-theme="dark"] .logo-circle{
+  background: rgba(15,23,42,0.55);
+  border-color: rgba(56,189,248,0.35);
+}
+
+.logo-img{
+  width: 86%;
+  height: 86%;
+  object-fit: cover;
+}
+
+/* כפתורים לבנים יפים */
+.nav-side a{
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.92);
+  border: 1px solid rgba(148,163,184,0.55);
+  color: #0f172a;
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+  box-shadow: 0 8px 20px rgba(15,23,42,0.08);
+  font-size: 0.92rem;
+}
+
+.nav-side a:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(15,23,42,0.12);
+}
+
+/* דארק מוד לכפתורים */
+html[data-theme="dark"] .nav-side a{
+  background: rgba(15,23,42,0.55);
+  color: #e5e7eb;
+  border-color: rgba(148,163,184,0.35);
+}
+
+/* הכפתורים המיוחדים שלך */
+.nav-side .personal-btn{
+  background: #1d4ed8 !important;
+  color: #fff !important;
+  border: none !important;
+}
+.nav-side .btn-outline{
+  background: rgba(255,255,255,0.92);
+}
+
+/* כפתור דארק מוד */
+.theme-toggle-btn{
+  all: unset;
+  box-sizing:border-box;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  border: 1px solid rgba(148,163,184,0.6);
+  background: rgba(255,255,255,0.92);
+  box-shadow: 0 8px 20px rgba(15,23,42,0.08);
+  font-size: 1.4rem;
+}
+html[data-theme="dark"] .theme-toggle-btn{
+  background: rgba(15,23,42,0.9);
+  color: #f9fafb;
+}
+
+/* ===== Mobile ===== */
+.nav-mobile{ display:none; }
+
+@media (max-width: 900px){
+  .nav-right-links,
+  .nav-left-links{
+    display:none;
+  }
+
+  /* שיישאר: לוגו באמצע + דארק מוד + המבורגר */
+  .nav.nav-centered{
+    justify-content:center;
+  }
+  .nav-center{
+    margin: 0 auto;
+  }
+
+  .theme-toggle-btn{
+    position:absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .nav-toggle{
+    position:absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .nav-mobile{
+    display:block;
+    position:absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% + 10px);
+    background: rgba(255,255,255,0.98);
+    border: 1px solid rgba(148,163,184,0.45);
+    border-radius: 18px;
+    padding: 10px;
+    box-shadow: 0 18px 45px rgba(15,23,42,0.18);
+
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity .2s ease, transform .2s ease, visibility .2s ease;
+    z-index: 999;
+  }
+
+  html[data-theme="dark"] .nav-mobile{
+    background: rgba(15,23,42,0.95);
+    border-color: rgba(148,163,184,0.35);
+  }
+
+  .nav-mobile a{
+    display:block;
+    padding: 10px 12px;
+    border-radius: 12px;
+    margin: 6px 0;
+    background: rgba(255,255,255,0.9);
+    border: 1px solid rgba(148,163,184,0.45);
+    color: #0f172a;
+  }
+  html[data-theme="dark"] .nav-mobile a{
+    background: rgba(2,6,23,0.55);
+    border-color: rgba(148,163,184,0.25);
+    color: #e5e7eb;
+  }
+
+  .nav-mobile.open{
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+}
+
   </style>
 
 </head>
@@ -976,14 +1160,36 @@ function showUpdateBanner(sw) {
     });
   })();
 </script>
+<script>
+  (function () {
+    const btn = document.getElementById("nav-toggle");
+    const menu = document.getElementById("nav-mobile");
+    if (!btn || !menu) return;
 
-<!-- HEADER -->
+    btn.addEventListener("click", () => {
+      const isOpen = menu.classList.toggle("open");
+      btn.classList.toggle("open", isOpen);
+      btn.setAttribute("aria-expanded", String(isOpen));
+      menu.setAttribute("aria-hidden", String(!isOpen));
+    });
+
+    menu.querySelectorAll("a").forEach(a => {
+      a.addEventListener("click", () => {
+        menu.classList.remove("open");
+        btn.classList.remove("open");
+        btn.setAttribute("aria-expanded", "false");
+        menu.setAttribute("aria-hidden", "true");
+      });
+    });
+  })();
+</script>
+
 <header class="header-main">
   <div class="container">
-    <nav class="nav nav-centered" aria-label="ניווט ראשי">
+    <nav class="nav nav-centered">
 
       <!-- ימין (דסקטופ) -->
-      <div class="nav-side nav-right-links" aria-label="קישורים ימניים">
+      <div class="nav-side nav-right-links">
         <a href="index.html#home-news">חדשות</a>
         <a href="index.html#home-exams">מבחנים</a>
         <a href="index.html#grades">השכבות</a>
@@ -991,7 +1197,7 @@ function showUpdateBanner(sw) {
         <a href="about.html">אודות</a>
       </div>
 
-      <!-- מרכז -->
+      <!-- מרכז (לוגו) -->
       <div class="nav-center">
         <a href="index.html" class="logo-circle" aria-label="דף הבית">
           <img
@@ -1003,35 +1209,26 @@ function showUpdateBanner(sw) {
       </div>
 
       <!-- שמאל (דסקטופ) -->
-      <div class="nav-side nav-left-links" aria-label="קישורים שמאליים">
+      <div class="nav-side nav-left-links">
         <a href="index.html#contact">יצירת קשר</a>
         <a href="news.html">כל החדשות</a>
         <a href="exams.html">כל המבחנים</a>
         <a href="redirect-edu.html" class="personal-btn">למרחב האישי</a>
         <a href="admin.html" class="btn-outline">Admin</a>
-
-        <button
-          id="theme-toggle"
-          class="theme-toggle-btn"
-          type="button"
-          aria-label="החלפת מצב תצוגה"
-        >🌙</button>
       </div>
 
+      <!-- כפתור דארק מוד (נשאר תמיד) -->
+      <button id="theme-toggle" class="theme-toggle-btn" type="button" aria-label="מצב כהה/בהיר">
+        🌙
+      </button>
+
       <!-- המבורגר (מובייל) -->
-      <button
-        class="nav-toggle"
-        id="nav-toggle"
-        type="button"
-        aria-label="פתח תפריט"
-        aria-controls="nav-mobile"
-        aria-expanded="false"
-      >
+      <button class="nav-toggle" id="nav-toggle" type="button" aria-label="פתח תפריט" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
 
       <!-- תפריט מובייל -->
-    <div class="nav-right" id="nav-right" aria-hidden="true">
+      <div class="nav-mobile" id="nav-mobile" aria-hidden="true">
         <a href="index.html#home-news">חדשות</a>
         <a href="index.html#home-exams">מבחנים</a>
         <a href="index.html#grades">השכבות</a>
@@ -1047,6 +1244,7 @@ function showUpdateBanner(sw) {
     </nav>
   </div>
 </header>
+
 
 
 
@@ -1464,7 +1662,7 @@ document.addEventListener("DOMContentLoaded", () => {
 <script type="module" src="firebase-config.js"></script>
 <script src="accessibility.js"></script>
 <script type="module" src="home-poll-mini.js"></script>
-<script type="module" src="app.js?v=35"></script>
+<script type="module" src="app.js?v=36"></script>
 </body>
 </html>
 
