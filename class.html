@@ -419,6 +419,31 @@ html[data-theme="dark"] .news-body a{
 html[data-theme="dark"] .news-body a:visited{
   color: #a78bfa;
 }
+/* LINKS – force colors (win all other CSS) */
+#news .news-body a,
+#news .news-body a:link,
+#news .news-body a:active{
+  text-decoration: underline !important;
+  font-weight: 800 !important;
+}
+
+html[data-theme="light"] #news .news-body a,
+html[data-theme="light"] #news .news-body a:link{
+  color: #1d4ed8 !important;
+}
+
+html[data-theme="light"] #news .news-body a:visited{
+  color: #7c3aed !important;
+}
+
+html[data-theme="dark"] #news .news-body a,
+html[data-theme="dark"] #news .news-body a:link{
+  color: #38bdf8 !important;
+}
+
+html[data-theme="dark"] #news .news-body a:visited{
+  color: #a78bfa !important;
+}
 
   </style>
 </head>
