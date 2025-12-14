@@ -840,6 +840,34 @@ body,
 
   #nav-mobile.nav-mobile a:last-child { margin-bottom: 0 !important; }
 }
+/* ===== FIX כפילות תפריטים ===== */
+
+/* דסקטופ */
+@media (min-width: 901px) {
+  /* מסתירים תפריט מובייל */
+  .nav-right#nav-right {
+    display: none !important;
+  }
+}
+
+/* מובייל */
+@media (max-width: 900px) {
+  /* מסתירים תפריט דסקטופ (5+5) */
+  .nav-right-links,
+  .nav-left-links {
+    display: none !important;
+  }
+
+  /* תפריט מובייל נסגר כברירת מחדל */
+  .nav-right#nav-right {
+    display: none;
+  }
+
+  /* כשהוא פתוח */
+  .nav-right#nav-right.open {
+    display: block;
+  }
+}
 
   </style>
 
@@ -934,6 +962,20 @@ function showUpdateBanner(sw) {
     }
     
   </script>
+<script>
+  (function () {
+    const btn = document.getElementById("nav-toggle");
+    const menu = document.getElementById("nav-right");
+    if (!btn || !menu) return;
+
+    btn.addEventListener("click", () => {
+      const isOpen = menu.classList.toggle("open");
+      btn.classList.toggle("open", isOpen);
+      btn.setAttribute("aria-expanded", String(isOpen));
+      menu.setAttribute("aria-hidden", String(!isOpen));
+    });
+  })();
+</script>
 
 <!-- HEADER -->
 <header class="header-main">
@@ -989,7 +1031,7 @@ function showUpdateBanner(sw) {
       </button>
 
       <!-- תפריט מובייל -->
-      <div class="nav-mobile" id="nav-mobile" aria-hidden="true">
+    <div class="nav-right" id="nav-right" aria-hidden="true">
         <a href="index.html#home-news">חדשות</a>
         <a href="index.html#home-exams">מבחנים</a>
         <a href="index.html#grades">השכבות</a>
@@ -1422,7 +1464,7 @@ document.addEventListener("DOMContentLoaded", () => {
 <script type="module" src="firebase-config.js"></script>
 <script src="accessibility.js"></script>
 <script type="module" src="home-poll-mini.js"></script>
-<script type="module" src="app.js?v=34"></script>
+<script type="module" src="app.js?v=35"></script>
 </body>
 </html>
 
