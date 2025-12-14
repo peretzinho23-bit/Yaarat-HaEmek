@@ -41,13 +41,15 @@
       </div>
 
       <div class="card register-card">
-        <form id="register-form" class="admin-form">
+        <!-- חגורת בטיחות: גם אם JS לא נטען, זה לא ישלח GET ולא יזרוק ל-URL -->
+        <form id="register-form" class="admin-form" action="javascript:void(0);" method="post" novalidate>
           <label for="fullName">שם מלא</label>
           <input
             id="fullName"
             name="fullName"
             type="text"
-            placeholder="לדוגמה: ישראל ישראלי "
+            placeholder="לדוגמה: ישראל ישראלי"
+            autocomplete="name"
             required
           />
 
@@ -57,10 +59,19 @@
             name="email"
             type="email"
             placeholder="example@school.org.il"
+            autocomplete="email"
             required
           />
-<label>סיסמה מוצעת</label>
-<input type="password" name="password" placeholder="בחר סיסמה למשתמש" required />
+
+          <label for="password">סיסמה מוצעת</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            placeholder="בחר סיסמה למשתמש"
+            autocomplete="new-password"
+            required
+          />
 
           <label for="role">תפקיד קיים / קודם בבית הספר</label>
           <input
@@ -93,12 +104,19 @@
           </button>
 
           <p id="register-status" class="register-status"></p>
+
+          <!-- אם JS לא נטען, לפחות נראה הודעה ולא "דף שחור" -->
+          <noscript>
+            <p class="register-status" style="color:#ef4444;">
+              צריך להפעיל JavaScript כדי לשלוח בקשה.
+            </p>
+          </noscript>
         </form>
       </div>
     </div>
   </section>
 
   <!-- JS של הטופס -->
-<script type="module" src="register.js?v=2"></script>
+  <script type="module" src="register.js?v=3"></script>
 </body>
 </html>
