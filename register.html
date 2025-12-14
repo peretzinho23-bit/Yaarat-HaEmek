@@ -41,82 +41,34 @@
       </div>
 
       <div class="card register-card">
-        <!-- חגורת בטיחות: גם אם JS לא נטען, זה לא ישלח GET ולא יזרוק ל-URL -->
+        <!-- חשוב: action/method כדי שלא יעשה GET עם query -->
         <form id="register-form" class="admin-form" action="javascript:void(0);" method="post" novalidate>
           <label for="fullName">שם מלא</label>
-          <input
-            id="fullName"
-            name="fullName"
-            type="text"
-            placeholder="לדוגמה: ישראל ישראלי"
-            autocomplete="name"
-            required
-          />
+          <input id="fullName" name="fullName" type="text" placeholder="לדוגמה: ישראל ישראלי" required />
 
           <label for="email">אימייל</label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            placeholder="example@school.org.il"
-            autocomplete="email"
-            required
-          />
+          <input id="email" name="email" type="email" placeholder="example@school.org.il" required />
 
           <label for="password">סיסמה מוצעת</label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            placeholder="בחר סיסמה למשתמש"
-            autocomplete="new-password"
-            required
-          />
+          <input id="password" type="password" name="password" placeholder="בחר סיסמה למשתמש" required />
 
           <label for="role">תפקיד קיים / קודם בבית הספר</label>
-          <input
-            id="role"
-            name="role"
-            type="text"
-            placeholder="לדוגמה: מחנכת ז2, מורה למתמטיקה"
-            required
-          />
+          <input id="role" name="role" type="text" placeholder="לדוגמה: מחנכת ז2, מורה למתמטיקה" required />
 
           <label for="reason">סיבה מוצעת לשימוש בלוח הניהול</label>
-          <input
-            id="reason"
-            name="reason"
-            type="text"
-            placeholder="לדוגמה: עדכון מבחנים וחדשות לכיתות שלי"
-            required
-          />
+          <input id="reason" name="reason" type="text" placeholder="לדוגמה: עדכון מבחנים וחדשות לכיתות שלי" required />
 
           <label for="message">הודעה נוספת (אופציונלי)</label>
-          <textarea
-            id="message"
-            name="message"
-            rows="3"
-            placeholder="כל מידע נוסף שיכול לעזור לאשר את הבקשה..."
-          ></textarea>
+          <textarea id="message" name="message" rows="3" placeholder="כל מידע נוסף שיכול לעזור לאשר את הבקשה..."></textarea>
 
-          <button type="submit" class="register-submit-btn">
-            שליחת בקשה
-          </button>
+          <button type="submit" class="register-submit-btn">שליחת בקשה</button>
 
           <p id="register-status" class="register-status"></p>
-
-          <!-- אם JS לא נטען, לפחות נראה הודעה ולא "דף שחור" -->
-          <noscript>
-            <p class="register-status" style="color:#ef4444;">
-              צריך להפעיל JavaScript כדי לשלוח בקשה.
-            </p>
-          </noscript>
         </form>
       </div>
     </div>
   </section>
 
-  <!-- JS של הטופס -->
   <script type="module" src="register.js?v=3"></script>
 </body>
 </html>
