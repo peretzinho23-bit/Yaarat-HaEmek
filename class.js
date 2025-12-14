@@ -268,11 +268,13 @@ async function loadTimetableOnce(classId) {
 
     const data = snap.data() || {};
 
-    if (data.grid && typeof data.grid === "object") {
-      ttStatus.textContent = "";
-      renderTimetableSchedule(data.grid);
-      return;
-    }
+    // ✅ schema חדש
+if (data.grid && typeof data.grid === "object") {
+  ttStatus.textContent = "";
+  renderTimetableFromGrid(data.grid || {}); // גם אם ריק
+  return;
+}
+
 
     const days = Array.isArray(data.days) ? data.days : [];
     if (days.length) {
