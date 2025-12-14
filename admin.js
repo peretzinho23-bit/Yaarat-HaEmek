@@ -1,6 +1,7 @@
 // admin.js – לוח ניהול יערת העמק
 
 import { db, auth, storage } from "./firebase-config.js";
+
 import {
   doc,
   getDoc,
@@ -13,29 +14,72 @@ import {
   updateDoc,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
 import {
   signInWithEmailAndPassword,
   onAuthStateChanged,
   signOut
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+
 import {
   ref,
   uploadBytes,
   getDownloadURL
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-storage.js";
 
-console.log("🔥 NEW ADMIN.JS LOADED");
+console.log("🔥 ADMIN.JS LOADED");
 
-// =============================
-// הרשאות אדמין (RBAC)
-// =============================
+/* =============================
+   הרשאות אדמין (RBAC)
+============================= */
+
 // DEV שמותר לו הכל + גישה לדף dev.html
 const DEV_EMAILS = ["nadavp1119@gmail.com", "peretzinho23@gmail.com"].map((e) => e.toLowerCase());
 
 let currentPerms = null; // נטען אחרי התחברות
+let unsubPerm = null;    // realtime watcher להרשאות
 
 function normalizeEmail(email) {
   return String(email || "").trim().toLowerCase();
+}
+
+function kickToLogin(msg = "אין לך יותר גישה") {
+  alert(msg);
+  try { if (unsubPerm) unsubPerm(); } catch {}
+  unsubPerm = null;
+  signOut(auth).finally(() => {
+    window.location.href = "admin.html";
+  });
+}
+
+// realtime guard — אם מוחקים/משנים role בזמן אמת => מעיפים
+function startPermissionWatcher(user) {
+  stopPermissionWatcher();
+
+  if (!user) return;
+
+  const refDoc = doc(db, "adminUsers", user.uid);
+
+  unsubPerm = onSnapshot(refDoc, (snap) => {
+    // אם מחקת לו את המסמך -> אין גישה
+    if (!snap.exists()) return kickToLogin("הגישה שלך בוטלה");
+
+    const data = snap.data() || {};
+    const role = String(data.role || "").toLowerCase();
+
+    // roles שמותר להיכנס ל-admin
+    const allowedRolesForAdmin = ["teacher", "gradelead", "counselor", "principal", "dev"];
+    if (!allowedRolesForAdmin.includes(role)) return kickToLogin("אין לך הרשאות");
+
+  }, (err) => {
+    console.error("perm snapshot error:", err);
+    kickToLogin("שגיאת הרשאות (בדוק חוקים/קונסול)");
+  });
+}
+
+function stopPermissionWatcher() {
+  try { if (unsubPerm) unsubPerm(); } catch {}
+  unsubPerm = null;
 }
 
 function buildPermsFromRole(role, allowedGrades = []) {
@@ -128,6 +172,10 @@ function applyPermissionsToUI() {
   // Logs
   const logsBtn = document.getElementById("open-logs");
   if (logsBtn) logsBtn.style.display = currentPerms.can.logs ? "" : "none";
+
+  // כפתור DEV (אם יש לך ב-HTML)
+  const devBtn = document.getElementById("open-dev");
+  if (devBtn) devBtn.style.display = currentPerms.can.dev ? "" : "none";
 }
 
 async function loadAdminPermissions(user) {
@@ -171,12 +219,16 @@ async function loadAdminPermissions(user) {
   return currentPerms;
 }
 
+/* =============================
+   DATA + CONSTS
+============================= */
+
 const GRADES = ["z", "h", "t"];
 
 // כיתות לכל שכבה
 const CLASS_IDS_BY_GRADE = {
   z: ["z1", "z2", "z3", "z4", "z5"],
-  h: ["h1", "h4", "h5", "h6"], // ← רק הכיתות שקיימות
+  h: ["h1", "h4", "h5", "h6"],
   t: ["t1", "t2", "t3", "t4", "t5"]
 };
 
@@ -191,7 +243,6 @@ const pollsCollectionRef = collection(db, "polls");
 
 /* ------------ LOGS – לוג כללי לכל הדברים ------------ */
 async function logSystemChange(action, entity, payload = {}) {
-  // לא כל תפקיד צריך לוגים
   if (!currentPerms || !currentPerms.can || !currentPerms.can.logs) return;
   try {
     const logsRef = collection(db, "exams_logs");
@@ -215,7 +266,6 @@ async function logSystemChange(action, entity, payload = {}) {
 }
 
 /* ------------ helpers ------------ */
-
 function escapeHtml(str) {
   return String(str || "")
     .replace(/&/g, "&amp;")
@@ -223,25 +273,12 @@ function escapeHtml(str) {
     .replace(/>/g, "&gt;");
 }
 
-// classId -> "ז1", "ח3" וכו'
+// classId -> label
 function classIdToLabel(classId) {
   const map = {
-    z1: "ז1",
-    z2: "ז2",
-    z3: "ז3",
-    z4: "ז4",
-    z5: "ז5",
-
-    h1: "ח1/7",
-    h4: "ח4/8",
-    h5: "ח5/9",
-    h6: "ח6/10",
-
-    t1: "ט1",
-    t2: "ט2",
-    t3: "ט3",
-    t4: "ט4",
-    t5: "ט5"
+    z1: "ז1", z2: "ז2", z3: "ז3", z4: "ז4", z5: "ז5",
+    h1: "ח1/7", h4: "ח4/8", h5: "ח5/9", h6: "ח6/10",
+    t1: "ט1", t2: "ט2", t3: "ט3", t4: "ט4", t5: "ט5"
   };
   return map[classId] || "";
 }
@@ -273,22 +310,27 @@ function initAuth() {
     const password = loginForm.password.value;
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
       statusEl.textContent = "מתחבר...";
+      await signInWithEmailAndPassword(auth, email, password);
     } catch (err) {
       console.error(err);
+      statusEl.textContent = "לא מחובר";
       alert("כניסה נכשלה: " + (err.message || err.code));
     }
   });
 
   logoutBtn.addEventListener("click", async () => {
+    stopPermissionWatcher();
     await signOut(auth);
   });
 
   onAuthStateChanged(auth, async (user) => {
     if (user) {
       try {
-        // טעינת הרשאות + החלת UI
+        // 1) realtime guard
+        startPermissionWatcher(user);
+
+        // 2) load perms + UI
         currentPerms = await loadAdminPermissions(user);
         applyPermissionsToUI();
 
@@ -300,9 +342,11 @@ function initAuth() {
       } catch (err) {
         console.error("Permission check failed:", err);
         alert("אין לך הרשאה להיכנס לפאנל הניהול.");
+        stopPermissionWatcher();
         await signOut(auth);
       }
     } else {
+      stopPermissionWatcher();
       currentPerms = null;
       statusEl.textContent = "לא מחובר";
       loginSection.style.display = "block";
@@ -336,7 +380,7 @@ async function loadAllData() {
   // POLLS
   await loadPolls();
 
-  // תוכן אתר
+  // SITE CONTENT
   await loadSiteContent();
 
   // realtime listeners
@@ -344,7 +388,6 @@ async function loadAllData() {
 }
 
 /* ------------ realtime ------------ */
-
 function subscribeRealtimeAdmin() {
   // NEWS
   for (const g of GRADES) {
@@ -371,14 +414,11 @@ function subscribeRealtimeAdmin() {
     renderBoardAdmin();
   });
 
-  // POLLS – בזמן אמת
+  // POLLS
   onSnapshot(pollsCollectionRef, (snap) => {
     pollsData = [];
     snap.forEach((docSnap) => {
-      pollsData.push({
-        id: docSnap.id,
-        ...docSnap.data()
-      });
+      pollsData.push({ id: docSnap.id, ...docSnap.data() });
     });
     renderPollsAdmin();
   });
@@ -398,19 +438,13 @@ function renderNewsAdmin() {
       continue;
     }
 
-    // מוסיפים אינדקס אמיתי לכל אייטם ואז מציגים מהחדש לישן
-    const itemsWithIndex = items.map((item, idx) => ({
-      ...item,
-      _index: idx
-    }));
-
+    const itemsWithIndex = items.map((item, idx) => ({ ...item, _index: idx }));
     const orderedForUi = itemsWithIndex.slice().reverse();
 
     listEl.innerHTML = orderedForUi
       .map((n) => {
         const i = n._index;
 
-        // תמונות: תומך גם ב-imageUrls (מערך) וגם ב-imageUrl יחיד
         const images =
           Array.isArray(n.imageUrls) && n.imageUrls.length
             ? n.imageUrls
@@ -460,7 +494,6 @@ async function saveNewsGrade(grade) {
   await setDoc(refDoc, { items: newsData[grade] });
 }
 
-// ⬇⬇⬇ טופס חדשות – תומך בכמה תמונות (עד 2) ⬇⬇⬇
 function setupNewsForms() {
   for (const g of GRADES) {
     const form = document.getElementById(`news-form-${g}`);
@@ -473,15 +506,12 @@ function setupNewsForms() {
       const meta = form.meta.value.trim();
       const body = form.body.value.trim();
       const manualImageUrl =
-        (form.imageUrl && form.imageUrl.value && form.imageUrl.value.trim()) ||
-        "";
+        (form.imageUrl && form.imageUrl.value && form.imageUrl.value.trim()) || "";
       const color =
-        (form.color && form.color.value && form.color.value.trim()) ||
-        "#ffffff";
+        (form.color && form.color.value && form.color.value.trim()) || "#ffffff";
 
       const fileInput = form.imageFile;
-      const files =
-        fileInput && fileInput.files ? Array.from(fileInput.files) : [];
+      const files = fileInput && fileInput.files ? Array.from(fileInput.files) : [];
 
       if (!title || !body) {
         alert("חובה למלא לפחות כותרת ותוכן.");
@@ -491,9 +521,7 @@ function setupNewsForms() {
       try {
         const imageUrls = [];
 
-        if (manualImageUrl) {
-          imageUrls.push(manualImageUrl);
-        }
+        if (manualImageUrl) imageUrls.push(manualImageUrl);
 
         for (let i = 0; i < files.length && i < 2; i++) {
           const file = files[i];
@@ -505,13 +533,12 @@ function setupNewsForms() {
         }
 
         const newItem = {
-  title,
-  body,
-  meta,
-  imageUrls, // או imageUrl
-  createdAt: new Date().toISOString()
-};
-
+          title,
+          body,
+          meta,
+          imageUrls,
+          createdAt: new Date().toISOString()
+        };
 
         newsData[g].push(newItem);
 
@@ -529,11 +556,7 @@ function setupNewsForms() {
         alert("הידיעה נשמרה.");
       } catch (err) {
         console.error("שגיאה בהעלאת תמונות/שמירת חדשות:", err);
-        alert(
-          "שגיאה בשמירת הידיעה:\n" +
-            (err.code ? err.code + " – " : "") +
-            (err.message || JSON.stringify(err))
-        );
+        alert("שגיאה בשמירת הידיעה:\n" + (err.message || JSON.stringify(err)));
       }
     });
   }
@@ -585,22 +608,17 @@ function renderExamsAdmin() {
     const parts = [];
     const classIdsForGrade = CLASS_IDS_BY_GRADE[g] || [];
 
-    // קודם – לפי כיתות מוכרות (ז1, ז2 וכו')
     classIdsForGrade.forEach((classId) => {
       let examsForClass = items
-        .map((ex, index) => ({
-          ...ex,
-          _index: index,
-          _dateObj: parseDateForSort(ex.date)
-        }))
+        .map((ex, index) => ({ ...ex, _index: index, _dateObj: parseDateForSort(ex.date) }))
         .filter((ex) => String(ex.classId).toLowerCase() === classId);
 
       if (!examsForClass.length) return;
 
       examsForClass.sort((a, b) => {
         const da = a._dateObj ? a._dateObj.getTime() : Infinity;
-        const db = b._dateObj ? b._dateObj.getTime() : Infinity;
-        return da - db;
+        const dbb = b._dateObj ? b._dateObj.getTime() : Infinity;
+        return da - dbb;
       });
 
       const classLabel = classIdToLabel(classId);
@@ -613,27 +631,19 @@ function renderExamsAdmin() {
 
       examsForClass.forEach((ex) => {
         const metaParts = [];
-
         if (ex.date) metaParts.push(escapeHtml(ex.date));
         if (ex.time) metaParts.push(escapeHtml(ex.time));
         if (classLabel) metaParts.push("כיתה " + escapeHtml(classLabel));
-
         const metaText = metaParts.join(" · ");
 
         parts.push(`
-          <div
-            class="admin-item admin-exam-item"
-            data-class-id="${escapeHtml(ex.classId || "")}"
-          >
+          <div class="admin-item admin-exam-item" data-class-id="${escapeHtml(ex.classId || "")}">
             <div class="admin-item-main">
               <strong>${escapeHtml(ex.subject || "")}</strong>
               <span class="admin-item-meta">${metaText}</span>
             </div>
             <div class="admin-item-body">${escapeHtml(ex.topic || "")}</div>
-            <button class="admin-remove"
-                    data-type="exam"
-                    data-grade="${g}"
-                    data-index="${ex._index}">
+            <button class="admin-remove" data-type="exam" data-grade="${g}" data-index="${ex._index}">
               מחיקה
             </button>
           </div>
@@ -641,23 +651,16 @@ function renderExamsAdmin() {
       });
     });
 
-    // מבחנים שלא משויכים לכיתה מוכרת
     const knownIdsSet = new Set(classIdsForGrade);
     let unassigned = items
-      .map((ex, index) => ({
-        ...ex,
-        _index: index,
-        _dateObj: parseDateForSort(ex.date)
-      }))
-      .filter(
-        (ex) => !knownIdsSet.has(String(ex.classId || "").toLowerCase())
-      );
+      .map((ex, index) => ({ ...ex, _index: index, _dateObj: parseDateForSort(ex.date) }))
+      .filter((ex) => !knownIdsSet.has(String(ex.classId || "").toLowerCase()));
 
     if (unassigned.length) {
       unassigned.sort((a, b) => {
         const da = a._dateObj ? a._dateObj.getTime() : Infinity;
-        const db = b._dateObj ? b._dateObj.getTime() : Infinity;
-        return da - db;
+        const dbb = b._dateObj ? b._dateObj.getTime() : Infinity;
+        return da - dbb;
       });
 
       parts.push(`
@@ -668,27 +671,19 @@ function renderExamsAdmin() {
 
       unassigned.forEach((ex) => {
         const metaParts = [];
-
         if (ex.date) metaParts.push(escapeHtml(ex.date));
         if (ex.time) metaParts.push(escapeHtml(ex.time));
         if (ex.classId) metaParts.push("classId=" + escapeHtml(ex.classId));
-
         const metaText = metaParts.join(" · ");
 
         parts.push(`
-          <div
-            class="admin-item admin-exam-item"
-            data-class-id="${escapeHtml(ex.classId || "")}"
-          >
+          <div class="admin-item admin-exam-item" data-class-id="${escapeHtml(ex.classId || "")}">
             <div class="admin-item-main">
               <strong>${escapeHtml(ex.subject || "")}</strong>
               <span class="admin-item-meta">${metaText}</span>
             </div>
             <div class="admin-item-body">${escapeHtml(ex.topic || "")}</div>
-            <button class="admin-remove"
-                    data-type="exam"
-                    data-grade="${g}"
-                    data-index="${ex._index}">
+            <button class="admin-remove" data-type="exam" data-grade="${g}" data-index="${ex._index}">
               מחיקה
             </button>
           </div>
@@ -715,8 +710,7 @@ function setupExamForms() {
       const classIdRaw = form.classId ? form.classId.value.trim() : "";
       const classId = classIdRaw.toLowerCase();
       const imageUrl =
-        (form.imageUrl && form.imageUrl.value && form.imageUrl.value.trim()) ||
-        "";
+        (form.imageUrl && form.imageUrl.value && form.imageUrl.value.trim()) || "";
 
       if (!date || !subject || !classId) {
         alert("חובה למלא תאריך, מקצוע וכיתה.");
@@ -728,14 +722,7 @@ function setupExamForms() {
         return;
       }
 
-      const newExam = {
-        date,
-        time,
-        subject,
-        topic,
-        classId,
-        imageUrl
-      };
+      const newExam = { date, time, subject, topic, classId, imageUrl };
 
       if (!examsData[g]) examsData[g] = [];
       examsData[g].push(newExam);
@@ -764,7 +751,7 @@ function setupExamForms() {
   }
 }
 
-/* ------------ POLLS (סקרים) ------------ */
+/* ------------ POLLS ------------ */
 
 async function loadPolls() {
   const listEl = document.getElementById("admin-polls");
@@ -772,18 +759,12 @@ async function loadPolls() {
     const snap = await getDocs(pollsCollectionRef);
     pollsData = [];
     snap.forEach((docSnap) => {
-      pollsData.push({
-        id: docSnap.id,
-        ...docSnap.data()
-      });
+      pollsData.push({ id: docSnap.id, ...docSnap.data() });
     });
     renderPollsAdmin();
   } catch (err) {
     console.error("שגיאה בטעינת סקרים:", err);
-    if (listEl) {
-      listEl.innerHTML =
-        `<p class="empty-msg">שגיאה בטעינת הסקרים. בדוק את ה-console.</p>`;
-    }
+    if (listEl) listEl.innerHTML = `<p class="empty-msg">שגיאה בטעינת הסקרים. בדוק את ה-console.</p>`;
   }
 }
 
@@ -798,23 +779,17 @@ function renderPollsAdmin() {
 
   listEl.innerHTML = pollsData
     .map((poll) => {
-      const totalVotes = (poll.options || []).reduce(
-        (sum, opt) => sum + (opt.votes || 0),
-        0
-      );
+      const totalVotes = (poll.options || []).reduce((sum, opt) => sum + (opt.votes || 0), 0);
 
       const optionsHtml = (poll.options || [])
         .map((opt) => {
           const votes = opt.votes || 0;
-          const percent =
-            totalVotes > 0 ? Math.round((votes / totalVotes) * 100) : 0;
+          const percent = totalVotes > 0 ? Math.round((votes / totalVotes) * 100) : 0;
 
           return `
             <div class="poll-option-row">
               <span class="poll-option-text">${escapeHtml(opt.text || "")}</span>
-              <span class="poll-option-votes">
-                ${votes} קולות (${percent}%)
-              </span>
+              <span class="poll-option-votes">${votes} קולות (${percent}%)</span>
             </div>
           `;
         })
@@ -828,22 +803,12 @@ function renderPollsAdmin() {
               ${poll.isActive ? "פעיל ✅" : "מושבת ⛔️"} · ${totalVotes} קולות
             </span>
           </div>
-          <div class="admin-item-body">
-            ${optionsHtml}
-          </div>
+          <div class="admin-item-body">${optionsHtml}</div>
           <div class="admin-item-actions">
-            <button
-              class="admin-remove"
-              data-type="poll"
-              data-id="${poll.id}"
-            >
+            <button class="admin-remove" data-type="poll" data-id="${poll.id}">
               מחיקת סקר
             </button>
-            <button
-              class="admin-toggle-poll"
-              data-id="${poll.id}"
-              data-active="${poll.isActive ? "1" : "0"}"
-            >
+            <button class="admin-toggle-poll" data-id="${poll.id}" data-active="${poll.isActive ? "1" : "0"}">
               ${poll.isActive ? "הפוך ללא פעיל" : "הפוך לפעיל"}
             </button>
           </div>
@@ -919,29 +884,9 @@ function renderBoardAdmin() {
       const colorStyle = b.color ? ` style="color:${escapeHtml(b.color)}"` : "";
 
       const imgs = [];
-      if (b.imageUrl) {
-        imgs.push(`
-          <div class="admin-image-wrapper">
-            <img src="${escapeHtml(b.imageUrl)}" class="admin-image">
-          </div>
-        `);
-      }
-      if (b.imageUrl2) {
-        imgs.push(`
-          <div class="admin-image-wrapper">
-            <img src="${escapeHtml(b.imageUrl2)}" class="admin-image">
-          </div>
-        `);
-      }
-      if (b.imageUrl3) {
-        imgs.push(`
-          <div class="admin-image-wrapper">
-            <img src="${escapeHtml(b.imageUrl3)}" class="admin-image">
-          </div>
-        `);
-      }
-
-      const imgsHtml = imgs.join("");
+      if (b.imageUrl) imgs.push(`<div class="admin-image-wrapper"><img src="${escapeHtml(b.imageUrl)}" class="admin-image"></div>`);
+      if (b.imageUrl2) imgs.push(`<div class="admin-image-wrapper"><img src="${escapeHtml(b.imageUrl2)}" class="admin-image"></div>`);
+      if (b.imageUrl3) imgs.push(`<div class="admin-image-wrapper"><img src="${escapeHtml(b.imageUrl3)}" class="admin-image"></div>`);
 
       return `
         <div class="admin-item"${colorStyle}>
@@ -950,10 +895,8 @@ function renderBoardAdmin() {
             <span class="admin-item-meta">${escapeHtml(b.meta || "")}</span>
           </div>
           <div class="admin-item-body">${escapeHtml(b.body)}</div>
-          ${imgsHtml}
-          <button class="admin-remove" data-type="board" data-index="${i}">
-            מחיקה
-          </button>
+          ${imgs.join("")}
+          <button class="admin-remove" data-type="board" data-index="${i}">מחיקה</button>
         </div>
       `;
     })
@@ -976,11 +919,9 @@ function setupBoardForm() {
     const meta = form.meta.value.trim();
     const body = form.body.value.trim();
     const manualImageUrl =
-      (form.imageUrl && form.imageUrl.value && form.imageUrl.value.trim()) ||
-      "";
+      (form.imageUrl && form.imageUrl.value && form.imageUrl.value.trim()) || "";
     const color =
-      (form.color && form.color.value && form.color.value.trim()) ||
-      "#ffffff";
+      (form.color && form.color.value && form.color.value.trim()) || "#ffffff";
 
     const fileInput = form.imageFile;
     const file = fileInput && fileInput.files && fileInput.files[0];
@@ -1000,14 +941,7 @@ function setupBoardForm() {
         finalImageUrl = await getDownloadURL(fileRef);
       }
 
-      const newBoardItem = {
-        title,
-        meta,
-        body,
-        imageUrl: finalImageUrl,
-        color
-      };
-
+      const newBoardItem = { title, meta, body, imageUrl: finalImageUrl, color };
       boardData.push(newBoardItem);
 
       form.reset();
@@ -1041,53 +975,20 @@ function fillSiteContentForm() {
   if (!form) return;
 
   const fields = [
-    "homeHeroTitle",
-    "homeHeroSubtitle",
-    "heroSideTitle",
-    "heroSideList",
-    "aboutTitle",
-    "aboutBody",
-    "importantTitle",
-    "importantSubtitle",
-    "importantCard1Title",
-    "importantCard1Body",
-    "importantCard2Title",
-    "importantCard2Body",
-    "importantCard3Title",
-    "importantCard3Body",
-    "homeNewsTitle",
-    "homeNewsSubtitle",
-    "boardTitle",
-    "boardSubtitle",
-    "homeExamsTitle",
-    "homeExamsSubtitle",
-    "gradesSectionTitle",
-    "gradesSectionSubtitle",
-    "zDescription",
-    "hDescription",
-    "tDescription",
-    "requestsTitle",
-    "requestsSubtitle",
-    "requestsBody",
-    "contactSectionTitle",
-    "contactSectionSubtitle",
-    "contactPhone",
-    "contactEmail",
-    "contactAddress",
-    "footerText",
-    "logoUrl",
-    "heroImageUrl",
-    "cardBgImageUrl",
-    "primaryColor",
-    "buttonColor",
-    "cardBgColor",
-    "fontColor"
+    "homeHeroTitle","homeHeroSubtitle","heroSideTitle","heroSideList",
+    "aboutTitle","aboutBody","importantTitle","importantSubtitle",
+    "importantCard1Title","importantCard1Body","importantCard2Title","importantCard2Body","importantCard3Title","importantCard3Body",
+    "homeNewsTitle","homeNewsSubtitle","boardTitle","boardSubtitle",
+    "homeExamsTitle","homeExamsSubtitle","gradesSectionTitle","gradesSectionSubtitle",
+    "zDescription","hDescription","tDescription",
+    "requestsTitle","requestsSubtitle","requestsBody",
+    "contactSectionTitle","contactSectionSubtitle","contactPhone","contactEmail","contactAddress",
+    "footerText","logoUrl","heroImageUrl","cardBgImageUrl",
+    "primaryColor","buttonColor","cardBgColor","fontColor"
   ];
 
   for (const name of fields) {
-    if (form[name]) {
-      form[name].value = siteContent[name] || "";
-    }
+    if (form[name]) form[name].value = siteContent[name] || "";
   }
 }
 
@@ -1100,10 +1001,7 @@ function setupSiteContentForm() {
 
     const formData = new FormData(form);
     const updated = {};
-
-    formData.forEach((value, key) => {
-      updated[key] = value.toString();
-    });
+    formData.forEach((value, key) => { updated[key] = value.toString(); });
 
     siteContent = { ...siteContent, ...updated };
 
@@ -1119,59 +1017,6 @@ function setupSiteContentForm() {
   });
 }
 
-/* ------------ REGISTER REQUESTS ------------ */
-
-function setupRegisterRequestForm() {
-  const form = document.getElementById("register-request-form");
-  const statusEl = document.getElementById("register-status");
-
-  if (!form) return;
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const fullName = form.fullName.value.trim();
-    const email = form.email.value.trim();
-    const role = form.role.value.trim();
-    const message = form.message.value.trim();
-
-    if (!fullName || !email) {
-      alert("חובה למלא שם מלא ואימייל.");
-      return;
-    }
-
-    try {
-      const id = Date.now().toString();
-
-      const refDoc = doc(db, "adminRequests", id);
-      await setDoc(refDoc, {
-        fullName,
-        email,
-        role,
-        message,
-        createdAt: new Date().toISOString()
-      });
-
-      await logSystemChange("create", "adminRequest", {
-        subject: fullName,
-        topic: message
-      });
-
-      form.reset();
-      if (statusEl) {
-        statusEl.textContent = "הבקשה נשלחה. לאחר אישור ידני תקבלו גישה.";
-      }
-      alert("הבקשה נשלחה בהצלחה. לאחר אישור ידני תקבלו גישה.");
-    } catch (err) {
-      console.error(err);
-      alert("הייתה שגיאה בשליחת הבקשה. נסו שוב מאוחר יותר.");
-      if (statusEl) {
-        statusEl.textContent = "שגיאה בשליחה. נסו שוב מאוחר יותר.";
-      }
-    }
-  });
-}
-
 /* ------------ DELETE + TOGGLE HANDLER ------------ */
 
 function setupDeleteHandler() {
@@ -1183,9 +1028,7 @@ function setupDeleteHandler() {
       if (!pollId) return;
 
       try {
-        await updateDoc(doc(db, "polls", pollId), {
-          isActive: !isActiveNow
-        });
+        await updateDoc(doc(db, "polls", pollId), { isActive: !isActiveNow });
 
         const poll = pollsData.find((p) => p.id === pollId);
         await logSystemChange("update", "poll", {
@@ -1228,7 +1071,6 @@ function setupDeleteHandler() {
       }
     } else if (type === "exam") {
       if (!examsData[grade]) return;
-
       const deletedExam = examsData[grade][index];
 
       examsData[grade].splice(index, 1);
@@ -1282,32 +1124,24 @@ function setupDeleteHandler() {
   });
 }
 
-/* ------------ GRADE FILTER (ז / ח / ט) ------------ */
+/* ------------ GRADE FILTER ------------ */
 
 function setupGradeFilter() {
   const buttons = document.querySelectorAll(".grade-filter-btn");
   const sections = document.querySelectorAll(".admin-grade-section");
 
-  if (!buttons.length || !sections.length) {
-    return;
-  }
+  if (!buttons.length || !sections.length) return;
 
   function setActiveGrade(grade) {
     buttons.forEach((btn) => {
       const btnGrade = btn.getAttribute("data-grade") || "all";
       btn.classList.toggle("active", btnGrade === grade);
-      if (grade === "all" && btnGrade === "all") {
-        btn.classList.add("active");
-      }
+      if (grade === "all" && btnGrade === "all") btn.classList.add("active");
     });
 
     sections.forEach((sec) => {
       const secGrade = sec.getAttribute("data-grade");
-      if (grade === "all" || secGrade === grade) {
-        sec.style.display = "";
-      } else {
-        sec.style.display = "none";
-      }
+      sec.style.display = (grade === "all" || secGrade === grade) ? "" : "none";
     });
   }
 
@@ -1332,5 +1166,4 @@ document.addEventListener("DOMContentLoaded", () => {
   setupDeleteHandler();
   setupSiteContentForm();
   setupGradeFilter();
-  setupRegisterRequestForm();
 });

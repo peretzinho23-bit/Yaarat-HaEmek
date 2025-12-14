@@ -27,22 +27,36 @@ import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/11.0.
 const DEV_EMAILS = ["nadavp1119@gmail.com", "peretzinho23@gmail.com"].map(e => e.toLowerCase());
 const ALL_GRADES = ["z", "h", "t"];
 
-function isDevViewer() {
-  return DEV_EMAILS.includes(norm(auth.currentUser?.email));
-}
+// מי מורשה להיכנס ל-DEV PANEL (תפקידים)
+const ALLOWED_ROLES_FOR_DEV_PANEL = ["dev", "principal", "gradelead"];
 
+/* =============================
+   Helpers
+============================= */
 function norm(email) {
   return String(email || "").trim().toLowerCase();
 }
 
+function normalizeRole(role) {
+  const r = String(role || "").trim().toLowerCase();
+  // תומך גם בגרסאות ישנות
+  if (r === "gradelead" || r === "grade_lead" || r === "אחראי שכבה") return "gradelead";
+  if (r === "principal" || r === "מנהל" || r === "מנהלת") return "principal";
+  if (r === "counselor" || r === "יועץ" || r === "יועצת") return "counselor";
+  if (r === "teacher" || r === "מורה") return "teacher";
+  if (r === "dev") return "dev";
+  return r || "teacher";
+}
+
 function roleLabel(role) {
-  switch (role) {
+  const r = normalizeRole(role);
+  switch (r) {
     case "teacher": return "מורה";
-    case "gradeLead": return "אחראי שכבה";
+    case "gradelead": return "אחראי שכבה";
     case "counselor": return "יועץ";
     case "principal": return "מנהל";
     case "dev": return "DEV";
-    default: return role || "-";
+    default: return r || "-";
   }
 }
 
@@ -50,6 +64,25 @@ function gradesLabel(grades) {
   const g = Array.isArray(grades) ? grades : [];
   const map = { z: "ז׳", h: "ח׳", t: "ט׳" };
   return g.map(x => map[x] || x).join(" , ") || "-";
+}
+
+function escapeHtml(str) {
+  return String(str || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function formatTime(ts) {
+  try {
+    if (!ts) return "-";
+    const d = ts?.toDate ? ts.toDate() : new Date(ts);
+    return d.toLocaleString("he-IL");
+  } catch {
+    return "-";
+  }
 }
 
 /* =============================
@@ -99,6 +132,53 @@ function getSecondaryAuth() {
 }
 
 /* =============================
+   🔥 REALTIME PERMISSION GUARD (ה“מיידי”)
+   אם מורידים הרשאה/מוחקים מסמך -> מעיף מיד
+============================= */
+let unsubPerm = null;
+
+function kick(msg = "אין לך יותר גישה") {
+  alert(msg);
+  try { if (unsubPerm) unsubPerm(); } catch {}
+  unsubPerm = null;
+
+  stopRealtime();
+
+  signOut(auth).finally(() => {
+    // חזרה לדף התחברות DEV (תשנה אם אצלך זה שם אחר)
+    window.location.href = "dev.html";
+  });
+}
+
+function stopPermWatcher() {
+  try { if (unsubPerm) unsubPerm(); } catch {}
+  unsubPerm = null;
+}
+
+function startPermWatcher(user) {
+  stopPermWatcher();
+  if (!user) return;
+
+  const ref = doc(db, "adminUsers", user.uid);
+
+  unsubPerm = onSnapshot(ref, (snap) => {
+    // אם מחקת לו את המסמך -> אין גישה
+    if (!snap.exists()) return kick("הגישה שלך בוטלה");
+
+    const data = snap.data() || {};
+    const role = normalizeRole(data.role);
+
+    // דף DEV בלבד: רק מנהל/אחראי שכבה/DEV
+    if (!ALLOWED_ROLES_FOR_DEV_PANEL.includes(role)) {
+      return kick("אין לך גישה לדף DEV (מותר רק מנהל / אחראי שכבה / DEV)");
+    }
+  }, (err) => {
+    console.error("perm snapshot error:", err);
+    kick("שגיאת הרשאות (בדוק חוקים/קונסול)");
+  });
+}
+
+/* =============================
    Login
 ============================= */
 console.log("✅ DEV.JS LOADED");
@@ -125,58 +205,6 @@ if (elLogout) {
   });
 }
 
-onAuthStateChanged(auth, async (user) => {
-  console.log("onAuthStateChanged:", user?.email || null);
-
-  if (!user) {
-    if (elStatus) elStatus.textContent = "לא מחובר";
-    if (elLogin) elLogin.style.display = "block";
-    if (elContent) elContent.style.display = "none";
-    stopRealtime();
-    return;
-  }
-
-  const email = norm(user.email);
-
-  // ✅ DEV תמיד מותר (לפי אימייל)
-  const isDevByEmail = DEV_EMAILS.includes(email);
-
-  // ✅ בודקים גם ROLE מתוך adminUsers/{uid}
-  let role = null;
-  try {
-    const snap = await getDoc(doc(db, "adminUsers", user.uid));
-    role = snap.exists() ? String(snap.data()?.role || "").toLowerCase() : null;
-  } catch (e) {
-    console.error("Failed reading adminUsers role:", e);
-  }
-
-  // ✅ מי מורשה להיכנס ל-DEV PANEL:
-  // DEV / מנהל / אחראי שכבה בלבד
-  const allowedRoles = ["dev", "principal", "gradelead"];
-  const isAllowedByRole = role && allowedRoles.includes(role);
-
-  if (!isDevByEmail && !isAllowedByRole) {
-    if (elStatus) elStatus.textContent = "אין לך גישה (מותר רק מנהל/אחראי שכבה/DEV)";
-    alert("אין לך גישה לדף DEV (מותר רק מנהל / אחראי שכבה / DEV)");
-    await signOut(auth);
-    return;
-  }
-
-  // אם הוא DEV לפי אימייל ואין לו מסמך — ניצור
-  if (isDevByEmail) {
-    await ensureDevAdminUserDoc(user);
-    role = "dev";
-  }
-
-  if (elStatus) elStatus.textContent = `מחובר: ${user.email} · תפקיד: ${roleLabel(role)}`;
-  if (elLogin) elLogin.style.display = "none";
-  if (elContent) elContent.style.display = "block";
-
-  // realtime
-  startRealtime();
-});
-
-
 /* =============================
    ensure DEV exists in adminUsers
 ============================= */
@@ -200,7 +228,67 @@ async function ensureDevAdminUserDoc(user) {
 }
 
 /* =============================
-   REALTIME subscriptions
+   Auth state
+============================= */
+onAuthStateChanged(auth, async (user) => {
+  console.log("onAuthStateChanged:", user?.email || null);
+
+  if (!user) {
+    stopPermWatcher();
+    stopRealtime();
+
+    if (elStatus) elStatus.textContent = "לא מחובר";
+    if (elLogin) elLogin.style.display = "block";
+    if (elContent) elContent.style.display = "none";
+    return;
+  }
+
+  const email = norm(user.email);
+  const isDevByEmail = DEV_EMAILS.includes(email);
+
+  // אם DEV לפי אימייל - ניצור מסמך אם חסר
+  if (isDevByEmail) {
+    await ensureDevAdminUserDoc(user);
+  }
+
+  // קוראים role פעם אחת כדי להציג סטטוס + בדיקת כניסה ראשונית
+  let role = null;
+  try {
+    const snap = await getDoc(doc(db, "adminUsers", user.uid));
+    role = snap.exists() ? normalizeRole(snap.data()?.role) : null;
+  } catch (e) {
+    console.error("Failed reading adminUsers role:", e);
+  }
+
+  // אם אין מסמך והוא לא DEV לפי אימייל -> אין גישה
+  if (!role && !isDevByEmail) {
+    if (elStatus) elStatus.textContent = "אין לך גישה";
+    alert("אין לך גישה לדף DEV (חסר מסמך הרשאות)");
+    await signOut(auth);
+    return;
+  }
+
+  // בדיקת כניסה: DEV לפי אימייל תמיד מותר, אחרת לפי role
+  if (!isDevByEmail && !ALLOWED_ROLES_FOR_DEV_PANEL.includes(role)) {
+    if (elStatus) elStatus.textContent = "אין לך גישה (מותר רק מנהל/אחראי שכבה/DEV)";
+    alert("אין לך גישה לדף DEV (מותר רק מנהל / אחראי שכבה / DEV)");
+    await signOut(auth);
+    return;
+  }
+
+  // 🔥 פה מתחיל המיידי: מאזין להרשאות של המשתמש
+  startPermWatcher(user);
+
+  if (elStatus) elStatus.textContent = `מחובר: ${user.email} · תפקיד: ${roleLabel(role || (isDevByEmail ? "dev" : ""))}`;
+  if (elLogin) elLogin.style.display = "none";
+  if (elContent) elContent.style.display = "block";
+
+  // realtime של הטבלאות
+  startRealtime();
+});
+
+/* =============================
+   REALTIME subscriptions (טבלאות)
 ============================= */
 let unsubReq = null;
 let unsubUsers = null;
@@ -223,7 +311,6 @@ function startRealtime() {
       renderRequestsFromArray(arr);
     }, (err) => {
       console.error("onSnapshot adminRequests error:", err);
-      // fallback חד פעמי
       refreshAll();
     });
   } catch (e) {
@@ -244,7 +331,6 @@ function startRealtime() {
     console.error("startRealtime adminUsers failed:", e);
   }
 
-  // גם רענון ראשוני
   refreshAll();
 }
 
@@ -254,7 +340,6 @@ async function refreshAll() {
 
 /* =============================
    Requests (adminRequests)
-   תומך גם ב-createdAt כ-Timestamp וגם כ-string
 ============================= */
 async function renderRequests() {
   if (!reqBody) return;
@@ -283,8 +368,8 @@ function isPendingRequest(r) {
 function toMillisCreatedAt(v) {
   try {
     if (!v) return 0;
-    if (typeof v?.toDate === "function") return v.toDate().getTime();        // Timestamp
-    if (typeof v === "string") return new Date(v).getTime() || 0;            // ISO string
+    if (typeof v?.toDate === "function") return v.toDate().getTime();
+    if (typeof v === "string") return new Date(v).getTime() || 0;
     if (v instanceof Date) return v.getTime();
     return 0;
   } catch {
@@ -297,11 +382,7 @@ function renderRequestsFromArray(arr) {
   reqBody.innerHTML = "";
 
   const pending = (arr || []).filter(isPendingRequest);
-
-  // מיון בצד-לקוח כדי להימנע מ-orderBy שנדפק מערבוב טיפוסים
   pending.sort((a, b) => toMillisCreatedAt(b.createdAt) - toMillisCreatedAt(a.createdAt));
-
-  console.log("DEV pending requests:", pending.length, pending);
 
   if (pending.length === 0) {
     if (reqEmpty) {
@@ -334,11 +415,13 @@ function renderRequestRow(r) {
   `;
 
   const tdPerm = document.createElement("td");
+
   const roleSel = document.createElement("select");
   roleSel.className = "select";
+  // ✅ תפקידים אחידים (lowercase)
   roleSel.innerHTML = `
     <option value="teacher">מורה</option>
-    <option value="gradeLead">אחראי שכבה</option>
+    <option value="gradelead">אחראי שכבה</option>
     <option value="counselor">יועץ</option>
     <option value="principal">מנהל</option>
   `;
@@ -378,7 +461,7 @@ function renderRequestRow(r) {
   msg.style.marginTop = "8px";
 
   btnApprove.addEventListener("click", async () => {
-    const role = roleSel.value;
+    const role = normalizeRole(roleSel.value);
     const grades = Array.from(chkWrap.querySelectorAll("input[type=checkbox]:checked")).map(c => c.value);
 
     if (grades.length === 0 && role !== "principal") {
@@ -439,14 +522,14 @@ function renderRequestRow(r) {
 }
 
 async function approveRequest(r, role, grades) {
-    // ✅ הגנה: רק מנהל/אחראי שכבה/DEV יכולים לאשר בקשות
+  // ✅ הגנה: רק מנהל/אחראי שכבה/DEV יכולים לאשר בקשות
   const meUid = auth.currentUser?.uid;
   const meEmail = norm(auth.currentUser?.email);
   const isDev = DEV_EMAILS.includes(meEmail);
 
   if (!isDev) {
     const snap = await getDoc(doc(db, "adminUsers", meUid));
-    const myRole = snap.exists() ? String(snap.data()?.role || "").toLowerCase() : "";
+    const myRole = snap.exists() ? normalizeRole(snap.data()?.role) : "";
     if (!["principal", "gradelead", "dev"].includes(myRole)) {
       throw new Error("אין לך הרשאה לאשר בקשות (רק מנהל/אחראי שכבה/DEV)");
     }
@@ -458,38 +541,33 @@ async function approveRequest(r, role, grades) {
 
   const secondaryAuth = getSecondaryAuth();
 
-  // יצירת משתמש Auth (בלי להעיף את DEV)
   let cred;
   try {
     cred = await createUserWithEmailAndPassword(secondaryAuth, email, password);
   } catch (e) {
-    // אם המשתמש כבר קיים - תן הודעה ברורה (כי בלי Admin SDK אי אפשר “למצוא uid לפי אימייל”)
     if (String(e?.code || "").includes("auth/email-already-in-use")) {
       throw new Error("האימייל הזה כבר קיים ב-Auth. אם זה משתמש ישן — תיצור לו הרשאות ידנית דרך Users (צריך UID).");
     }
     throw e;
   } finally {
-    // מנקה את הסשן של secondaryAuth כדי שלא יעשה בלגן
     try { await signOut(secondaryAuth); } catch {}
   }
 
   const uid = cred.user.uid;
 
-  // הרשאות
   await setDoc(doc(db, "adminUsers", uid), {
     email,
     fullName: r.fullName || "",
-    role,
+    role: normalizeRole(role),
     allowedGrades: (role === "principal" || role === "dev") ? ALL_GRADES : grades,
     createdAt: serverTimestamp(),
     createdBy: auth.currentUser?.email || ""
   });
 
-  // סגירת בקשה
   await updateDoc(doc(db, "adminRequests", r.id), {
     handled: true,
     status: "approved",
-    approvedRole: role,
+    approvedRole: normalizeRole(role),
     approvedGrades: (role === "principal" || role === "dev") ? ALL_GRADES : grades,
     handledAt: serverTimestamp(),
     handledBy: auth.currentUser?.email || "",
@@ -524,8 +602,6 @@ function renderUsersFromArray(users) {
 
   const filtered = (users || []).filter(u => u.email);
 
-  console.log("DEV adminUsers:", filtered.length, filtered);
-
   if (filtered.length === 0) {
     if (usersEmpty) {
       usersEmpty.style.display = "block";
@@ -541,23 +617,22 @@ function renderUsersFromArray(users) {
 
   for (const u of filtered) usersList.appendChild(renderUserCard(u));
 }
+
 function createRoleSelect(currentRole) {
   const sel = document.createElement("select");
   sel.className = "select";
 
-  // ⚠️ רק DEV אמיתי (לפי אימייל) יראה את אופציית dev
   const canSeeDev = DEV_EMAILS.includes(norm(auth.currentUser?.email));
 
   sel.innerHTML = `
     <option value="teacher">מורה</option>
-    <option value="gradeLead">אחראי שכבה</option>
+    <option value="gradelead">אחראי שכבה</option>
     <option value="counselor">יועץ</option>
     <option value="principal">מנהל</option>
     ${canSeeDev ? `<option value="dev">DEV</option>` : ``}
   `;
 
-  // אם מישהו הוא dev אבל המשתמש הנוכחי לא DEV — לא נאפשר להציג/לבחור dev
-  const normalized = String(currentRole || "teacher");
+  const normalized = normalizeRole(currentRole || "teacher");
   sel.value = (!canSeeDev && normalized === "dev") ? "principal" : normalized;
 
   return sel;
@@ -607,7 +682,6 @@ function renderUserCard(u) {
   top.appendChild(controls);
   wrap.appendChild(top);
 
-  // ====== אזור עריכה נפתח ======
   const editor = document.createElement("div");
   editor.style.marginTop = "10px";
   editor.style.padding = "10px";
@@ -616,10 +690,6 @@ function renderUserCard(u) {
   editor.style.background = "rgba(255,255,255,0.7)";
   editor.style.display = "none";
 
-  // דארק מוד (לא חובה, אבל יפה)
-  editor.classList.add("dev-editor");
-
-  // role select
   const roleRow = document.createElement("div");
   roleRow.style.display = "flex";
   roleRow.style.gap = "10px";
@@ -635,7 +705,6 @@ function renderUserCard(u) {
   roleRow.appendChild(roleLabelEl);
   roleRow.appendChild(roleSel);
 
-  // grades checkboxes
   const gradesRow = document.createElement("div");
   gradesRow.style.display = "flex";
   gradesRow.style.gap = "12px";
@@ -658,7 +727,6 @@ function renderUserCard(u) {
     <label class="small"><input type="checkbox" value="t"> ט׳</label>
   `;
 
-  // set initial grades
   const currentGrades = Array.isArray(u.allowedGrades) ? u.allowedGrades : [];
   chkWrap.querySelectorAll('input[type="checkbox"]').forEach((c) => {
     c.checked = currentGrades.includes(c.value);
@@ -667,7 +735,6 @@ function renderUserCard(u) {
   gradesRow.appendChild(gradesLabelEl);
   gradesRow.appendChild(chkWrap);
 
-  // actions row
   const actionRow = document.createElement("div");
   actionRow.style.display = "flex";
   actionRow.style.gap = "10px";
@@ -693,19 +760,17 @@ function renderUserCard(u) {
   wrap.appendChild(editor);
 
   function setGradesLockUI(role) {
-    const lockAll = (role === "principal" || role === "dev");
+    const r = normalizeRole(role);
+    const lockAll = (r === "principal" || r === "dev");
     chkWrap.querySelectorAll('input[type="checkbox"]').forEach((c) => {
       c.disabled = lockAll;
       c.checked = lockAll ? true : c.checked;
     });
   }
 
-  // init lock state
   setGradesLockUI(roleSel.value);
 
-  roleSel.addEventListener("change", () => {
-    setGradesLockUI(roleSel.value);
-  });
+  roleSel.addEventListener("change", () => setGradesLockUI(roleSel.value));
 
   btnEdit.addEventListener("click", () => {
     const open = editor.style.display === "block";
@@ -715,8 +780,7 @@ function renderUserCard(u) {
   });
 
   btnCancel.addEventListener("click", () => {
-    // מחזירים מצב כמו שהיה
-    roleSel.value = u.role || "teacher";
+    roleSel.value = normalizeRole(u.role || "teacher");
     chkWrap.querySelectorAll('input[type="checkbox"]').forEach((c) => {
       c.checked = currentGrades.includes(c.value);
       c.disabled = false;
@@ -729,7 +793,7 @@ function renderUserCard(u) {
   });
 
   btnSave.addEventListener("click", async () => {
-    const newRole = roleSel.value;
+    const newRole = normalizeRole(roleSel.value);
 
     let newGrades = [];
     if (newRole === "principal" || newRole === "dev") {
@@ -751,7 +815,6 @@ function renderUserCard(u) {
         updatedBy: auth.currentUser?.email || ""
       });
 
-      // עדכון UI מקומי בלי לחכות
       u.role = newRole;
       u.allowedGrades = newGrades;
 
@@ -761,9 +824,6 @@ function renderUserCard(u) {
       msg.textContent = "נשמר ✅";
       editor.style.display = "none";
       btnEdit.textContent = "ערוך הרשאות";
-
-      // ואם אתה רוצה תמיד רענון מלא:
-      // await refreshAll();
     } catch (e) {
       console.error(e);
       msg.textContent = "שגיאה: " + (e?.message || e);
@@ -790,27 +850,4 @@ function renderUserCard(u) {
   });
 
   return wrap;
-}
-
-
-/* =============================
-   Utils
-============================= */
-function escapeHtml(str) {
-  return String(str || "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/\"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
-
-function formatTime(ts) {
-  try {
-    if (!ts) return "-";
-    const d = ts?.toDate ? ts.toDate() : new Date(ts);
-    return d.toLocaleString("he-IL");
-  } catch {
-    return "-";
-  }
 }
