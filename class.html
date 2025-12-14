@@ -231,6 +231,46 @@ html[data-theme="light"] #news .imgs img{
   box-shadow: 0 8px 20px rgba(15,23,42,0.15);
   background: #fff;
 }
+/* ===== Timetable DARK MODE fix ===== */
+html[data-theme="dark"] #tt table{
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  border-radius: 14px;
+  background: rgba(2,6,23,0.35);
+  border: 1px solid rgba(148,163,184,0.20);
+}
+
+html[data-theme="dark"] #tt th,
+html[data-theme="dark"] #tt td{
+  border-bottom: 1px solid rgba(148,163,184,0.18);
+  border-left: 1px solid rgba(148,163,184,0.18);
+  padding: 10px;
+  text-align: right;
+  color: #e5e7eb; /* טקסט קריא */
+}
+
+html[data-theme="dark"] #tt thead th{
+  background: rgba(15,23,42,0.65);
+  color: #f8fafc;
+  font-weight: 800;
+}
+
+html[data-theme="dark"] #tt tbody tr:nth-child(even) td{
+  background: rgba(15,23,42,0.32);
+}
+
+html[data-theme="dark"] #tt tbody tr:nth-child(odd) td{
+  background: rgba(15,23,42,0.18);
+}
+
+/* עמודת "שיעור" (מספרים) אם יש לך */
+html[data-theme="dark"] #tt td:first-child,
+html[data-theme="dark"] #tt th:first-child{
+  background: rgba(56,189,248,0.10);
+  font-weight: 800;
+}
 
   </style>
 </head>
