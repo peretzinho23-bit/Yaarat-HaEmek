@@ -1,3 +1,4 @@
+// class.js
 import { db, auth } from "./firebase-config.js";
 import { doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
@@ -51,6 +52,15 @@ function escapeHtml(str) {
     .replace(/"/g, "&quot;");
 }
 
+function linkify(text) {
+  const escaped = escapeHtml(text);
+  // הופך https://... ללחיץ
+  return escaped.replace(
+    /(https?:\/\/[^\s]+)/g,
+    '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
+  );
+}
+
 function parseDate(dateStr) {
   if (!dateStr) return null;
   const s = String(dateStr).trim();
@@ -79,6 +89,143 @@ function setQueryClass(classId) {
 
 function maxPeriodsForDay(dayKey) {
   return Number(DAY_PERIOD_LIMITS[dayKey] || PERIODS.length);
+}
+
+function isDarkMode() {
+  return (document.documentElement.getAttribute("data-theme") || "dark") === "dark";
+}
+
+function ensureLocalStyles() {
+  if (document.getElementById("classjs-inline-styles")) return;
+
+  const style = document.createElement("style");
+  style.id = "classjs-inline-styles";
+  style.textContent = `
+    /* ===== Timetable ===== */
+    .tt-wrap-table{
+      width: 100%;
+      overflow:auto;
+      border-radius: 16px;
+      border: 1px solid rgba(148,163,184,.35);
+      background: rgba(255,255,255,.06);
+    }
+    html[data-theme="light"] .tt-wrap-table{
+      background: rgba(255,255,255,.85);
+      border-color: rgba(148,163,184,.35);
+    }
+    table.tt-big{
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      min-width: 760px;
+    }
+    table.tt-big thead th{
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      font-weight: 800;
+      padding: 10px 10px;
+      border-bottom: 1px solid rgba(148,163,184,.35);
+      background: rgba(15,23,42,.22);
+      color: rgba(255,255,255,.92);
+      text-align: center;
+      white-space: nowrap;
+    }
+    html[data-theme="light"] table.tt-big thead th{
+      background: rgba(241,245,249,.95);
+      color: #0f172a;
+    }
+    table.tt-big td{
+      padding: 10px 8px;
+      border-bottom: 1px solid rgba(148,163,184,.22);
+      border-left: 1px solid rgba(148,163,184,.18);
+      vertical-align: middle;
+      text-align: center;
+      min-height: 56px;
+    }
+    table.tt-big tr td:first-child,
+    table.tt-big tr th:first-child{
+      border-left: none;
+    }
+    td.tt-period{
+      font-weight: 900;
+      width: 76px;
+      background: rgba(56,189,248,.16);
+      color: rgba(255,255,255,.92);
+      position: sticky;
+      right: 0;
+      z-index: 1;
+      border-left: 1px solid rgba(148,163,184,.25);
+    }
+    html[data-theme="light"] td.tt-period{
+      color:#0f172a;
+      background: rgba(56,189,248,.10);
+    }
+    .tt-td.tt-disabled{
+      opacity: .45;
+      background: rgba(148,163,184,.08);
+    }
+    html[data-theme="light"] .tt-td.tt-disabled{
+      background: rgba(15,23,42,.04);
+    }
+    .tt-subject{
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 4px;
+    }
+    .tt-meta{
+      opacity: .86;
+      font-size: .9rem;
+      display:flex;
+      gap:6px;
+      justify-content:center;
+      flex-wrap:wrap;
+    }
+    .tt-dot{ opacity:.6; }
+    .tt-dash{ opacity:.55; font-weight:700; }
+
+    /* ===== News ===== */
+    .news-item{
+      border:1px solid rgba(148,163,184,.25);
+      border-radius:14px;
+      padding:12px;
+      margin-bottom:10px;
+      background: rgba(255,255,255,.06);
+    }
+    html[data-theme="light"] .news-item{
+      background: rgba(255,255,255,.92);
+    }
+    .news-title{
+      font-weight: 900;
+      margin-bottom: 2px;
+    }
+    .news-meta{
+      opacity:.78;
+      font-size:.9rem;
+      margin-bottom: 8px;
+    }
+    .news-body{
+      line-height: 1.45;
+      white-space: pre-wrap;
+    }
+    .news-body a{
+      text-decoration: underline;
+      font-weight: 800;
+    }
+    .news-imgs{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .news-imgs img{
+      max-width: 240px;
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid rgba(148,163,184,.25);
+    }
+  `;
+  document.head.appendChild(style);
 }
 
 // ====== DOM ======
@@ -153,21 +300,10 @@ function showContentFor(classId) {
   elPill.textContent = `${classLabel(classId)}`;
 }
 
-// ====== Timetable (REAL schedule grid) ======
-function getCell(grid, dayKey, pIndex) {
-  const arr = Array.isArray(grid?.[dayKey]) ? grid[dayKey] : [];
-  const c = arr[pIndex] || {};
-  return {
-    subject: String(c.subject || ""),
-    teacher: String(c.teacher || ""),
-    room: String(c.room || "")
-  };
-}
-
+// ====== Timetable (grid) ======
 function renderTimetableFromGrid(grid) {
-  // grid = { sun:[{subject,teacher,room}..], mon:.. }
+  ensureLocalStyles();
 
-  // שישה ימים + עמודת "שיעור"
   const thead = `
     <thead>
       <tr>
@@ -179,14 +315,19 @@ function renderTimetableFromGrid(grid) {
 
   const tbodyRows = PERIODS.map((p, pIndex) => {
     const tds = DAYS.map((d) => {
+      const limit = maxPeriodsForDay(d.key);
+      const disabled = (pIndex + 1) > limit;
+
       const cell = (Array.isArray(grid?.[d.key]) ? grid[d.key][pIndex] : null) || {};
       const subject = (cell.subject || "").trim();
       const teacher = (cell.teacher || "").trim();
       const room = (cell.room || "").trim();
-
       const empty = !subject && !teacher && !room;
 
-      // תא יפה: מקצוע בולט, מתחת מורה/חדר בשורה קטנה
+      if (disabled) {
+        return `<td class="tt-td tt-disabled"><div class="tt-dash">—</div></td>`;
+      }
+
       return `
         <td class="tt-td ${empty ? "tt-empty" : ""}">
           ${empty ? `<div class="tt-dash">—</div>` : `
@@ -219,11 +360,8 @@ function renderTimetableFromGrid(grid) {
   `;
 }
 
-
-
-// תמיכה גם בסכמה ישנה (days/rows) אם יש מסמכים ישנים
+// schema ישן (days/rows) -> ממירים ל-grid ומציגים
 function renderTimetableFromDays(days) {
-  // ננסה להפוך ל-grid ואז להציג באותו style
   const grid = {};
   for (const d of DAYS) grid[d.key] = PERIODS.map(() => ({ subject:"", teacher:"", room:"" }));
 
@@ -251,10 +389,10 @@ function renderTimetableFromDays(days) {
     });
   });
 
-  renderTimetableSchedule(grid);
+  renderTimetableFromGrid(grid);
 }
 
-// ====== Data loaders (getDoc versions) ======
+// ====== Data loaders (first load) ======
 async function loadTimetableOnce(classId) {
   tt.innerHTML = "";
   ttStatus.textContent = "טוען…";
@@ -268,13 +406,11 @@ async function loadTimetableOnce(classId) {
 
     const data = snap.data() || {};
 
-    // ✅ schema חדש
-if (data.grid && typeof data.grid === "object") {
-  ttStatus.textContent = "";
-  renderTimetableFromGrid(data.grid || {}); // גם אם ריק
-  return;
-}
-
+    if (data.grid && typeof data.grid === "object") {
+      ttStatus.textContent = "";
+      renderTimetableFromGrid(data.grid || {});
+      return;
+    }
 
     const days = Array.isArray(data.days) ? data.days : [];
     if (days.length) {
@@ -343,6 +479,59 @@ function extractNewsImages(n) {
   return [...new Set(imgs.map(x => String(x).trim()).filter(Boolean))].slice(0,2);
 }
 
+function normalizeNewsColorForTheme(color) {
+  const c = String(color || "").trim().toLowerCase();
+  if (!c) return "";
+
+  // בלייט מוד: אם מישהו בחר לבן -> זה בלתי נראה -> מחזירים לשחור
+  if (!isDarkMode() && (c === "#ffffff" || c === "white" || c === "rgb(255,255,255)")) {
+    return "#0f172a";
+  }
+
+  return color;
+}
+
+function renderNewsList(classId, items) {
+  ensureLocalStyles();
+
+  const classSpecific = items.filter(n => String(n.classId || "").toLowerCase() === classId);
+
+  if (!classSpecific.length) {
+    newsStatus.textContent = "אין חדשות לכיתה הזאת עדיין.";
+    news.innerHTML = "";
+    return;
+  }
+
+  const ordered = classSpecific.slice(-12).reverse();
+  newsStatus.textContent = "";
+
+  news.innerHTML = ordered.map(n => {
+    const imgs = extractNewsImages(n);
+
+    // צבע טקסט
+    const finalColor = normalizeNewsColorForTheme(n.color);
+    const baseText = isDarkMode() ? "rgba(255,255,255,.92)" : "#0f172a";
+
+    const titleColor = (!isDarkMode()) ? "#0f172a" : (finalColor || baseText); // ✅ כותרת שחורה בלייט מוד תמיד
+    const bodyColor = finalColor || baseText;
+
+    const imgsHtml = imgs.length ? `
+      <div class="news-imgs">
+        ${imgs.map(url => `<img src="${escapeHtml(url)}" alt="תמונה לידיעה">`).join("")}
+      </div>
+    ` : "";
+
+    return `
+      <div class="news-item" style="color:${bodyColor};">
+        <div class="news-title" style="color:${titleColor};">${escapeHtml(n.title || "")}</div>
+        <div class="news-meta">${escapeHtml(n.meta || "")}</div>
+        <div class="news-body">${linkify(n.body || "")}</div>
+        ${imgsHtml}
+      </div>
+    `;
+  }).join("");
+}
+
 async function loadNewsOnce(classId) {
   news.innerHTML = "";
   newsStatus.textContent = "טוען…";
@@ -356,57 +545,14 @@ async function loadNewsOnce(classId) {
   try {
     const snap = await getDoc(doc(db, "news", grade));
     const items = snap.exists() ? (snap.data()?.items || []) : [];
-
-    const classSpecific = items.filter(n => String(n.classId || "").toLowerCase() === classId);
-
-    if (!classSpecific.length) {
-      newsStatus.textContent = "אין חדשות לכיתה הזאת עדיין.";
-      return;
-    }
-
-    const ordered = classSpecific.slice(-12).reverse();
-
-    newsStatus.textContent = "";
-    news.innerHTML = ordered.map(n => {
-      const imgs = extractNewsImages(n);
-
-      // ✅ פיקס ללייט מוד: אם בחרו צבע לבן וזה בהיר -> עדיין יהיה קריא כי אנחנו נותנים רקע עדין
-      const color = n.color ? escapeHtml(n.color) : "";
-      const style = `
-        border:1px solid rgba(148,163,184,.25);
-        border-radius:14px;
-        padding:10px;
-        margin-bottom:10px;
-        background: rgba(255,255,255,.06);
-        ${color ? `color:${color};` : ""}
-      `;
-
-      const imgsHtml = imgs.length ? `
-        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
-          ${imgs.map(url => `
-            <img src="${escapeHtml(url)}" alt="תמונה לידיעה"
-                 style="max-width:220px; width:100%; border-radius:12px; border:1px solid rgba(148,163,184,.25);" />
-          `).join("")}
-        </div>
-      ` : "";
-
-      return `
-        <div class="item" style="${style}">
-          <div><b>${escapeHtml(n.title || "")}</b></div>
-          <div class="meta" style="opacity:.85; margin-top:2px;">${escapeHtml(n.meta || "")}</div>
-          <div class="body" style="margin-top:6px;">${escapeHtml(n.body || "")}</div>
-          ${imgsHtml}
-        </div>
-      `;
-    }).join("");
-
+    renderNewsList(classId, items);
   } catch (e) {
     console.error("news error:", e);
     newsStatus.textContent = "שגיאה בטעינת חדשות (בדוק Console/Rules).";
   }
 }
 
-// ====== REALTIME (no refresh) ======
+// ====== REALTIME ======
 let unsubTT = null;
 let unsubNews = null;
 let unsubExams = null;
@@ -424,7 +570,6 @@ function startRealtime(classId) {
   const grade = classToGrade(classId);
   if (!grade) return;
 
-  // timetables/classId
   unsubTT = onSnapshot(doc(db, "timetables", classId), (snap) => {
     if (!snap.exists()) {
       tt.innerHTML = "";
@@ -432,17 +577,23 @@ function startRealtime(classId) {
       return;
     }
     const data = snap.data() || {};
-    ttStatus.textContent = "";
-    if (data.grid && typeof data.grid === "object") return renderTimetableSchedule(data.grid);
+    if (data.grid && typeof data.grid === "object") {
+      ttStatus.textContent = "";
+      renderTimetableFromGrid(data.grid || {});
+      return;
+    }
     const days = Array.isArray(data.days) ? data.days : [];
-    if (days.length) return renderTimetableFromDays(days);
+    if (days.length) {
+      ttStatus.textContent = "";
+      renderTimetableFromDays(days);
+      return;
+    }
     ttStatus.textContent = "המערכת קיימת אבל ריקה.";
   }, (err) => {
     console.error("timetable snapshot error:", err);
     ttStatus.textContent = "שגיאה בטעינת מערכת שעות (בדוק Console/Rules).";
   });
 
-  // exams/grade
   unsubExams = onSnapshot(doc(db, "exams", grade), (snap) => {
     const items = snap.exists() ? (snap.data()?.items || []) : [];
     ex.innerHTML = "";
@@ -477,52 +628,10 @@ function startRealtime(classId) {
     exStatus.textContent = "שגיאה בטעינת מבחנים (בדוק Console/Rules).";
   });
 
-  // news/grade
   unsubNews = onSnapshot(doc(db, "news", grade), (snap) => {
     const items = snap.exists() ? (snap.data()?.items || []) : [];
-    news.innerHTML = "";
     newsStatus.textContent = "טוען…";
-
-    const classSpecific = items.filter(n => String(n.classId || "").toLowerCase() === classId);
-
-    if (!classSpecific.length) {
-      newsStatus.textContent = "אין חדשות לכיתה הזאת עדיין.";
-      return;
-    }
-
-    const ordered = classSpecific.slice(-12).reverse();
-    newsStatus.textContent = "";
-
-    news.innerHTML = ordered.map(n => {
-      const imgs = extractNewsImages(n);
-      const color = n.color ? escapeHtml(n.color) : "";
-      const style = `
-        border:1px solid rgba(148,163,184,.25);
-        border-radius:14px;
-        padding:10px;
-        margin-bottom:10px;
-        background: rgba(255,255,255,.06);
-        ${color ? `color:${color};` : ""}
-      `;
-
-      const imgsHtml = imgs.length ? `
-        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
-          ${imgs.map(url => `
-            <img src="${escapeHtml(url)}" alt="תמונה לידיעה"
-                 style="max-width:220px; width:100%; border-radius:12px; border:1px solid rgba(148,163,184,.25);" />
-          `).join("")}
-        </div>
-      ` : "";
-
-      return `
-        <div class="item" style="${style}">
-          <div><b>${escapeHtml(n.title || "")}</b></div>
-          <div class="meta" style="opacity:.85; margin-top:2px;">${escapeHtml(n.meta || "")}</div>
-          <div class="body" style="margin-top:6px;">${escapeHtml(n.body || "")}</div>
-          ${imgsHtml}
-        </div>
-      `;
-    }).join("");
+    renderNewsList(classId, items);
   }, (err) => {
     console.error("news snapshot error:", err);
     newsStatus.textContent = "שגיאה בטעינת חדשות (בדוק Console/Rules).";
