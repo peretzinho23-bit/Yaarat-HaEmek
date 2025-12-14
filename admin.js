@@ -324,35 +324,31 @@ function initAuth() {
     await signOut(auth);
   });
 
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      try {
-        // 1) realtime guard
-        startPermissionWatcher(user);
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    try {
+      currentPerms = await loadAdminPermissions(user);
+      applyPermissionsToUI();
 
-        // 2) load perms + UI
-        currentPerms = await loadAdminPermissions(user);
-        applyPermissionsToUI();
-
-        statusEl.textContent = "מחובר כ: " + (user.email || "");
-        loginSection.style.display = "none";
-        adminSection.style.display = "block";
-
-        await loadAllData();
-      } catch (err) {
-        console.error("Permission check failed:", err);
-        alert("אין לך הרשאה להיכנס לפאנל הניהול.");
-        stopPermissionWatcher();
-        await signOut(auth);
+      // 👇👇👇 כאן בדיוק
+      const devBtn = document.getElementById("dev-btn");
+      if (devBtn) {
+        const role = String(currentPerms?.role || "").toLowerCase();
+        const canSeeDev = ["dev", "principal", "gradelead"].includes(role);
+        devBtn.style.display = canSeeDev ? "inline-block" : "none";
       }
-    } else {
-      stopPermissionWatcher();
-      currentPerms = null;
-      statusEl.textContent = "לא מחובר";
-      loginSection.style.display = "block";
-      adminSection.style.display = "none";
+
+      statusEl.textContent = "מחובר כ: " + (user.email || "");
+      loginSection.style.display = "none";
+      adminSection.style.display = "block";
+      await loadAllData();
+    } catch (err) {
+      alert("אין לך הרשאה להיכנס לפאנל הניהול.");
+      await signOut(auth);
     }
-  });
+  }
+});
+
 }
 
 /* ------------ load everything ------------ */
