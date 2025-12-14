@@ -155,6 +155,83 @@
         color:#e5e7eb;
       }
     }
+    /* ===== Timetable "מחברת" ===== */
+.tt-grid-wrap{
+  border-radius: 18px;
+  overflow: hidden;
+  border: 2px solid rgba(0, 175, 190, 0.45);
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255,255,255,.9), transparent 45%),
+    radial-gradient(circle at 70% 35%, rgba(255,255,255,.85), transparent 50%),
+    linear-gradient(180deg, rgba(210,245,255,.65), rgba(255,255,255,.65));
+}
+
+.tt-grid{
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  background: transparent;
+}
+
+.tt-grid th,
+.tt-grid td{
+  border-right: 2px solid rgba(0, 175, 190, 0.55);
+  border-bottom: 2px solid rgba(0, 175, 190, 0.55);
+  padding: 10px 8px;
+  vertical-align: top;
+  text-align: right;
+  background: rgba(255,255,255,0.35);
+}
+
+.tt-grid thead th{
+  font-weight: 800;
+  background: rgba(210,245,255,0.85);
+}
+
+.tt-grid thead th{
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.tt-grid th:first-child,
+.tt-grid td:first-child{
+  width: 86px;
+  text-align: center;
+  font-weight: 800;
+  background: rgba(210,245,255,0.85);
+}
+
+.tt-grid tr:last-child td{ border-bottom: 0; }
+.tt-grid th:last-child, .tt-grid td:last-child{ border-right: 0; }
+
+.tt-cellbox .subj{ font-weight: 800; line-height: 1.15; }
+.tt-cellbox .meta{ opacity: .85; font-size: .9rem; margin-top: 3px; }
+.tt-empty{ opacity: .55; text-align:center; }
+.tt-disabled{ opacity: .35; text-align:center; background: rgba(255,255,255,0.18); }
+
+/* ===== FIX: News visibility in LIGHT mode ===== */
+html[data-theme="light"] #news .item{
+  background: rgba(255,255,255,0.95);
+  color: #0f172a;
+  border: 1px solid rgba(15,23,42,0.12);
+}
+
+html[data-theme="light"] #news .item .meta{
+  color: #334155;
+}
+
+html[data-theme="light"] #news .item .body{
+  color: #0f172a;
+}
+
+/* תמונות חדשות בלייט מוד */
+html[data-theme="light"] #news .imgs img{
+  box-shadow: 0 8px 20px rgba(15,23,42,0.15);
+  background: #fff;
+}
+
   </style>
 </head>
 
