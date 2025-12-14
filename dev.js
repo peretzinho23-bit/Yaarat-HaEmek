@@ -15,7 +15,10 @@ import {
   setDoc,
   updateDoc,
   deleteDoc,
-  serverTimestamp
+  orderBy,
+  query,
+  serverTimestamp,
+  limit
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
 import {
@@ -24,9 +27,9 @@ import {
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
 
 // =============================
-// DEV SETTINGS
+// DEV הגדרות
 // =============================
-const DEV_EMAILS = ["nadavp1119@gmail.com", "peretzinho23@gmail.com"].map((e) => e.toLowerCase());
+const DEV_EMAILS = ["nadavp1119@gmail.com", "peretzinho23@gmail.com"].map(e => e.toLowerCase());
 const ALL_GRADES = ["z", "h", "t"];
 
 function norm(email) {
@@ -47,7 +50,7 @@ function roleLabel(role) {
 function gradesLabel(grades) {
   const g = Array.isArray(grades) ? grades : [];
   const map = { z: "ז׳", h: "ח׳", t: "ט׳" };
-  return g.map((x) => map[x] || x).join(" , ") || "-";
+  return g.map(x => map[x] || x).join(" , ") || "-";
 }
 
 // =============================
@@ -78,7 +81,6 @@ if (themeBtn) {
     themeBtn.textContent = next === "dark" ? "🌙" : "☀️";
     try { localStorage.setItem("theme", next); } catch {}
   });
-
   try {
     const saved = localStorage.getItem("theme");
     if (saved) {
@@ -89,10 +91,10 @@ if (themeBtn) {
 }
 
 // =============================
-// Secondary Auth (כדי ליצור משתמשים בלי לזרוק את ה-DEV)
+// Secondary Auth (כדי ליצור משתמש בלי לזרוק את DEV מהסשן)
 // =============================
 function getSecondaryAuth() {
-  const existing = getApps().find((a) => a.name === "secondary");
+  const existing = getApps().find(a => a.name === "secondary");
   const secondaryApp = existing || initializeApp(app.options, "secondary");
   return getAuth(secondaryApp);
 }
@@ -100,27 +102,31 @@ function getSecondaryAuth() {
 // =============================
 // Login
 // =============================
-elLoginForm?.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  elLoginMsg.textContent = "";
-  const email = document.getElementById("dev-email").value.trim();
-  const password = document.getElementById("dev-password").value;
+if (elLoginForm) {
+  elLoginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    elLoginMsg.textContent = "";
+    const email = document.getElementById("dev-email").value.trim();
+    const password = document.getElementById("dev-password").value;
 
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-  } catch (err) {
-    console.error(err);
-    elLoginMsg.textContent = "שגיאה בכניסה: " + (err?.message || err);
-  }
-});
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (err) {
+      console.error(err);
+      elLoginMsg.textContent = "שגיאה בכניסה: " + (err?.message || err);
+    }
+  });
+}
 
-elLogout?.addEventListener("click", async () => {
-  await signOut(auth);
-});
+if (elLogout) {
+  elLogout.addEventListener("click", async () => {
+    await signOut(auth);
+  });
+}
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
-    elStatus.textContent = "לא מחובר";
+    if (elStatus) elStatus.textContent = "לא מחובר";
     if (elLogin) elLogin.style.display = "block";
     if (elContent) elContent.style.display = "none";
     return;
@@ -128,13 +134,13 @@ onAuthStateChanged(auth, async (user) => {
 
   const email = norm(user.email);
   if (!DEV_EMAILS.includes(email)) {
-    elStatus.textContent = "אין לך גישה (לא DEV)";
+    if (elStatus) elStatus.textContent = "אין לך גישה (לא DEV)";
     alert("אין לך גישה לדף DEV");
     await signOut(auth);
     return;
   }
 
-  elStatus.textContent = `מחובר כ-DEV: ${user.email}`;
+  if (elStatus) elStatus.textContent = `מחובר כ-DEV: ${user.email}`;
   if (elLogin) elLogin.style.display = "none";
   if (elContent) elContent.style.display = "block";
 
@@ -146,7 +152,6 @@ async function ensureDevAdminUserDoc(user) {
   const ref = doc(db, "adminUsers", user.uid);
   const snap = await getDoc(ref);
   if (snap.exists()) return;
-
   await setDoc(ref, {
     email: user.email,
     fullName: "DEV",
@@ -163,66 +168,62 @@ async function refreshAll() {
 
 // =============================
 // Requests (adminRequests)
+// ✅ תואם ל-register.js שלך
+// - שם שדות: fullName,email,role,reason,message,password,createdAt,handled
 // =============================
 async function renderRequests() {
-  if (!reqBody || !reqEmpty) return;
-
+  if (!reqBody) return;
   reqBody.innerHTML = "";
-  let snaps;
 
-  // הכי יציב: מביאים הכל ומסננים בצד לקוח (מונע כאב ראש של אינדקסים)
-  snaps = await getDocs(collection(db, "adminRequests"));
+  let snaps;
+  try {
+    // בלי where כדי לא להיתקע על אינדקסים + ערבוב טיפוסים ישנים
+    snaps = await getDocs(
+      query(collection(db, "adminRequests"), orderBy("createdAt", "desc"), limit(50))
+    );
+  } catch (e) {
+    console.warn("orderBy failed, fallback no-order:", e);
+    snaps = await getDocs(collection(db, "adminRequests"));
+  }
 
   const arr = [];
-  snaps.forEach((s) => arr.push({ id: s.id, ...s.data() }));
+  snaps.forEach(s => arr.push({ id: s.id, ...s.data() }));
 
-  // תומך גם בסכמות ישנות:
-  // status:"pending" או handled:false
-  const pending = arr.filter((r) => {
-    if (r.status) return String(r.status) === "pending";
-    if (typeof r.handled === "boolean") return r.handled === false;
-    return true; // אם אין שדה, נציג כדי שלא ייעלם
-  });
-
-  // מיון לפי זמן (אם יש)
-  pending.sort((a, b) => {
-    const ta = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
-    const tb = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
-    return tb - ta;
+  // מגדירים “ממתין” בצורה גמישה: handled !== true וגם status לא approved/rejected
+  const pending = arr.filter(r => {
+    const handled = r.handled === true;
+    const status = String(r.status || "").toLowerCase();
+    return !handled && status !== "approved" && status !== "rejected";
   });
 
   if (pending.length === 0) {
-    reqEmpty.style.display = "block";
+    if (reqEmpty) reqEmpty.style.display = "block";
     return;
   }
-  reqEmpty.style.display = "none";
+  if (reqEmpty) reqEmpty.style.display = "none";
 
-  for (const r of pending) {
-    reqBody.appendChild(renderRequestRow(r));
-  }
+  for (const r of pending) reqBody.appendChild(renderRequestRow(r));
 }
 
 function renderRequestRow(r) {
   const tr = document.createElement("tr");
   tr.className = "row";
 
-  const email = r.email || "";
-  const fullName = r.fullName || "";
-  const jobTitle = r.jobTitle || r.role || "-";
-  const note = r.note || r.reason || r.message || "-";
-
   const tdEmail = document.createElement("td");
-  tdEmail.innerHTML = `<div><b>${escapeHtml(email)}</b></div><div class="small">${escapeHtml(fullName)}</div>`;
+  tdEmail.innerHTML = `
+    <div><b>${escapeHtml(r.email || "")}</b></div>
+    <div class="small">${escapeHtml(r.fullName || "")}</div>
+  `;
 
   const tdInfo = document.createElement("td");
   tdInfo.innerHTML = `
-    <div class="small">מה הוא בבית ספר: <b>${escapeHtml(jobTitle)}</b></div>
-    <div class="small">סיבה/הערה: ${escapeHtml(note)}</div>
+    <div class="small">תפקיד שהזין: <b>${escapeHtml(r.role || "-")}</b></div>
+    <div class="small">סיבה: <b>${escapeHtml(r.reason || "-")}</b></div>
+    <div class="small">הודעה: ${escapeHtml(r.message || "-")}</div>
     <div class="small muted">נשלח: ${formatTime(r.createdAt)}</div>
   `;
 
   const tdPerm = document.createElement("td");
-
   const roleSel = document.createElement("select");
   roleSel.className = "select";
   roleSel.innerHTML = `
@@ -268,7 +269,8 @@ function renderRequestRow(r) {
 
   btnApprove.addEventListener("click", async () => {
     const role = roleSel.value;
-    const grades = Array.from(chkWrap.querySelectorAll("input[type=checkbox]:checked")).map((c) => c.value);
+    const grades = Array.from(chkWrap.querySelectorAll("input[type=checkbox]:checked"))
+      .map(c => c.value);
 
     if (grades.length === 0 && role !== "principal") {
       alert("בחר לפחות שכבה אחת");
@@ -289,11 +291,10 @@ function renderRequestRow(r) {
   btnReject.addEventListener("click", async () => {
     if (!confirm("לדחות את הבקשה?")) return;
     msg.textContent = "דוחה...";
-
     try {
       await updateDoc(doc(db, "adminRequests", r.id), {
-        status: "rejected",
         handled: true,
+        status: "rejected",
         handledAt: serverTimestamp(),
         handledBy: auth.currentUser?.email || ""
       });
@@ -308,7 +309,6 @@ function renderRequestRow(r) {
   btnDelete.addEventListener("click", async () => {
     if (!confirm("למחוק את הבקשה?")) return;
     msg.textContent = "מוחק...";
-
     try {
       await deleteDoc(doc(db, "adminRequests", r.id));
       msg.textContent = "נמחק ✅";
@@ -334,59 +334,55 @@ function renderRequestRow(r) {
 
 async function approveRequest(r, role, grades) {
   const email = String(r.email || "").trim();
-  const password = String(r.password || "");
+  const password = String(r.password || "").trim();
   if (!email || !password) throw new Error("לבקשה חסר אימייל/סיסמה");
 
   const secondaryAuth = getSecondaryAuth();
 
-  // יצירת משתמש Auth (בלי להחליף את ה-DEV מהסשן)
+  // יצירת משתמש Auth (בלי להעיף את DEV)
   const cred = await createUserWithEmailAndPassword(secondaryAuth, email, password);
   const uid = cred.user.uid;
 
-  // הרשאות
+  // שמירת הרשאות
   await setDoc(doc(db, "adminUsers", uid), {
     email,
     fullName: r.fullName || "",
     role,
-    allowedGrades: role === "principal" ? ALL_GRADES : grades,
+    allowedGrades: (role === "principal" || role === "dev") ? ALL_GRADES : grades,
     createdAt: serverTimestamp(),
     createdBy: auth.currentUser?.email || ""
   });
 
-  // עדכון בקשה
+  // סגירת בקשה
   await updateDoc(doc(db, "adminRequests", r.id), {
-    status: "approved",
     handled: true,
+    status: "approved",
     approvedRole: role,
-    approvedGrades: role === "principal" ? ALL_GRADES : grades,
-    approvedUid: uid,
+    approvedGrades: (role === "principal" || role === "dev") ? ALL_GRADES : grades,
     handledAt: serverTimestamp(),
-    handledBy: auth.currentUser?.email || ""
+    handledBy: auth.currentUser?.email || "",
+    approvedUid: uid
   });
-
-  // ניקוי סשן משני (לא חובה אבל נקי)
-  try { await signOut(secondaryAuth); } catch {}
 }
 
 // =============================
 // Users (adminUsers)
 // =============================
 async function renderUsers() {
-  if (!usersList || !usersEmpty) return;
-
+  if (!usersList) return;
   usersList.innerHTML = "";
+
   const snaps = await getDocs(collection(db, "adminUsers"));
-
   const users = [];
-  snaps.forEach((s) => users.push({ id: s.id, ...s.data() }));
+  snaps.forEach(s => users.push({ id: s.id, ...s.data() }));
 
-  const filtered = users.filter((u) => u.email);
+  const filtered = users.filter(u => u.email);
 
   if (filtered.length === 0) {
-    usersEmpty.style.display = "block";
+    if (usersEmpty) usersEmpty.style.display = "block";
     return;
   }
-  usersEmpty.style.display = "none";
+  if (usersEmpty) usersEmpty.style.display = "none";
 
   filtered.sort((a, b) =>
     (String(a.role).localeCompare(String(b.role)) || String(a.email).localeCompare(String(b.email)))
@@ -439,7 +435,6 @@ function renderUserCard(u) {
     }
     if (!confirm(`לבטל גישה ל-${u.email}?`)) return;
     msg.textContent = "מבטל...";
-
     try {
       await deleteDoc(doc(db, "adminUsers", u.id));
       msg.textContent = "בוטל ✅";
@@ -458,7 +453,7 @@ function renderUserCard(u) {
     if (newRole !== "principal" && newRole !== "dev") {
       const g = prompt("שכבות (z,h,t) מופרד בפסיקים", (newGrades || []).join(","));
       if (g === null) return;
-      newGrades = g.split(",").map((x) => x.trim()).filter(Boolean);
+      newGrades = g.split(",").map(x => x.trim()).filter(Boolean);
     } else {
       newGrades = ALL_GRADES;
     }
