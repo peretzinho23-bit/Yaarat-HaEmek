@@ -27,6 +27,10 @@ import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/11.0.
 const DEV_EMAILS = ["nadavp1119@gmail.com", "peretzinho23@gmail.com"].map(e => e.toLowerCase());
 const ALL_GRADES = ["z", "h", "t"];
 
+function isDevViewer() {
+  return DEV_EMAILS.includes(norm(auth.currentUser?.email));
+}
+
 function norm(email) {
   return String(email || "").trim().toLowerCase();
 }
@@ -133,22 +137,45 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   const email = norm(user.email);
-  if (!DEV_EMAILS.includes(email)) {
-    if (elStatus) elStatus.textContent = "אין לך גישה (לא DEV)";
-    alert("אין לך גישה לדף DEV");
+
+  // ✅ DEV תמיד מותר (לפי אימייל)
+  const isDevByEmail = DEV_EMAILS.includes(email);
+
+  // ✅ בודקים גם ROLE מתוך adminUsers/{uid}
+  let role = null;
+  try {
+    const snap = await getDoc(doc(db, "adminUsers", user.uid));
+    role = snap.exists() ? String(snap.data()?.role || "").toLowerCase() : null;
+  } catch (e) {
+    console.error("Failed reading adminUsers role:", e);
+  }
+
+  // ✅ מי מורשה להיכנס ל-DEV PANEL:
+  // DEV / מנהל / אחראי שכבה בלבד
+  const allowedRoles = ["dev", "principal", "gradelead"];
+  const isAllowedByRole = role && allowedRoles.includes(role);
+
+  if (!isDevByEmail && !isAllowedByRole) {
+    if (elStatus) elStatus.textContent = "אין לך גישה (מותר רק מנהל/אחראי שכבה/DEV)";
+    alert("אין לך גישה לדף DEV (מותר רק מנהל / אחראי שכבה / DEV)");
     await signOut(auth);
     return;
   }
 
-  if (elStatus) elStatus.textContent = `מחובר כ-DEV: ${user.email}`;
+  // אם הוא DEV לפי אימייל ואין לו מסמך — ניצור
+  if (isDevByEmail) {
+    await ensureDevAdminUserDoc(user);
+    role = "dev";
+  }
+
+  if (elStatus) elStatus.textContent = `מחובר: ${user.email} · תפקיד: ${roleLabel(role)}`;
   if (elLogin) elLogin.style.display = "none";
   if (elContent) elContent.style.display = "block";
 
-  await ensureDevAdminUserDoc(user);
-
-  // realtime במקום “רענון ידני” (עדיין יש רענון פנימי)
+  // realtime
   startRealtime();
 });
+
 
 /* =============================
    ensure DEV exists in adminUsers
@@ -412,6 +439,19 @@ function renderRequestRow(r) {
 }
 
 async function approveRequest(r, role, grades) {
+    // ✅ הגנה: רק מנהל/אחראי שכבה/DEV יכולים לאשר בקשות
+  const meUid = auth.currentUser?.uid;
+  const meEmail = norm(auth.currentUser?.email);
+  const isDev = DEV_EMAILS.includes(meEmail);
+
+  if (!isDev) {
+    const snap = await getDoc(doc(db, "adminUsers", meUid));
+    const myRole = snap.exists() ? String(snap.data()?.role || "").toLowerCase() : "";
+    if (!["principal", "gradelead", "dev"].includes(myRole)) {
+      throw new Error("אין לך הרשאה לאשר בקשות (רק מנהל/אחראי שכבה/DEV)");
+    }
+  }
+
   const email = String(r.email || "").trim();
   const password = String(r.password || "").trim();
   if (!email || !password) throw new Error("לבקשה חסר אימייל/סיסמה");
@@ -501,6 +541,27 @@ function renderUsersFromArray(users) {
 
   for (const u of filtered) usersList.appendChild(renderUserCard(u));
 }
+function createRoleSelect(currentRole) {
+  const sel = document.createElement("select");
+  sel.className = "select";
+
+  // ⚠️ רק DEV אמיתי (לפי אימייל) יראה את אופציית dev
+  const canSeeDev = DEV_EMAILS.includes(norm(auth.currentUser?.email));
+
+  sel.innerHTML = `
+    <option value="teacher">מורה</option>
+    <option value="gradeLead">אחראי שכבה</option>
+    <option value="counselor">יועץ</option>
+    <option value="principal">מנהל</option>
+    ${canSeeDev ? `<option value="dev">DEV</option>` : ``}
+  `;
+
+  // אם מישהו הוא dev אבל המשתמש הנוכחי לא DEV — לא נאפשר להציג/לבחור dev
+  const normalized = String(currentRole || "teacher");
+  sel.value = (!canSeeDev && normalized === "dev") ? "principal" : normalized;
+
+  return sel;
+}
 
 function renderUserCard(u) {
   const wrap = document.createElement("div");
@@ -517,8 +578,8 @@ function renderUserCard(u) {
   info.innerHTML = `
     <div><b>${escapeHtml(u.email || "")}</b></div>
     <div class="small">${escapeHtml(u.fullName || "")}</div>
-    <div class="small">תפקיד: <b>${escapeHtml(roleLabel(u.role))}</b></div>
-    <div class="small">שכבות: <b>${escapeHtml(gradesLabel(u.allowedGrades))}</b></div>
+    <div class="small">תפקיד: <b class="role-text">${escapeHtml(roleLabel(u.role))}</b></div>
+    <div class="small">שכבות: <b class="grades-text">${escapeHtml(gradesLabel(u.allowedGrades))}</b></div>
   `;
 
   const controls = document.createElement("div");
@@ -538,34 +599,147 @@ function renderUserCard(u) {
   msg.className = "small";
   msg.style.marginTop = "6px";
 
-  btnRemove.addEventListener("click", async () => {
-    const me = norm(auth.currentUser?.email);
-    if (norm(u.email) === me) {
-      alert("לא מוחקים את עצמנו 😅");
-      return;
-    }
-    if (!confirm(`לבטל גישה ל-${u.email}?`)) return;
-    msg.textContent = "מבטל...";
-    try {
-      await deleteDoc(doc(db, "adminUsers", u.id));
-      msg.textContent = "בוטל ✅";
-    } catch (e) {
-      console.error(e);
-      msg.textContent = "שגיאה: " + (e?.message || e);
-    }
+  controls.appendChild(btnEdit);
+  controls.appendChild(btnRemove);
+  controls.appendChild(msg);
+
+  top.appendChild(info);
+  top.appendChild(controls);
+  wrap.appendChild(top);
+
+  // ====== אזור עריכה נפתח ======
+  const editor = document.createElement("div");
+  editor.style.marginTop = "10px";
+  editor.style.padding = "10px";
+  editor.style.borderRadius = "14px";
+  editor.style.border = "1px solid rgba(148,163,184,0.35)";
+  editor.style.background = "rgba(255,255,255,0.7)";
+  editor.style.display = "none";
+
+  // דארק מוד (לא חובה, אבל יפה)
+  editor.classList.add("dev-editor");
+
+  // role select
+  const roleRow = document.createElement("div");
+  roleRow.style.display = "flex";
+  roleRow.style.gap = "10px";
+  roleRow.style.flexWrap = "wrap";
+  roleRow.style.alignItems = "center";
+
+  const roleLabelEl = document.createElement("div");
+  roleLabelEl.className = "small";
+  roleLabelEl.innerHTML = "<b>תפקיד:</b>";
+
+  const roleSel = createRoleSelect(u.role || "teacher");
+
+  roleRow.appendChild(roleLabelEl);
+  roleRow.appendChild(roleSel);
+
+  // grades checkboxes
+  const gradesRow = document.createElement("div");
+  gradesRow.style.display = "flex";
+  gradesRow.style.gap = "12px";
+  gradesRow.style.flexWrap = "wrap";
+  gradesRow.style.alignItems = "center";
+  gradesRow.style.marginTop = "10px";
+
+  const gradesLabelEl = document.createElement("div");
+  gradesLabelEl.className = "small";
+  gradesLabelEl.innerHTML = "<b>שכבות:</b>";
+
+  const chkWrap = document.createElement("div");
+  chkWrap.style.display = "flex";
+  chkWrap.style.gap = "10px";
+  chkWrap.style.flexWrap = "wrap";
+
+  chkWrap.innerHTML = `
+    <label class="small"><input type="checkbox" value="z"> ז׳</label>
+    <label class="small"><input type="checkbox" value="h"> ח׳</label>
+    <label class="small"><input type="checkbox" value="t"> ט׳</label>
+  `;
+
+  // set initial grades
+  const currentGrades = Array.isArray(u.allowedGrades) ? u.allowedGrades : [];
+  chkWrap.querySelectorAll('input[type="checkbox"]').forEach((c) => {
+    c.checked = currentGrades.includes(c.value);
   });
 
-  btnEdit.addEventListener("click", async () => {
-    const newRole = prompt("תפקיד (teacher/gradeLead/counselor/principal/dev)", u.role || "teacher");
-    if (!newRole) return;
+  gradesRow.appendChild(gradesLabelEl);
+  gradesRow.appendChild(chkWrap);
 
-    let newGrades = u.allowedGrades || [];
-    if (newRole !== "principal" && newRole !== "dev") {
-      const g = prompt("שכבות (z,h,t) מופרד בפסיקים", (newGrades || []).join(","));
-      if (g === null) return;
-      newGrades = g.split(",").map(x => x.trim()).filter(Boolean);
-    } else {
+  // actions row
+  const actionRow = document.createElement("div");
+  actionRow.style.display = "flex";
+  actionRow.style.gap = "10px";
+  actionRow.style.flexWrap = "wrap";
+  actionRow.style.marginTop = "12px";
+
+  const btnSave = document.createElement("button");
+  btnSave.className = "btn";
+  btnSave.type = "button";
+  btnSave.textContent = "שמור";
+
+  const btnCancel = document.createElement("button");
+  btnCancel.className = "btn-outline";
+  btnCancel.type = "button";
+  btnCancel.textContent = "ביטול";
+
+  actionRow.appendChild(btnSave);
+  actionRow.appendChild(btnCancel);
+
+  editor.appendChild(roleRow);
+  editor.appendChild(gradesRow);
+  editor.appendChild(actionRow);
+  wrap.appendChild(editor);
+
+  function setGradesLockUI(role) {
+    const lockAll = (role === "principal" || role === "dev");
+    chkWrap.querySelectorAll('input[type="checkbox"]').forEach((c) => {
+      c.disabled = lockAll;
+      c.checked = lockAll ? true : c.checked;
+    });
+  }
+
+  // init lock state
+  setGradesLockUI(roleSel.value);
+
+  roleSel.addEventListener("change", () => {
+    setGradesLockUI(roleSel.value);
+  });
+
+  btnEdit.addEventListener("click", () => {
+    const open = editor.style.display === "block";
+    editor.style.display = open ? "none" : "block";
+    btnEdit.textContent = open ? "ערוך הרשאות" : "סגור עריכה";
+    msg.textContent = "";
+  });
+
+  btnCancel.addEventListener("click", () => {
+    // מחזירים מצב כמו שהיה
+    roleSel.value = u.role || "teacher";
+    chkWrap.querySelectorAll('input[type="checkbox"]').forEach((c) => {
+      c.checked = currentGrades.includes(c.value);
+      c.disabled = false;
+    });
+    setGradesLockUI(roleSel.value);
+
+    editor.style.display = "none";
+    btnEdit.textContent = "ערוך הרשאות";
+    msg.textContent = "";
+  });
+
+  btnSave.addEventListener("click", async () => {
+    const newRole = roleSel.value;
+
+    let newGrades = [];
+    if (newRole === "principal" || newRole === "dev") {
       newGrades = ALL_GRADES;
+    } else {
+      newGrades = Array.from(chkWrap.querySelectorAll('input[type="checkbox"]:checked')).map((c) => c.value);
+      if (newGrades.length === 0) {
+        alert("בחר לפחות שכבה אחת");
+        return;
+      }
     }
 
     msg.textContent = "שומר...";
@@ -576,22 +750,48 @@ function renderUserCard(u) {
         updatedAt: serverTimestamp(),
         updatedBy: auth.currentUser?.email || ""
       });
+
+      // עדכון UI מקומי בלי לחכות
+      u.role = newRole;
+      u.allowedGrades = newGrades;
+
+      info.querySelector(".role-text").textContent = roleLabel(newRole);
+      info.querySelector(".grades-text").textContent = gradesLabel(newGrades);
+
       msg.textContent = "נשמר ✅";
+      editor.style.display = "none";
+      btnEdit.textContent = "ערוך הרשאות";
+
+      // ואם אתה רוצה תמיד רענון מלא:
+      // await refreshAll();
     } catch (e) {
       console.error(e);
       msg.textContent = "שגיאה: " + (e?.message || e);
     }
   });
 
-  controls.appendChild(btnEdit);
-  controls.appendChild(btnRemove);
-  controls.appendChild(msg);
+  btnRemove.addEventListener("click", async () => {
+    const me = norm(auth.currentUser?.email);
+    if (norm(u.email) === me) {
+      alert("לא מוחקים את עצמנו 😅");
+      return;
+    }
+    if (!confirm(`לבטל גישה ל-${u.email}?`)) return;
 
-  top.appendChild(info);
-  top.appendChild(controls);
-  wrap.appendChild(top);
+    msg.textContent = "מבטל...";
+    try {
+      await deleteDoc(doc(db, "adminUsers", u.id));
+      msg.textContent = "בוטל ✅";
+      await refreshAll();
+    } catch (e) {
+      console.error(e);
+      msg.textContent = "שגיאה: " + (e?.message || e);
+    }
+  });
+
   return wrap;
 }
+
 
 /* =============================
    Utils
