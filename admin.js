@@ -25,6 +25,52 @@ import {
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-storage.js";
 
 console.log("🔥 NEW ADMIN.JS LOADED");
+import { auth, db } from "./firebase-config.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+let unsubPerm = null;
+
+function kick(msg = "אין לך יותר גישה") {
+  alert(msg);
+  try { if (unsubPerm) unsubPerm(); } catch {}
+  signOut(auth).finally(() => {
+    // תחזיר לעמוד התחברות
+    window.location.href = "admin.html";
+  });
+}
+
+onAuthStateChanged(auth, (user) => {
+  if (!user) return kick("לא מחובר");
+
+  // מנקים מאזין קודם אם היה
+  try { if (unsubPerm) unsubPerm(); } catch {}
+  unsubPerm = null;
+
+  const ref = doc(db, "adminUsers", user.uid);
+
+  unsubPerm = onSnapshot(ref, (snap) => {
+    // אם מחקת לו את המסמך -> אין גישה
+    if (!snap.exists()) return kick("הגישה שלך בוטלה");
+
+    const data = snap.data() || {};
+    const role = String(data.role || "").toLowerCase();
+
+    // אם הורדת אותו לתפקיד שלא אמור להיכנס לאדמין בכלל
+    // (תשנה לפי המדיניות שלך)
+    const allowedRolesForAdmin = ["teacher", "gradelead", "counselor", "principal", "dev"];
+    if (!allowedRolesForAdmin.includes(role)) return kick("אין לך הרשאות");
+
+    // אם זה דף DEV בלבד:
+    // const allowedRolesForDev = ["gradelead", "principal", "dev"];
+    // if (!allowedRolesForDev.includes(role)) return kick("אין גישה ל-DEV Panel");
+
+  }, (err) => {
+    console.error("perm snapshot error:", err);
+    // אם יש בעיה בקריאה - עדיף להעיף כדי לא להשאיר פרצה
+    kick("שגיאת הרשאות (בדוק חוקים/קונסול)");
+  });
+});
 
 // =============================
 // הרשאות אדמין (RBAC)
