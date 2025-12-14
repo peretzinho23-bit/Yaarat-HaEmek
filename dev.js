@@ -3,7 +3,8 @@ import {
   signInWithEmailAndPassword,
   onAuthStateChanged,
   signOut,
-  getAuth
+  getAuth,
+  createUserWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
 import {
@@ -16,7 +17,6 @@ import {
   deleteDoc,
   orderBy,
   query,
-  where,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
@@ -53,7 +53,7 @@ function gradesLabel(grades) {
 }
 
 // =============================
-// DOM
+// DOM (עם הגנה שלא יקרוס אם חסר משהו)
 // =============================
 const elStatus = document.getElementById("dev-status");
 const elLogout = document.getElementById("dev-logout");
@@ -68,7 +68,7 @@ const usersList = document.getElementById("users-list");
 const usersEmpty = document.getElementById("users-empty");
 
 // =============================
-// Theme toggle (אם כבר יש לך לוגיקה אחרת – זה לא מפריע)
+// Theme toggle (לא מפריע אם יש לך משהו אחר)
 // =============================
 const themeBtn = document.getElementById("theme-toggle");
 if (themeBtn) {
@@ -101,45 +101,52 @@ function getSecondaryAuth() {
 // =============================
 // Login
 // =============================
-elLoginForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  elLoginMsg.textContent = "";
-  const email = document.getElementById("dev-email").value.trim();
-  const password = document.getElementById("dev-password").value;
+if (elLoginForm) {
+  elLoginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (elLoginMsg) elLoginMsg.textContent = "";
 
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-  } catch (err) {
-    console.error(err);
-    elLoginMsg.textContent = "שגיאה בכניסה: " + (err?.message || err);
-  }
-});
+    const emailEl = document.getElementById("dev-email");
+    const passEl = document.getElementById("dev-password");
+    const email = (emailEl?.value || "").trim();
+    const password = passEl?.value || "";
 
-elLogout.addEventListener("click", async () => {
-  await signOut(auth);
-});
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (err) {
+      console.error(err);
+      if (elLoginMsg) elLoginMsg.textContent = "שגיאה בכניסה: " + (err?.message || err);
+    }
+  });
+}
+
+if (elLogout) {
+  elLogout.addEventListener("click", async () => {
+    await signOut(auth);
+  });
+}
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
-    elStatus.textContent = "לא מחובר";
-    elLogin.style.display = "block";
-    elContent.style.display = "none";
+    if (elStatus) elStatus.textContent = "לא מחובר";
+    if (elLogin) elLogin.style.display = "block";
+    if (elContent) elContent.style.display = "none";
     return;
   }
 
   const email = norm(user.email);
   if (!DEV_EMAILS.includes(email)) {
-    elStatus.textContent = "אין לך גישה (לא DEV)";
+    if (elStatus) elStatus.textContent = "אין לך גישה (לא DEV)";
     alert("אין לך גישה לדף DEV");
     await signOut(auth);
     return;
   }
 
-  elStatus.textContent = `מחובר כ-DEV: ${user.email}`;
-  elLogin.style.display = "none";
-  elContent.style.display = "block";
+  if (elStatus) elStatus.textContent = `מחובר כ-DEV: ${user.email}`;
+  if (elLogin) elLogin.style.display = "none";
+  if (elContent) elContent.style.display = "block";
 
-  // דואגים של-DEV יהיה גם מסמך הרשאות כדי שהאדמין יעבוד חלק
+  // דואגים של-DEV יהיה גם מסמך הרשאות
   await ensureDevAdminUserDoc(user);
 
   await refreshAll();
@@ -149,6 +156,7 @@ async function ensureDevAdminUserDoc(user) {
   const ref = doc(db, "adminUsers", user.uid);
   const snap = await getDoc(ref);
   if (snap.exists()) return;
+
   await setDoc(ref, {
     email: user.email,
     fullName: "DEV",
@@ -166,25 +174,40 @@ async function refreshAll() {
 // =============================
 // Requests (adminRequests)
 // =============================
+function isPendingRequest(d) {
+  // תומך גם בחדש וגם בישן:
+  // חדש: status=pending
+  // ישן: handled=false
+  // עוד יותר ישן: אין status, אין handled=true
+  const status = String(d?.status || "").toLowerCase();
+  if (status === "pending") return true;
+  if (d?.handled === false) return true;
+  if (!d?.status && d?.handled !== true) return true;
+  return false;
+}
+
 async function renderRequests() {
+  if (!reqBody || !reqEmpty) return;
+
   reqBody.innerHTML = "";
 
-  const qy = query(
-    collection(db, "adminRequests"),
-    where("status", "==", "pending"),
-    orderBy("createdAt", "desc")
-  );
+  // בלי where כדי לא להיתקע על אינדקסים וגם כדי לא לפספס בקשות ישנות
+  const qy = query(collection(db, "adminRequests"), orderBy("createdAt", "desc"));
 
   let snaps;
   try {
     snaps = await getDocs(qy);
   } catch (e) {
-    // אם אין אינדקס ל-where+orderBy - ניפול לגרסה בלי orderBy
-    snaps = await getDocs(query(collection(db, "adminRequests"), where("status", "==", "pending")));
+    // אם אין createdAt/אינדקס - ניפול לשליפה בלי orderBy
+    console.warn("renderRequests fallback:", e);
+    snaps = await getDocs(collection(db, "adminRequests"));
   }
 
   const arr = [];
-  snaps.forEach((s) => arr.push({ id: s.id, ...s.data() }));
+  snaps.forEach((s) => {
+    const data = s.data() || {};
+    if (isPendingRequest(data)) arr.push({ id: s.id, ...data });
+  });
 
   if (arr.length === 0) {
     reqEmpty.style.display = "block";
@@ -201,13 +224,17 @@ function renderRequestRow(r) {
   const tr = document.createElement("tr");
   tr.className = "row";
 
+  // התאמות שמות שדות (חדש + ישן)
+  const jobTitle = r.jobTitle ?? r.role ?? "-";
+  const note = r.note ?? r.reason ?? "-";
+
   const tdEmail = document.createElement("td");
   tdEmail.innerHTML = `<div><b>${escapeHtml(r.email || "")}</b></div><div class="small">${escapeHtml(r.fullName || "")}</div>`;
 
   const tdInfo = document.createElement("td");
   tdInfo.innerHTML = `
-    <div class="small">תפקיד בבי"ס: <b>${escapeHtml(r.jobTitle || "-")}</b></div>
-    <div class="small">הערה: ${escapeHtml(r.note || "-")}</div>
+    <div class="small">תפקיד בבי"ס: <b>${escapeHtml(jobTitle)}</b></div>
+    <div class="small">הערה: ${escapeHtml(note)}</div>
     <div class="small muted">נשלח: ${formatTime(r.createdAt)}</div>
   `;
 
@@ -258,10 +285,12 @@ function renderRequestRow(r) {
   btnApprove.addEventListener("click", async () => {
     const role = roleSel.value;
     const grades = Array.from(chkWrap.querySelectorAll("input[type=checkbox]:checked")).map((c) => c.value);
-    if (grades.length === 0 && role !== "principal") {
+
+    if (role !== "principal" && grades.length === 0) {
       alert("בחר לפחות שכבה אחת");
       return;
     }
+
     msg.textContent = "יוצר משתמש...";
     try {
       await approveRequest(r, role, grades);
@@ -274,11 +303,12 @@ function renderRequestRow(r) {
   });
 
   btnReject.addEventListener("click", async () => {
-    if (!confirm("לדחות את הבקשה?") ) return;
+    if (!confirm("לדחות את הבקשה?")) return;
     msg.textContent = "דוחה...";
     try {
       await updateDoc(doc(db, "adminRequests", r.id), {
         status: "rejected",
+        handled: true,
         handledAt: serverTimestamp(),
         handledBy: auth.currentUser?.email || ""
       });
@@ -324,18 +354,20 @@ async function approveRequest(r, role, grades) {
   const secondaryAuth = getSecondaryAuth();
 
   // יצירת משתמש Auth (בלי להחליף את ה-DEV מהסשן)
-  const cred = await import("https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js").then(async (m) => {
-    return await m.createUserWithEmailAndPassword(secondaryAuth, email, password);
-  });
-
+  const cred = await createUserWithEmailAndPassword(secondaryAuth, email, password);
   const uid = cred.user.uid;
+
+  // שמות שדות (חדש + ישן)
+  const fullName = r.fullName || "";
+  const jobTitle = r.jobTitle ?? r.role ?? "";
 
   // שמירת הרשאות
   await setDoc(doc(db, "adminUsers", uid), {
     email,
-    fullName: r.fullName || "",
+    fullName,
+    jobTitle,
     role,
-    allowedGrades: role === "principal" ? ALL_GRADES : grades,
+    allowedGrades: (role === "principal" || role === "dev") ? ALL_GRADES : grades,
     createdAt: serverTimestamp(),
     createdBy: auth.currentUser?.email || ""
   });
@@ -343,8 +375,9 @@ async function approveRequest(r, role, grades) {
   // סגירת בקשה
   await updateDoc(doc(db, "adminRequests", r.id), {
     status: "approved",
+    handled: true,
     approvedRole: role,
-    approvedGrades: role === "principal" ? ALL_GRADES : grades,
+    approvedGrades: (role === "principal" || role === "dev") ? ALL_GRADES : grades,
     handledAt: serverTimestamp(),
     handledBy: auth.currentUser?.email || "",
     approvedUid: uid
@@ -355,12 +388,14 @@ async function approveRequest(r, role, grades) {
 // Users (adminUsers)
 // =============================
 async function renderUsers() {
+  if (!usersList || !usersEmpty) return;
+
   usersList.innerHTML = "";
   const snaps = await getDocs(collection(db, "adminUsers"));
+
   const users = [];
   snaps.forEach((s) => users.push({ id: s.id, ...s.data() }));
 
-  // לא מציגים משתמשים בלי email
   const filtered = users.filter((u) => u.email);
 
   if (filtered.length === 0) {
@@ -369,8 +404,9 @@ async function renderUsers() {
   }
   usersEmpty.style.display = "none";
 
-  // sort by role then email
-  filtered.sort((a, b) => (String(a.role).localeCompare(String(b.role)) || String(a.email).localeCompare(String(b.email))));
+  filtered.sort((a, b) =>
+    (String(a.role).localeCompare(String(b.role)) || String(a.email).localeCompare(String(b.email)))
+  );
 
   for (const u of filtered) {
     usersList.appendChild(renderUserCard(u));
@@ -485,7 +521,6 @@ function escapeHtml(str) {
 function formatTime(ts) {
   try {
     if (!ts) return "-";
-    // Firestore Timestamp
     const d = ts.toDate ? ts.toDate() : new Date(ts);
     return d.toLocaleString("he-IL");
   } catch {

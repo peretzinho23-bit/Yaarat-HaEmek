@@ -37,15 +37,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       await addDoc(collection(db, "adminRequests"), {
-        fullName,
-        email,
-        role,
-        reason,
-        message,
-        password,            // << נשמר במסמך
-        createdAt: serverTimestamp(),
-        handled: false
-      });
+  fullName,
+  email,
+
+  // שמות שה-DEV מבין
+  jobTitle: role,          // התפקיד בבית הספר
+  note: reason,            // סיבה / למה לבקש גישה
+  message,                 // הודעה חופשית
+  password,                // הסיסמה שהוא ביקש
+
+  // סטטוס שה-DEV מחפש
+  status: "pending",
+  handled: false,
+
+  createdAt: serverTimestamp()
+});
+
 
       form.reset();
       statusEl.textContent = "הבקשה נשלחה ונשמרה בהצלחה. תודה!";
