@@ -364,6 +364,24 @@
         color: #e5e7eb;
       }
     }
+    /* ✅ תפריט מובייל קטן יותר (לא ענקי) */
+@media (max-width: 900px) {
+  #nav-mobile.nav-mobile{
+    width: min(360px, calc(100% - 24px)) !important; /* פה שולט הגודל */
+    left: 12px !important;   /* יוצא מההמבורגר (שמאל) */
+    right: auto !important;  /* לא נמתח */
+    top: calc(100% + 10px) !important;
+
+    padding: 8px !important;
+  }
+
+  #nav-mobile.nav-mobile a{
+    padding: 9px 10px !important;
+    margin: 6px 0 !important;
+    font-size: 0.92rem !important;
+  }
+}
+
   </style>
 </head>
 
