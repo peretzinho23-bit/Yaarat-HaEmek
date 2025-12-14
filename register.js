@@ -1,3 +1,25 @@
+console.log("✅ register.js loaded");
+
+window.addEventListener("error", (e) => {
+  console.error("❌ window error:", e.message, e.filename, e.lineno);
+});
+window.addEventListener("unhandledrejection", (e) => {
+  console.error("❌ unhandled rejection:", e.reason);
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("✅ DOMContentLoaded");
+
+  const form = document.querySelector("form");
+  console.log("✅ form found?", !!form, form);
+
+  if (!form) return;
+
+  form.addEventListener("submit", (ev) => {
+    console.log("✅ submit fired");
+  }, { capture: true }); // בכוונה capture כדי לתפוס גם אם משהו עוצר
+});
+
 import { app, auth, db } from "./firebase-config.js";
 import {
   signInWithEmailAndPassword,
