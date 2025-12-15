@@ -46,6 +46,7 @@ const BETWEEN_BLOCKS = [
   { label: "הפסקה", time: "11:45-12:00" },
   { label: "הפסקה", time: "13:30-13:45" }
 ];
+
 function toMinutes(hhmm) {
   const m = String(hhmm || "").match(/^(\d{1,2}):(\d{2})$/);
   if (!m) return null;
@@ -396,8 +397,10 @@ function setSelectedDayKey(key) {
 
 function renderMobileDayFromLastGrid() {
   if (!ttMobileWrap || !daySchedule) return;
+
   if (!lastTimetableGrid) {
     daySchedule.innerHTML = "";
+    if (boomNowNext) boomNowNext.innerHTML = "";
     return;
   }
 
@@ -407,53 +410,61 @@ function renderMobileDayFromLastGrid() {
   const limit = maxPeriodsForDay(dayKey);
   const arr = Array.isArray(lastTimetableGrid?.[dayKey]) ? lastTimetableGrid[dayKey] : [];
 
-const { nowId, nextId, nowText, nextText } = getNowNextForDay(dayKey);
+  const { nowId, nextId, nowText, nextText } = getNowNextForDay(dayKey);
 
-const rows = PERIODS.map((p, idx) => {
-  const disabled = (idx + 1) > limit;
-  if (disabled) return null;
+  // חישוב דקות שנותרו/בעוד כמה
+  const nowMin = new Date().getHours() * 60 + new Date().getMinutes();
+  const blocks = buildDayTimeline(dayKey);
+  const nowBlock = blocks.find(b => `${b.type}:${b.type==="lesson" ? b.period : b.start}` === nowId) || null;
+  const nextBlock = blocks.find(b => `${b.type}:${b.type==="lesson" ? b.period : b.start}` === nextId) || null;
 
-  const cell = arr[idx] || {};
-  const subject = String(cell.subject || "").trim();
-  const teacher = String(cell.teacher || "").trim();
-  const room = String(cell.room || "").trim();
-  const empty = !subject && !teacher && !room;
+  const nowRemainingMin = nowBlock ? Math.max(0, nowBlock.end - nowMin) : null;
+  const nextInMin = nextBlock ? Math.max(0, nextBlock.start - nowMin) : null;
 
-  const id = `lesson:${p}`;
-  const isNow = (id === nowId);
-  const isNext = (!isNow && id === nextId);
+  const rows = PERIODS.map((p, idx) => {
+    const disabled = (idx + 1) > limit;
+    if (disabled) return null;
 
-  const badge = isNow
-    ? `<span class="ttm-badge">🔥 עכשיו</span>`
-    : (isNext ? `<span class="ttm-badge">➡️ הבא</span>` : "");
+    const cell = arr[idx] || {};
+    const subject = String(cell.subject || "").trim();
+    const teacher = String(cell.teacher || "").trim();
+    const room = String(cell.room || "").trim();
+    const empty = !subject && !teacher && !room;
 
-  return `
-    <div class="ttm-row ${isNow ? "ttm-now" : ""} ${isNext ? "ttm-next" : ""}" style="
-      border:1px solid rgba(148,163,184,.25);
-      border-radius:14px;
-      padding:10px 12px;
-      margin-bottom:10px;
-      background: ${isDarkMode() ? "rgba(2,6,23,.28)" : "rgba(255,255,255,.92)"};
-    ">
-      <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:6px;">
-        <div style="display:flex;gap:10px;align-items:center;">
-          <div style="font-weight:900; opacity:.92;">שיעור ${p}</div>
-          ${badge}
+    const id = `lesson:${p}`;
+    const isNow = (id === nowId);
+    const isNext = (!isNow && id === nextId);
+
+    const badge = isNow
+      ? `<span class="ttm-badge">🔥 עכשיו</span>`
+      : (isNext ? `<span class="ttm-badge">➡️ הבא</span>` : "");
+
+    return `
+      <div class="ttm-row ${isNow ? "ttm-now" : ""} ${isNext ? "ttm-next" : ""}" style="
+        border:1px solid rgba(148,163,184,.25);
+        border-radius:14px;
+        padding:10px 12px;
+        margin-bottom:10px;
+        background: ${isDarkMode() ? "rgba(2,6,23,.28)" : "rgba(255,255,255,.92)"};
+      ">
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:6px;">
+          <div style="display:flex;gap:10px;align-items:center;">
+            <div style="font-weight:900; opacity:.92;">שיעור ${p}</div>
+            ${badge}
+          </div>
+          <div style="font-weight:800; opacity:.75;">${escapeHtml(PERIOD_TIMES[p] || "")}</div>
         </div>
-        <div style="font-weight:800; opacity:.75;">${escapeHtml(PERIOD_TIMES[p] || "")}</div>
+        ${empty ? `<div style="opacity:.65; font-weight:700;">—</div>` : `
+          <div style="font-weight:900; line-height:1.2;">${escapeHtml(subject)}</div>
+          <div style="opacity:.85; margin-top:6px;">
+            ${teacher ? `<span>${escapeHtml(teacher)}</span>` : ""}
+            ${teacher && room ? `<span style="opacity:.6; margin:0 6px;">•</span>` : ""}
+            ${room ? `<span>${escapeHtml(room)}</span>` : ""}
+          </div>
+        `}
       </div>
-      ${empty ? `<div style="opacity:.65; font-weight:700;">—</div>` : `
-        <div style="font-weight:900; line-height:1.2;">${escapeHtml(subject)}</div>
-        <div style="opacity:.85; margin-top:6px;">
-          ${teacher ? `<span>${escapeHtml(teacher)}</span>` : ""}
-          ${teacher && room ? `<span style="opacity:.6; margin:0 6px;">•</span>` : ""}
-          ${room ? `<span>${escapeHtml(room)}</span>` : ""}
-        </div>
-      `}
-    </div>
-  `;
-}).filter(Boolean);
-
+    `;
+  }).filter(Boolean);
 
   const betweenHtml = BETWEEN_BLOCKS.map(b => `
     <div class="ttm-row" style="
@@ -477,26 +488,27 @@ const rows = PERIODS.map((p, idx) => {
     <div style="margin-top:12px; font-weight:900; opacity:.85;">בין לבין</div>
     ${betweenHtml}
   `;
-}
 
-if (boomNowNext) {
-  if (nowText || nextText) {
-    const nowExtra = (nowRemainingMin != null)
+  // ✅ BOOM "עכשיו/הבא" — כאן זה בטוח (לא שובֵר את הקובץ)
+  if (boomNowNext) {
+    const nowExtra = (nowRemainingMin != null && nowText)
       ? ` <span style="opacity:.8;font-weight:800;">(נותרו ${nowRemainingMin} דק׳)</span>` : "";
 
-    const nextExtra = (nextInMin != null)
+    const nextExtra = (nextInMin != null && nextText)
       ? ` <span style="opacity:.8;font-weight:800;">(בעוד ${nextInMin} דק׳)</span>` : "";
 
-    boomNowNext.innerHTML = `
-      <div style="font-weight:900;">
-        ${nowText ? `🔥 עכשיו: ${escapeHtml(nowText)}${nowExtra}` : "🔥 עכשיו: אין"}
-      </div>
-      <div style="opacity:.85; margin-top:6px;">
-        ${nextText ? `➡️ הבא: ${escapeHtml(nextText)}${nextExtra}` : "➡️ הבא: אין"}
-      </div>
-    `;
-  } else {
-    boomNowNext.innerHTML = "";
+    if (nowText || nextText) {
+      boomNowNext.innerHTML = `
+        <div style="font-weight:900;">
+          ${nowText ? `🔥 עכשיו: ${escapeHtml(nowText)}${nowExtra}` : "🔥 עכשיו: אין"}
+        </div>
+        <div style="opacity:.85; margin-top:6px;">
+          ${nextText ? `➡️ הבא: ${escapeHtml(nextText)}${nextExtra}` : "➡️ הבא: אין"}
+        </div>
+      `;
+    } else {
+      boomNowNext.innerHTML = "";
+    }
   }
 }
 
@@ -932,6 +944,7 @@ async function openClass(classId) {
 // ====== boot ======
 const qs = new URLSearchParams(location.search);
 const classId = (qs.get("class") || "").trim().toLowerCase();
+
 // ✅ refresh NOW/NEXT highlight every 30s (only affects mobile day view)
 setInterval(() => {
   if (!isMobileView()) return;
