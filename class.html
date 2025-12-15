@@ -498,6 +498,78 @@ html[data-theme="dark"] .tt-day-period{
 .tt-day-subject{font-weight:900;line-height:1.1}
 .tt-day-meta{opacity:.85;margin-top:6px;font-size:.92rem}
 .tt-day-dash{opacity:.65;font-weight:800;text-align:center}
+/* ===== BOOM BAR ===== */
+#announceBox{
+  border:1px solid rgba(148,163,184,.35);
+  border-radius:16px;
+  padding:12px;
+  margin-bottom:12px;
+  background: rgba(255,255,255,.08);
+}
+html[data-theme="light"] #announceBox{
+  background: rgba(255,255,255,.92);
+  border-color: rgba(15,23,42,.12);
+  color:#0f172a;
+}
+#announceBox .a-title{font-weight:900;margin-bottom:4px}
+#announceBox .a-body{white-space:pre-wrap;line-height:1.4}
+#announceBox .a-meta{opacity:.75;font-size:.9rem;margin-top:6px}
+
+.boom-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.boom-title{font-weight:900;font-size:1.05rem}
+.boom-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+@media (max-width: 900px){ .boom-grid{grid-template-columns:1fr} }
+
+.boom-chip{
+  border:1px solid rgba(148,163,184,.25);
+  border-radius:16px;
+  padding:12px;
+  background: rgba(255,255,255,.06);
+}
+html[data-theme="light"] .boom-chip{background:rgba(255,255,255,.92);border-color:rgba(15,23,42,.12)}
+.boom-k{opacity:.85;font-size:.9rem}
+.boom-v{font-weight:900;font-size:1.05rem;margin-top:6px}
+
+/* ===== Timetable highlight: עכשיו / הבא ===== */
+.tt-now{
+  outline: 2px solid rgba(56,189,248,.9);
+  box-shadow: 0 0 0 4px rgba(56,189,248,.18);
+  border-radius: 10px;
+}
+.tt-next{
+  outline: 2px dashed rgba(167,139,250,.9);
+  box-shadow: 0 0 0 4px rgba(167,139,250,.16);
+  border-radius: 10px;
+}
+/* ===== Mobile highlight (NOW / NEXT) ===== */
+.ttm-row.ttm-now{
+  outline: 2px solid rgba(56,189,248,.55);
+  box-shadow: 0 14px 40px rgba(56,189,248,.20);
+}
+.ttm-row.ttm-now .ttm-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:4px 10px;
+  border-radius:999px;
+  font-weight:900;
+  background: rgba(56,189,248,.18);
+  border: 1px solid rgba(56,189,248,.35);
+}
+
+.ttm-row.ttm-next{
+  outline: 2px dashed rgba(148,163,184,.45);
+}
+.ttm-row.ttm-next .ttm-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:4px 10px;
+  border-radius:999px;
+  font-weight:900;
+  background: rgba(148,163,184,.14);
+  border: 1px solid rgba(148,163,184,.28);
+}
 
   </style>
 </head>
@@ -582,6 +654,32 @@ html[data-theme="dark"] .tt-day-period{
   </section>
 
   <section id="content" class="hide">
+<!-- ===== BOOM BAR: הודעה חשובה + מה קורה היום ===== -->
+<div class="cardx" id="boom-wrap" style="margin-top:12px;">
+  <div id="announceBox" class="hide"></div>
+
+  <div class="boom-top">
+    <div class="boom-title">⚡ מה קורה היום?</div>
+    <div class="boom-sub muted" id="boomSub">טוען…</div>
+  </div>
+
+  <div class="boom-grid">
+    <div class="boom-chip">
+      <div class="boom-k">📝 מבחנים קרובים</div>
+      <div class="boom-v" id="boomExams">—</div>
+    </div>
+
+    <div class="boom-chip">
+      <div class="boom-k">📰 ידיעות לכיתה</div>
+      <div class="boom-v" id="boomNews">—</div>
+    </div>
+
+    <div class="boom-chip">
+      <div class="boom-k">⏰ עכשיו / הבא</div>
+      <div class="boom-v" id="boomNowNext">—</div>
+    </div>
+  </div>
+</div>
 
     <div class="grid" style="margin-top:12px;">
       <div class="cardx" id="tt-section">

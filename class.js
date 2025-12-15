@@ -25,6 +25,108 @@ const PERIODS = [1,2,3,4,5,6,7,8,9];
 // שישי קצר (אפשר לשנות)
 const DAY_PERIOD_LIMITS = { fri: 6 };
 
+// ✅ שעות שיעורים בדיוק כמו שכתבת
+// (שיעור 9 נשאר ריק כדי לא לבלבל אם אין לכם)
+const PERIOD_TIMES = {
+  1: "8:10-8:55",
+  2: "8:55-9:40",
+  3: "10:15-11:00",
+  4: "11:00-11:45",
+  5: "12:00-12:45",
+  6: "12:45-13:30",
+  7: "13:45-14:30",
+  8: "14:30-15:15",
+  9: ""
+};
+
+// ✅ הפסקות/אירועים קבועים (לתצוגה בסליידר בנייד)
+const BETWEEN_BLOCKS = [
+  { label: "הפסקה", time: "9:40-10:00" },
+  { label: "פותחים בטוב", time: "10:00-10:15" },
+  { label: "הפסקה", time: "11:45-12:00" },
+  { label: "הפסקה", time: "13:30-13:45" }
+];
+function toMinutes(hhmm) {
+  const m = String(hhmm || "").match(/^(\d{1,2}):(\d{2})$/);
+  if (!m) return null;
+  return (Number(m[1]) * 60) + Number(m[2]);
+}
+
+function parseRange(rangeStr) {
+  // "8:10-8:55"
+  const s = String(rangeStr || "").trim();
+  const m = s.match(/^(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})$/);
+  if (!m) return null;
+  const a = toMinutes(m[1]);
+  const b = toMinutes(m[2]);
+  if (a == null || b == null) return null;
+  return { start: a, end: b };
+}
+
+function todayDayKey() {
+  // JS: 0=Sun .. 6=Sat
+  const d = new Date().getDay();
+  const map = ["sun","mon","tue","wed","thu","fri","sat"];
+  return map[d] || "sun";
+}
+
+function buildDayTimeline(dayKey) {
+  // בונה ציר זמן לפי השעות שנתת (שיעורים) + בין לבין
+  const limit = maxPeriodsForDay(dayKey);
+
+  const blocks = [];
+  for (let p = 1; p <= PERIODS.length; p++) {
+    if (p > limit) continue;
+    const r = parseRange(PERIOD_TIMES[p]);
+    if (!r) continue; // למשל שיעור 9 ריק
+    blocks.push({ type:"lesson", period:p, label:`שיעור ${p}`, start:r.start, end:r.end });
+  }
+
+  // מוסיף בלוקים קבועים של הפסקות/פותחים בטוב
+  for (const b of BETWEEN_BLOCKS) {
+    const r = parseRange(b.time);
+    if (!r) continue;
+    blocks.push({ type:"break", period:null, label:b.label, start:r.start, end:r.end });
+  }
+
+  // ממיין לפי התחלה
+  blocks.sort((a,b) => a.start - b.start);
+  return blocks;
+}
+
+function getNowNextForDay(dayKey) {
+  const nowKey = todayDayKey();
+  if (dayKey !== nowKey) return { nowId: null, nextId: null, nowText: "", nextText: "" };
+
+  const blocks = buildDayTimeline(dayKey);
+  const now = new Date();
+  const nowMin = now.getHours() * 60 + now.getMinutes();
+
+  let nowBlock = null;
+  let nextBlock = null;
+
+  for (let i=0; i<blocks.length; i++) {
+    const b = blocks[i];
+    if (nowMin >= b.start && nowMin < b.end) {
+      nowBlock = b;
+      nextBlock = blocks[i+1] || null;
+      break;
+    }
+    if (nowMin < b.start) {
+      nextBlock = b;
+      break;
+    }
+  }
+
+  const nowId = nowBlock ? `${nowBlock.type}:${nowBlock.type==="lesson" ? nowBlock.period : nowBlock.start}` : null;
+  const nextId = nextBlock ? `${nextBlock.type}:${nextBlock.type==="lesson" ? nextBlock.period : nextBlock.start}` : null;
+
+  const nowText = nowBlock ? `${nowBlock.label} (${String(Math.floor(nowBlock.start/60)).padStart(2,"0")}:${String(nowBlock.start%60).padStart(2,"0")}-${String(Math.floor(nowBlock.end/60)).padStart(2,"0")}:${String(nowBlock.end%60).padStart(2,"0")})` : "";
+  const nextText = nextBlock ? `${nextBlock.label} (${String(Math.floor(nextBlock.start/60)).padStart(2,"0")}:${String(nextBlock.start%60).padStart(2,"0")}-${String(Math.floor(nextBlock.end/60)).padStart(2,"0")}:${String(nextBlock.end%60).padStart(2,"0")})` : "";
+
+  return { nowId, nextId, nowText, nextText };
+}
+
 // ====== helpers ======
 function classToGrade(classId) {
   const c = String(classId || "").toLowerCase();
@@ -246,6 +348,11 @@ const ex = document.getElementById("ex");
 const exStatus = document.getElementById("exStatus");
 const news = document.getElementById("news");
 const newsStatus = document.getElementById("newsStatus");
+const announceBox = document.getElementById("announceBox");
+const boomSub = document.getElementById("boomSub");
+const boomExams = document.getElementById("boomExams");
+const boomNews = document.getElementById("boomNews");
+const boomNowNext = document.getElementById("boomNowNext");
 
 const devLink = document.getElementById("dev-link");
 
@@ -300,41 +407,87 @@ function renderMobileDayFromLastGrid() {
   const limit = maxPeriodsForDay(dayKey);
   const arr = Array.isArray(lastTimetableGrid?.[dayKey]) ? lastTimetableGrid[dayKey] : [];
 
-  const rows = PERIODS.map((p, idx) => {
-    const disabled = (idx + 1) > limit;
-    if (disabled) return null;
+const { nowId, nextId, nowText, nextText } = getNowNextForDay(dayKey);
 
-    const cell = arr[idx] || {};
-    const subject = String(cell.subject || "").trim();
-    const teacher = String(cell.teacher || "").trim();
-    const room = String(cell.room || "").trim();
-    const empty = !subject && !teacher && !room;
+const rows = PERIODS.map((p, idx) => {
+  const disabled = (idx + 1) > limit;
+  if (disabled) return null;
 
-    return `
-      <div class="ttm-row" style="
-        border:1px solid rgba(148,163,184,.25);
-        border-radius:14px;
-        padding:10px 12px;
-        margin-bottom:10px;
-        background: ${isDarkMode() ? "rgba(2,6,23,.28)" : "rgba(255,255,255,.92)"};
-      ">
-        <div style="font-weight:900; opacity:.9; margin-bottom:6px;">שיעור ${p}</div>
-        ${empty ? `<div style="opacity:.65; font-weight:700;">—</div>` : `
-          <div style="font-weight:900; line-height:1.2;">${escapeHtml(subject)}</div>
-          <div style="opacity:.85; margin-top:6px;">
-            ${teacher ? `<span>${escapeHtml(teacher)}</span>` : ""}
-            ${teacher && room ? `<span style="opacity:.6; margin:0 6px;">•</span>` : ""}
-            ${room ? `<span>${escapeHtml(room)}</span>` : ""}
-          </div>
-        `}
+  const cell = arr[idx] || {};
+  const subject = String(cell.subject || "").trim();
+  const teacher = String(cell.teacher || "").trim();
+  const room = String(cell.room || "").trim();
+  const empty = !subject && !teacher && !room;
+
+  const id = `lesson:${p}`;
+  const isNow = (id === nowId);
+  const isNext = (!isNow && id === nextId);
+
+  const badge = isNow
+    ? `<span class="ttm-badge">🔥 עכשיו</span>`
+    : (isNext ? `<span class="ttm-badge">➡️ הבא</span>` : "");
+
+  return `
+    <div class="ttm-row ${isNow ? "ttm-now" : ""} ${isNext ? "ttm-next" : ""}" style="
+      border:1px solid rgba(148,163,184,.25);
+      border-radius:14px;
+      padding:10px 12px;
+      margin-bottom:10px;
+      background: ${isDarkMode() ? "rgba(2,6,23,.28)" : "rgba(255,255,255,.92)"};
+    ">
+      <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:6px;">
+        <div style="display:flex;gap:10px;align-items:center;">
+          <div style="font-weight:900; opacity:.92;">שיעור ${p}</div>
+          ${badge}
+        </div>
+        <div style="font-weight:800; opacity:.75;">${escapeHtml(PERIOD_TIMES[p] || "")}</div>
       </div>
-    `;
-  }).filter(Boolean);
+      ${empty ? `<div style="opacity:.65; font-weight:700;">—</div>` : `
+        <div style="font-weight:900; line-height:1.2;">${escapeHtml(subject)}</div>
+        <div style="opacity:.85; margin-top:6px;">
+          ${teacher ? `<span>${escapeHtml(teacher)}</span>` : ""}
+          ${teacher && room ? `<span style="opacity:.6; margin:0 6px;">•</span>` : ""}
+          ${room ? `<span>${escapeHtml(room)}</span>` : ""}
+        </div>
+      `}
+    </div>
+  `;
+}).filter(Boolean);
+
+
+  const betweenHtml = BETWEEN_BLOCKS.map(b => `
+    <div class="ttm-row" style="
+      border:1px dashed rgba(148,163,184,.35);
+      border-radius:14px;
+      padding:10px 12px;
+      margin-bottom:10px;
+      opacity:.92;
+      background: ${isDarkMode() ? "rgba(2,6,23,.18)" : "rgba(241,245,249,.95)"};
+    ">
+      <div style="display:flex;justify-content:space-between;gap:10px;align-items:baseline;">
+        <div style="font-weight:900;">⏸ ${escapeHtml(b.label)}</div>
+        <div style="font-weight:800; opacity:.75;">${escapeHtml(b.time)}</div>
+      </div>
+    </div>
+  `).join("");
 
   daySchedule.innerHTML = `
     <div style="font-weight:900; margin: 4px 0 10px; opacity:.9;">${escapeHtml(dayLabel)}</div>
     ${rows.join("") || `<div style="opacity:.75;">אין שיעורים ליום הזה.</div>`}
+    <div style="margin-top:12px; font-weight:900; opacity:.85;">בין לבין</div>
+    ${betweenHtml}
   `;
+}
+// ✅ עדכון "עכשיו/הבא" בקופסה למעלה אם קיימת
+if (boomNowNext) {
+  if (nowText || nextText) {
+    boomNowNext.innerHTML = `
+      <div style="font-weight:900;">${nowText ? `🔥 עכשיו: ${escapeHtml(nowText)}` : "🔥 עכשיו: אין"}</div>
+      <div style="opacity:.85; margin-top:6px;">${nextText ? `➡️ הבא: ${escapeHtml(nextText)}` : "➡️ הבא: אין"}</div>
+    `;
+  } else {
+    boomNowNext.innerHTML = "";
+  }
 }
 
 function syncTimetableMobileVisibility() {
@@ -402,13 +555,16 @@ function showContentFor(classId) {
 function renderTimetableFromGrid(grid) {
   ensureLocalStyles();
 
-  // ✅ added only: keep last grid for mobile day view
+  // ✅ keep last grid for mobile day view
   lastTimetableGrid = grid || null;
 
   const thead = `
     <thead>
       <tr>
-        <th style="width:76px">שיעור</th>
+        <th style="width:76px">
+          שיעור
+          <div style="font-weight:700; opacity:.75; font-size:.82rem; margin-top:2px;">שעה</div>
+        </th>
         ${DAYS.map(d => `<th>${escapeHtml(d.label)}</th>`).join("")}
       </tr>
     </thead>
@@ -445,7 +601,12 @@ function renderTimetableFromGrid(grid) {
 
     return `
       <tr>
-        <td class="tt-period">${p}</td>
+        <td class="tt-period">
+          ${p}
+          <div style="font-weight:800; opacity:.78; font-size:.78rem; margin-top:4px;">
+            ${escapeHtml(PERIOD_TIMES[p] || "")}
+          </div>
+        </td>
         ${tds}
       </tr>
     `;
@@ -460,7 +621,7 @@ function renderTimetableFromGrid(grid) {
     </div>
   `;
 
-  // ✅ added only: mobile sync + render selected day
+  // ✅ mobile sync + render selected day
   syncTimetableMobileVisibility();
   renderMobileDayFromLastGrid();
 }
@@ -617,7 +778,7 @@ function renderNewsList(classId, items) {
     const finalColor = normalizeNewsColorForTheme(n.color);
     const baseText = isDarkMode() ? "rgba(255,255,255,.92)" : "#0f172a";
 
-    const titleColor = (!isDarkMode()) ? "#0f172a" : (finalColor || baseText); // ✅ כותרת שחורה בלייט מוד תמיד
+    const titleColor = (!isDarkMode()) ? "#0f172a" : (finalColor || baseText);
     const bodyColor = finalColor || baseText;
 
     const imgsHtml = imgs.length ? `
@@ -761,6 +922,11 @@ async function openClass(classId) {
 // ====== boot ======
 const qs = new URLSearchParams(location.search);
 const classId = (qs.get("class") || "").trim().toLowerCase();
+// ✅ refresh NOW/NEXT highlight every 30s (only affects mobile day view)
+setInterval(() => {
+  if (!isMobileView()) return;
+  renderMobileDayFromLastGrid();
+}, 30000);
 
 if (!classId) {
   showChooser();
