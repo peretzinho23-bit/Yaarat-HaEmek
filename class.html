@@ -444,6 +444,60 @@ html[data-theme="dark"] #news .news-body a:link{
 html[data-theme="dark"] #news .news-body a:visited{
   color: #a78bfa !important;
 }
+/* ===== MOBILE Timetable: day slider/picker (ADD ONLY) ===== */
+.tt-mobile{display:none;margin-top:10px}
+@media (max-width: 768px){
+  /* במובייל נסתיר את הטבלה הענקית (שוברת מסך) ונראה בחירת יום */
+  #tt .tt-wrap-table{display:none !important;}
+  .tt-mobile{display:block;}
+}
+
+.tt-mobile-top{
+  display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;
+  margin: 10px 0 12px;
+}
+.tt-mobile-top label{font-weight:900}
+.tt-mobile-top select{
+  min-width:220px;
+  padding:10px 12px;
+  border-radius:14px;
+  border:1px solid rgba(148,163,184,.35);
+  background: rgba(255,255,255,.88);
+  color:#0f172a;
+}
+html[data-theme="dark"] .tt-mobile-top select{
+  background: rgba(15,23,42,.55);
+  color:#e5e7eb;
+  border-color: rgba(148,163,184,.22);
+}
+
+.tt-day-list{display:flex;flex-direction:column;gap:10px}
+.tt-day-row{
+  border:1px solid rgba(148,163,184,.25);
+  border-radius:14px;
+  padding:12px;
+  background: rgba(255,255,255,.10);
+}
+html[data-theme="dark"] .tt-day-row{
+  background: rgba(2,6,23,.25);
+  border-color: rgba(148,163,184,.18);
+}
+.tt-day-row-top{display:flex;gap:10px;align-items:flex-start}
+.tt-day-period{
+  width:44px;flex:0 0 44px;
+  height:34px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:900;
+  background: rgba(56,189,248,.16);
+  border:1px solid rgba(56,189,248,.25);
+}
+html[data-theme="dark"] .tt-day-period{
+  background: rgba(56,189,248,.10);
+  border-color: rgba(56,189,248,.18);
+}
+.tt-day-subject{font-weight:900;line-height:1.1}
+.tt-day-meta{opacity:.85;margin-top:6px;font-size:.92rem}
+.tt-day-dash{opacity:.65;font-weight:800;text-align:center}
 
   </style>
 </head>
@@ -493,119 +547,138 @@ html[data-theme="dark"] #news .news-body a:visited{
     </div>
   </header>
 
-  <main class="page-wrap">
-    <div class="topbar">
-      <div class="left">
-        <div class="pill" id="page-title">דף כיתה</div>
-        <div class="pill muted" id="page-sub">בחר כיתה כדי לראות חדשות, מבחנים ומערכת שעות</div>
+ <main class="page-wrap">
+  <div class="topbar">
+    <div class="left">
+      <div class="pill" id="page-title">דף כיתה</div>
+      <div class="pill muted" id="page-sub">בחר כיתה כדי לראות חדשות, מבחנים ומערכת שעות</div>
+    </div>
+    <div class="pill" id="class-pill">לא נבחרה כיתה</div>
+  </div>
+
+  <section class="cardx" id="chooser-card">
+    <h2 class="section-title2">בחירת כיתה</h2>
+
+    <div class="chooser">
+      <div>
+        <label>שכבה</label>
+        <select id="gradeSel">
+          <option value="">בחר שכבה</option>
+          <option value="z">ז׳</option>
+          <option value="h">ח׳</option>
+          <option value="t">ט׳</option>
+        </select>
       </div>
-      <div class="pill" id="class-pill">לא נבחרה כיתה</div>
+
+      <div>
+        <label>כיתה</label>
+        <select id="classSel" disabled>
+          <option value="">בחר כיתה</option>
+        </select>
+      </div>
+
+      <button class="btn" id="goBtn" disabled>פתח דף כיתה</button>
+    </div>
+  </section>
+
+  <section id="content" class="hide">
+
+    <div class="grid" style="margin-top:12px;">
+      <div class="cardx" id="tt-section">
+        <h2 class="section-title2">📅 מערכת שעות</h2>
+        <div class="muted" id="ttStatus">טוען…</div>
+
+        <div id="tt"></div>
+
+        <!-- ✅ MOBILE: בחירת יום למערכת שעות -->
+        <div class="tt-mobile" id="tt-mobile">
+          <div class="tt-mobile-top">
+            <label for="daySelect">בחר יום:</label>
+            <select id="daySelect">
+              <option value="sun">ראשון</option>
+              <option value="mon">שני</option>
+              <option value="tue">שלישי</option>
+              <option value="wed">רביעי</option>
+              <option value="thu">חמישי</option>
+              <option value="fri">שישי</option>
+            </select>
+          </div>
+          <div id="daySchedule" class="tt-day-list"></div>
+        </div>
+        <!-- ✅ /MOBILE -->
+
+      </div>
+
+      <div class="cardx" id="ex-section">
+        <h2 class="section-title2">📝 מבחנים לכיתה</h2>
+        <div class="muted" id="exStatus">טוען…</div>
+        <div id="ex" class="list"></div>
+      </div>
     </div>
 
-    <section class="cardx" id="chooser-card">
-      <h2 class="section-title2">בחירת כיתה</h2>
+    <div class="cardx" style="margin-top:12px;" id="news-section">
+      <h2 class="section-title2">📰 חדשות לכיתה</h2>
+      <div class="muted" id="newsStatus">טוען…</div>
+      <div id="news" class="list"></div>
+    </div>
 
-      <div class="chooser">
-        <div>
-          <label>שכבה</label>
-          <select id="gradeSel">
-            <option value="">בחר שכבה</option>
-            <option value="z">ז׳</option>
-            <option value="h">ח׳</option>
-            <option value="t">ט׳</option>
-          </select>
-        </div>
+  </section>
+</main>
 
-        <div>
-          <label>כיתה</label>
-          <select id="classSel" disabled>
-            <option value="">בחר כיתה</option>
-          </select>
-        </div>
+<script>
+  // Theme toggle
+  (function () {
+    const btn = document.getElementById("theme-toggle");
+    if (!btn) return;
 
-        <button class="btn" id="goBtn" disabled>פתח דף כיתה</button>
-      </div>
-    </section>
+    function applyTheme(theme) {
+      document.documentElement.setAttribute("data-theme", theme);
+      btn.textContent = theme === "dark" ? "🌙" : "☀️";
+      try { localStorage.setItem("theme", theme); } catch {}
+    }
 
-    <section id="content" class="hide">
+    let saved = "dark";
+    try { saved = localStorage.getItem("theme") || "dark"; } catch {}
+    applyTheme(saved);
 
-      <div class="grid" style="margin-top:12px;">
-        <div class="cardx" id="tt-section">
-          <h2 class="section-title2">📅 מערכת שעות</h2>
-          <div class="muted" id="ttStatus">טוען…</div>
-          <div id="tt"></div>
-        </div>
+    btn.addEventListener("click", () => {
+      const cur = document.documentElement.getAttribute("data-theme") || "dark";
+      applyTheme(cur === "dark" ? "light" : "dark");
+    });
+  })();
+</script>
 
-        <div class="cardx" id="ex-section">
-          <h2 class="section-title2">📝 מבחנים לכיתה</h2>
-          <div class="muted" id="exStatus">טוען…</div>
-          <div id="ex" class="list"></div>
-        </div>
-      </div>
+<script>
+  // mobile menu
+  (function () {
+    const btn = document.getElementById("nav-toggle");
+    const menu = document.getElementById("nav-mobile");
+    if (!btn || !menu) return;
 
-      <div class="cardx" style="margin-top:12px;" id="news-section">
-        <h2 class="section-title2">📰 חדשות לכיתה</h2>
-        <div class="muted" id="newsStatus">טוען…</div>
-        <div id="news" class="list"></div>
-      </div>
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const isOpen = menu.classList.toggle("open");
+      btn.setAttribute("aria-expanded", String(isOpen));
+      menu.setAttribute("aria-hidden", String(!isOpen));
+    });
 
-    </section>
-  </main>
-
-  <script>
-    // Theme toggle
-    (function () {
-      const btn = document.getElementById("theme-toggle");
-      if (!btn) return;
-
-      function applyTheme(theme) {
-        document.documentElement.setAttribute("data-theme", theme);
-        btn.textContent = theme === "dark" ? "🌙" : "☀️";
-        try { localStorage.setItem("theme", theme); } catch {}
-      }
-
-      let saved = "dark";
-      try { saved = localStorage.getItem("theme") || "dark"; } catch {}
-      applyTheme(saved);
-
-      btn.addEventListener("click", () => {
-        const cur = document.documentElement.getAttribute("data-theme") || "dark";
-        applyTheme(cur === "dark" ? "light" : "dark");
-      });
-    })();
-  </script>
-
-  <script>
-    // mobile menu
-    (function () {
-      const btn = document.getElementById("nav-toggle");
-      const menu = document.getElementById("nav-mobile");
-      if (!btn || !menu) return;
-
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const isOpen = menu.classList.toggle("open");
-        btn.setAttribute("aria-expanded", String(isOpen));
-        menu.setAttribute("aria-hidden", String(!isOpen));
-      });
-
-      menu.querySelectorAll("a").forEach((a) => {
-        a.addEventListener("click", () => {
-          menu.classList.remove("open");
-          btn.setAttribute("aria-expanded", "false");
-          menu.setAttribute("aria-hidden", "true");
-        });
-      });
-
-      document.addEventListener("click", (e) => {
-        if (menu.contains(e.target) || btn.contains(e.target)) return;
+    menu.querySelectorAll("a").forEach((a) => {
+      a.addEventListener("click", () => {
         menu.classList.remove("open");
         btn.setAttribute("aria-expanded", "false");
         menu.setAttribute("aria-hidden", "true");
       });
-    })();
-  </script>
+    });
 
-  <script type="module" src="class.js?v=2"></script>
+    document.addEventListener("click", (e) => {
+      if (menu.contains(e.target) || btn.contains(e.target)) return;
+      menu.classList.remove("open");
+      btn.setAttribute("aria-expanded", "false");
+      menu.setAttribute("aria-hidden", "true");
+    });
+  })();
+</script>
+
+<script type="module" src="class.js?v=2"></script>
 </body>
 </html>

@@ -254,6 +254,104 @@ onAuthStateChanged(auth, (user) => {
   if (devLink) devLink.style.display = user ? "" : "none";
 });
 
+// ===============================
+// ✅ MOBILE DAY SLIDER (added only)
+// ===============================
+const ttMobileWrap = document.getElementById("tt-mobile");
+const daySelect = document.getElementById("daySelect");
+const daySchedule = document.getElementById("daySchedule");
+
+let lastTimetableGrid = null;
+let selectedDayKey = "sun";
+
+function isMobileView() {
+  return window.matchMedia && window.matchMedia("(max-width: 820px)").matches;
+}
+
+function setSelectedDayKey(key) {
+  if (!key) return;
+  selectedDayKey = key;
+  try { localStorage.setItem("ttDay", key); } catch {}
+  if (daySelect) daySelect.value = key;
+}
+
+(function initDaySelect() {
+  if (!daySelect) return;
+  let saved = null;
+  try { saved = localStorage.getItem("ttDay"); } catch {}
+  if (saved) setSelectedDayKey(saved);
+
+  daySelect.addEventListener("change", () => {
+    setSelectedDayKey(daySelect.value);
+    renderMobileDayFromLastGrid();
+  });
+})();
+
+function renderMobileDayFromLastGrid() {
+  if (!ttMobileWrap || !daySchedule) return;
+  if (!lastTimetableGrid) {
+    daySchedule.innerHTML = "";
+    return;
+  }
+
+  const dayKey = selectedDayKey || "sun";
+  const dayLabel = (DAYS.find(d => d.key === dayKey)?.label) || "";
+
+  const limit = maxPeriodsForDay(dayKey);
+  const arr = Array.isArray(lastTimetableGrid?.[dayKey]) ? lastTimetableGrid[dayKey] : [];
+
+  const rows = PERIODS.map((p, idx) => {
+    const disabled = (idx + 1) > limit;
+    if (disabled) return null;
+
+    const cell = arr[idx] || {};
+    const subject = String(cell.subject || "").trim();
+    const teacher = String(cell.teacher || "").trim();
+    const room = String(cell.room || "").trim();
+    const empty = !subject && !teacher && !room;
+
+    return `
+      <div class="ttm-row" style="
+        border:1px solid rgba(148,163,184,.25);
+        border-radius:14px;
+        padding:10px 12px;
+        margin-bottom:10px;
+        background: ${isDarkMode() ? "rgba(2,6,23,.28)" : "rgba(255,255,255,.92)"};
+      ">
+        <div style="font-weight:900; opacity:.9; margin-bottom:6px;">שיעור ${p}</div>
+        ${empty ? `<div style="opacity:.65; font-weight:700;">—</div>` : `
+          <div style="font-weight:900; line-height:1.2;">${escapeHtml(subject)}</div>
+          <div style="opacity:.85; margin-top:6px;">
+            ${teacher ? `<span>${escapeHtml(teacher)}</span>` : ""}
+            ${teacher && room ? `<span style="opacity:.6; margin:0 6px;">•</span>` : ""}
+            ${room ? `<span>${escapeHtml(room)}</span>` : ""}
+          </div>
+        `}
+      </div>
+    `;
+  }).filter(Boolean);
+
+  daySchedule.innerHTML = `
+    <div style="font-weight:900; margin: 4px 0 10px; opacity:.9;">${escapeHtml(dayLabel)}</div>
+    ${rows.join("") || `<div style="opacity:.75;">אין שיעורים ליום הזה.</div>`}
+  `;
+}
+
+function syncTimetableMobileVisibility() {
+  if (!ttMobileWrap) return;
+
+  const wrapTable = tt.querySelector(".tt-wrap-table");
+  const mobile = isMobileView();
+
+  // בטלפון: מציגים את בחירת היום ומסתירים את הטבלה הגדולה
+  ttMobileWrap.style.display = mobile ? "" : "none";
+  if (wrapTable) wrapTable.style.display = mobile ? "none" : "";
+}
+
+window.addEventListener("resize", () => {
+  syncTimetableMobileVisibility();
+});
+
 // ====== chooser ======
 function fillClassesForGrade(g) {
   classSel.innerHTML = `<option value="">בחר כיתה</option>`;
@@ -303,6 +401,9 @@ function showContentFor(classId) {
 // ====== Timetable (grid) ======
 function renderTimetableFromGrid(grid) {
   ensureLocalStyles();
+
+  // ✅ added only: keep last grid for mobile day view
+  lastTimetableGrid = grid || null;
 
   const thead = `
     <thead>
@@ -358,6 +459,10 @@ function renderTimetableFromGrid(grid) {
       </table>
     </div>
   `;
+
+  // ✅ added only: mobile sync + render selected day
+  syncTimetableMobileVisibility();
+  renderMobileDayFromLastGrid();
 }
 
 // schema ישן (days/rows) -> ממירים ל-grid ומציגים
