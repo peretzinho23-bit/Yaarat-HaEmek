@@ -478,12 +478,22 @@ const rows = PERIODS.map((p, idx) => {
     ${betweenHtml}
   `;
 }
-// ✅ עדכון "עכשיו/הבא" בקופסה למעלה אם קיימת
+
 if (boomNowNext) {
   if (nowText || nextText) {
+    const nowExtra = (nowRemainingMin != null)
+      ? ` <span style="opacity:.8;font-weight:800;">(נותרו ${nowRemainingMin} דק׳)</span>` : "";
+
+    const nextExtra = (nextInMin != null)
+      ? ` <span style="opacity:.8;font-weight:800;">(בעוד ${nextInMin} דק׳)</span>` : "";
+
     boomNowNext.innerHTML = `
-      <div style="font-weight:900;">${nowText ? `🔥 עכשיו: ${escapeHtml(nowText)}` : "🔥 עכשיו: אין"}</div>
-      <div style="opacity:.85; margin-top:6px;">${nextText ? `➡️ הבא: ${escapeHtml(nextText)}` : "➡️ הבא: אין"}</div>
+      <div style="font-weight:900;">
+        ${nowText ? `🔥 עכשיו: ${escapeHtml(nowText)}${nowExtra}` : "🔥 עכשיו: אין"}
+      </div>
+      <div style="opacity:.85; margin-top:6px;">
+        ${nextText ? `➡️ הבא: ${escapeHtml(nextText)}${nextExtra}` : "➡️ הבא: אין"}
+      </div>
     `;
   } else {
     boomNowNext.innerHTML = "";

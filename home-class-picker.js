@@ -1,4 +1,5 @@
 // home-class-picker.js
+
 const CLASS_IDS_BY_GRADE = {
   z: [
     { id: "z1", label: "ז1" },
@@ -22,16 +23,23 @@ const CLASS_IDS_BY_GRADE = {
   ],
 };
 
-function $(id) {
-  return document.getElementById(id);
-}
+function initHomeClassPicker() {
+  const gradeSel = document.getElementById("home-grade");
+  const classSel = document.getElementById("home-class");
+  const openBtn = document.getElementById("home-open-class");
 
-document.addEventListener("DOMContentLoaded", () => {
-  const gradeSel = $("home-grade");
-  const classSel = $("home-class");
-  const openBtn = $("home-open-class");
+  // אם אחד מהם חסר – אין מה לעשות, אבל לפחות תדע למה
+  if (!gradeSel || !classSel || !openBtn) {
+    console.error("[home-class-picker] Missing elements:", {
+      gradeSel: !!gradeSel,
+      classSel: !!classSel,
+      openBtn: !!openBtn,
+    });
+    return;
+  }
 
-  if (!gradeSel || !classSel || !openBtn) return;
+  // חשוב אם הכפתור בתוך FORM
+  openBtn.type = "button";
 
   function resetClasses() {
     classSel.innerHTML = `<option value="">בחר כיתה</option>`;
@@ -41,15 +49,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function fillClasses(grade) {
     const list = CLASS_IDS_BY_GRADE[grade] || [];
-    classSel.innerHTML = `<option value="">בחר כיתה</option>` + list
-      .map((c) => `<option value="${c.id}">${c.label}</option>`)
-      .join("");
+    classSel.innerHTML =
+      `<option value="">בחר כיתה</option>` +
+      list.map((c) => `<option value="${c.id}">${c.label}</option>`).join("");
+
     classSel.disabled = list.length === 0;
     openBtn.disabled = true;
   }
 
   gradeSel.addEventListener("change", () => {
-    const g = gradeSel.value;
+    const g = (gradeSel.value || "").trim();
     if (!g) return resetClasses();
     fillClasses(g);
   });
@@ -58,12 +67,23 @@ document.addEventListener("DOMContentLoaded", () => {
     openBtn.disabled = !classSel.value;
   });
 
-  openBtn.addEventListener("click", () => {
-    const classId = classSel.value;
+  openBtn.addEventListener("click", (e) => {
+    e.preventDefault(); // מגן מפני submit/התנהגות של form
+
+    const classId = (classSel.value || "").trim();
     if (!classId) return;
-    window.location.href = `class.html?class=${encodeURIComponent(classId)}`;
+
+    const url = `class.html?class=${encodeURIComponent(classId)}`;
+    console.log("[home-class-picker] Navigating to:", url);
+    window.location.assign(url);
   });
 
-  // התחלה
+  // start
   resetClasses();
-});
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initHomeClassPicker);
+} else {
+  initHomeClassPicker();
+}
