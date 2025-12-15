@@ -5,7 +5,7 @@ const CLASS_IDS_BY_GRADE = {
     { id: "z2", label: "ז2" },
     { id: "z3", label: "ז3" },
     { id: "z4", label: "ז4" },
-    { id: "z5", label: "ז5" },
+    { id: "z5", label: "ז5/7" },
   ],
   h: [
     { id: "h1", label: "ח1/7" },
