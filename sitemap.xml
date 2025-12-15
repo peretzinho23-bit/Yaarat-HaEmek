@@ -1,24 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
+  <!-- דף הבית -->
   <url>
     <loc>https://yaarathaemek.online/</loc>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- דפי תוכן מרכזיים -->
+  <url>
+    <loc>https://yaarathaemek.online/class.html</loc>
+    <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://yaarathaemek.online/z.html</loc>
+    <loc>https://yaarathaemek.online/exams.html</loc>
+    <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://yaarathaemek.online/h.html</loc>
+    <loc>https://yaarathaemek.online/article.html</loc>
+    <priority>0.7</priority>
   </url>
 
+  <!-- סקרים -->
   <url>
-    <loc>https://yaarathaemek.online/t.html</loc>
+    <loc>https://yaarathaemek.online/polls.html</loc>
+    <priority>0.6</priority>
   </url>
 
+  <!-- אזור ניהול (כן – אפשר, זה לא חוסם אינדוקס של האתר) -->
   <url>
     <loc>https://yaarathaemek.online/admin.html</loc>
+    <priority>0.4</priority>
+  </url>
+
+  <url>
+    <loc>https://yaarathaemek.online/dev.html</loc>
+    <priority>0.3</priority>
+  </url>
+
+  <url>
+    <loc>https://yaarathaemek.online/polls-admin.html</loc>
+    <priority>0.3</priority>
   </url>
 
 </urlset>
