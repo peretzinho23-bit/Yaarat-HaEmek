@@ -24,33 +24,33 @@ function ensureUrgentStyles() {
   const style = document.createElement("style");
   style.id = "urgent-inline-styles";
   style.textContent = `
-    /* מרכז + רוחב נעים */
     #urgent-wrap{ width:100%; }
 
     .urgent-bar{
       width: min(1200px, calc(100% - 28px));
       margin: 18px auto;
       border-radius: 16px;
-      padding: 10px 12px;
       border: 1px solid rgba(148,163,184,.35);
       overflow: hidden;
-      direction: rtl; /* badge מימין */
+      direction: rtl;
       box-shadow: 0 10px 30px rgba(2,6,23,.06);
-      background: rgba(255,255,255,.75);
+      background: rgba(255,255,255,.72);
     }
     html[data-theme="dark"] .urgent-bar{
       background: rgba(2,6,23,.22);
       box-shadow: 0 10px 30px rgba(0,0,0,.22);
     }
 
-    .urgent-bar[data-type="danger"]{ background: rgba(239,68,68,.12); }
-    .urgent-bar[data-type="warn"]{ background: rgba(245,158,11,.14); }
-    .urgent-bar[data-type="info"]{ background: rgba(59,130,246,.12); }
+    /* רקע פחות "ענק" + יותר נקי */
+    .urgent-bar[data-type="danger"]{ background: rgba(239,68,68,.10); }
+    .urgent-bar[data-type="warn"]{ background: rgba(245,158,11,.12); }
+    .urgent-bar[data-type="info"]{ background: rgba(59,130,246,.10); }
 
     .urgent-inner{
       display:flex;
       align-items:center;
       gap:10px;
+      padding: 10px 12px;
       min-width:0;
     }
 
@@ -64,7 +64,7 @@ function ensureUrgentStyles() {
       flex: 0 0 auto;
     }
 
-    /* הטריק: שולטים באנימציה ב-LTR כדי שהמרקיי יזוז חלק, אבל הטקסט עצמו נשאר RTL */
+    /* האנימציה עובדת הכי טוב כשמסילה ב-LTR */
     .urgent-track{
       position: relative;
       flex: 1 1 auto;
@@ -72,33 +72,34 @@ function ensureUrgentStyles() {
       overflow: hidden;
       white-space: nowrap;
       direction: ltr;
+      height: 26px; /* נמוך יותר = פחות "שמיכה" */
     }
 
-    .urgent-runner{
-      display: inline-flex;
-      align-items: center;
-      white-space: nowrap;
-      will-change: transform;
-      animation: urgentMarquee var(--urgent-speed, 10s) linear infinite;
-    }
-
-    .urgent-item{
-      display: inline-flex;
-      align-items: center;
+    .urgent-text{
+      display:inline-block;
       direction: rtl;
       unicode-bidi: plaintext;
       font-weight: 900;
       opacity: .92;
-      padding-right: 44px; /* רווח לפני “הסיבוב הבא” */
+      will-change: transform;
+      transform: translateX(100%);
+      animation: urgentMarquee var(--urgent-speed, 10s) linear infinite;
+      padding-left: 60px; /* רווח לפני סיבוב הבא */
     }
 
+    /* מימין -> שמאל ואז מתחיל מחדש */
     @keyframes urgentMarquee{
-      from { transform: translateX(0); }
-      to   { transform: translateX(-50%); }
+      from { transform: translateX(100%); }
+      to   { transform: translateX(-120%); }
+    }
+
+    /* קצת יותר איטי בנייד */
+    @media (max-width: 820px){
+      .urgent-text{ animation-duration: var(--urgent-speed-mobile, 13s); }
     }
 
     @media (prefers-reduced-motion: reduce){
-      .urgent-runner{ animation: none; }
+      .urgent-text{ animation: none; transform:none; }
     }
   `;
   document.head.appendChild(style);
@@ -115,12 +116,11 @@ function showTicker() {
   wrap.style.display = "";
 }
 
-// מהירות: קצר = מהיר יותר, ארוך = קצת יותר זמן כדי שיהיה קריא
+// קצר = יותר מהר, ארוך = יותר זמן לקריאה
 function calcSpeedSeconds(text) {
   const len = String(text || "").length;
-  // בערך: 7–16 שניות
-  const s = 7 + Math.min(9, len / 14);
-  return Math.max(7, Math.min(16, s));
+  const s = 6 + Math.min(10, len / 10); // בערך 6–16
+  return Math.max(6, Math.min(16, s));
 }
 
 let lastKey = "";
@@ -134,32 +134,27 @@ function renderTicker(text, type) {
   const safeText = escapeHtml(text);
 
   const key = `${safeType}::${safeText}`;
-  if (key === lastKey) return;
+  if (key === lastKey) return; // לא מרנדר שוב בלי שינוי
   lastKey = key;
 
   const speed = calcSpeedSeconds(text);
+  const speedMobile = Math.max(speed + 3, 11);
 
-wrap.innerHTML = `
-  <div class="urgent-bar"
-       data-type="${safeType}"
-       role="status"
-       aria-live="polite"
-       style="--urgent-speed:${speed}s; --urgent-speed-mobile:${Math.max(speed + 3, 11)}s;">
-       
-    <div class="urgent-inner">
-      <div class="urgent-badge">
-        ${typeToBadge(safeType)}
-      </div>
-
-      <div class="urgent-track" aria-label="הודעה דחופה">
-        <span class="urgent-text">
-          ${safeText}
-        </span>
+  wrap.innerHTML = `
+    <div class="urgent-bar"
+         data-type="${safeType}"
+         role="status"
+         aria-live="polite"
+         style="--urgent-speed:${speed}s; --urgent-speed-mobile:${speedMobile}s;">
+      <div class="urgent-inner">
+        <div class="urgent-badge">${typeToBadge(safeType)}</div>
+        <div class="urgent-track" aria-label="הודעה דחופה">
+          <span class="urgent-text">${safeText}</span>
+        </div>
       </div>
     </div>
-  </div>
-`;
-
+  `;
+}
 
 function bootUrgent() {
   if (!wrap) return;
