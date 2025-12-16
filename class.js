@@ -271,12 +271,12 @@ onAuthStateChanged(auth, (user) => {
 let lastExamsArr = [];
 let lastNewsArr = [];
 let activeClassId = null;
-function getNextExamCountdown() {
+
+function getNextExamCountdownParts() {
   if (!lastExamsArr || !lastExamsArr.length) return null;
 
   const now = new Date();
 
-  // מוצא את המבחן הראשון שעוד לא עבר
   const next = lastExamsArr
     .map(e => ({ ...e, _d: parseDate(e.date) }))
     .filter(e => e._d && e._d.getTime() > now.getTime())
@@ -287,19 +287,22 @@ function getNextExamCountdown() {
   let diff = Math.floor((next._d.getTime() - now.getTime()) / 1000);
   if (diff <= 0) return null;
 
-  const hours = Math.floor(diff / 3600);
-  diff %= 3600;
-  const minutes = Math.floor(diff / 60);
+  const totalMinutes = Math.floor(diff / 60);
   const seconds = diff % 60;
 
-  return {
-    text: `📝 המבחן הבא בעוד ${hours}ש ${minutes}ד ${seconds}ש׳`,
-  };
+  return { totalMinutes, seconds };
 }
 
 function updateBoomCounts() {
-  if (boomExams) boomExams.textContent =
-    lastExamsArr?.length ? `${lastExamsArr.length}` : "—";
+  // ✅ "מבחנים קרובים" במקום מספר => ספירה לאחור למבחן הבא (דקות+שניות)
+  if (boomExams) {
+    const cd = getNextExamCountdownParts();
+    if (cd) {
+      boomExams.textContent = `עוד ${cd.totalMinutes}ד ${cd.seconds}ש׳`;
+    } else {
+      boomExams.textContent = "—";
+    }
+  }
 
   if (boomNews) boomNews.textContent =
     lastNewsArr?.length ? `${lastNewsArr.length}` : "—";
@@ -310,14 +313,9 @@ function updateBoomCounts() {
     const hh = String(now.getHours()).padStart(2,"0");
     const mm = String(now.getMinutes()).padStart(2,"0");
     const ss = String(now.getSeconds()).padStart(2,"0");
-
-    const examCountdown = getNextExamCountdown();
-    boomSub.textContent = examCountdown
-      ? examCountdown.text
-      : `עודכן ב-${hh}:${mm}:${ss}`;
+    boomSub.textContent = `עודכן ב-${hh}:${mm}:${ss}`;
   }
 }
-
 
 function getBoomDayKey() {
   // במובייל – היום שנבחר
@@ -332,7 +330,7 @@ function updateBoomNowNext() {
   if (!boomNowNext) return;
 
   const dayKey = getBoomDayKey();
-  const { nowText, nextText } = getNowNextForDay(dayKey);
+  const { nowText } = getNowNextForDay(dayKey);
 
   const nowMin = new Date().getHours() * 60 + new Date().getMinutes();
   const blocks = buildDayTimeline(dayKey);
@@ -387,7 +385,7 @@ function setSelectedDayKey(key) {
   daySelect.addEventListener("change", () => {
     setSelectedDayKey(daySelect.value);
     renderMobileDayFromLastGrid();
-updateBoomNowNext();
+    updateBoomNowNext();
   });
 })();
 
@@ -532,7 +530,7 @@ function showChooser() {
   lastExamsArr = [];
   lastNewsArr = [];
   updateBoomCounts();
-  updateBoomNowNext(todayDayKey());
+  updateBoomNowNext();
   if (announceBox) announceBox.classList.add("hide");
 }
 
@@ -617,7 +615,7 @@ function renderTimetableFromGrid(grid) {
 
   syncTimetableMobileVisibility();
   renderMobileDayFromLastGrid();
-  updateBoomNowNext(selectedDayKey || todayDayKey());
+  updateBoomNowNext();
   updateBoomCounts();
 }
 
@@ -660,7 +658,7 @@ async function loadTimetableOnce(classId) {
       if (ttStatus) ttStatus.textContent = "אין מערכת שעות לכיתה הזאת עדיין.";
       lastTimetableGrid = null;
       renderMobileDayFromLastGrid();
-      updateBoomNowNext(selectedDayKey || todayDayKey());
+      updateBoomNowNext();
       return;
     }
 
@@ -682,7 +680,7 @@ async function loadTimetableOnce(classId) {
     if (ttStatus) ttStatus.textContent = "המערכת קיימת אבל ריקה.";
     lastTimetableGrid = null;
     renderMobileDayFromLastGrid();
-    updateBoomNowNext(selectedDayKey || todayDayKey());
+    updateBoomNowNext();
   } catch (e) {
     console.error("timetable error:", e);
     if (ttStatus) ttStatus.textContent = "שגיאה בטעינת מערכת שעות (בדוק Console/Rules).";
@@ -851,7 +849,7 @@ function startRealtime(classId) {
       if (ttStatus) ttStatus.textContent = "אין מערכת שעות לכיתה הזאת עדיין.";
       lastTimetableGrid = null;
       renderMobileDayFromLastGrid();
-      updateBoomNowNext(selectedDayKey || todayDayKey());
+      updateBoomNowNext();
       return;
     }
 
@@ -872,7 +870,7 @@ function startRealtime(classId) {
     if (ttStatus) ttStatus.textContent = "המערכת קיימת אבל ריקה.";
     lastTimetableGrid = null;
     renderMobileDayFromLastGrid();
-    updateBoomNowNext(selectedDayKey || todayDayKey());
+    updateBoomNowNext();
   }, (err) => {
     console.error("timetable snapshot error:", err);
     if (ttStatus) ttStatus.textContent = "שגיאה בטעינת מערכת שעות (בדוק Console/Rules).";
@@ -941,7 +939,7 @@ async function openClass(classId) {
   lastExamsArr = [];
   lastNewsArr = [];
   updateBoomCounts();
-  updateBoomNowNext(selectedDayKey || todayDayKey());
+  updateBoomNowNext();
 
   await Promise.all([
     loadTimetableOnce(classId),
@@ -953,23 +951,22 @@ async function openClass(classId) {
 
   // עדכון אחרון
   updateBoomCounts();
-  updateBoomNowNext(selectedDayKey || todayDayKey());
+  updateBoomNowNext();
 }
 
 // ====== boot ======
 const qs = new URLSearchParams(location.search);
 const classId = (qs.get("class") || "").trim().toLowerCase();
 
-// ✅ refresh NOW/NEXT every 30s
+// ✅ refresh every 1s (בשביל דקות+שניות)
 setInterval(() => {
   updateBoomCounts();
-  updateBoomNowNext(selectedDayKey || todayDayKey());
+  updateBoomNowNext();
 
   if (isMobileView()) {
     renderMobileDayFromLastGrid();
   }
 }, 1000);
-
 
 if (!classId || !isKnownClass(classId)) {
   showChooser();
