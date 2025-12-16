@@ -45,6 +45,7 @@ function ensureUrgentStyles() {
       box-shadow: 0 10px 30px rgba(0,0,0,.22);
     }
 
+    /* רקע לפי סוג (עדין, קצר ולא צועק) */
     .urgent-bar[data-type="danger"]{ background: rgba(239,68,68,.10); }
     .urgent-bar[data-type="warn"]{ background: rgba(245,158,11,.12); }
     .urgent-bar[data-type="info"]{ background: rgba(59,130,246,.10); }
@@ -67,61 +68,44 @@ function ensureUrgentStyles() {
       flex: 0 0 auto;
     }
 
-    /* TRACK */
+    /* המסילה */
     .urgent-track{
       position: relative;
       flex: 1 1 auto;
       min-width: 0;
       overflow: hidden;
       white-space: nowrap;
-      direction: ltr; /* משאירים LTR בשביל ביצועים של transform */
+      height: 26px;
+      display:flex;
+      align-items:center;
+      justify-content:flex-start; /* בגלל RTL: זה צמוד לבאדג׳ */
     }
 
-    /* RUNNER – מתחיל מימין ונוסע שמאלה */
-    .urgent-runner{
-      display: inline-flex;
-      align-items: center;
-      gap: var(--urgent-gap, 64px);
-      will-change: transform;
-
-      /* 👇 זה מה שמתקן לך: מתחילים מחוץ לימין */
-      transform: translateX(50%);
-      animation: urgentLoopRTL var(--urgent-speed, 12s) linear infinite;
-    }
-
-    .urgent-bar:hover .urgent-runner{ animation-play-state: paused; }
-
+    /* הטקסט: עותק אחד, מתחיל ליד "דחוף" ונוסע שמאלה */
     .urgent-text{
       display:inline-block;
       direction: rtl;
       unicode-bidi: plaintext;
       font-weight: 900;
       opacity: .92;
-      white-space: nowrap;
+      will-change: transform;
+      transform: translateX(0);
+      animation: urgentMove var(--urgent-speed, 10s) linear infinite;
+      color: var(--urgent-text-color, #0f172a);
+    }
+    html[data-theme="dark"] .urgent-text{
+      color: var(--urgent-text-color, rgba(255,255,255,.92));
     }
 
-    .urgent-text.default-gradient{
-      background: linear-gradient(90deg, #2563eb, #0f172a, #f59e0b);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      color: transparent;
-      opacity: 1;
+    @keyframes urgentMove{
+      from { transform: translateX(0); }
+      to   { transform: translateX(calc(-1 * var(--urgent-distance, 600px))); }
     }
 
-    /* 👇 אנימציה נכונה לעברית: מימין -> שמאל (ואז לופ) */
-    @keyframes urgentLoopRTL{
-      from { transform: translateX(50%); }
-      to   { transform: translateX(-50%); }
-    }
-
-    @media (max-width: 820px){
-      .urgent-runner{ animation-duration: var(--urgent-speed-mobile, 14s); }
-      .urgent-bar{ width: calc(100% - 18px); }
-    }
+    .urgent-bar:hover .urgent-text{ animation-play-state: paused; }
 
     @media (prefers-reduced-motion: reduce){
-      .urgent-runner{ animation: none; transform: none; }
+      .urgent-text{ animation:none; transform:none; }
     }
   `;
   document.head.appendChild(style);
@@ -138,10 +122,11 @@ function showTicker() {
   wrap.style.display = "";
 }
 
-function calcSpeedSeconds(text) {
-  const len = String(text || "").length;
-  const s = 7 + Math.min(11, len / 12);
-  return Math.max(7, Math.min(18, s));
+// מהירות לפי "מרחק" בפיקסלים כדי שיהיה חלק תמיד
+function calcDurationByDistancePx(distancePx) {
+  const pxPerSec = 120; // יותר גבוה = יותר מהר
+  const s = distancePx / pxPerSec;
+  return Math.max(6, Math.min(18, s));
 }
 
 let lastKey = "";
@@ -153,34 +138,43 @@ function renderTicker(text, type, color) {
 
   const safeType = ["info", "warn", "danger"].includes(type) ? type : "info";
   const safeText = escapeHtml(text);
+  const textColor = isValidHex(color) ? color.trim() : "";
 
-  const colorKey = isValidHex(color) ? color.trim().toLowerCase() : "";
-  const key = `${safeType}::${safeText}::${colorKey}`;
+  const key = `${safeType}::${safeText}::${textColor}`;
   if (key === lastKey) return;
   lastKey = key;
 
-  const speed = calcSpeedSeconds(text);
-  const speedMobile = Math.max(speed + 3, 12);
-
-  const useCustomColor = isValidHex(color);
-  const textStyle = useCustomColor ? `style="color:${escapeHtml(color.trim())}"` : "";
-  const textClass = useCustomColor ? "urgent-text" : "urgent-text default-gradient";
-
   wrap.innerHTML = `
-    <div class="urgent-bar" data-type="${safeType}" role="status" aria-live="polite"
-         style="--urgent-speed:${speed}s; --urgent-speed-mobile:${speedMobile}s;">
+    <div class="urgent-bar" data-type="${safeType}" role="status" aria-live="polite">
       <div class="urgent-inner">
         <div class="urgent-badge">${typeToBadge(safeType)}</div>
 
         <div class="urgent-track" aria-label="הודעה דחופה">
-          <div class="urgent-runner">
-            <span class="${textClass}" ${textStyle}>${safeText}</span>
-            <span class="${textClass}" ${textStyle} aria-hidden="true">${safeText}</span>
-          </div>
+          <span class="urgent-text" style="${textColor ? `--urgent-text-color:${escapeHtml(textColor)};` : ""}">
+            ${safeText}
+          </span>
         </div>
       </div>
     </div>
   `;
+
+  // מודדים מרחק כדי שייצא מהמסילה לגמרי ואז יחזור להתחלה
+  requestAnimationFrame(() => {
+    const track = wrap.querySelector(".urgent-track");
+    const span = wrap.querySelector(".urgent-text");
+    if (!track || !span) return;
+
+    const trackW = track.getBoundingClientRect().width;
+    const textW = span.getBoundingClientRect().width;
+
+    // המרחק שצריך לעבור: רוחב הטקסט + רוחב המסילה + רווח קטן
+    const distance = Math.ceil(textW + trackW + 40);
+
+    const duration = calcDurationByDistancePx(distance);
+
+    span.style.setProperty("--urgent-distance", `${distance}px`);
+    span.style.setProperty("--urgent-speed", `${duration}s`);
+  });
 }
 
 function bootUrgent() {
