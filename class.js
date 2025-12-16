@@ -355,19 +355,30 @@ function updateBoomNowNext() {
   if (!boomNowNext) return;
 
   const dayKey = getBoomDayKey();
-  const { nowId } = getNowNextForDay(dayKey);
+  const { nowId, nextId } = getNowNextForDay(dayKey);
 
-  let subjectText = "";
+  let nowSubject = "";
+  let nextSubject = "";
 
-  // 🔹 אם יש מערכת שעות – נשלוף את שם המקצוע
+  // 🔥 עכשיו – שם מקצוע
   if (nowId && nowId.startsWith("lesson:") && lastTimetableGrid) {
-    const period = Number(nowId.split(":")[1]);
+    const p = Number(nowId.split(":")[1]);
     const dayArr = lastTimetableGrid[dayKey];
-    if (Array.isArray(dayArr) && dayArr[period - 1]) {
-      subjectText = dayArr[period - 1].subject || "";
+    if (Array.isArray(dayArr) && dayArr[p - 1]) {
+      nowSubject = dayArr[p - 1].subject || "";
     }
   }
 
+  // ➡️ הבא – שם מקצוע
+  if (nextId && nextId.startsWith("lesson:") && lastTimetableGrid) {
+    const p = Number(nextId.split(":")[1]);
+    const dayArr = lastTimetableGrid[dayKey];
+    if (Array.isArray(dayArr) && dayArr[p - 1]) {
+      nextSubject = dayArr[p - 1].subject || "";
+    }
+  }
+
+  // חישוב זמן עד השיעור הבא
   const nowMin = new Date().getHours() * 60 + new Date().getMinutes();
   const blocks = buildDayTimeline(dayKey);
 
@@ -383,14 +394,16 @@ function updateBoomNowNext() {
     <div style="font-weight:900;">
       🔥 עכשיו: 
       ${nowId ? "שיעור" : "אין"}
-      ${subjectText ? ` <span style="opacity:.85;">(${escapeHtml(subjectText)})</span>` : ""}
+      ${nowSubject ? ` <span style="opacity:.85;">(${escapeHtml(nowSubject)})</span>` : ""}
     </div>
     <div style="opacity:.85; margin-top:6px;">
-      ➡️ השיעור הבא בעוד 
-      <b>${nextInMin != null ? `${nextInMin} דקות` : "—"}</b>
+      ➡️ השיעור הבא:
+      ${nextSubject ? ` <b>${escapeHtml(nextSubject)}</b>` : "—"}
+      ${nextInMin != null ? ` בעוד ${nextInMin} דקות` : ""}
     </div>
   `;
 }
+
 
 
 
