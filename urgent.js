@@ -17,6 +17,20 @@ function typeToBadge(type) {
   if (type === "warn") return "⚠️ שימו לב";
   return "📢 הודעה";
 }
+function isValidHex(c) {
+  return typeof c === "string" && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(c.trim());
+}
+
+function bestTextColor(bgHex) {
+  // מחזיר שחור/לבן לפי בהירות הרקע
+  const hex = bgHex.replace("#", "");
+  const full = hex.length === 3 ? hex.split("").map(x => x + x).join("") : hex;
+  const r = parseInt(full.slice(0,2), 16);
+  const g = parseInt(full.slice(2,4), 16);
+  const b = parseInt(full.slice(4,6), 16);
+  const yiq = (r*299 + g*587 + b*114) / 1000;
+  return yiq >= 150 ? "#0f172a" : "rgba(255,255,255,.92)";
+}
 
 function ensureUrgentStyles() {
   if (document.getElementById("urgent-inline-styles")) return;
@@ -75,26 +89,30 @@ function ensureUrgentStyles() {
     }
 
     /* טקסט (מחלקה חדשה שלא מתנגשת עם CSS שלך) */
-    .urgent-marquee-text{
-      display:inline-block;
-      direction: rtl;
-      unicode-bidi: plaintext;
-      font-weight: 900;
-      will-change: transform;
-      transform: translateX(110%);
-      animation: urgentMarquee2 var(--urgent-speed, 10s) linear infinite;
-      padding-left: 70px;
-      color: #0f172a;
-      opacity: .92;
-    }
+   .urgent-marquee-text{
+  display:inline-block;
+  direction: rtl;
+  unicode-bidi: plaintext;
+  font-weight: 900;
+  white-space: nowrap;
+  will-change: transform;
+  animation: urgentMarquee2 var(--urgent-speed, 10s) linear infinite;
+  transform: translateX(100%);
+  color: #0f172a;
+  opacity: .92;
+}
+
     html[data-theme="dark"] .urgent-marquee-text{
       color: rgba(255,255,255,.92);
     }
+@keyframes urgentMarquee2{
+  from { transform: translateX(100%); }
+  to   { transform: translateX(-100%); }
+}
+.urgent-marquee-track{
+  padding-right: 6px;
+}
 
-    @keyframes urgentMarquee2{
-      from { transform: translateX(110%); }
-      to   { transform: translateX(-130%); }
-    }
 
     @media (max-width: 820px){
       .urgent-marquee-text{ animation-duration: var(--urgent-speed-mobile, 13s); }
@@ -126,13 +144,15 @@ function calcSpeedSeconds(text) {
 
 let lastKey = "";
 
-function renderTicker(text, type) {
+function renderTicker(text, type, color) {
   if (!wrap) return;
 
   ensureUrgentStyles();
 
   const safeType = ["info", "warn", "danger"].includes(type) ? type : "info";
   const safeText = escapeHtml(text);
+const bgColor = isValidHex(color) ? color.trim() : "";
+const textColor = bgColor ? bestTextColor(bgColor) : "";
 
   const key = `${safeType}::${safeText}`;
   if (key === lastKey) return;
@@ -143,10 +163,11 @@ function renderTicker(text, type) {
 
   wrap.innerHTML = `
     <div class="urgent-bar"
-         data-type="${safeType}"
-         role="status"
-         aria-live="polite"
-         style="--urgent-speed:${speed}s; --urgent-speed-mobile:${speedMobile}s;">
+     data-type="${safeType}"
+     role="status"
+     aria-live="polite"
+     style="--urgent-speed:${speed}s; ${bgColor ? `background:${bgColor};` : ""} ${textColor ? `color:${textColor};` : ""}">
+
       <div class="urgent-inner">
         <div class="urgent-badge">${typeToBadge(safeType)}</div>
         <div class="urgent-marquee-track" aria-label="הודעה דחופה">
@@ -183,7 +204,7 @@ function bootUrgent() {
       }
 
       showTicker();
-      renderTicker(text, type);
+renderTicker(text, type, data.color);
     },
     (err) => {
       console.error("urgent ticker snapshot error:", err);
