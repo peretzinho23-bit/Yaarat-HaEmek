@@ -541,6 +541,50 @@ html[data-theme="light"] .urgent-text{
   max-width: 1100px;
   margin: 0 auto;
 }
+.urgent-bar{
+  border-radius: 14px;
+  padding: 8px 12px;
+  border: 1px solid rgba(148,163,184,.35);
+  background: rgba(239,68,68,.12);
+  overflow: hidden;
+  max-width: 100%;
+}
+
+.urgent-inner{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.urgent-badge{
+  flex-shrink:0;
+  font-weight:900;
+  padding:6px 10px;
+  border-radius:999px;
+  background:rgba(239,68,68,.25);
+  white-space:nowrap;
+}
+
+.urgent-track{
+  position:relative;
+  overflow:hidden;
+  flex:1;
+  height:28px;
+}
+
+.urgent-text{
+  position:absolute;
+  right:-100%;
+  white-space:nowrap;
+  font-weight:800;
+  animation: urgent-marquee linear infinite;
+  animation-duration: var(--urgent-speed, 8s);
+}
+
+@keyframes urgent-marquee{
+  from { right: -100%; }
+  to   { right: 100%; }
+}
 
   </style>
 </head>
