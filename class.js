@@ -936,7 +936,7 @@ setInterval(() => {
   renderMobileDayFromLastGrid();
   updateBoomNowNext(selectedDayKey || todayDayKey());
   updateBoomCounts();
-}, 30000);
+}, 15000);
 
 if (!classId || !isKnownClass(classId)) {
   showChooser();
