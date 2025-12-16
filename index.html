@@ -505,6 +505,42 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+/* מסילה */
+.urgent-marquee-track{
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  direction: ltr;
+  padding-inline-start: 8px;
+}
+
+/* הטקסט עצמו */
+.urgent-marquee-text{
+  display: inline-block;
+  direction: rtl;
+  unicode-bidi: plaintext;
+  font-weight: 900;
+  white-space: nowrap;
+  will-change: transform;
+  animation: urgentMarquee linear infinite;
+  animation-duration: var(--urgent-speed, 14s);
+  transform: translateX(0); /* 🔥 מתחיל ליד הדחוף */
+}
+
+/* האנימציה */
+@keyframes urgentMarquee{
+  from { transform: translateX(0); }
+  to   { transform: translateX(-100%); }
+}
+
+/* 📱 נייד = יותר איטי + יותר מרווח */
+@media (max-width: 768px){
+  .urgent-marquee-text{
+    animation-duration: 22s !important; /* איטי ונעים */
+    padding-right: 24px;
+  }
+}
 
 /* ANIMATION */
 @keyframes urgentScroll {
