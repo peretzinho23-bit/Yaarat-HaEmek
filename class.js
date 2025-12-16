@@ -272,43 +272,67 @@ let lastExamsArr = [];
 let lastNewsArr = [];
 let activeClassId = null;
 
+// ✅ מחזיר את המבחן הבא + ספירה לאחור (שעות/דקות/שניות) + מקצוע + שעה (אם קיימת)
 function getNextExamCountdownParts() {
-  if (!lastExamsArr || !lastExamsArr.length) return null;
+  if (!Array.isArray(lastExamsArr) || lastExamsArr.length === 0) return null;
 
   const now = new Date();
 
   const next = lastExamsArr
-    .map(e => ({ ...e, _d: parseDate(e.date) }))
-    .filter(e => e._d && e._d.getTime() > now.getTime())
-    .sort((a,b) => a._d - b._d)[0];
+    .map(e => {
+      const d = parseDate(e.date);
+      if (!d) return null;
+
+      let timeStr = "";
+      if (typeof e.time === "string" && /^\d{1,2}:\d{2}$/.test(e.time.trim())) {
+        timeStr = e.time.trim();
+        const [hh, mm] = timeStr.split(":").map(Number);
+        d.setHours(hh, mm, 0, 0);
+      } else {
+        // אם אין שעה – ברירת מחדל 08:00 כדי שהספירה תהיה הגיונית
+        d.setHours(8, 0, 0, 0);
+      }
+
+      return {
+        ...e,
+        _dt: d,
+        _timeStr: timeStr
+      };
+    })
+    .filter(e => e && e._dt.getTime() > now.getTime())
+    .sort((a, b) => a._dt - b._dt)[0];
 
   if (!next) return null;
 
-  let diff = Math.floor((next._d.getTime() - now.getTime()) / 1000);
+  let diff = Math.floor((next._dt.getTime() - now.getTime()) / 1000);
   if (diff <= 0) return null;
 
-  const totalMinutes = Math.floor(diff / 60);
+  const hours = Math.floor(diff / 3600);
+  diff %= 3600;
+  const minutes = Math.floor(diff / 60);
   const seconds = diff % 60;
 
-  return { totalMinutes, seconds };
+  const subject = String(next.subject || "").trim() || "מבחן";
+  const timeLabel = next._timeStr ? ` · ${next._timeStr}` : "";
+
+  return { subject, timeLabel, hours, minutes, seconds };
 }
 
 function updateBoomCounts() {
-  // ✅ מבחנים קרובים – מקצוע + שעות + דקות + שניות
+  // ✅ מבחנים קרובים – טקסט במקום מספר
   if (boomExams) {
     const cd = getNextExamCountdownParts();
-
     boomExams.textContent = cd
-      ? `📘 ${cd.subject} בעוד ${cd.hours}ש ${cd.minutes}ד ${cd.seconds}ש׳`
+      ? `📘 ${cd.subject}${cd.timeLabel} בעוד ${cd.hours}ש ${cd.minutes}ד ${cd.seconds}ש׳`
       : "—";
   }
 
-  // חדשות – נשאר כמו שהיה
+  // ✅ חדשות – נשאר מספר
   if (boomNews) {
     boomNews.textContent = lastNewsArr?.length ? `${lastNewsArr.length}` : "—";
   }
 
-  // זמן עדכון
+  // ✅ זמן עדכון
   if (boomSub) {
     const now = new Date();
     const hh = String(now.getHours()).padStart(2,"0");
@@ -317,7 +341,6 @@ function updateBoomCounts() {
     boomSub.textContent = `עודכן ב-${hh}:${mm}:${ss}`;
   }
 }
-
 
 function getBoomDayKey() {
   // במובייל – היום שנבחר
@@ -960,7 +983,7 @@ async function openClass(classId) {
 const qs = new URLSearchParams(location.search);
 const classId = (qs.get("class") || "").trim().toLowerCase();
 
-// ✅ refresh every 1s (בשביל דקות+שניות)
+// ✅ refresh every 1s (בשביל ספירה לאחור + עכשיו/הבא)
 setInterval(() => {
   updateBoomCounts();
   updateBoomNowNext();
