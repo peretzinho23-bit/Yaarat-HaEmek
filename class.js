@@ -289,42 +289,43 @@ function updateBoomCounts() {
 function updateBoomNowNext(dayKey = todayDayKey()) {
   if (!boomNowNext) return;
 
-  const { nowId, nextId, nowText, nextText } = getNowNextForDay(dayKey);
-
-  if (!nowText && !nextText) {
-    boomNowNext.innerHTML = "—";
-    return;
-  }
+  const { nowText, nextText } = getNowNextForDay(dayKey);
 
   const nowMin = new Date().getHours() * 60 + new Date().getMinutes();
   const blocks = buildDayTimeline(dayKey);
 
-  const findBlock = (id) =>
-    blocks.find(b => `${b.type}:${b.type==="lesson" ? b.period : b.start}` === id) || null;
+  const nowBlock = blocks.find(b =>
+    nowText && `${b.label}` === nowText.split(" (")[0]
+  ) || null;
 
-  const nowBlock = nowId ? findBlock(nowId) : null;
-  const nextBlock = nextId ? findBlock(nextId) : null;
+  const nextBlock = blocks.find(b =>
+    nextText && `${b.label}` === nextText.split(" (")[0]
+  ) || null;
 
-  const nowRemainingMin = nowBlock ? Math.max(0, nowBlock.end - nowMin) : null;
-  const nextInMin = nextBlock ? Math.max(0, nextBlock.start - nowMin) : null;
+  const nowRemainingMin = nowBlock
+    ? Math.max(0, nowBlock.end - nowMin)
+    : null;
 
-  const nowExtra = (nowRemainingMin != null)
-    ? ` <span style="opacity:.8;font-weight:800;">(נותרו ${nowRemainingMin} דק׳)</span>`
-    : "";
-
-  const nextExtra = (nextInMin != null)
-    ? ` <span style="opacity:.8;font-weight:800;">(בעוד ${nextInMin} דק׳)</span>`
-    : "";
+  const nextInMin = nextBlock
+    ? Math.max(0, nextBlock.start - nowMin)
+    : null;
 
   boomNowNext.innerHTML = `
     <div style="font-weight:900;">
-      🔥 עכשיו: ${nowText ? escapeHtml(nowText) + nowExtra : "אין"}
+      🔥 עכשיו: ${nowText || "אין"}
+      ${
+        nowRemainingMin != null
+          ? `<span style="opacity:.8;font-weight:800;"> (עוד ${nowRemainingMin} דק׳)</span>`
+          : ""
+      }
     </div>
     <div style="opacity:.85; margin-top:6px;">
-      ➡️ הבא: ${nextText ? escapeHtml(nextText) + nextExtra : "אין"}
+      ➡️ השיעור הבא בעוד
+      <b>${nextInMin != null ? `${nextInMin} דקות` : "—"}</b>
     </div>
   `;
 }
+
 
 // ===============================
 // ✅ MOBILE DAY SLIDER
