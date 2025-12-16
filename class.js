@@ -377,9 +377,6 @@ function updateBoomNowNext() {
   const dayKey = getBoomDayKey();
   const { nowBlock, nextBlock, nextInMin } = getNowNextBlocks(dayKey);
 
-  const fmt = (min) => `${String(Math.floor(min/60)).padStart(2,"0")}:${String(min%60).padStart(2,"0")}`;
-  const timeRange = (b) => `${fmt(b.start)}-${fmt(b.end)}`;
-
   const subjectForLesson = (period) => {
     if (!lastTimetableGrid) return "";
     const dayArr = lastTimetableGrid[dayKey];
@@ -387,29 +384,29 @@ function updateBoomNowNext() {
     return String(dayArr[period - 1].subject || "").trim();
   };
 
-  const renderBlockLine = (b, icon) => {
-    if (!b) return `<div style="font-weight:900;">${icon} אין</div>`;
+  const nowLabel = (() => {
+    if (!nowBlock) return "אין";
+    if (nowBlock.type === "break") return nowBlock.label;
+    const subj = subjectForLesson(nowBlock.period);
+    return subj ? `${nowBlock.label} · ${subj}` : nowBlock.label;
+  })();
 
-    if (b.type === "break") {
-      // ✅ הפסקה / פותחים בטוב
-      return `
-        <div style="font-weight:900;">
-          ${icon} ${escapeHtml(b.label)} 
-          <span style="opacity:.75; font-weight:800;">${escapeHtml(timeRange(b))}</span>
-        </div>
-      `;
-    }
+  const nextLabel = (() => {
+    if (!nextBlock) return "—";
+    if (nextBlock.type === "break") return nextBlock.label;
+    const subj = subjectForLesson(nextBlock.period);
+    return subj ? `${nextBlock.label} · ${subj}` : nextBlock.label;
+  })();
 
-    // ✅ שיעור + מקצוע
-    const subj = subjectForLesson(b.period);
-    return `
-      <div style="font-weight:900;">
-        ${icon} ${escapeHtml(b.label)}
-        ${subj ? ` <span style="opacity:.85; font-weight:900;">• ${escapeHtml(subj)}</span>` : ""}
-        <span style="opacity:.75; font-weight:800;"> ${escapeHtml(timeRange(b))}</span>
-      </div>
-    `;
-  };
+  const nextTime = (nextBlock && nextInMin != null) ? ` בעוד ${nextInMin} דקות` : "";
+
+  boomNowNext.innerHTML = `
+    <div style="font-weight:900;">🔥 עכשיו: ${escapeHtml(nowLabel)}</div>
+    <div style="opacity:.9; margin-top:6px; font-weight:800;">
+      ➡️ הבא: ${escapeHtml(nextLabel)}${escapeHtml(nextTime)}
+    </div>
+  `;
+}
 
   const nextExtra = nextBlock
     ? `<div style="opacity:.85; margin-top:6px;">
