@@ -126,7 +126,7 @@ function showTicker() {
 function calcDurationByDistancePx(distancePx) {
   const pxPerSec = 120; // יותר גבוה = יותר מהר
   const s = distancePx / pxPerSec;
-  return Math.max(6, Math.min(18, s));
+  return Math.max(5, Math.min(16, s));
 }
 
 let lastKey = "";
