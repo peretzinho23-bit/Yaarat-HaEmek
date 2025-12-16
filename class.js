@@ -124,8 +124,9 @@ function getNowNextForDay(dayKey) {
 
   const fmt = (min) => `${String(Math.floor(min/60)).padStart(2,"0")}:${String(min%60).padStart(2,"0")}`;
 
-  const nowText = nowBlock ? `${nowBlock.label} (${fmt(nowBlock.start)}-${fmt(nowBlock.end)})` : "";
-  const nextText = nextBlock ? `${nextBlock.label} (${fmt(nextBlock.start)}-${fmt(nextBlock.end)})` : "";
+  // שומר תאימות – אבל אנחנו לא נשתמש ב"סוגריים" בבום-בר
+  const nowText = nowBlock ? `${nowBlock.label} ${fmt(nowBlock.start)}-${fmt(nowBlock.end)}` : "";
+  const nextText = nextBlock ? `${nextBlock.label} ${fmt(nextBlock.start)}-${fmt(nextBlock.end)}` : "";
 
   return { nowId, nextId, nowText, nextText };
 }
@@ -289,15 +290,10 @@ function getNextExamCountdownParts() {
         const [hh, mm] = timeStr.split(":").map(Number);
         d.setHours(hh, mm, 0, 0);
       } else {
-        // אם אין שעה – ברירת מחדל 08:00 כדי שהספירה תהיה הגיונית
         d.setHours(8, 0, 0, 0);
       }
 
-      return {
-        ...e,
-        _dt: d,
-        _timeStr: timeStr
-      };
+      return { ...e, _dt: d, _timeStr: timeStr };
     })
     .filter(e => e && e._dt.getTime() > now.getTime())
     .sort((a, b) => a._dt - b._dt)[0];
@@ -319,7 +315,6 @@ function getNextExamCountdownParts() {
 }
 
 function updateBoomCounts() {
-  // ✅ מבחנים קרובים – טקסט במקום מספר
   if (boomExams) {
     const cd = getNextExamCountdownParts();
     boomExams.textContent = cd
@@ -327,12 +322,10 @@ function updateBoomCounts() {
       : "—";
   }
 
-  // ✅ חדשות – נשאר מספר
   if (boomNews) {
     boomNews.textContent = lastNewsArr?.length ? `${lastNewsArr.length}` : "—";
   }
 
-  // ✅ זמן עדכון
   if (boomSub) {
     const now = new Date();
     const hh = String(now.getHours()).padStart(2,"0");
@@ -343,69 +336,93 @@ function updateBoomCounts() {
 }
 
 function getBoomDayKey() {
-  // במובייל – היום שנבחר
-  if (isMobileView() && selectedDayKey) {
-    return selectedDayKey;
-  }
-  // בדסקטופ – היום האמיתי
+  if (isMobileView() && selectedDayKey) return selectedDayKey;
   return todayDayKey();
+}
+
+// ✅ helper: מחזיר עכשיו+הבא כולל הפסקות
+function getNowNextBlocks(dayKey) {
+  const nowKey = todayDayKey();
+  if (dayKey !== nowKey) return { nowBlock: null, nextBlock: null, nextInMin: null };
+
+  const blocks = buildDayTimeline(dayKey);
+  const now = new Date();
+  const nowMin = now.getHours() * 60 + now.getMinutes();
+
+  let nowBlock = null;
+  let nextBlock = null;
+
+  for (let i = 0; i < blocks.length; i++) {
+    const b = blocks[i];
+    if (nowMin >= b.start && nowMin < b.end) {
+      nowBlock = b;
+      nextBlock = blocks[i + 1] || null;
+      break;
+    }
+    if (nowMin < b.start) {
+      nextBlock = b;
+      break;
+    }
+  }
+
+  let nextInMin = null;
+  if (nextBlock) nextInMin = Math.max(0, nextBlock.start - nowMin);
+
+  return { nowBlock, nextBlock, nextInMin };
 }
 
 function updateBoomNowNext() {
   if (!boomNowNext) return;
 
   const dayKey = getBoomDayKey();
-  const { nowId, nextId } = getNowNextForDay(dayKey);
+  const { nowBlock, nextBlock, nextInMin } = getNowNextBlocks(dayKey);
 
-  let nowSubject = "";
-  let nextSubject = "";
+  const fmt = (min) => `${String(Math.floor(min/60)).padStart(2,"0")}:${String(min%60).padStart(2,"0")}`;
+  const timeRange = (b) => `${fmt(b.start)}-${fmt(b.end)}`;
 
-  // 🔥 עכשיו – שם מקצוע
-  if (nowId && nowId.startsWith("lesson:") && lastTimetableGrid) {
-    const p = Number(nowId.split(":")[1]);
+  const subjectForLesson = (period) => {
+    if (!lastTimetableGrid) return "";
     const dayArr = lastTimetableGrid[dayKey];
-    if (Array.isArray(dayArr) && dayArr[p - 1]) {
-      nowSubject = dayArr[p - 1].subject || "";
-    }
-  }
+    if (!Array.isArray(dayArr) || !dayArr[period - 1]) return "";
+    return String(dayArr[period - 1].subject || "").trim();
+  };
 
-  // ➡️ הבא – שם מקצוע
-  if (nextId && nextId.startsWith("lesson:") && lastTimetableGrid) {
-    const p = Number(nextId.split(":")[1]);
-    const dayArr = lastTimetableGrid[dayKey];
-    if (Array.isArray(dayArr) && dayArr[p - 1]) {
-      nextSubject = dayArr[p - 1].subject || "";
-    }
-  }
+  const renderBlockLine = (b, icon) => {
+    if (!b) return `<div style="font-weight:900;">${icon} אין</div>`;
 
-  // חישוב זמן עד השיעור הבא
-  const nowMin = new Date().getHours() * 60 + new Date().getMinutes();
-  const blocks = buildDayTimeline(dayKey);
-
-  let nextInMin = null;
-  for (const b of blocks) {
-    if (nowMin < b.start) {
-      nextInMin = b.start - nowMin;
-      break;
+    if (b.type === "break") {
+      // ✅ הפסקה / פותחים בטוב
+      return `
+        <div style="font-weight:900;">
+          ${icon} ${escapeHtml(b.label)} 
+          <span style="opacity:.75; font-weight:800;">${escapeHtml(timeRange(b))}</span>
+        </div>
+      `;
     }
-  }
+
+    // ✅ שיעור + מקצוע
+    const subj = subjectForLesson(b.period);
+    return `
+      <div style="font-weight:900;">
+        ${icon} ${escapeHtml(b.label)}
+        ${subj ? ` <span style="opacity:.85; font-weight:900;">• ${escapeHtml(subj)}</span>` : ""}
+        <span style="opacity:.75; font-weight:800;"> ${escapeHtml(timeRange(b))}</span>
+      </div>
+    `;
+  };
+
+  const nextExtra = nextBlock
+    ? `<div style="opacity:.85; margin-top:6px;">
+         ➡️ הבא בעוד <b>${nextInMin != null ? `${nextInMin} דקות` : "—"}</b>
+       </div>`
+    : `<div style="opacity:.85; margin-top:6px;">➡️ הבא: <b>—</b></div>`;
 
   boomNowNext.innerHTML = `
-    <div style="font-weight:900;">
-      🔥 עכשיו: 
-      ${nowId ? "שיעור" : "אין"}
-${nowSubject ? ` <span style="opacity:.85;">${escapeHtml(nowSubject)}</span>` : ""}
-    </div>
-    <div style="opacity:.85; margin-top:6px;">
-      ➡️ השיעור הבא:
-      ${nextSubject ? ` <b>${escapeHtml(nextSubject)}</b>` : "—"}
-      ${nextInMin != null ? ` בעוד ${nextInMin} דקות` : ""}
-    </div>
+    ${renderBlockLine(nowBlock, "🔥 עכשיו:")}
+    ${renderBlockLine(nextBlock, "➡️ הבא:")}
+    ${nextExtra}
   `;
 }
-
-
-
 
 // ===============================
 // ✅ MOBILE DAY SLIDER
@@ -578,7 +595,6 @@ function showChooser() {
   if (elSub) elSub.textContent = "בחר כיתה כדי לראות חדשות, מבחנים ומערכת שעות";
   if (elPill) elPill.textContent = "לא נבחרה כיתה";
 
-  // reset boom
   lastExamsArr = [];
   lastNewsArr = [];
   updateBoomCounts();
@@ -987,7 +1003,6 @@ async function openClass(classId) {
 
   showContentFor(classId);
 
-  // איפוס בום-בר
   lastExamsArr = [];
   lastNewsArr = [];
   updateBoomCounts();
@@ -1001,7 +1016,6 @@ async function openClass(classId) {
 
   startRealtime(classId);
 
-  // עדכון אחרון
   updateBoomCounts();
   updateBoomNowNext();
 }
