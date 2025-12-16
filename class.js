@@ -294,20 +294,21 @@ function getNextExamCountdownParts() {
 }
 
 function updateBoomCounts() {
-  // ✅ "מבחנים קרובים" במקום מספר => ספירה לאחור למבחן הבא (דקות+שניות)
+  // ✅ מבחנים קרובים – מקצוע + שעות + דקות + שניות
   if (boomExams) {
     const cd = getNextExamCountdownParts();
-    if (cd) {
-      boomExams.textContent = `עוד ${cd.totalMinutes}ד ${cd.seconds}ש׳`;
-    } else {
-      boomExams.textContent = "—";
-    }
+
+    boomExams.textContent = cd
+      ? `📘 ${cd.subject} בעוד ${cd.hours}ש ${cd.minutes}ד ${cd.seconds}ש׳`
+      : "—";
   }
 
-  if (boomNews) boomNews.textContent =
-    lastNewsArr?.length ? `${lastNewsArr.length}` : "—";
+  // חדשות – נשאר כמו שהיה
+  if (boomNews) {
+    boomNews.textContent = lastNewsArr?.length ? `${lastNewsArr.length}` : "—";
+  }
 
-  // זמן עדכון כולל שניות
+  // זמן עדכון
   if (boomSub) {
     const now = new Date();
     const hh = String(now.getHours()).padStart(2,"0");
@@ -316,6 +317,7 @@ function updateBoomCounts() {
     boomSub.textContent = `עודכן ב-${hh}:${mm}:${ss}`;
   }
 }
+
 
 function getBoomDayKey() {
   // במובייל – היום שנבחר
