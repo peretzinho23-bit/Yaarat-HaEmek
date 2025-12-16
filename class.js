@@ -355,7 +355,18 @@ function updateBoomNowNext() {
   if (!boomNowNext) return;
 
   const dayKey = getBoomDayKey();
-  const { nowText } = getNowNextForDay(dayKey);
+  const { nowId } = getNowNextForDay(dayKey);
+
+  let subjectText = "";
+
+  // 🔹 אם יש מערכת שעות – נשלוף את שם המקצוע
+  if (nowId && nowId.startsWith("lesson:") && lastTimetableGrid) {
+    const period = Number(nowId.split(":")[1]);
+    const dayArr = lastTimetableGrid[dayKey];
+    if (Array.isArray(dayArr) && dayArr[period - 1]) {
+      subjectText = dayArr[period - 1].subject || "";
+    }
+  }
 
   const nowMin = new Date().getHours() * 60 + new Date().getMinutes();
   const blocks = buildDayTimeline(dayKey);
@@ -370,7 +381,9 @@ function updateBoomNowNext() {
 
   boomNowNext.innerHTML = `
     <div style="font-weight:900;">
-      🔥 עכשיו: ${nowText || "אין"}
+      🔥 עכשיו: 
+      ${nowId ? "שיעור" : "אין"}
+      ${subjectText ? ` <span style="opacity:.85;">(${escapeHtml(subjectText)})</span>` : ""}
     </div>
     <div style="opacity:.85; margin-top:6px;">
       ➡️ השיעור הבא בעוד 
@@ -378,6 +391,7 @@ function updateBoomNowNext() {
     </div>
   `;
 }
+
 
 
 // ===============================
