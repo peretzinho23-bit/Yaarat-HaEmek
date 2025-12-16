@@ -25,8 +25,7 @@ const PERIODS = [1,2,3,4,5,6,7,8,9];
 // שישי קצר (אפשר לשנות)
 const DAY_PERIOD_LIMITS = { fri: 6 };
 
-// ✅ שעות שיעורים בדיוק כמו שכתבת
-// (שיעור 9 נשאר ריק כדי לא לבלבל אם אין לכם)
+// ✅ שעות שיעורים
 const PERIOD_TIMES = {
   1: "8:10-8:55",
   2: "8:55-9:40",
@@ -39,7 +38,7 @@ const PERIOD_TIMES = {
   9: ""
 };
 
-// ✅ הפסקות/אירועים קבועים (לתצוגה בסליידר בנייד)
+// ✅ הפסקות/אירועים קבועים (לתצוגה בנייד)
 const BETWEEN_BLOCKS = [
   { label: "הפסקה", time: "9:40-10:00" },
   { label: "פותחים בטוב", time: "10:00-10:15" },
@@ -47,6 +46,7 @@ const BETWEEN_BLOCKS = [
   { label: "הפסקה", time: "13:30-13:45" }
 ];
 
+// ====== time helpers ======
 function toMinutes(hhmm) {
   const m = String(hhmm || "").match(/^(\d{1,2}):(\d{2})$/);
   if (!m) return null;
@@ -54,7 +54,6 @@ function toMinutes(hhmm) {
 }
 
 function parseRange(rangeStr) {
-  // "8:10-8:55"
   const s = String(rangeStr || "").trim();
   const m = s.match(/^(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})$/);
   if (!m) return null;
@@ -71,26 +70,27 @@ function todayDayKey() {
   return map[d] || "sun";
 }
 
+function maxPeriodsForDay(dayKey) {
+  return Number(DAY_PERIOD_LIMITS[dayKey] || PERIODS.length);
+}
+
 function buildDayTimeline(dayKey) {
-  // בונה ציר זמן לפי השעות שנתת (שיעורים) + בין לבין
   const limit = maxPeriodsForDay(dayKey);
 
   const blocks = [];
   for (let p = 1; p <= PERIODS.length; p++) {
     if (p > limit) continue;
     const r = parseRange(PERIOD_TIMES[p]);
-    if (!r) continue; // למשל שיעור 9 ריק
+    if (!r) continue;
     blocks.push({ type:"lesson", period:p, label:`שיעור ${p}`, start:r.start, end:r.end });
   }
 
-  // מוסיף בלוקים קבועים של הפסקות/פותחים בטוב
   for (const b of BETWEEN_BLOCKS) {
     const r = parseRange(b.time);
     if (!r) continue;
     blocks.push({ type:"break", period:null, label:b.label, start:r.start, end:r.end });
   }
 
-  // ממיין לפי התחלה
   blocks.sort((a,b) => a.start - b.start);
   return blocks;
 }
@@ -122,8 +122,10 @@ function getNowNextForDay(dayKey) {
   const nowId = nowBlock ? `${nowBlock.type}:${nowBlock.type==="lesson" ? nowBlock.period : nowBlock.start}` : null;
   const nextId = nextBlock ? `${nextBlock.type}:${nextBlock.type==="lesson" ? nextBlock.period : nextBlock.start}` : null;
 
-  const nowText = nowBlock ? `${nowBlock.label} (${String(Math.floor(nowBlock.start/60)).padStart(2,"0")}:${String(nowBlock.start%60).padStart(2,"0")}-${String(Math.floor(nowBlock.end/60)).padStart(2,"0")}:${String(nowBlock.end%60).padStart(2,"0")})` : "";
-  const nextText = nextBlock ? `${nextBlock.label} (${String(Math.floor(nextBlock.start/60)).padStart(2,"0")}:${String(nextBlock.start%60).padStart(2,"0")}-${String(Math.floor(nextBlock.end/60)).padStart(2,"0")}:${String(nextBlock.end%60).padStart(2,"0")})` : "";
+  const fmt = (min) => `${String(Math.floor(min/60)).padStart(2,"0")}:${String(min%60).padStart(2,"0")}`;
+
+  const nowText = nowBlock ? `${nowBlock.label} (${fmt(nowBlock.start)}-${fmt(nowBlock.end)})` : "";
+  const nextText = nextBlock ? `${nextBlock.label} (${fmt(nextBlock.start)}-${fmt(nextBlock.end)})` : "";
 
   return { nowId, nextId, nowText, nextText };
 }
@@ -135,6 +137,12 @@ function classToGrade(classId) {
   if (c.startsWith("h")) return "h";
   if (c.startsWith("t")) return "t";
   return null;
+}
+
+function isKnownClass(classId) {
+  const g = classToGrade(classId);
+  if (!g) return false;
+  return (CLASS_IDS_BY_GRADE[g] || []).includes(classId);
 }
 
 function classLabel(classId) {
@@ -157,7 +165,6 @@ function escapeHtml(str) {
 
 function linkify(text) {
   const escaped = escapeHtml(text);
-  // הופך https://... ללחיץ
   return escaped.replace(
     /(https?:\/\/[^\s]+)/g,
     '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
@@ -190,10 +197,6 @@ function setQueryClass(classId) {
   history.replaceState({}, "", url.toString());
 }
 
-function maxPeriodsForDay(dayKey) {
-  return Number(DAY_PERIOD_LIMITS[dayKey] || PERIODS.length);
-}
-
 function isDarkMode() {
   return (document.documentElement.getAttribute("data-theme") || "dark") === "dark";
 }
@@ -204,129 +207,30 @@ function ensureLocalStyles() {
   const style = document.createElement("style");
   style.id = "classjs-inline-styles";
   style.textContent = `
-    /* ===== Timetable ===== */
-    .tt-wrap-table{
-      width: 100%;
-      overflow:auto;
-      border-radius: 16px;
-      border: 1px solid rgba(148,163,184,.35);
-      background: rgba(255,255,255,.06);
-    }
-    html[data-theme="light"] .tt-wrap-table{
-      background: rgba(255,255,255,.85);
-      border-color: rgba(148,163,184,.35);
-    }
-    table.tt-big{
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      min-width: 760px;
-    }
-    table.tt-big thead th{
-      position: sticky;
-      top: 0;
-      z-index: 2;
-      font-weight: 800;
-      padding: 10px 10px;
-      border-bottom: 1px solid rgba(148,163,184,.35);
-      background: rgba(15,23,42,.22);
-      color: rgba(255,255,255,.92);
-      text-align: center;
-      white-space: nowrap;
-    }
-    html[data-theme="light"] table.tt-big thead th{
-      background: rgba(241,245,249,.95);
-      color: #0f172a;
-    }
-    table.tt-big td{
-      padding: 10px 8px;
-      border-bottom: 1px solid rgba(148,163,184,.22);
-      border-left: 1px solid rgba(148,163,184,.18);
-      vertical-align: middle;
-      text-align: center;
-      min-height: 56px;
-    }
-    table.tt-big tr td:first-child,
-    table.tt-big tr th:first-child{
-      border-left: none;
-    }
-    td.tt-period{
-      font-weight: 900;
-      width: 76px;
-      background: rgba(56,189,248,.16);
-      color: rgba(255,255,255,.92);
-      position: sticky;
-      right: 0;
-      z-index: 1;
-      border-left: 1px solid rgba(148,163,184,.25);
-    }
-    html[data-theme="light"] td.tt-period{
-      color:#0f172a;
-      background: rgba(56,189,248,.10);
-    }
-    .tt-td.tt-disabled{
-      opacity: .45;
-      background: rgba(148,163,184,.08);
-    }
-    html[data-theme="light"] .tt-td.tt-disabled{
-      background: rgba(15,23,42,.04);
-    }
-    .tt-subject{
-      font-weight: 800;
-      line-height: 1.15;
-      margin-bottom: 4px;
-    }
-    .tt-meta{
-      opacity: .86;
-      font-size: .9rem;
-      display:flex;
-      gap:6px;
-      justify-content:center;
-      flex-wrap:wrap;
-    }
-    .tt-dot{ opacity:.6; }
-    .tt-dash{ opacity:.55; font-weight:700; }
+    .tt-wrap-table{width:100%;overflow:auto;border-radius:16px;border:1px solid rgba(148,163,184,.35);background:rgba(255,255,255,.06)}
+    html[data-theme="light"] .tt-wrap-table{background:rgba(255,255,255,.85)}
+    table.tt-big{width:100%;border-collapse:separate;border-spacing:0;min-width:760px}
+    table.tt-big thead th{position:sticky;top:0;z-index:2;font-weight:800;padding:10px;border-bottom:1px solid rgba(148,163,184,.35);background:rgba(15,23,42,.22);color:rgba(255,255,255,.92);text-align:center;white-space:nowrap}
+    html[data-theme="light"] table.tt-big thead th{background:rgba(241,245,249,.95);color:#0f172a}
+    table.tt-big td{padding:10px 8px;border-bottom:1px solid rgba(148,163,184,.22);border-left:1px solid rgba(148,163,184,.18);vertical-align:middle;text-align:center;min-height:56px}
+    table.tt-big tr td:first-child, table.tt-big tr th:first-child{border-left:none}
+    td.tt-period{font-weight:900;width:76px;background:rgba(56,189,248,.16);color:rgba(255,255,255,.92);position:sticky;right:0;z-index:1;border-left:1px solid rgba(148,163,184,.25)}
+    html[data-theme="light"] td.tt-period{color:#0f172a;background:rgba(56,189,248,.10)}
+    .tt-td.tt-disabled{opacity:.45;background:rgba(148,163,184,.08)}
+    html[data-theme="light"] .tt-td.tt-disabled{background:rgba(15,23,42,.04)}
+    .tt-subject{font-weight:800;line-height:1.15;margin-bottom:4px}
+    .tt-meta{opacity:.86;font-size:.9rem;display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+    .tt-dot{opacity:.6}
+    .tt-dash{opacity:.55;font-weight:700}
 
-    /* ===== News ===== */
-    .news-item{
-      border:1px solid rgba(148,163,184,.25);
-      border-radius:14px;
-      padding:12px;
-      margin-bottom:10px;
-      background: rgba(255,255,255,.06);
-    }
-    html[data-theme="light"] .news-item{
-      background: rgba(255,255,255,.92);
-    }
-    .news-title{
-      font-weight: 900;
-      margin-bottom: 2px;
-    }
-    .news-meta{
-      opacity:.78;
-      font-size:.9rem;
-      margin-bottom: 8px;
-    }
-    .news-body{
-      line-height: 1.45;
-      white-space: pre-wrap;
-    }
-    .news-body a{
-      text-decoration: underline;
-      font-weight: 800;
-    }
-    .news-imgs{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-top:10px;
-    }
-    .news-imgs img{
-      max-width: 240px;
-      width: 100%;
-      border-radius: 12px;
-      border: 1px solid rgba(148,163,184,.25);
-    }
+    .news-item{border:1px solid rgba(148,163,184,.25);border-radius:14px;padding:12px;margin-bottom:10px;background:rgba(255,255,255,.06)}
+    html[data-theme="light"] .news-item{background:rgba(255,255,255,.92)}
+    .news-title{font-weight:900;margin-bottom:2px}
+    .news-meta{opacity:.78;font-size:.9rem;margin-bottom:8px}
+    .news-body{line-height:1.45;white-space:pre-wrap}
+    .news-body a{text-decoration:underline;font-weight:800}
+    .news-imgs{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    .news-imgs img{max-width:240px;width:100%;border-radius:12px;border:1px solid rgba(148,163,184,.25)}
   `;
   document.head.appendChild(style);
 }
@@ -349,6 +253,7 @@ const ex = document.getElementById("ex");
 const exStatus = document.getElementById("exStatus");
 const news = document.getElementById("news");
 const newsStatus = document.getElementById("newsStatus");
+
 const announceBox = document.getElementById("announceBox");
 const boomSub = document.getElementById("boomSub");
 const boomExams = document.getElementById("boomExams");
@@ -362,8 +267,67 @@ onAuthStateChanged(auth, (user) => {
   if (devLink) devLink.style.display = user ? "" : "none";
 });
 
+// ====== BOOM BAR state ======
+let lastExamsArr = [];
+let lastNewsArr = [];
+let activeClassId = null;
+
+// ====== BOOM BAR updates ======
+function updateBoomCounts() {
+  if (boomExams) boomExams.textContent = (lastExamsArr?.length ? `${lastExamsArr.length}` : "—");
+  if (boomNews) boomNews.textContent = (lastNewsArr?.length ? `${lastNewsArr.length}` : "—");
+
+  if (boomSub) {
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2,"0");
+    const mm = String(now.getMinutes()).padStart(2,"0");
+    boomSub.textContent = `עודכן ב-${hh}:${mm}`;
+  }
+}
+
+// ✅ NOW/NEXT (+ דקות)
+function updateBoomNowNext(dayKey = todayDayKey()) {
+  if (!boomNowNext) return;
+
+  const { nowId, nextId, nowText, nextText } = getNowNextForDay(dayKey);
+
+  if (!nowText && !nextText) {
+    boomNowNext.innerHTML = "—";
+    return;
+  }
+
+  const nowMin = new Date().getHours() * 60 + new Date().getMinutes();
+  const blocks = buildDayTimeline(dayKey);
+
+  const findBlock = (id) =>
+    blocks.find(b => `${b.type}:${b.type==="lesson" ? b.period : b.start}` === id) || null;
+
+  const nowBlock = nowId ? findBlock(nowId) : null;
+  const nextBlock = nextId ? findBlock(nextId) : null;
+
+  const nowRemainingMin = nowBlock ? Math.max(0, nowBlock.end - nowMin) : null;
+  const nextInMin = nextBlock ? Math.max(0, nextBlock.start - nowMin) : null;
+
+  const nowExtra = (nowRemainingMin != null)
+    ? ` <span style="opacity:.8;font-weight:800;">(נותרו ${nowRemainingMin} דק׳)</span>`
+    : "";
+
+  const nextExtra = (nextInMin != null)
+    ? ` <span style="opacity:.8;font-weight:800;">(בעוד ${nextInMin} דק׳)</span>`
+    : "";
+
+  boomNowNext.innerHTML = `
+    <div style="font-weight:900;">
+      🔥 עכשיו: ${nowText ? escapeHtml(nowText) + nowExtra : "אין"}
+    </div>
+    <div style="opacity:.85; margin-top:6px;">
+      ➡️ הבא: ${nextText ? escapeHtml(nextText) + nextExtra : "אין"}
+    </div>
+  `;
+}
+
 // ===============================
-// ✅ MOBILE DAY SLIDER (added only)
+// ✅ MOBILE DAY SLIDER
 // ===============================
 const ttMobileWrap = document.getElementById("tt-mobile");
 const daySelect = document.getElementById("daySelect");
@@ -392,6 +356,7 @@ function setSelectedDayKey(key) {
   daySelect.addEventListener("change", () => {
     setSelectedDayKey(daySelect.value);
     renderMobileDayFromLastGrid();
+    updateBoomNowNext(selectedDayKey || todayDayKey());
   });
 })();
 
@@ -400,7 +365,6 @@ function renderMobileDayFromLastGrid() {
 
   if (!lastTimetableGrid) {
     daySchedule.innerHTML = "";
-    if (boomNowNext) boomNowNext.innerHTML = "";
     return;
   }
 
@@ -410,16 +374,7 @@ function renderMobileDayFromLastGrid() {
   const limit = maxPeriodsForDay(dayKey);
   const arr = Array.isArray(lastTimetableGrid?.[dayKey]) ? lastTimetableGrid[dayKey] : [];
 
-  const { nowId, nextId, nowText, nextText } = getNowNextForDay(dayKey);
-
-  // חישוב דקות שנותרו/בעוד כמה
-  const nowMin = new Date().getHours() * 60 + new Date().getMinutes();
-  const blocks = buildDayTimeline(dayKey);
-  const nowBlock = blocks.find(b => `${b.type}:${b.type==="lesson" ? b.period : b.start}` === nowId) || null;
-  const nextBlock = blocks.find(b => `${b.type}:${b.type==="lesson" ? b.period : b.start}` === nextId) || null;
-
-  const nowRemainingMin = nowBlock ? Math.max(0, nowBlock.end - nowMin) : null;
-  const nextInMin = nextBlock ? Math.max(0, nextBlock.start - nowMin) : null;
+  const { nowId, nextId } = getNowNextForDay(dayKey);
 
   const rows = PERIODS.map((p, idx) => {
     const disabled = (idx + 1) > limit;
@@ -488,37 +443,14 @@ function renderMobileDayFromLastGrid() {
     <div style="margin-top:12px; font-weight:900; opacity:.85;">בין לבין</div>
     ${betweenHtml}
   `;
-
-  // ✅ BOOM "עכשיו/הבא" — כאן זה בטוח (לא שובֵר את הקובץ)
-  if (boomNowNext) {
-    const nowExtra = (nowRemainingMin != null && nowText)
-      ? ` <span style="opacity:.8;font-weight:800;">(נותרו ${nowRemainingMin} דק׳)</span>` : "";
-
-    const nextExtra = (nextInMin != null && nextText)
-      ? ` <span style="opacity:.8;font-weight:800;">(בעוד ${nextInMin} דק׳)</span>` : "";
-
-    if (nowText || nextText) {
-      boomNowNext.innerHTML = `
-        <div style="font-weight:900;">
-          ${nowText ? `🔥 עכשיו: ${escapeHtml(nowText)}${nowExtra}` : "🔥 עכשיו: אין"}
-        </div>
-        <div style="opacity:.85; margin-top:6px;">
-          ${nextText ? `➡️ הבא: ${escapeHtml(nextText)}${nextExtra}` : "➡️ הבא: אין"}
-        </div>
-      `;
-    } else {
-      boomNowNext.innerHTML = "";
-    }
-  }
 }
 
 function syncTimetableMobileVisibility() {
-  if (!ttMobileWrap) return;
+  if (!ttMobileWrap || !tt) return;
 
   const wrapTable = tt.querySelector(".tt-wrap-table");
   const mobile = isMobileView();
 
-  // בטלפון: מציגים את בחירת היום ומסתירים את הטבלה הגדולה
   ttMobileWrap.style.display = mobile ? "" : "none";
   if (wrapTable) wrapTable.style.display = mobile ? "none" : "";
 }
@@ -529,6 +461,7 @@ window.addEventListener("resize", () => {
 
 // ====== chooser ======
 function fillClassesForGrade(g) {
+  if (!classSel) return;
   classSel.innerHTML = `<option value="">בחר כיתה</option>`;
   const arr = CLASS_IDS_BY_GRADE[g] || [];
   for (const c of arr) {
@@ -542,11 +475,11 @@ function fillClassesForGrade(g) {
 
 gradeSel?.addEventListener("change", () => {
   fillClassesForGrade(gradeSel.value);
-  goBtn.disabled = true;
+  if (goBtn) goBtn.disabled = true;
 });
 
 classSel?.addEventListener("change", () => {
-  goBtn.disabled = !classSel.value;
+  if (goBtn) goBtn.disabled = !classSel.value;
 });
 
 goBtn?.addEventListener("click", () => {
@@ -558,26 +491,32 @@ goBtn?.addEventListener("click", () => {
 
 // ====== render helpers ======
 function showChooser() {
-  chooserCard.classList.remove("hide");
-  content.classList.add("hide");
-  elTitle.textContent = "דף כיתה";
-  elSub.textContent = "בחר כיתה כדי לראות חדשות, מבחנים ומערכת שעות";
-  elPill.textContent = "לא נבחרה כיתה";
+  chooserCard?.classList.remove("hide");
+  content?.classList.add("hide");
+  if (elTitle) elTitle.textContent = "דף כיתה";
+  if (elSub) elSub.textContent = "בחר כיתה כדי לראות חדשות, מבחנים ומערכת שעות";
+  if (elPill) elPill.textContent = "לא נבחרה כיתה";
+
+  // reset boom
+  lastExamsArr = [];
+  lastNewsArr = [];
+  updateBoomCounts();
+  updateBoomNowNext(todayDayKey());
+  if (announceBox) announceBox.classList.add("hide");
 }
 
 function showContentFor(classId) {
-  chooserCard.classList.add("hide");
-  content.classList.remove("hide");
-  elTitle.textContent = `דף כיתה ${classLabel(classId)}`;
-  elSub.textContent = "חדשות לכיתה · מבחנים לכיתה · מערכת שעות";
-  elPill.textContent = `${classLabel(classId)}`;
+  chooserCard?.classList.add("hide");
+  content?.classList.remove("hide");
+  if (elTitle) elTitle.textContent = `דף כיתה ${classLabel(classId)}`;
+  if (elSub) elSub.textContent = "חדשות לכיתה · מבחנים לכיתה · מערכת שעות";
+  if (elPill) elPill.textContent = `${classLabel(classId)}`;
 }
 
 // ====== Timetable (grid) ======
 function renderTimetableFromGrid(grid) {
   ensureLocalStyles();
 
-  // ✅ keep last grid for mobile day view
   lastTimetableGrid = grid || null;
 
   const thead = `
@@ -634,18 +573,21 @@ function renderTimetableFromGrid(grid) {
     `;
   }).join("");
 
-  tt.innerHTML = `
-    <div class="tt-wrap-table">
-      <table class="tt-big">
-        ${thead}
-        <tbody>${tbodyRows}</tbody>
-      </table>
-    </div>
-  `;
+  if (tt) {
+    tt.innerHTML = `
+      <div class="tt-wrap-table">
+        <table class="tt-big">
+          ${thead}
+          <tbody>${tbodyRows}</tbody>
+        </table>
+      </div>
+    `;
+  }
 
-  // ✅ mobile sync + render selected day
   syncTimetableMobileVisibility();
   renderMobileDayFromLastGrid();
+  updateBoomNowNext(selectedDayKey || todayDayKey());
+  updateBoomCounts();
 }
 
 // schema ישן (days/rows) -> ממירים ל-grid ומציגים
@@ -668,11 +610,7 @@ function renderTimetableFromDays(days) {
     const rows = Array.isArray(dayObj.rows) ? dayObj.rows : [];
     rows.forEach((r, idx) => {
       if (idx < PERIODS.length) {
-        grid[key][idx] = {
-          subject: r.subject || "",
-          teacher: r.teacher || "",
-          room: r.room || ""
-        };
+        grid[key][idx] = { subject: r.subject || "", teacher: r.teacher || "", room: r.room || "" };
       }
     });
   });
@@ -682,45 +620,53 @@ function renderTimetableFromDays(days) {
 
 // ====== Data loaders (first load) ======
 async function loadTimetableOnce(classId) {
-  tt.innerHTML = "";
-  ttStatus.textContent = "טוען…";
+  if (tt) tt.innerHTML = "";
+  if (ttStatus) ttStatus.textContent = "טוען…";
 
   try {
     const snap = await getDoc(doc(db, "timetables", classId));
     if (!snap.exists()) {
-      ttStatus.textContent = "אין מערכת שעות לכיתה הזאת עדיין.";
+      if (ttStatus) ttStatus.textContent = "אין מערכת שעות לכיתה הזאת עדיין.";
+      lastTimetableGrid = null;
+      renderMobileDayFromLastGrid();
+      updateBoomNowNext(selectedDayKey || todayDayKey());
       return;
     }
 
     const data = snap.data() || {};
 
     if (data.grid && typeof data.grid === "object") {
-      ttStatus.textContent = "";
+      if (ttStatus) ttStatus.textContent = "";
       renderTimetableFromGrid(data.grid || {});
       return;
     }
 
     const days = Array.isArray(data.days) ? data.days : [];
     if (days.length) {
-      ttStatus.textContent = "";
+      if (ttStatus) ttStatus.textContent = "";
       renderTimetableFromDays(days);
       return;
     }
 
-    ttStatus.textContent = "המערכת קיימת אבל ריקה.";
+    if (ttStatus) ttStatus.textContent = "המערכת קיימת אבל ריקה.";
+    lastTimetableGrid = null;
+    renderMobileDayFromLastGrid();
+    updateBoomNowNext(selectedDayKey || todayDayKey());
   } catch (e) {
     console.error("timetable error:", e);
-    ttStatus.textContent = "שגיאה בטעינת מערכת שעות (בדוק Console/Rules).";
+    if (ttStatus) ttStatus.textContent = "שגיאה בטעינת מערכת שעות (בדוק Console/Rules).";
   }
 }
 
 async function loadExamsOnce(classId) {
-  ex.innerHTML = "";
-  exStatus.textContent = "טוען…";
+  if (ex) ex.innerHTML = "";
+  if (exStatus) exStatus.textContent = "טוען…";
 
   const grade = classToGrade(classId);
   if (!grade) {
-    exStatus.textContent = "כיתה לא חוקית.";
+    if (exStatus) exStatus.textContent = "כיתה לא חוקית.";
+    lastExamsArr = [];
+    updateBoomCounts();
     return;
   }
 
@@ -739,23 +685,29 @@ async function loadExamsOnce(classId) {
       })
       .slice(0, 12);
 
+    lastExamsArr = arr;
+    updateBoomCounts();
+
     if (!arr.length) {
-      exStatus.textContent = "אין מבחנים קרובים לכיתה הזאת.";
+      if (exStatus) exStatus.textContent = "אין מבחנים קרובים לכיתה הזאת.";
       return;
     }
 
-    exStatus.textContent = "";
-    ex.innerHTML = arr.map(e => `
-      <div class="item">
-        <div><b>${escapeHtml(e.subject || "")}</b></div>
-        <div class="meta">${escapeHtml(e.date || "")}${e.time ? " · " + escapeHtml(e.time) : ""}</div>
-        <div class="body" style="margin-top:6px;">${escapeHtml(e.topic || "")}</div>
-      </div>
-    `).join("");
-
+    if (exStatus) exStatus.textContent = "";
+    if (ex) {
+      ex.innerHTML = arr.map(e => `
+        <div class="item">
+          <div><b>${escapeHtml(e.subject || "")}</b></div>
+          <div class="meta">${escapeHtml(e.date || "")}${e.time ? " · " + escapeHtml(e.time) : ""}</div>
+          <div class="body" style="margin-top:6px;">${escapeHtml(e.topic || "")}</div>
+        </div>
+      `).join("");
+    }
   } catch (e) {
     console.error("exams error:", e);
-    exStatus.textContent = "שגיאה בטעינת מבחנים (בדוק Console/Rules).";
+    if (exStatus) exStatus.textContent = "שגיאה בטעינת מבחנים (בדוק Console/Rules).";
+    lastExamsArr = [];
+    updateBoomCounts();
   }
 }
 
@@ -770,33 +722,33 @@ function extractNewsImages(n) {
 function normalizeNewsColorForTheme(color) {
   const c = String(color || "").trim().toLowerCase();
   if (!c) return "";
-
-  // בלייט מוד: אם מישהו בחר לבן -> זה בלתי נראה -> מחזירים לשחור
   if (!isDarkMode() && (c === "#ffffff" || c === "white" || c === "rgb(255,255,255)")) {
     return "#0f172a";
   }
-
   return color;
 }
 
 function renderNewsList(classId, items) {
   ensureLocalStyles();
 
-  const classSpecific = items.filter(n => String(n.classId || "").toLowerCase() === classId);
+  const classSpecific = (items || []).filter(n => String(n.classId || "").toLowerCase() === classId);
+
+  lastNewsArr = classSpecific.slice(-12);
+  updateBoomCounts();
 
   if (!classSpecific.length) {
-    newsStatus.textContent = "אין חדשות לכיתה הזאת עדיין.";
-    news.innerHTML = "";
+    if (newsStatus) newsStatus.textContent = "אין חדשות לכיתה הזאת עדיין.";
+    if (news) news.innerHTML = "";
     return;
   }
 
   const ordered = classSpecific.slice(-12).reverse();
-  newsStatus.textContent = "";
+  if (newsStatus) newsStatus.textContent = "";
+
+  if (!news) return;
 
   news.innerHTML = ordered.map(n => {
     const imgs = extractNewsImages(n);
-
-    // צבע טקסט
     const finalColor = normalizeNewsColorForTheme(n.color);
     const baseText = isDarkMode() ? "rgba(255,255,255,.92)" : "#0f172a";
 
@@ -821,12 +773,14 @@ function renderNewsList(classId, items) {
 }
 
 async function loadNewsOnce(classId) {
-  news.innerHTML = "";
-  newsStatus.textContent = "טוען…";
+  if (news) news.innerHTML = "";
+  if (newsStatus) newsStatus.textContent = "טוען…";
 
   const grade = classToGrade(classId);
   if (!grade) {
-    newsStatus.textContent = "כיתה לא חוקית.";
+    if (newsStatus) newsStatus.textContent = "כיתה לא חוקית.";
+    lastNewsArr = [];
+    updateBoomCounts();
     return;
   }
 
@@ -836,7 +790,9 @@ async function loadNewsOnce(classId) {
     renderNewsList(classId, items);
   } catch (e) {
     console.error("news error:", e);
-    newsStatus.textContent = "שגיאה בטעינת חדשות (בדוק Console/Rules).";
+    if (newsStatus) newsStatus.textContent = "שגיאה בטעינת חדשות (בדוק Console/Rules).";
+    lastNewsArr = [];
+    updateBoomCounts();
   }
 }
 
@@ -860,32 +816,41 @@ function startRealtime(classId) {
 
   unsubTT = onSnapshot(doc(db, "timetables", classId), (snap) => {
     if (!snap.exists()) {
-      tt.innerHTML = "";
-      ttStatus.textContent = "אין מערכת שעות לכיתה הזאת עדיין.";
+      if (tt) tt.innerHTML = "";
+      if (ttStatus) ttStatus.textContent = "אין מערכת שעות לכיתה הזאת עדיין.";
+      lastTimetableGrid = null;
+      renderMobileDayFromLastGrid();
+      updateBoomNowNext(selectedDayKey || todayDayKey());
       return;
     }
+
     const data = snap.data() || {};
     if (data.grid && typeof data.grid === "object") {
-      ttStatus.textContent = "";
+      if (ttStatus) ttStatus.textContent = "";
       renderTimetableFromGrid(data.grid || {});
       return;
     }
+
     const days = Array.isArray(data.days) ? data.days : [];
     if (days.length) {
-      ttStatus.textContent = "";
+      if (ttStatus) ttStatus.textContent = "";
       renderTimetableFromDays(days);
       return;
     }
-    ttStatus.textContent = "המערכת קיימת אבל ריקה.";
+
+    if (ttStatus) ttStatus.textContent = "המערכת קיימת אבל ריקה.";
+    lastTimetableGrid = null;
+    renderMobileDayFromLastGrid();
+    updateBoomNowNext(selectedDayKey || todayDayKey());
   }, (err) => {
     console.error("timetable snapshot error:", err);
-    ttStatus.textContent = "שגיאה בטעינת מערכת שעות (בדוק Console/Rules).";
+    if (ttStatus) ttStatus.textContent = "שגיאה בטעינת מערכת שעות (בדוק Console/Rules).";
   });
 
   unsubExams = onSnapshot(doc(db, "exams", grade), (snap) => {
     const items = snap.exists() ? (snap.data()?.items || []) : [];
-    ex.innerHTML = "";
-    exStatus.textContent = "טוען…";
+    if (ex) ex.innerHTML = "";
+    if (exStatus) exStatus.textContent = "טוען…";
 
     const arr = items
       .filter(x => String(x.classId || "").toLowerCase() === classId)
@@ -898,60 +863,81 @@ function startRealtime(classId) {
       })
       .slice(0, 12);
 
+    lastExamsArr = arr;
+    updateBoomCounts();
+
     if (!arr.length) {
-      exStatus.textContent = "אין מבחנים קרובים לכיתה הזאת.";
+      if (exStatus) exStatus.textContent = "אין מבחנים קרובים לכיתה הזאת.";
       return;
     }
 
-    exStatus.textContent = "";
-    ex.innerHTML = arr.map(e => `
-      <div class="item">
-        <div><b>${escapeHtml(e.subject || "")}</b></div>
-        <div class="meta">${escapeHtml(e.date || "")}${e.time ? " · " + escapeHtml(e.time) : ""}</div>
-        <div class="body" style="margin-top:6px;">${escapeHtml(e.topic || "")}</div>
-      </div>
-    `).join("");
+    if (exStatus) exStatus.textContent = "";
+    if (ex) {
+      ex.innerHTML = arr.map(e => `
+        <div class="item">
+          <div><b>${escapeHtml(e.subject || "")}</b></div>
+          <div class="meta">${escapeHtml(e.date || "")}${e.time ? " · " + escapeHtml(e.time) : ""}</div>
+          <div class="body" style="margin-top:6px;">${escapeHtml(e.topic || "")}</div>
+        </div>
+      `).join("");
+    }
   }, (err) => {
     console.error("exams snapshot error:", err);
-    exStatus.textContent = "שגיאה בטעינת מבחנים (בדוק Console/Rules).";
+    if (exStatus) exStatus.textContent = "שגיאה בטעינת מבחנים (בדוק Console/Rules).";
+    lastExamsArr = [];
+    updateBoomCounts();
   });
 
   unsubNews = onSnapshot(doc(db, "news", grade), (snap) => {
     const items = snap.exists() ? (snap.data()?.items || []) : [];
-    newsStatus.textContent = "טוען…";
+    if (newsStatus) newsStatus.textContent = "טוען…";
     renderNewsList(classId, items);
   }, (err) => {
     console.error("news snapshot error:", err);
-    newsStatus.textContent = "שגיאה בטעינת חדשות (בדוק Console/Rules).";
+    if (newsStatus) newsStatus.textContent = "שגיאה בטעינת חדשות (בדוק Console/Rules).";
+    lastNewsArr = [];
+    updateBoomCounts();
   });
 }
 
 // ====== open class ======
 async function openClass(classId) {
+  activeClassId = classId;
+
   showContentFor(classId);
 
-  // טעינה ראשונה מהר
+  // איפוס בום-בר
+  lastExamsArr = [];
+  lastNewsArr = [];
+  updateBoomCounts();
+  updateBoomNowNext(selectedDayKey || todayDayKey());
+
   await Promise.all([
     loadTimetableOnce(classId),
     loadExamsOnce(classId),
     loadNewsOnce(classId)
   ]);
 
-  // ואז realtime בלי רענון
   startRealtime(classId);
+
+  // עדכון אחרון
+  updateBoomCounts();
+  updateBoomNowNext(selectedDayKey || todayDayKey());
 }
 
 // ====== boot ======
 const qs = new URLSearchParams(location.search);
 const classId = (qs.get("class") || "").trim().toLowerCase();
 
-// ✅ refresh NOW/NEXT highlight every 30s (only affects mobile day view)
+// ✅ refresh NOW/NEXT every 30s
 setInterval(() => {
   if (!isMobileView()) return;
   renderMobileDayFromLastGrid();
+  updateBoomNowNext(selectedDayKey || todayDayKey());
+  updateBoomCounts();
 }, 30000);
 
-if (!classId) {
+if (!classId || !isKnownClass(classId)) {
   showChooser();
 } else {
   openClass(classId);
