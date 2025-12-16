@@ -17,19 +17,9 @@ function typeToBadge(type) {
   if (type === "warn") return "⚠️ שימו לב";
   return "📢 הודעה";
 }
+
 function isValidHex(c) {
   return typeof c === "string" && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(c.trim());
-}
-
-function bestTextColor(bgHex) {
-  // מחזיר שחור/לבן לפי בהירות הרקע
-  const hex = bgHex.replace("#", "");
-  const full = hex.length === 3 ? hex.split("").map(x => x + x).join("") : hex;
-  const r = parseInt(full.slice(0,2), 16);
-  const g = parseInt(full.slice(2,4), 16);
-  const b = parseInt(full.slice(4,6), 16);
-  const yiq = (r*299 + g*587 + b*114) / 1000;
-  return yiq >= 150 ? "#0f172a" : "rgba(255,255,255,.92)";
 }
 
 function ensureUrgentStyles() {
@@ -77,49 +67,61 @@ function ensureUrgentStyles() {
       flex: 0 0 auto;
     }
 
-    /* מסילה */
-    .urgent-marquee-track{
+    /* TRACK */
+    .urgent-track{
       position: relative;
       flex: 1 1 auto;
       min-width: 0;
       overflow: hidden;
       white-space: nowrap;
-      direction: ltr;
-      height: 26px;
+      direction: ltr; /* משאירים LTR בשביל ביצועים של transform */
     }
 
-    /* טקסט (מחלקה חדשה שלא מתנגשת עם CSS שלך) */
-   .urgent-marquee-text{
-  display:inline-block;
-  direction: rtl;
-  unicode-bidi: plaintext;
-  font-weight: 900;
-  white-space: nowrap;
-  will-change: transform;
-  animation: urgentMarquee2 var(--urgent-speed, 10s) linear infinite;
-  transform: translateX(100%);
-  color: #0f172a;
-  opacity: .92;
-}
+    /* RUNNER – מתחיל מימין ונוסע שמאלה */
+    .urgent-runner{
+      display: inline-flex;
+      align-items: center;
+      gap: var(--urgent-gap, 64px);
+      will-change: transform;
 
-    html[data-theme="dark"] .urgent-marquee-text{
-      color: rgba(255,255,255,.92);
+      /* 👇 זה מה שמתקן לך: מתחילים מחוץ לימין */
+      transform: translateX(50%);
+      animation: urgentLoopRTL var(--urgent-speed, 12s) linear infinite;
     }
-@keyframes urgentMarquee2{
-  from { transform: translateX(100%); }
-  to   { transform: translateX(-100%); }
-}
-.urgent-marquee-track{
-  padding-right: 6px;
-}
 
+    .urgent-bar:hover .urgent-runner{ animation-play-state: paused; }
+
+    .urgent-text{
+      display:inline-block;
+      direction: rtl;
+      unicode-bidi: plaintext;
+      font-weight: 900;
+      opacity: .92;
+      white-space: nowrap;
+    }
+
+    .urgent-text.default-gradient{
+      background: linear-gradient(90deg, #2563eb, #0f172a, #f59e0b);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+      opacity: 1;
+    }
+
+    /* 👇 אנימציה נכונה לעברית: מימין -> שמאל (ואז לופ) */
+    @keyframes urgentLoopRTL{
+      from { transform: translateX(50%); }
+      to   { transform: translateX(-50%); }
+    }
 
     @media (max-width: 820px){
-      .urgent-marquee-text{ animation-duration: var(--urgent-speed-mobile, 13s); }
+      .urgent-runner{ animation-duration: var(--urgent-speed-mobile, 14s); }
+      .urgent-bar{ width: calc(100% - 18px); }
     }
 
     @media (prefers-reduced-motion: reduce){
-      .urgent-marquee-text{ animation:none; transform:none; }
+      .urgent-runner{ animation: none; transform: none; }
     }
   `;
   document.head.appendChild(style);
@@ -138,8 +140,8 @@ function showTicker() {
 
 function calcSpeedSeconds(text) {
   const len = String(text || "").length;
-  const s = 6 + Math.min(10, len / 10); // 6–16
-  return Math.max(6, Math.min(16, s));
+  const s = 7 + Math.min(11, len / 12);
+  return Math.max(7, Math.min(18, s));
 }
 
 let lastKey = "";
@@ -151,27 +153,30 @@ function renderTicker(text, type, color) {
 
   const safeType = ["info", "warn", "danger"].includes(type) ? type : "info";
   const safeText = escapeHtml(text);
-const bgColor = isValidHex(color) ? color.trim() : "";
-const textColor = bgColor ? bestTextColor(bgColor) : "";
 
-  const key = `${safeType}::${safeText}`;
+  const colorKey = isValidHex(color) ? color.trim().toLowerCase() : "";
+  const key = `${safeType}::${safeText}::${colorKey}`;
   if (key === lastKey) return;
   lastKey = key;
 
   const speed = calcSpeedSeconds(text);
-  const speedMobile = Math.max(speed + 3, 11);
+  const speedMobile = Math.max(speed + 3, 12);
+
+  const useCustomColor = isValidHex(color);
+  const textStyle = useCustomColor ? `style="color:${escapeHtml(color.trim())}"` : "";
+  const textClass = useCustomColor ? "urgent-text" : "urgent-text default-gradient";
 
   wrap.innerHTML = `
-    <div class="urgent-bar"
-     data-type="${safeType}"
-     role="status"
-     aria-live="polite"
-     style="--urgent-speed:${speed}s; ${bgColor ? `background:${bgColor};` : ""} ${textColor ? `color:${textColor};` : ""}">
-
+    <div class="urgent-bar" data-type="${safeType}" role="status" aria-live="polite"
+         style="--urgent-speed:${speed}s; --urgent-speed-mobile:${speedMobile}s;">
       <div class="urgent-inner">
         <div class="urgent-badge">${typeToBadge(safeType)}</div>
-        <div class="urgent-marquee-track" aria-label="הודעה דחופה">
-          <span class="urgent-marquee-text">${safeText}</span>
+
+        <div class="urgent-track" aria-label="הודעה דחופה">
+          <div class="urgent-runner">
+            <span class="${textClass}" ${textStyle}>${safeText}</span>
+            <span class="${textClass}" ${textStyle} aria-hidden="true">${safeText}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -196,6 +201,7 @@ function bootUrgent() {
       const active = !!data.active;
       const text = String(data.text || "").trim();
       const type = String(data.type || "info");
+      const color = data.color;
 
       if (!active || !text) {
         lastKey = "";
@@ -204,7 +210,7 @@ function bootUrgent() {
       }
 
       showTicker();
-renderTicker(text, type, data.color);
+      renderTicker(text, type, color);
     },
     (err) => {
       console.error("urgent ticker snapshot error:", err);
