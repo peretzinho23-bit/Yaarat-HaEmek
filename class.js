@@ -394,7 +394,7 @@ function updateBoomNowNext() {
     <div style="font-weight:900;">
       🔥 עכשיו: 
       ${nowId ? "שיעור" : "אין"}
-      ${nowSubject ? ` <span style="opacity:.85;">(${escapeHtml(nowSubject)})</span>` : ""}
+${nowSubject ? ` <span style="opacity:.85;">${escapeHtml(nowSubject)}</span>` : ""}
     </div>
     <div style="opacity:.85; margin-top:6px;">
       ➡️ השיעור הבא:
