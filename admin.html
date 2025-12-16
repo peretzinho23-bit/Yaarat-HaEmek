@@ -439,6 +439,31 @@
         </div>
 
         <br><br>
+<div class="card" style="margin-top:16px;">
+  <h3 style="margin:0 0 10px;">הודעה דחופה</h3>
+
+  <label style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
+    <input type="checkbox" id="urgentActive">
+    <span>פעילה</span>
+  </label>
+
+  <label style="display:block; margin-bottom:8px; font-weight:800;">סוג</label>
+  <select id="urgentType" style="width:100%; padding:10px; border-radius:12px; margin-bottom:10px;">
+    <option value="info">רגילה (כחול)</option>
+    <option value="warn">אזהרה (צהוב)</option>
+    <option value="danger">דחוף (אדום)</option>
+  </select>
+
+  <label style="display:block; margin-bottom:8px; font-weight:800;">טקסט</label>
+  <textarea id="urgentText" rows="3" style="width:100%; padding:10px; border-radius:12px;"></textarea>
+
+  <div style="display:flex; gap:10px; margin-top:10px;">
+    <button id="urgentSave" class="btn">שמירה</button>
+    <button id="urgentClear" class="btn" style="opacity:.85;">מחיקה</button>
+  </div>
+
+  <div id="urgentStatus" style="margin-top:10px; opacity:.8;"></div>
+</div>
 
         <!-- BOARD -->
         <h3 class="section-title" style="font-size:1.2rem;margin-bottom:10px;"> לוח מודעות
@@ -649,6 +674,8 @@
   </section>
 
   <script type="module" src="admin.js?v=7"></script>
-  <script src="accessibility.js"></script>
+ 
+ <script type="module" src="./admin-urgent.js"></script>
+ <script src="accessibility.js"></script>
 </body>
 </html>
