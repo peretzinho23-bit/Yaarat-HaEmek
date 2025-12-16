@@ -139,22 +139,27 @@ function renderTicker(text, type) {
 
   const speed = calcSpeedSeconds(text);
 
-  wrap.innerHTML = `
-    <div class="urgent-bar" data-type="${safeType}" role="status" aria-live="polite" style="--urgent-speed:${speed}s;">
-      <div class="urgent-inner">
-        <div class="urgent-badge">${typeToBadge(safeType)}</div>
+wrap.innerHTML = `
+  <div class="urgent-bar"
+       data-type="${safeType}"
+       role="status"
+       aria-live="polite"
+       style="--urgent-speed:${speed}s; --urgent-speed-mobile:${Math.max(speed + 3, 11)}s;">
+       
+    <div class="urgent-inner">
+      <div class="urgent-badge">
+        ${typeToBadge(safeType)}
+      </div>
 
-        <div class="urgent-track" aria-label="הודעה דחופה">
-          <!-- שני עותקים בשביל לופ אינסופי (השני aria-hidden כדי לא “להקריא” פעמיים) -->
-          <div class="urgent-runner">
-            <span class="urgent-item">${safeText}</span>
-            <span class="urgent-item" aria-hidden="true">${safeText}</span>
-          </div>
-        </div>
+      <div class="urgent-track" aria-label="הודעה דחופה">
+        <span class="urgent-text">
+          ${safeText}
+        </span>
       </div>
     </div>
-  `;
-}
+  </div>
+`;
+
 
 function bootUrgent() {
   if (!wrap) return;
