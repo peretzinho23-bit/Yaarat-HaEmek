@@ -271,22 +271,53 @@ onAuthStateChanged(auth, (user) => {
 let lastExamsArr = [];
 let lastNewsArr = [];
 let activeClassId = null;
+function getNextExamCountdown() {
+  if (!lastExamsArr || !lastExamsArr.length) return null;
 
-// ====== BOOM BAR updates ======
+  const now = new Date();
+
+  // מוצא את המבחן הראשון שעוד לא עבר
+  const next = lastExamsArr
+    .map(e => ({ ...e, _d: parseDate(e.date) }))
+    .filter(e => e._d && e._d.getTime() > now.getTime())
+    .sort((a,b) => a._d - b._d)[0];
+
+  if (!next) return null;
+
+  let diff = Math.floor((next._d.getTime() - now.getTime()) / 1000);
+  if (diff <= 0) return null;
+
+  const hours = Math.floor(diff / 3600);
+  diff %= 3600;
+  const minutes = Math.floor(diff / 60);
+  const seconds = diff % 60;
+
+  return {
+    text: `📝 המבחן הבא בעוד ${hours}ש ${minutes}ד ${seconds}ש׳`,
+  };
+}
+
 function updateBoomCounts() {
-  if (boomExams) boomExams.textContent = (lastExamsArr?.length ? `${lastExamsArr.length}` : "—");
-  if (boomNews) boomNews.textContent = (lastNewsArr?.length ? `${lastNewsArr.length}` : "—");
+  if (boomExams) boomExams.textContent =
+    lastExamsArr?.length ? `${lastExamsArr.length}` : "—";
 
+  if (boomNews) boomNews.textContent =
+    lastNewsArr?.length ? `${lastNewsArr.length}` : "—";
+
+  // זמן עדכון כולל שניות
   if (boomSub) {
     const now = new Date();
-   const hh = String(now.getHours()).padStart(2,"0");
-const mm = String(now.getMinutes()).padStart(2,"0");
-const ss = String(now.getSeconds()).padStart(2,"0");
+    const hh = String(now.getHours()).padStart(2,"0");
+    const mm = String(now.getMinutes()).padStart(2,"0");
+    const ss = String(now.getSeconds()).padStart(2,"0");
 
-boomSub.textContent = `עודכן עכשיו · ${hh}:${mm}:${ss}`;
-
+    const examCountdown = getNextExamCountdown();
+    boomSub.textContent = examCountdown
+      ? examCountdown.text
+      : `עודכן ב-${hh}:${mm}:${ss}`;
   }
 }
+
 
 function getBoomDayKey() {
   // במובייל – היום שנבחר
@@ -356,7 +387,7 @@ function setSelectedDayKey(key) {
   daySelect.addEventListener("change", () => {
     setSelectedDayKey(daySelect.value);
     renderMobileDayFromLastGrid();
-    updateBoomNowNext(selectedDayKey || todayDayKey());
+updateBoomNowNext();
   });
 })();
 
