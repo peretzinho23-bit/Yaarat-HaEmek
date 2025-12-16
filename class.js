@@ -285,42 +285,38 @@ function updateBoomCounts() {
   }
 }
 
-// ✅ NOW/NEXT (+ דקות)
-function updateBoomNowNext(dayKey = todayDayKey()) {
+function getBoomDayKey() {
+  // במובייל – היום שנבחר
+  if (isMobileView() && selectedDayKey) {
+    return selectedDayKey;
+  }
+  // בדסקטופ – היום האמיתי
+  return todayDayKey();
+}
+
+function updateBoomNowNext() {
   if (!boomNowNext) return;
 
+  const dayKey = getBoomDayKey();
   const { nowText, nextText } = getNowNextForDay(dayKey);
 
   const nowMin = new Date().getHours() * 60 + new Date().getMinutes();
   const blocks = buildDayTimeline(dayKey);
 
-  const nowBlock = blocks.find(b =>
-    nowText && `${b.label}` === nowText.split(" (")[0]
-  ) || null;
-
-  const nextBlock = blocks.find(b =>
-    nextText && `${b.label}` === nextText.split(" (")[0]
-  ) || null;
-
-  const nowRemainingMin = nowBlock
-    ? Math.max(0, nowBlock.end - nowMin)
-    : null;
-
-  const nextInMin = nextBlock
-    ? Math.max(0, nextBlock.start - nowMin)
-    : null;
+  let nextInMin = null;
+  for (const b of blocks) {
+    if (nowMin < b.start) {
+      nextInMin = b.start - nowMin;
+      break;
+    }
+  }
 
   boomNowNext.innerHTML = `
     <div style="font-weight:900;">
       🔥 עכשיו: ${nowText || "אין"}
-      ${
-        nowRemainingMin != null
-          ? `<span style="opacity:.8;font-weight:800;"> (עוד ${nowRemainingMin} דק׳)</span>`
-          : ""
-      }
     </div>
     <div style="opacity:.85; margin-top:6px;">
-      ➡️ השיעור הבא בעוד
+      ➡️ השיעור הבא בעוד 
       <b>${nextInMin != null ? `${nextInMin} דקות` : "—"}</b>
     </div>
   `;
@@ -938,7 +934,7 @@ setInterval(() => {
   if (isMobileView()) {
     renderMobileDayFromLastGrid();
   }
-}, 15000);
+}, 5000);
 
 
 if (!classId || !isKnownClass(classId)) {
