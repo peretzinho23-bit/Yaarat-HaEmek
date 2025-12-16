@@ -932,11 +932,14 @@ const classId = (qs.get("class") || "").trim().toLowerCase();
 
 // ✅ refresh NOW/NEXT every 30s
 setInterval(() => {
-  if (!isMobileView()) return;
-  renderMobileDayFromLastGrid();
-  updateBoomNowNext(selectedDayKey || todayDayKey());
   updateBoomCounts();
+  updateBoomNowNext(selectedDayKey || todayDayKey());
+
+  if (isMobileView()) {
+    renderMobileDayFromLastGrid();
+  }
 }, 15000);
+
 
 if (!classId || !isKnownClass(classId)) {
   showChooser();
