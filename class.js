@@ -408,19 +408,6 @@ function updateBoomNowNext() {
   `;
 }
 
-  const nextExtra = nextBlock
-    ? `<div style="opacity:.85; margin-top:6px;">
-         ➡️ הבא בעוד <b>${nextInMin != null ? `${nextInMin} דקות` : "—"}</b>
-       </div>`
-    : `<div style="opacity:.85; margin-top:6px;">➡️ הבא: <b>—</b></div>`;
-
-  boomNowNext.innerHTML = `
-    ${renderBlockLine(nowBlock, "🔥 עכשיו:")}
-    ${renderBlockLine(nextBlock, "➡️ הבא:")}
-    ${nextExtra}
-  `;
-}
-
 // ===============================
 // ✅ MOBILE DAY SLIDER
 // ===============================
