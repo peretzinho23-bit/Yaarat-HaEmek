@@ -41,7 +41,6 @@ function ensureUrgentStyles() {
       box-shadow: 0 10px 30px rgba(0,0,0,.22);
     }
 
-    /* רקע פחות "ענק" + יותר נקי */
     .urgent-bar[data-type="danger"]{ background: rgba(239,68,68,.10); }
     .urgent-bar[data-type="warn"]{ background: rgba(245,158,11,.12); }
     .urgent-bar[data-type="info"]{ background: rgba(59,130,246,.10); }
@@ -64,42 +63,45 @@ function ensureUrgentStyles() {
       flex: 0 0 auto;
     }
 
-    /* האנימציה עובדת הכי טוב כשמסילה ב-LTR */
-    .urgent-track{
+    /* מסילה */
+    .urgent-marquee-track{
       position: relative;
       flex: 1 1 auto;
       min-width: 0;
       overflow: hidden;
       white-space: nowrap;
       direction: ltr;
-      height: 26px; /* נמוך יותר = פחות "שמיכה" */
+      height: 26px;
     }
 
-    .urgent-text{
+    /* טקסט (מחלקה חדשה שלא מתנגשת עם CSS שלך) */
+    .urgent-marquee-text{
       display:inline-block;
       direction: rtl;
       unicode-bidi: plaintext;
       font-weight: 900;
-      opacity: .92;
       will-change: transform;
-      transform: translateX(100%);
-      animation: urgentMarquee var(--urgent-speed, 10s) linear infinite;
-      padding-left: 60px; /* רווח לפני סיבוב הבא */
+      transform: translateX(110%);
+      animation: urgentMarquee2 var(--urgent-speed, 10s) linear infinite;
+      padding-left: 70px;
+      color: #0f172a;
+      opacity: .92;
+    }
+    html[data-theme="dark"] .urgent-marquee-text{
+      color: rgba(255,255,255,.92);
     }
 
-    /* מימין -> שמאל ואז מתחיל מחדש */
-    @keyframes urgentMarquee{
-      from { transform: translateX(100%); }
-      to   { transform: translateX(-120%); }
+    @keyframes urgentMarquee2{
+      from { transform: translateX(110%); }
+      to   { transform: translateX(-130%); }
     }
 
-    /* קצת יותר איטי בנייד */
     @media (max-width: 820px){
-      .urgent-text{ animation-duration: var(--urgent-speed-mobile, 13s); }
+      .urgent-marquee-text{ animation-duration: var(--urgent-speed-mobile, 13s); }
     }
 
     @media (prefers-reduced-motion: reduce){
-      .urgent-text{ animation: none; transform:none; }
+      .urgent-marquee-text{ animation:none; transform:none; }
     }
   `;
   document.head.appendChild(style);
@@ -116,10 +118,9 @@ function showTicker() {
   wrap.style.display = "";
 }
 
-// קצר = יותר מהר, ארוך = יותר זמן לקריאה
 function calcSpeedSeconds(text) {
   const len = String(text || "").length;
-  const s = 6 + Math.min(10, len / 10); // בערך 6–16
+  const s = 6 + Math.min(10, len / 10); // 6–16
   return Math.max(6, Math.min(16, s));
 }
 
@@ -134,7 +135,7 @@ function renderTicker(text, type) {
   const safeText = escapeHtml(text);
 
   const key = `${safeType}::${safeText}`;
-  if (key === lastKey) return; // לא מרנדר שוב בלי שינוי
+  if (key === lastKey) return;
   lastKey = key;
 
   const speed = calcSpeedSeconds(text);
@@ -148,8 +149,8 @@ function renderTicker(text, type) {
          style="--urgent-speed:${speed}s; --urgent-speed-mobile:${speedMobile}s;">
       <div class="urgent-inner">
         <div class="urgent-badge">${typeToBadge(safeType)}</div>
-        <div class="urgent-track" aria-label="הודעה דחופה">
-          <span class="urgent-text">${safeText}</span>
+        <div class="urgent-marquee-track" aria-label="הודעה דחופה">
+          <span class="urgent-marquee-text">${safeText}</span>
         </div>
       </div>
     </div>
