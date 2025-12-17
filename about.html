@@ -815,69 +815,65 @@
   <!-- אנליטיקות -->
   <script type="module" src="analytics.js"></script>
 
-  <!-- NEW TOPBAR -->
-  <div class="about-topbar">
+  
+
+ <header class="header-main">
     <div class="container">
-      <div class="inner">
-        <div class="about-crumbs">
-          <a href="index.html">דף הבית</a>
-          <span class="sep">›</span>
-          <span>אודות</span>
-        </div>
+      <nav class="nav nav-centered" aria-label="ניווט ראשי">
 
-        <div class="about-search" aria-label="חיפוש בדף">
-          <span style="opacity:.85">🔎</span>
-          <input id="aboutSearch" type="text" placeholder="חפש בדף (למשל: מבחנים / סקרים / צוות)" />
-        </div>
-
-        <div class="about-actions">
-          <a class="about-btn primary" href="index.html">🏠 בית</a>
-          <a class="about-btn green" href="polls.html">🗳️ סקרים</a>
-          <button class="about-menu-btn" id="aboutMenuBtn" type="button">☰ תפריט</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- HEADER (נשאר כדי לא לשבור את style.css שלך, אבל עכשיו הוא פחות קריטי) -->
-  <header class="header-main">
-    <div class="container">
-      <nav class="nav">
-        <div class="nav-left">
-          <div class="logo-circle">
-            <img
-              src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png"
-              alt="סמל בית הספר יערת העמק"
-              class="logo-img"
-              id="logo-img"
-            >
-          </div>
-
-          <div>
-            <div class="school-title-main">חטיבת הנעורים – יערת העמק</div>
-            <div class="school-title-sub">סביבת למידה בטוחה, תומכת ומצמיחה – עבור כל תלמיד ותלמידה.</div>
-            <div class="back-btn-wrap">
-              <a href="index.html" class="back-btn"> חזרה לדף התלמידים</a>
-            </div>
-          </div>
-        </div>
-
-        <div class="nav-right">
+        <!-- ימין (דסקטופ) -->
+        <div class="nav-side nav-right-links">
           <a href="index.html#home-news">חדשות</a>
           <a href="index.html#home-exams">מבחנים</a>
           <a href="index.html#grades">השכבות</a>
           <a href="polls.html">סקרים</a>
-          <a href="about.html" class="active">אודות</a>
+          <a href="about.html">אודות</a>
+        </div>
+
+        <!-- מרכז (לוגו) -->
+        <div class="nav-center">
+          <a href="index.html" class="logo-circle" aria-label="דף הבית">
+            <img
+              src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png"
+              alt="סמל יערת העמק"
+              class="logo-img"
+            />
+          </a>
+        </div>
+
+        <!-- שמאל (דסקטופ) -->
+        <div class="nav-side nav-left-links">
           <a href="index.html#contact">יצירת קשר</a>
+          <a href="news.html">כל החדשות</a>
+          <a href="exams.html">כל המבחנים</a>
           <a href="redirect-edu.html" class="personal-btn">למרחב האישי</a>
           <a href="admin.html" class="btn-outline">Admin</a>
         </div>
 
-        <button id="theme-toggle" class="theme-toggle" type="button">🌙</button>
+        <!-- דארק מוד -->
+        <button id="theme-toggle" class="theme-toggle-btn" type="button" aria-label="מצב כהה/בהיר">
+          🌙
+        </button>
 
-        <button class="nav-toggle" type="button" aria-label="פתח תפריט" aria-expanded="false">
+        <!-- המבורגר (מובייל) -->
+        <button class="nav-toggle" id="nav-toggle" type="button" aria-label="פתח תפריט" aria-expanded="false" aria-controls="nav-mobile">
           <span></span><span></span><span></span>
         </button>
+
+        <!-- תפריט מובייל -->
+        <div class="nav-mobile" id="nav-mobile" aria-hidden="true">
+          <a href="index.html#home-news">חדשות</a>
+          <a href="index.html#home-exams">מבחנים</a>
+          <a href="index.html#grades">השכבות</a>
+          <a href="polls.html">סקרים</a>
+          <a href="about.html">אודות</a>
+          <a href="index.html#contact">יצירת קשר</a>
+          <a href="news.html">כל החדשות</a>
+          <a href="exams.html">כל המבחנים</a>
+          <a href="redirect-edu.html" class="personal-btn">למרחב האישי</a>
+          <a href="admin.html" class="btn-outline">Admin</a>
+        </div>
+
       </nav>
     </div>
   </header>
