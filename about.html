@@ -651,7 +651,238 @@
       border-color: rgba(59,130,246,.35);
       color: rgba(219,234,254,.95);
     }
+    /* בסיס */
+    .nav.nav-centered{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding: 10px 0;
+      position: relative;
+    }
+    .nav-side{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex: 1;
+    }
+    .nav-right-links{ justify-content:flex-start; }
+    .nav-left-links{ justify-content:flex-end; }
 
+    .logo-circle{
+      width: 60px;   /* לוגו קצת יותר גדול */
+      height: 60px;
+      border-radius: 999px;
+      overflow:hidden;
+      border: 2px solid rgba(59,130,246,0.35);
+      background: rgba(255,255,255,0.9);
+      box-shadow: 0 10px 25px rgba(15,23,42,0.12);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    html[data-theme="dark"] .logo-circle{
+      background: rgba(15,23,42,0.55);
+      border-color: rgba(56,189,248,0.35);
+    }
+    .logo-img{ width:100%; height:100%; object-fit:cover; }
+
+    .nav-side a{
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.92);
+      border: 1px solid rgba(148,163,184,0.55);
+      color: #0f172a;
+      transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+      box-shadow: 0 8px 20px rgba(15,23,42,0.08);
+      font-size: 0.92rem;
+    }
+    .nav-side a:hover{
+      transform: translateY(-1px);
+      box-shadow: 0 12px 28px rgba(15,23,42,0.12);
+      background: #eff6ff;
+    }
+    html[data-theme="dark"] .nav-side a{
+      background: rgba(15,23,42,0.55);
+      color: #e5e7eb;
+      border-color: rgba(148,163,184,0.35);
+    }
+    .nav-side .personal-btn{
+      background: #1d4ed8 !important;
+      color: #fff !important;
+      border: none !important;
+      font-weight: 700;
+    }
+
+    .theme-toggle-btn{
+      all: unset;
+      box-sizing:border-box;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      border: 1px solid rgba(148,163,184,0.6);
+      background: rgba(255,255,255,0.92);
+      box-shadow: 0 8px 20px rgba(15,23,42,0.08);
+      font-size: 1.4rem;
+      z-index: 50;
+    }
+    html[data-theme="dark"] .theme-toggle-btn{
+      background: rgba(15,23,42,0.9);
+      color: #f9fafb;
+    }
+
+    .nav-toggle{ display:none; }
+    .nav-mobile{ display:none; }
+
+    @media (max-width: 900px){
+      /* במובייל מסתירים 5+5 */
+      .nav-right-links,
+      .nav-left-links{ display:none !important; }
+
+      /* מרכז */
+      .nav.nav-centered{
+        justify-content:center !important;
+        min-height: 70px;
+      }
+
+      /* ✅ המבורגר בצד שמאל */
+      .nav-toggle{
+        display:flex !important;
+        position:absolute !important;
+        left: 12px !important;
+        right: auto !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        flex-direction:column;
+        gap:4px;
+        background:none;
+        border:none;
+        cursor:pointer;
+        z-index: 9999;
+      }
+      .nav-toggle span{
+        width: 22px;
+        height: 2px;
+        background: #0f172a;
+      }
+      html[data-theme="dark"] .nav-toggle span{
+        background: #e5e7eb;
+      }
+
+      /* ✅ דארק מוד בצד ימין */
+      #theme-toggle.theme-toggle-btn{
+        position:absolute !important;
+        right: 12px !important;
+        left: auto !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        z-index: 9999;
+      }
+
+      /* תפריט נפתח */
+      #nav-mobile.nav-mobile{
+        display:none;
+        position:absolute;
+        top: calc(100% + 10px);
+        left: 12px;
+        right: 12px;
+        background: rgba(255,255,255,0.98);
+        border: 1px solid rgba(148,163,184,0.45);
+        border-radius: 18px;
+        padding: 10px;
+        box-shadow: 0 18px 45px rgba(15,23,42,0.18);
+        z-index: 9999;
+      }
+      html[data-theme="dark"] #nav-mobile.nav-mobile{
+        background: rgba(15,23,42,0.95);
+        border-color: rgba(148,163,184,0.35);
+      }
+
+      #nav-mobile.nav-mobile.open{ display:block !important; }
+
+      #nav-mobile.nav-mobile a{
+        display:block;
+        padding: 10px 12px;
+        border-radius: 12px;
+        margin: 6px 0;
+        background: rgba(255,255,255,0.9);
+        border: 1px solid rgba(148,163,184,0.45);
+        color: #0f172a;
+      }
+      html[data-theme="dark"] #nav-mobile.nav-mobile a{
+        background: rgba(2,6,23,0.55);
+        border-color: rgba(148,163,184,0.25);
+        color: #e5e7eb;
+      }
+    }
+    /* ✅ תפריט מובייל קטן יותר (לא ענקי) */
+@media (max-width: 900px) {
+  #nav-mobile.nav-mobile{
+    width: min(220px, calc(100% - 24px)) !important; /* פה שולט הגודל */
+    left: 12px !important;   /* יוצא מההמבורגר (שמאל) */
+    right: auto !important;  /* לא נמתח */
+    top: calc(100% + 10px) !important;
+
+    padding: 8px !important;
+  }
+
+  #nav-mobile.nav-mobile a{
+    padding: 9px 10px !important;
+    margin: 6px 0 !important;
+    font-size: 0.92rem !important;
+  }
+}
+@media (max-width: 900px) {
+  #nav-mobile.nav-mobile{
+    left: 6px !important;   /* היה 12px */
+  }
+}
+
+
+.home-class-card {
+  width: 100%;
+  max-width: 520px;
+  text-align: center;
+}
+.home-class-center {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.home-class-card h3 {
+  font-size: 1.4rem;
+}
+
+.home-class-card .section-subtitle {
+  opacity: 0.85;
+}
+.home-class-card { padding: 18px; }
+.home-class-row { justify-content: center; }
+
+/* בחירת כיתה - עיצוב נקי ומרוכז */
+.home-class-card{
+  max-width: 680px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 18px;
+}
+
+.home-class-row{
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.home-class-row .select{
+  min-width: 160px;
+}
     /* =========================================================
        MOBILE MENU (לא תלוי app.js)
        ========================================================= */
@@ -808,6 +1039,7 @@
     html[data-theme="light"] .cta .txt{
       color: #064e3b;
     }
+
   </style>
 </head>
 
