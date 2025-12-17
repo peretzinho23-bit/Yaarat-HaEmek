@@ -11,67 +11,191 @@
 
   <style>
     /* =========================================================
-       ABOUT PAGE – NEW CLEAN DESIGN (בלי לשנות שמות תמונות)
+       ABOUT PAGE – REAL REBUILD (בלי לשנות שמות תמונות)
        ========================================================= */
+
+    :root{
+      --bg0:#0b1220;
+      --glass: rgba(2,6,23,.58);
+      --glass2: rgba(2,6,23,.42);
+      --stroke: rgba(148,163,184,.20);
+      --stroke2: rgba(148,163,184,.28);
+      --txt: rgba(241,245,249,.92);
+      --muted: rgba(226,232,240,.74);
+      --shadow: 0 22px 70px rgba(0,0,0,.35);
+      --shadow2: 0 16px 45px rgba(0,0,0,.22);
+      --blue: rgba(59,130,246,1);
+      --green: rgba(16,185,129,1);
+      --amber: rgba(245,158,11,1);
+    }
 
     body[data-page="about"]{
       background:
-        radial-gradient(1200px 700px at 80% -10%, rgba(59,130,246,.18), transparent 55%),
-        radial-gradient(900px 600px at 10% 0%, rgba(34,197,94,.10), transparent 55%),
-        radial-gradient(900px 600px at 60% 110%, rgba(245,158,11,.12), transparent 55%),
-        #0b1220;
-      color: #eaf2ff;
+        radial-gradient(1200px 700px at 78% -10%, rgba(59,130,246,.22), transparent 58%),
+        radial-gradient(900px 600px at 12% 0%, rgba(16,185,129,.14), transparent 60%),
+        radial-gradient(900px 600px at 55% 110%, rgba(245,158,11,.18), transparent 60%),
+        linear-gradient(180deg, rgba(2,6,23,.8), rgba(2,6,23,.95)),
+        var(--bg0);
+      color: var(--txt);
     }
 
-    .about-wrapper{
-      padding-top: 96px;
-      padding-bottom: 48px;
-      min-height: 100vh;
+    /* =========================================================
+       NEW TOP BAR + HEADER (לא הורס classים קיימים)
+       ========================================================= */
+
+    .about-topbar{
+      position: sticky;
+      top: 0;
+      z-index: 999;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      background: rgba(2,6,23,.55);
+      border-bottom: 1px solid var(--stroke);
     }
 
-    .about-page-title{
+    .about-topbar .inner{
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:14px;
-      margin: 0 0 12px;
+      gap: 12px;
+      padding: 8px 0;
     }
 
-    .about-page-title h1{
-      margin: 0;
-      font-size: clamp(1.4rem, 2.2vw, 2.1rem);
-      letter-spacing: .01em;
-      line-height: 1.2;
-    }
-
-    .about-kicker{
-      margin: 10px 0 0;
-      color: rgba(226,232,240,.86);
-      line-height: 1.75;
-      max-width: 820px;
-      font-size: .98rem;
-    }
-
-    /* ===== glass card base ===== */
-    .about-cardx{
-      border-radius: 22px;
-      border: 1px solid rgba(148,163,184,.22);
-      background:
-        radial-gradient(800px 500px at 20% 0%, rgba(56,189,248,.10), transparent 50%),
-        rgba(2,6,23,.55);
-      box-shadow: 0 20px 60px rgba(0,0,0,.35);
+    .about-crumbs{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      color: rgba(226,232,240,.78);
+      font-weight: 800;
+      font-size: .86rem;
+      white-space: nowrap;
       overflow: hidden;
+      text-overflow: ellipsis;
     }
+    .about-crumbs a{
+      color: rgba(191,219,254,.95);
+      text-decoration:none;
+      border-bottom: 1px dashed rgba(191,219,254,.35);
+    }
+    .about-crumbs .sep{ opacity:.6; }
+
+    .about-actions{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .about-btn{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--stroke2);
+      background: rgba(15,23,42,.55);
+      color: var(--txt);
+      text-decoration:none;
+      font-weight: 900;
+      font-size: .86rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,.18);
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+    }
+    .about-btn:hover{ transform: translateY(-1px); border-color: rgba(191,219,254,.35); }
+    .about-btn.primary{
+      background: rgba(59,130,246,.18);
+      border-color: rgba(59,130,246,.35);
+      color: rgba(219,234,254,.95);
+    }
+    .about-btn.green{
+      background: rgba(16,185,129,.16);
+      border-color: rgba(16,185,129,.35);
+      color: rgba(209,250,229,.96);
+    }
+
+    /* Search pill */
+    .about-search{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      border-radius: 999px;
+      border: 1px solid var(--stroke2);
+      background: rgba(2,6,23,.45);
+      padding: 7px 10px;
+      min-width: 240px;
+      max-width: 360px;
+      box-shadow: 0 10px 26px rgba(0,0,0,.16);
+    }
+    .about-search input{
+      width: 100%;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: rgba(241,245,249,.92);
+      font-weight: 800;
+      font-size: .88rem;
+    }
+    .about-search input::placeholder{ color: rgba(226,232,240,.55); font-weight: 800; }
+
+    @media (max-width: 920px){
+      .about-search{ display:none; }
+    }
+
+    /* =========================================================
+       WRAPPER
+       ========================================================= */
+
+    .about-wrapper{
+      padding-top: 22px; /* במקום 96 כי יש topbar */
+      padding-bottom: 56px;
+      min-height: 100vh;
+    }
+
+    /* =========================================================
+       HERO – big modern panel
+       ========================================================= */
 
     .about-hero{
       margin-top: 14px;
     }
 
+    .about-hero-shell{
+      border-radius: 26px;
+      border: 1px solid var(--stroke);
+      background:
+        radial-gradient(900px 520px at 80% 0%, rgba(59,130,246,.22), transparent 58%),
+        radial-gradient(700px 420px at 10% 0%, rgba(16,185,129,.16), transparent 60%),
+        rgba(2,6,23,.55);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position: relative;
+    }
+
+    .about-hero-shell::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(90deg, transparent, rgba(255,255,255,.04), transparent);
+      transform: translateX(-60%);
+      animation: sheen 7s ease-in-out infinite;
+      pointer-events:none;
+      opacity:.7;
+    }
+    @keyframes sheen{
+      0%{ transform: translateX(-60%); }
+      55%{ transform: translateX(60%); }
+      100%{ transform: translateX(60%); }
+    }
+
     .about-hero-grid{
       display:grid;
-      grid-template-columns: 1.25fr .9fr;
-      gap: 16px;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 14px;
       align-items: stretch;
+      padding: 16px;
+      position: relative;
+      z-index: 1;
     }
 
     @media (max-width: 980px){
@@ -79,319 +203,408 @@
     }
 
     .about-hero-main{
-      padding: 18px 18px 16px;
+      border-radius: 22px;
+      border: 1px solid var(--stroke);
+      background: rgba(2,6,23,.38);
+      padding: 16px 16px 14px;
+      box-shadow: var(--shadow2);
     }
 
-    .about-pill{
+    .about-title-row{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .about-title-row h1{
+      margin: 0;
+      font-size: clamp(1.45rem, 2.4vw, 2.3rem);
+      letter-spacing: .01em;
+      line-height: 1.15;
+    }
+
+    .about-badges{
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content:flex-start;
+    }
+
+    .badge{
       display:inline-flex;
       align-items:center;
-      gap:8px;
-      padding: 7px 12px;
+      gap: 8px;
+      padding: 7px 11px;
       border-radius: 999px;
-      border: 1px solid rgba(59,130,246,.38);
-      background: rgba(59,130,246,.10);
-      color: rgba(191,219,254,.95);
+      border: 1px solid var(--stroke2);
+      background: rgba(15,23,42,.55);
       font-weight: 900;
       font-size: .86rem;
+      color: rgba(241,245,249,.92);
       white-space: nowrap;
     }
+    .badge.blue{ border-color: rgba(59,130,246,.35); background: rgba(59,130,246,.14); color: rgba(219,234,254,.95); }
+    .badge.green{ border-color: rgba(16,185,129,.35); background: rgba(16,185,129,.14); color: rgba(209,250,229,.96); }
+    .badge.amber{ border-color: rgba(245,158,11,.35); background: rgba(245,158,11,.14); color: rgba(254,243,199,.96); }
 
-    .about-hero-main h2{
-      margin: 12px 0 6px;
-      font-size: clamp(1.2rem, 1.8vw, 1.7rem);
-      line-height: 1.25;
+    .about-lead{
+      margin: 6px 0 0;
+      color: rgba(226,232,240,.86);
+      line-height: 1.8;
+      font-size: 1.02rem;
+      max-width: 860px;
     }
 
-    .about-hero-main p{
-      margin: 0;
-      color: rgba(226,232,240,.88);
-      line-height: 1.75;
-      font-size: .98rem;
-      max-width: 780px;
-    }
-
-    .about-chips{
+    .about-quick-grid{
       margin-top: 14px;
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    @media (max-width: 820px){
+      .about-quick-grid{ grid-template-columns: 1fr; }
+    }
+
+    .quick{
+      border-radius: 18px;
+      border: 1px solid var(--stroke);
+      background: rgba(2,6,23,.32);
+      padding: 12px 12px 10px;
+      box-shadow: 0 14px 34px rgba(0,0,0,.18);
+      transition: transform .18s ease, border-color .18s ease;
+    }
+    .quick:hover{ transform: translateY(-2px); border-color: rgba(191,219,254,.30); }
+
+    .quick .k{
       display:flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .about-chip{
-      display:inline-flex;
       align-items:center;
-      gap:8px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(148,163,184,.22);
-      background: rgba(15,23,42,.55);
-      color: rgba(241,245,249,.92);
-      font-weight: 800;
-      font-size: .88rem;
+      gap: 8px;
+      font-weight: 1000;
+      font-size: .95rem;
+      margin-bottom: 4px;
+    }
+    .quick .d{
+      color: rgba(226,232,240,.78);
+      font-size: .92rem;
+      line-height: 1.7;
+      margin:0;
     }
 
+    /* Side media */
     .about-hero-side{
+      border-radius: 22px;
+      border: 1px solid var(--stroke);
+      background: rgba(2,6,23,.38);
       padding: 14px;
+      box-shadow: var(--shadow2);
       display:flex;
       flex-direction: column;
       gap: 10px;
     }
 
-    .about-side-head{
+    .side-head{
       display:flex;
-      align-items:flex-start;
       justify-content:space-between;
       gap: 10px;
-      padding: 12px 12px 0;
+      align-items:flex-start;
     }
 
-    .about-side-head h3{
-      margin: 0;
-      font-size: 1rem;
-    }
-
-    .about-side-head p{
-      margin: 6px 0 0;
-      color: rgba(226,232,240,.85);
-      font-size: .9rem;
-      line-height: 1.7;
-    }
-
-    .about-media{
-      margin-top: 6px;
-      border-radius: 18px;
-      overflow: hidden;
-      border: 1px solid rgba(148,163,184,.22);
-      background: rgba(0,0,0,.22);
-    }
-
-    .about-media img{
-      width: 100%;
-      height: 280px;
-      object-fit: cover;
-      display:block;
-    }
-
-    @media (max-width: 520px){
-      .about-media img{ height: 220px; }
-    }
-
-    /* ===== sections ===== */
-    .about-section{
-      margin-top: 18px;
-    }
-
-    .about-section-header{
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap: 14px;
-      margin-bottom: 10px;
-    }
-
-    .about-section-title{
-      margin: 0;
-      font-size: 1.25rem;
-    }
-
-    .about-section-subtitle{
+    .side-head h3{ margin: 0; font-size: 1.02rem; }
+    .side-head p{
       margin: 6px 0 0;
       color: rgba(226,232,240,.78);
-      font-size: .95rem;
       line-height: 1.7;
-      max-width: 760px;
-    }
-
-    /* ===== cards grid ===== */
-    .about-grid{
-      display:grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    @media (max-width: 980px){
-      .about-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
-    @media (max-width: 640px){
-      .about-grid{ grid-template-columns: 1fr; }
-    }
-
-    .about-mini{
-      padding: 14px 14px 12px;
-      border-radius: 18px;
-      border: 1px solid rgba(148,163,184,.20);
-      background: rgba(2,6,23,.48);
-      box-shadow: 0 18px 40px rgba(0,0,0,.25);
-    }
-
-    .about-mini .tag{
-      color: rgba(148,163,184,.9);
-      font-weight: 900;
-      font-size: .82rem;
-      margin-bottom: 6px;
-    }
-
-    .about-mini h3{
-      margin: 0 0 6px;
-      font-size: 1rem;
-    }
-
-    .about-mini p{
-      margin: 0;
-      color: rgba(226,232,240,.85);
       font-size: .92rem;
-      line-height: 1.7;
     }
 
-    /* ===== stats ===== */
-    .about-stats{
-      display:grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 10px;
-    }
-
-    @media (max-width: 980px){
-      .about-stats{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
-    @media (max-width: 640px){
-      .about-stats{ grid-template-columns: 1fr; }
-    }
-
-    .stat{
-      padding: 14px 14px 12px;
+    .media{
       border-radius: 18px;
-      border: 1px solid rgba(59,130,246,.22);
-      background:
-        radial-gradient(700px 400px at 10% 0%, rgba(59,130,246,.18), transparent 50%),
-        rgba(2,6,23,.50);
-    }
-
-    .stat .label{
-      color: rgba(191,219,254,.95);
-      font-weight: 900;
-      font-size: .86rem;
-    }
-
-    .stat .value{
-      margin-top: 6px;
-      font-size: 1.9rem;
-      font-weight: 900;
-      letter-spacing: .02em;
-      line-height: 1;
-    }
-
-    .stat .note{
-      margin-top: 8px;
-      color: rgba(226,232,240,.75);
-      font-size: .86rem;
-    }
-
-    /* ===== gallery ===== */
-    .about-gallery{
-      display:grid;
-      grid-template-columns: 1.4fr 1fr;
-      gap: 12px;
-      margin-top: 10px;
-    }
-
-    @media (max-width: 980px){
-      .about-gallery{ grid-template-columns: 1fr; }
-    }
-
-    .gallery-main{
-      border-radius: 20px;
       overflow:hidden;
-      border: 1px solid rgba(148,163,184,.22);
+      border: 1px solid var(--stroke);
       background: rgba(0,0,0,.22);
     }
-
-    .gallery-main img{
-      width:100%;
+    .media img{
+      width: 100%;
       height: 320px;
       object-fit: cover;
       display:block;
       transform: scale(1.01);
     }
-
-    @media (max-width: 640px){
-      .gallery-main img{ height: 240px; }
+    @media (max-width: 520px){
+      .media img{ height: 240px; }
     }
 
-    .gallery-mini{
+    /* =========================================================
+       SECTION TITLES
+       ========================================================= */
+    .about-section{
+      margin-top: 18px;
+    }
+
+    .sec-head{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap: 12px;
+      margin: 0 0 10px;
+    }
+    .sec-head h2{
+      margin: 0;
+      font-size: 1.25rem;
+    }
+    .sec-head p{
+      margin: 6px 0 0;
+      color: rgba(226,232,240,.70);
+      line-height: 1.7;
+      max-width: 760px;
+      font-size: .95rem;
+    }
+
+    /* =========================================================
+       "VALUES" GRID
+       ========================================================= */
+    .cards3{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+    @media (max-width: 980px){
+      .cards3{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 640px){
+      .cards3{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      border-radius: 20px;
+      border: 1px solid var(--stroke);
+      background: rgba(2,6,23,.42);
+      box-shadow: var(--shadow2);
+      padding: 14px 14px 12px;
+      position: relative;
+      overflow:hidden;
+      transition: transform .18s ease, border-color .18s ease;
+    }
+    .card:hover{ transform: translateY(-2px); border-color: rgba(191,219,254,.28); }
+
+    .card::after{
+      content:"";
+      position:absolute;
+      inset:-1px;
+      background:
+        radial-gradient(600px 240px at 90% 0%, rgba(59,130,246,.14), transparent 55%),
+        radial-gradient(600px 240px at 10% 0%, rgba(16,185,129,.12), transparent 55%);
+      pointer-events:none;
+      opacity:.9;
+    }
+    .card > *{ position:relative; z-index:1; }
+
+    .card .tag{
+      color: rgba(148,163,184,.9);
+      font-weight: 1000;
+      font-size: .82rem;
+      margin-bottom: 6px;
+    }
+    .card h3{ margin: 0 0 6px; font-size: 1.02rem; }
+    .card p{
+      margin: 0;
+      color: rgba(226,232,240,.80);
+      font-size: .92rem;
+      line-height: 1.7;
+    }
+
+    /* =========================================================
+       STATS – pop cards
+       ========================================================= */
+    .stats{
+      display:grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 10px;
+    }
+    @media (max-width: 980px){
+      .stats{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 640px){
+      .stats{ grid-template-columns: 1fr; }
+    }
+
+    .stat{
+      border-radius: 20px;
+      border: 1px solid rgba(59,130,246,.20);
+      background:
+        radial-gradient(700px 360px at 10% 0%, rgba(59,130,246,.22), transparent 55%),
+        rgba(2,6,23,.42);
+      box-shadow: var(--shadow2);
+      padding: 14px 14px 12px;
+      transition: transform .18s ease;
+    }
+    .stat:hover{ transform: translateY(-2px); }
+
+    .stat .label{
+      color: rgba(191,219,254,.95);
+      font-weight: 1000;
+      font-size: .86rem;
+    }
+    .stat .value{
+      margin-top: 8px;
+      font-size: 2.05rem;
+      font-weight: 1000;
+      letter-spacing: .02em;
+      line-height: 1;
+    }
+    .stat .note{
+      margin-top: 8px;
+      color: rgba(226,232,240,.70);
+      font-size: .86rem;
+    }
+
+    /* =========================================================
+       GALLERY – premium layout
+       ========================================================= */
+    .gallery{
+      display:grid;
+      grid-template-columns: 1.45fr 1fr;
+      gap: 12px;
+      margin-top: 10px;
+    }
+    @media (max-width: 980px){
+      .gallery{ grid-template-columns: 1fr; }
+    }
+
+    .g-main{
+      border-radius: 22px;
+      overflow:hidden;
+      border: 1px solid var(--stroke);
+      background: rgba(0,0,0,.22);
+      box-shadow: var(--shadow2);
+      position: relative;
+    }
+    .g-main img{
+      width: 100%;
+      height: 360px;
+      object-fit: cover;
+      display:block;
+    }
+    @media (max-width: 640px){
+      .g-main img{ height: 250px; }
+    }
+    .g-main .cap{
+      position:absolute;
+      bottom: 10px;
+      right: 10px;
+      left: 10px;
+      border-radius: 16px;
+      padding: 10px 12px;
+      border: 1px solid rgba(148,163,184,.18);
+      background: rgba(2,6,23,.55);
+      color: rgba(241,245,249,.92);
+      font-weight: 900;
+      font-size: .92rem;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .g-mini{
       display:grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 10px;
     }
-
-    .gallery-mini .ph{
-      border-radius: 16px;
+    .g-mini .ph{
+      border-radius: 18px;
       overflow:hidden;
-      border: 1px solid rgba(148,163,184,.22);
+      border: 1px solid var(--stroke);
       background: rgba(0,0,0,.18);
+      box-shadow: 0 14px 30px rgba(0,0,0,.18);
+      transition: transform .18s ease;
     }
-
-    .gallery-mini img{
+    .g-mini .ph:hover{ transform: translateY(-2px); }
+    .g-mini img{
       width:100%;
-      height: 150px;
+      height: 160px;
       object-fit: cover;
       display:block;
     }
-
     @media (max-width: 640px){
-      .gallery-mini img{ height: 140px; }
+      .g-mini img{ height: 140px; }
     }
 
-    /* ===== reasons list ===== */
-    .about-reasons{
+    /* =========================================================
+       REASONS – nicer bullets
+       ========================================================= */
+    .reasons{
       display:grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 12px;
       margin-top: 10px;
     }
-
     @media (max-width: 900px){
-      .about-reasons{ grid-template-columns: 1fr; }
+      .reasons{ grid-template-columns: 1fr; }
     }
 
     .reason{
+      border-radius: 20px;
+      border: 1px solid var(--stroke);
+      background: rgba(2,6,23,.42);
+      box-shadow: var(--shadow2);
       padding: 14px 14px 12px;
-      border-radius: 18px;
-      border: 1px solid rgba(148,163,184,.20);
-      background: rgba(2,6,23,.48);
       display:flex;
-      gap: 10px;
+      gap: 12px;
       align-items:flex-start;
+      position: relative;
+      overflow:hidden;
     }
+    .reason::after{
+      content:"";
+      position:absolute;
+      inset:-1px;
+      background:
+        radial-gradient(520px 220px at 0% 0%, rgba(245,158,11,.12), transparent 55%);
+      opacity:.9;
+      pointer-events:none;
+    }
+    .reason > *{ position:relative; z-index:1; }
 
     .reason .icon{
-      font-size: 1.1rem;
-      line-height: 1;
-      margin-top: 2px;
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      display:grid;
+      place-items:center;
+      border: 1px solid rgba(148,163,184,.18);
+      background: rgba(15,23,42,.55);
+      box-shadow: 0 10px 22px rgba(0,0,0,.18);
+      font-size: 1.05rem;
       flex: 0 0 auto;
+      margin-top: 2px;
     }
-
     .reason strong{
       display:block;
       margin-bottom: 4px;
-      font-size: .98rem;
+      font-size: 1rem;
     }
-
     .reason span{
-      color: rgba(226,232,240,.82);
+      display:block;
+      color: rgba(226,232,240,.78);
       font-size: .92rem;
       line-height: 1.7;
     }
 
-    /* ===== CTA ===== */
-    .about-cta{
+    /* =========================================================
+       CTA – big
+       ========================================================= */
+    .cta{
       margin-top: 18px;
-      padding: 16px 16px 14px;
-      border-radius: 22px;
+      border-radius: 26px;
       border: 1px solid rgba(16,185,129,.30);
       background:
-        radial-gradient(900px 450px at 10% 0%, rgba(16,185,129,.18), transparent 55%),
-        rgba(2,6,23,.52);
+        radial-gradient(900px 420px at 10% 0%, rgba(16,185,129,.22), transparent 58%),
+        radial-gradient(900px 420px at 90% 0%, rgba(59,130,246,.18), transparent 58%),
+        rgba(2,6,23,.50);
+      box-shadow: var(--shadow);
+      padding: 16px;
       display:flex;
       flex-wrap: wrap;
       gap: 12px;
@@ -399,101 +612,201 @@
       justify-content:space-between;
     }
 
-    .about-cta .txt{
-      max-width: 820px;
+    .cta .txt{
+      max-width: 860px;
       color: rgba(236,253,245,.92);
       line-height: 1.75;
-      font-size: .95rem;
+      font-size: .98rem;
     }
-
-    .about-cta .txt strong{
+    .cta .txt strong{
       display:inline-block;
-      margin-bottom: 3px;
-      font-size: 1.02rem;
+      margin-bottom: 4px;
+      font-size: 1.06rem;
     }
 
-    .about-cta .actions{
+    .cta .actions{
       display:flex;
       gap: 10px;
       flex-wrap: wrap;
     }
-
-    .about-cta a{
+    .cta a{
       text-decoration:none;
       border-radius: 999px;
-      padding: 9px 14px;
-      font-weight: 900;
+      padding: 10px 14px;
+      font-weight: 1000;
       font-size: .9rem;
-      border: 1px solid rgba(16,185,129,.45);
+      border: 1px solid rgba(148,163,184,.22);
+      background: rgba(15,23,42,.55);
+      color: rgba(241,245,249,.92);
+      transition: transform .18s ease, border-color .18s ease;
     }
-
-    .about-cta a.primary{
+    .cta a:hover{ transform: translateY(-1px); border-color: rgba(191,219,254,.30); }
+    .cta a.primary{
       background: #10b981;
-      color: #052e23;
       border-color: rgba(16,185,129,.85);
+      color: #052e23;
     }
-
-    .about-cta a.secondary{
-      background: rgba(16,185,129,.08);
-      color: rgba(167,243,208,.95);
+    .cta a.secondary{
+      background: rgba(59,130,246,.14);
+      border-color: rgba(59,130,246,.35);
+      color: rgba(219,234,254,.95);
     }
 
     /* =========================================================
-       LIGHT THEME OVERRIDES
+       MOBILE MENU (לא תלוי app.js)
+       ========================================================= */
+    .about-mobile{
+      display:none;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(0,0,0,.45);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+    .about-mobile.open{ display:block; }
+
+    .about-drawer{
+      position:absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+      width: min(340px, 88vw);
+      background: rgba(2,6,23,.82);
+      border-left: 1px solid rgba(148,163,184,.20);
+      box-shadow: -30px 0 80px rgba(0,0,0,.45);
+      padding: 14px;
+      transform: translateX(0);
+    }
+
+    .drawer-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .drawer-head strong{ font-size: .98rem; }
+    .drawer-close{
+      border:none;
+      cursor:pointer;
+      background: rgba(15,23,42,.55);
+      border: 1px solid rgba(148,163,184,.20);
+      color: rgba(241,245,249,.92);
+      border-radius: 12px;
+      padding: 8px 10px;
+      font-weight: 1000;
+    }
+
+    .drawer-links{
+      display:flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .drawer-links a{
+      text-decoration:none;
+      border-radius: 14px;
+      padding: 10px 12px;
+      border: 1px solid rgba(148,163,184,.20);
+      background: rgba(15,23,42,.45);
+      color: rgba(241,245,249,.92);
+      font-weight: 1000;
+    }
+
+    .drawer-links a.active{
+      border-color: rgba(59,130,246,.35);
+      background: rgba(59,130,246,.16);
+      color: rgba(219,234,254,.95);
+    }
+
+    /* show drawer button only on small screens */
+    .about-menu-btn{
+      display:none;
+      border:none;
+      cursor:pointer;
+      background: rgba(15,23,42,.55);
+      border: 1px solid rgba(148,163,184,.20);
+      color: rgba(241,245,249,.92);
+      border-radius: 12px;
+      padding: 8px 10px;
+      font-weight: 1000;
+    }
+    @media (max-width: 920px){
+      .about-menu-btn{ display:inline-flex; align-items:center; gap:8px; }
+    }
+
+    /* =========================================================
+       LIGHT THEME
        ========================================================= */
     html[data-theme="light"] body[data-page="about"]{
       background:
-        radial-gradient(1200px 700px at 80% -10%, rgba(59,130,246,.16), transparent 55%),
-        radial-gradient(900px 600px at 10% 0%, rgba(16,185,129,.10), transparent 55%),
-        radial-gradient(900px 600px at 60% 110%, rgba(245,158,11,.10), transparent 55%),
+        radial-gradient(1200px 700px at 78% -10%, rgba(59,130,246,.18), transparent 58%),
+        radial-gradient(900px 600px at 12% 0%, rgba(16,185,129,.12), transparent 60%),
+        radial-gradient(900px 600px at 55% 110%, rgba(245,158,11,.14), transparent 60%),
         #f3f7ff;
       color: #0f172a;
     }
 
-    html[data-theme="light"] .about-cardx,
-    html[data-theme="light"] .about-mini,
+    html[data-theme="light"] .about-topbar{
+      background: rgba(255,255,255,.75);
+      border-bottom-color: rgba(148,163,184,.30);
+    }
+    html[data-theme="light"] .about-crumbs{ color: #475569; }
+    html[data-theme="light"] .about-crumbs a{ color: #1d4ed8; border-bottom-color: rgba(29,78,216,.25); }
+
+    html[data-theme="light"] .about-search{
+      background: rgba(255,255,255,.85);
+      border-color: rgba(148,163,184,.35);
+    }
+    html[data-theme="light"] .about-search input{ color: #0f172a; }
+    html[data-theme="light"] .about-search input::placeholder{ color: #64748b; }
+
+    html[data-theme="light"] .about-btn{
+      background: rgba(255,255,255,.85);
+      border-color: rgba(148,163,184,.35);
+      color: #0f172a;
+    }
+
+    html[data-theme="light"] .about-hero-shell,
+    html[data-theme="light"] .about-hero-main,
+    html[data-theme="light"] .about-hero-side,
+    html[data-theme="light"] .card,
     html[data-theme="light"] .stat,
+    html[data-theme="light"] .g-main,
+    html[data-theme="light"] .g-mini .ph,
     html[data-theme="light"] .reason,
-    html[data-theme="light"] .about-cta{
-      background: rgba(255,255,255,.9);
-      border-color: rgba(148,163,184,.30);
+    html[data-theme="light"] .cta{
+      background: rgba(255,255,255,.88);
+      border-color: rgba(148,163,184,.35);
       box-shadow: 0 18px 45px rgba(15,23,42,.08);
     }
 
-    html[data-theme="light"] .about-kicker,
-    html[data-theme="light"] .about-hero-main p,
-    html[data-theme="light"] .about-mini p,
+    html[data-theme="light"] .about-lead,
+    html[data-theme="light"] .quick .d,
+    html[data-theme="light"] .sec-head p,
+    html[data-theme="light"] .card p,
+    html[data-theme="light"] .stat .note,
     html[data-theme="light"] .reason span,
-    html[data-theme="light"] .about-section-subtitle{
+    html[data-theme="light"] .side-head p{
       color: #475569;
     }
 
-    html[data-theme="light"] .about-pill{
-      background: rgba(59,130,246,.10);
-      border-color: rgba(59,130,246,.35);
-      color: #0f172a;
-    }
-
-    html[data-theme="light"] .about-chip{
+    html[data-theme="light"] .badge{
       background: rgba(241,245,249,.9);
       color: #0f172a;
+      border-color: rgba(148,163,184,.30);
     }
 
-    html[data-theme="light"] .stat .label{
-      color: #1d4ed8;
+    html[data-theme="light"] .g-main .cap{
+      background: rgba(255,255,255,.82);
+      border-color: rgba(148,163,184,.30);
+      color: #0f172a;
     }
 
-    html[data-theme="light"] .stat .note{
-      color: #64748b;
-    }
-
-    html[data-theme="light"] .about-cta .txt{
+    html[data-theme="light"] .cta .txt{
       color: #064e3b;
-    }
-
-    html[data-theme="light"] .about-cta a.secondary{
-      color: #047857;
-      background: rgba(16,185,129,.08);
     }
   </style>
 </head>
@@ -502,7 +815,31 @@
   <!-- אנליטיקות -->
   <script type="module" src="analytics.js"></script>
 
-  <!-- HEADER -->
+  <!-- NEW TOPBAR -->
+  <div class="about-topbar">
+    <div class="container">
+      <div class="inner">
+        <div class="about-crumbs">
+          <a href="index.html">דף הבית</a>
+          <span class="sep">›</span>
+          <span>אודות</span>
+        </div>
+
+        <div class="about-search" aria-label="חיפוש בדף">
+          <span style="opacity:.85">🔎</span>
+          <input id="aboutSearch" type="text" placeholder="חפש בדף (למשל: מבחנים / סקרים / צוות)" />
+        </div>
+
+        <div class="about-actions">
+          <a class="about-btn primary" href="index.html">🏠 בית</a>
+          <a class="about-btn green" href="polls.html">🗳️ סקרים</a>
+          <button class="about-menu-btn" id="aboutMenuBtn" type="button">☰ תפריט</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEADER (נשאר כדי לא לשבור את style.css שלך, אבל עכשיו הוא פחות קריטי) -->
   <header class="header-main">
     <div class="container">
       <nav class="nav">
@@ -517,12 +854,8 @@
           </div>
 
           <div>
-            <div class="school-title-main">
-              חטיבת הנעורים – יערת העמק
-            </div>
-            <div class="school-title-sub">
-              סביבת למידה בטוחה, תומכת ומצמיחה – עבור כל תלמיד ותלמידה.
-            </div>
+            <div class="school-title-main">חטיבת הנעורים – יערת העמק</div>
+            <div class="school-title-sub">סביבת למידה בטוחה, תומכת ומצמיחה – עבור כל תלמיד ותלמידה.</div>
             <div class="back-btn-wrap">
               <a href="index.html" class="back-btn"> חזרה לדף התלמידים</a>
             </div>
@@ -540,125 +873,135 @@
           <a href="admin.html" class="btn-outline">Admin</a>
         </div>
 
-        <button id="theme-toggle" class="theme-toggle" type="button">
-          🌙
-        </button>
+        <button id="theme-toggle" class="theme-toggle" type="button">🌙</button>
 
-        <button
-          class="nav-toggle"
-          type="button"
-          aria-label="פתח תפריט"
-          aria-expanded="false">
-          <span></span>
-          <span></span>
-          <span></span>
+        <button class="nav-toggle" type="button" aria-label="פתח תפריט" aria-expanded="false">
+          <span></span><span></span><span></span>
         </button>
       </nav>
     </div>
   </header>
 
-  <main class="about-wrapper">
-    <div class="container">
-      <div class="about-page-title">
-        <h1>אודות חטיבת הנעורים יערת העמק</h1>
+  <!-- MOBILE DRAWER (חדש) -->
+  <div class="about-mobile" id="aboutMobile">
+    <div class="about-drawer" role="dialog" aria-modal="true" aria-label="תפריט אודות">
+      <div class="drawer-head">
+        <strong>תפריט מהיר</strong>
+        <button class="drawer-close" id="aboutCloseBtn" type="button">✕</button>
       </div>
-      <p class="about-kicker">
-        כאן תמצאו הצצה מהירה למה שקורה אצלנו: מי אנחנו, מה חשוב לנו, ומה הופך את יערת העמק למקום שכיף ללמוד בו.
-      </p>
-    </div>
 
-    <!-- HERO -->
+      <div class="drawer-links">
+        <a href="index.html">🏠 דף הבית</a>
+        <a href="index.html#home-news">📰 חדשות</a>
+        <a href="index.html#home-exams">📝 מבחנים</a>
+        <a href="index.html#grades">👥 השכבות</a>
+        <a href="polls.html">🗳️ סקרים</a>
+        <a href="about.html" class="active">ℹ️ אודות</a>
+        <a href="index.html#contact">✉️ יצירת קשר</a>
+        <a href="redirect-edu.html">🔒 מרחב אישי</a>
+        <a href="admin.html">🛠️ Admin</a>
+      </div>
+    </div>
+  </div>
+
+  <main class="about-wrapper">
     <section class="about-hero">
       <div class="container">
-        <div class="about-hero-grid">
-          <div class="about-cardx about-hero-main">
-            <span class="about-pill">🏫 חטיבת הנעורים יערת העמק – הבית של השכבה</span>
+        <div class="about-hero-shell">
+          <div class="about-hero-grid">
+            <div class="about-hero-main">
+              <div class="about-title-row">
+                <div>
+                  <h1>אודות חטיבת הנעורים יערת העמק</h1>
+                  <p class="about-lead">
+                    כאן תמצאו את הסיפור של החטיבה: שילוב של לימודים ברמה גבוהה, אווירה חברתית חזקה,
+                    וקשר אמיתי בין תלמידים לצוות.
+                  </p>
+                </div>
 
-            <h2>מקום שנותן לתלמידים להרגיש שייכים, נראים ומשמעותיים.</h2>
+                <div class="about-badges">
+                  <span class="badge blue">🏫 חטיבה במגדל העמק</span>
+                  <span class="badge green">🤝 יחס אישי</span>
+                  <span class="badge amber">🚀 יוזמות ומנהיגות</span>
+                </div>
+              </div>
 
-            <p>
-              יערת העמק היא חטיבת נעורים במגדל העמק שמחברת בין מצוינות לימודית, חוויה חברתית עשירה ותמיכה רגשית אמיתית.
-              אנחנו מאמינים שתלמידים שמרגישים טוב – לומדים טוב, יוזמים, מובילים ומשפיעים.
-            </p>
-
-            <div class="about-chips">
-              <span class="about-chip">🎓 למידה איכותית ומותאמת</span>
-              <span class="about-chip">🤝 קשר אישי עם הצוות</span>
-              <span class="about-chip">🚀 מנהיגות, חדשנות ויוזמות תלמידים</span>
-            </div>
-          </div>
-
-          <aside class="about-cardx about-hero-side">
-            <div class="about-side-head">
-              <div>
-                <h3>יום לימודים ביערת העמק</h3>
-                <p>
-                  שיעורי עומק, למידה דיגיטלית, פרויקטים, מועצת תלמידים, הפסקות פעילות וחוויה חברתית שממשיכה גם אחרי הצלצול.
-                </p>
+              <div class="about-quick-grid">
+                <div class="quick">
+                  <div class="k">🎯 מטרה</div>
+                  <p class="d">שכל תלמיד ותלמידה ירגישו שייכים, בטוחים ובדרך להצלחה.</p>
+                </div>
+                <div class="quick">
+                  <div class="k">🧠 למידה</div>
+                  <p class="d">כלים דיגיטליים, חקר, פרויקטים — ולא רק “לשנן”.</p>
+                </div>
+                <div class="quick">
+                  <div class="k">🧡 קהילה</div>
+                  <p class="d">בית ספר שהוא גם מקום חברתי, ערכי ותומך.</p>
+                </div>
               </div>
             </div>
 
-            <div class="about-media">
-              <img src="images/about-hero.png" alt="מבט אל חצר בית הספר יערת העמק">
-            </div>
-          </aside>
+            <aside class="about-hero-side">
+              <div class="side-head">
+                <div>
+                  <h3>יום לימודים ביערת העמק</h3>
+                  <p>שיעורי עומק, למידה דיגיטלית, מועצת תלמידים, הפסקות פעילות ואווירה שמרימה.</p>
+                </div>
+              </div>
+
+              <div class="media">
+                <img src="images/about-hero.png" alt="מבט אל חצר בית הספר יערת העמק">
+              </div>
+            </aside>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- מי אנחנו -->
+    <!-- VALUES -->
     <section class="about-section">
       <div class="container">
-        <header class="about-section-header">
+        <div class="sec-head">
           <div>
-            <h2 class="about-section-title">מי אנחנו – יערת העמק מקרוב</h2>
-            <p class="about-section-subtitle">
-              החטיבה משלבת סטנדרט לימודי גבוה עם אווירה משפחתית, דגש על קשר אישי ושיתוף פעולה עם ההורים.
-            </p>
+            <h2>מי אנחנו – יערת העמק מקרוב</h2>
+            <p>שלושה דברים שמגדירים אותנו: ערכים, למידה, וקהילה.</p>
           </div>
-        </header>
+        </div>
 
-        <div class="about-grid">
-          <article class="about-mini">
+        <div class="cards3">
+          <article class="card">
             <div class="tag">ערכים וחינוך</div>
             <h3>מקום בטוח לגדול בו</h3>
-            <p>
-              אנחנו מחנכים לאחריות, כבוד הדדי, קבלה והקשבה. צוות שמכיר מקרוב, שומר על קשר עם הבית ודואג לכל תלמיד ותלמידה.
-            </p>
+            <p>כבוד הדדי, הקשבה וקבלה. צוות שמלווה מקרוב ושומר על קשר עם הבית.</p>
           </article>
 
-          <article class="about-mini">
+          <article class="card">
             <div class="tag">למידה וחדשנות</div>
-            <h3>מצוינות שמתאימה למאה ה-21</h3>
-            <p>
-              שיעורים מגוונים, למידה דיגיטלית, חקר ופרויקטים בין-תחומיים. עבודה בצוות, כלים מתקדמים וחשיבה ביקורתית.
-            </p>
+            <h3>מצוינות שמתאימה להיום</h3>
+            <p>למידה דיגיטלית, חקר ופרויקטים — עם חשיבה ביקורתית ועבודת צוות.</p>
           </article>
 
-          <article class="about-mini">
+          <article class="card">
             <div class="tag">חברה וקהילה</div>
-            <h3>התלמידים משפיעים על מה שקורה</h3>
-            <p>
-              מועצת תלמידים פעילה, סקרים דיגיטליים, ימי שיא, מעורבות חברתית ועוד — הקול של התלמידים באמת נשמע וגם משפיע.
-            </p>
+            <h3>התלמידים משפיעים</h3>
+            <p>מועצת תלמידים, סקרים, ימי שיא ומעורבות חברתית — הקול של התלמידים נשמע.</p>
           </article>
         </div>
       </div>
     </section>
 
-    <!-- במספרים -->
+    <!-- STATS -->
     <section class="about-section">
       <div class="container">
-        <header class="about-section-header">
+        <div class="sec-head">
           <div>
-            <h2 class="about-section-title">יערת העמק – במספרים</h2>
-            <p class="about-section-subtitle">
-              נתונים כלליים להמחשה (יכולים להשתנות משנה לשנה).
-            </p>
+            <h2>יערת העמק – במספרים</h2>
+            <p>נתונים כלליים להמחשה (יכולים להשתנות משנה לשנה).</p>
           </div>
-        </header>
+        </div>
 
-        <div class="about-stats">
+        <div class="stats">
           <div class="stat">
             <div class="label">תלמידים בחטיבה</div>
             <div class="value">383</div>
@@ -686,59 +1029,48 @@
       </div>
     </section>
 
-    <!-- גלריה -->
+    <!-- GALLERY -->
     <section class="about-section">
       <div class="container">
-        <header class="about-section-header">
+        <div class="sec-head">
           <div>
-            <h2 class="about-section-title">רגעים מהחיים בבית הספר</h2>
-            <p class="about-section-subtitle">
-              טיולים, ימי שיא, חצר ושגרה — כאן רואים את האנרגיה של המקום.
-            </p>
+            <h2>רגעים מהחיים בבית הספר</h2>
+            <p>טיולים, ימי שיא, חצר ושגרה — האנרגיה של המקום בתמונות.</p>
           </div>
-        </header>
+        </div>
 
-        <div class="about-gallery">
-          <div class="gallery-main">
+        <div class="gallery">
+          <div class="g-main">
             <img src="images/PIC-HATZER.png" alt="תלמידים בחצר בית הספר">
+            <div class="cap">📸 חצר בית הספר – רגעים של שגרה טובה</div>
           </div>
 
-          <div class="gallery-mini">
-            <div class="ph">
-              <img src="images/about-gallery-1.png" alt="פעילות חברתית בכיתה">
-            </div>
-            <div class="ph">
-              <img src="images/pic2.png" alt="יום שיא או טקס בית ספרי">
-            </div>
-            <div class="ph">
-              <img src="images/pic3-demo.png" alt="למידה במעבדה / מחשבים">
-            </div>
-            <div class="ph">
-              <img src="images/PIC4-TIOL.png" alt="טיול שנתי או פעילות מחוץ לבית הספר">
-            </div>
+          <div class="g-mini">
+            <div class="ph"><img src="images/about-gallery-1.png" alt="פעילות חברתית בכיתה"></div>
+            <div class="ph"><img src="images/pic2.png" alt="יום שיא או טקס בית ספרי"></div>
+            <div class="ph"><img src="images/pic3-demo.png" alt="למידה במעבדה / מחשבים"></div>
+            <div class="ph"><img src="images/PIC4-TIOL.png" alt="טיול שנתי או פעילות מחוץ לבית הספר"></div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- למה לבחור -->
+    <!-- REASONS -->
     <section class="about-section">
       <div class="container">
-        <header class="about-section-header">
+        <div class="sec-head">
           <div>
-            <h2 class="about-section-title">למה תלמידים אוהבים ללמוד כאן?</h2>
-            <p class="about-section-subtitle">
-              כמה סיבות שחוזרות שוב ושוב בשיחות עם תלמידים, הורים וצוות.
-            </p>
+            <h2>למה תלמידים אוהבים ללמוד כאן?</h2>
+            <p>כמה סיבות שחוזרות שוב ושוב בשיחות עם תלמידים, הורים וצוות.</p>
           </div>
-        </header>
+        </div>
 
-        <div class="about-reasons">
+        <div class="reasons">
           <div class="reason">
             <div class="icon">✅</div>
             <div>
               <strong>יחס אישי ותמיכה רגשית</strong>
-              <span>מחנכים וצוות שמכירים כל תלמיד, עוזרים ברגעים קשים ומלווים גם מעבר לשעות הלימודים.</span>
+              <span>מחנכים שמכירים כל תלמיד, עוזרים ברגעים קשים ומלווים לאורך השנה.</span>
             </div>
           </div>
 
@@ -746,7 +1078,7 @@
             <div class="icon">💡</div>
             <div>
               <strong>למידה חווייתית ומאתגרת</strong>
-              <span>שיעורים יצירתיים, פרויקטים, חקר, למידה בשטח ומתן מקום לחוזקות האישיות של כל אחד.</span>
+              <span>פרויקטים, חקר, יצירתיות ולמידה שמחוברת למציאות.</span>
             </div>
           </div>
 
@@ -754,7 +1086,7 @@
             <div class="icon">🤝</div>
             <div>
               <strong>אווירה חברתית וקהילתית</strong>
-              <span>חברויות, עבודת צוות, מועצת תלמידים פעילה והרגשה של בית אחד גדול.</span>
+              <span>חברויות, עבודת צוות ומועצת תלמידים פעילה שמרימה את כולם.</span>
             </div>
           </div>
 
@@ -762,7 +1094,7 @@
             <div class="icon">🚀</div>
             <div>
               <strong>הזדמנויות להתפתח ולהוביל</strong>
-              <span>תוכניות מנהיגות, פרויקטים מיוחדים, סקרים דיגיטליים והשפעה אמיתית על מה שקורה בחטיבה.</span>
+              <span>תוכניות מנהיגות, יוזמות תלמידים, סקרים והשפעה אמיתית.</span>
             </div>
           </div>
         </div>
@@ -772,7 +1104,7 @@
     <!-- CTA -->
     <section class="about-section">
       <div class="container">
-        <div class="about-cta">
+        <div class="cta">
           <div class="txt">
             <strong>רוצים להמשיך להכיר את יערת העמק?</strong><br>
             חזרו לדף הבית, הציצו בחדשות, עברו על לוח המבחנים או כנסו לעמוד הסקרים והשפיעו על מה שקורה בחטיבה.
@@ -789,13 +1121,61 @@
 
   <footer>
     <div class="container">
-      <p id="footer-text">
-        © כל הזכויות שמורות לחטיבת הנעורים יערת העמק
-      </p>
+      <p id="footer-text">© כל הזכויות שמורות לחטיבת הנעורים יערת העמק</p>
     </div>
   </footer>
 
   <div id="to-top">↑</div>
+
+  <!-- small JS for new UI only (לא נוגע ב-app.js שלך) -->
+  <script>
+    // Mobile drawer
+    const mobile = document.getElementById("aboutMobile");
+    const openBtn = document.getElementById("aboutMenuBtn");
+    const closeBtn = document.getElementById("aboutCloseBtn");
+
+    function openDrawer(){ if(mobile) mobile.classList.add("open"); }
+    function closeDrawer(){ if(mobile) mobile.classList.remove("open"); }
+
+    if(openBtn) openBtn.addEventListener("click", openDrawer);
+    if(closeBtn) closeBtn.addEventListener("click", closeDrawer);
+    if(mobile) mobile.addEventListener("click", (e)=>{ if(e.target === mobile) closeDrawer(); });
+
+    // Search highlight (simple)
+    const inp = document.getElementById("aboutSearch");
+    let lastMark = null;
+
+    function clearMark(){
+      if(!lastMark) return;
+      lastMark.style.outline = "";
+      lastMark.style.scrollMarginTop = "";
+      lastMark = null;
+    }
+
+    function findAndJump(q){
+      const text = (q||"").trim().toLowerCase();
+      if(!text) { clearMark(); return; }
+
+      const candidates = Array.from(document.querySelectorAll("main h1, main h2, main h3, main p, main strong, main .cap"));
+      const hit = candidates.find(el => (el.textContent || "").toLowerCase().includes(text));
+      if(!hit) return;
+
+      clearMark();
+      lastMark = hit;
+      hit.style.scrollMarginTop = "120px";
+      hit.style.outline = "3px solid rgba(59,130,246,.35)";
+      hit.style.borderRadius = "12px";
+      hit.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    if(inp){
+      let t = null;
+      inp.addEventListener("input", () => {
+        clearTimeout(t);
+        t = setTimeout(()=> findAndJump(inp.value), 250);
+      });
+    }
+  </script>
 
   <script src="accessibility.js"></script>
   <script type="module" src="app.js"></script>
