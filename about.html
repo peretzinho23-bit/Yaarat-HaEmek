@@ -701,8 +701,9 @@
             <div class="school-title-sub">סביבת למידה בטוחה, תומכת ומצמיחה – עבור כל תלמיד ותלמידה.</div>
 
             <div class="back-btn-wrap">
-              <a href="index.html" class="back-btn"> חזרה לדף התלמידים</a>
-            </div>
+  <a href="index.html" class="back-btn">חזרה לדף הבית</a>
+</div>
+
           </div>
         </div>
 
@@ -913,6 +914,7 @@
   <script type="module">
     import { db } from "./firebase-config.js";
     import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
     const $ = (id) => document.getElementById(id);
 
@@ -1244,100 +1246,120 @@
       document.addEventListener("keydown", (e) => { if(e.key === "Escape") close(); });
     })();
 
-    // Edit Mode (?edit=1)
-    (function(){
-      const params = new URLSearchParams(location.search);
-      const enabled = params.has("edit");
-      const fab = $("editFab");
-      const modal = $("editModal");
-      const area = $("editArea");
-      const status = $("editStatus");
-      if(!enabled || !fab || !modal || !area) return;
+ // Edit Mode (?edit=1) — רק DEV
+(function(){
+  const params = new URLSearchParams(location.search);
+  const enabled = params.has("edit");
+  const fab = $("editFab");
+  const modal = $("editModal");
+  const area = $("editArea");
+  const status = $("editStatus");
+  if(!enabled || !fab || !modal || !area) return;
 
-      fab.style.display = "inline-flex";
+  // ✅ רק אתה רואה את הכפתור
+  const DEV_EMAILS = [
+    "nadavp1119@gmail.com",
+    "peretzinho23@gmail.com"
+  ].map(x => x.toLowerCase());
 
-      const ref = doc(db, "siteContent", "aboutSimple");
-      const localKey = "aboutSimpleDraft";
+  const auth = getAuth();
+  const setStatus = (t) => { if(status) status.textContent = t; };
 
-      const setStatus = (t) => { if(status) status.textContent = t; };
+  // נחביא כברירת מחדל עד שנדע מי המשתמש
+  fab.style.display = "none";
 
-      const open = () => {
-        modal.classList.add("open");
-        modal.setAttribute("aria-hidden","false");
-        document.body.style.overflow = "hidden";
-        area.value = JSON.stringify(window.__aboutSimpleLast || fallback, null, 2);
-        setStatus("מוכן.");
-      };
+  onAuthStateChanged(auth, (user) => {
+    const email = (user?.email || "").toLowerCase();
+    const isDev = DEV_EMAILS.includes(email);
 
-      const close = () => {
-        modal.classList.remove("open");
-        modal.setAttribute("aria-hidden","true");
-        document.body.style.overflow = "";
-      };
+    if(!isDev){
+      // אם מישהו נכנס עם ?edit=1 — פשוט לא יראה כלום
+      fab.style.display = "none";
+      return;
+    }
 
-      const validate = () => {
-        try{
-          JSON.parse(area.value);
-          setStatus("✅ JSON תקין.");
-        }catch(e){
-          setStatus("❌ JSON לא תקין: " + (e?.message || "שגיאה"));
+    fab.style.display = "inline-flex";
+  });
+
+  const ref = doc(db, "siteContent", "aboutSimple");
+  const localKey = "aboutSimpleDraft";
+
+  const open = () => {
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden","false");
+    document.body.style.overflow = "hidden";
+    area.value = JSON.stringify(window.__aboutSimpleLast || fallback, null, 2);
+    setStatus("מוכן.");
+  };
+
+  const close = () => {
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden","true");
+    document.body.style.overflow = "";
+  };
+
+  const validate = () => {
+    try{
+      JSON.parse(area.value);
+      setStatus("✅ JSON תקין.");
+    }catch(e){
+      setStatus("❌ JSON לא תקין: " + (e?.message || "שגיאה"));
+    }
+  };
+
+  const save = async () => {
+    try{
+      const parsed = JSON.parse(area.value);
+      setStatus("שומר...");
+      try{
+        await setDoc(ref, parsed);
+        localStorage.removeItem(localKey);
+        window.__aboutSimpleLast = parsed;
+        render(parsed);
+        setStatus("✅ נשמר! (Firestore עודכן)");
+        return;
+      }catch(e){
+        localStorage.setItem(localKey, JSON.stringify(parsed));
+        window.__aboutSimpleLast = parsed;
+        render(parsed);
+        const msg = String(e?.message || e || "");
+        if(msg.toLowerCase().includes("permission")){
+          setStatus("⚠️ אין הרשאה ל-Firestore, נשמר מקומית (localStorage).");
+        }else{
+          setStatus("⚠️ נשמר מקומית (בעיה בשמירה ל-Firestore).");
         }
-      };
+        return;
+      }
+    }catch(e){
+      setStatus("❌ JSON לא תקין, לא שמרתי.");
+    }
+  };
 
-      const save = async () => {
-        try{
-          const parsed = JSON.parse(area.value);
-          setStatus("שומר...");
-          // try firestore
-          try{
-            await setDoc(ref, parsed); // replace full
-            localStorage.removeItem(localKey);
-            window.__aboutSimpleLast = parsed;
-            render(parsed);
-            setStatus("✅ נשמר! (Firestore עודכן)");
-            return;
-          }catch(e){
-            // fallback local
-            localStorage.setItem(localKey, JSON.stringify(parsed));
-            window.__aboutSimpleLast = parsed;
-            render(parsed);
-            const msg = String(e?.message || e || "");
-            if(msg.toLowerCase().includes("permission")){
-              setStatus("⚠️ אין הרשאה ל-Firestore, נשמר מקומית (localStorage).");
-            }else{
-              setStatus("⚠️ נשמר מקומית (בעיה בשמירה ל-Firestore).");
-            }
-            return;
-          }
-        }catch(e){
-          setStatus("❌ JSON לא תקין, לא שמרתי.");
-        }
-      };
+  const copy = async () => {
+    try{
+      await navigator.clipboard.writeText(area.value);
+      setStatus("📋 הועתק.");
+    }catch(e){
+      setStatus("❌ לא הצלחתי להעתיק (דפדפן).");
+    }
+  };
 
-      const copy = async () => {
-        try{
-          await navigator.clipboard.writeText(area.value);
-          setStatus("📋 הועתק.");
-        }catch(e){
-          setStatus("❌ לא הצלחתי להעתיק (דפדפן).");
-        }
-      };
+  const reset = () => {
+    area.value = JSON.stringify(window.__aboutSimpleLast || fallback, null, 2);
+    setStatus("↩️ הוחזר.");
+  };
 
-      const reset = () => {
-        area.value = JSON.stringify(window.__aboutSimpleLast || fallback, null, 2);
-        setStatus("↩️ הוחזר.");
-      };
+  fab.addEventListener("click", open);
+  $("editCloseTop")?.addEventListener("click", close);
+  $("editValidate")?.addEventListener("click", validate);
+  $("editSave")?.addEventListener("click", save);
+  $("editCopy")?.addEventListener("click", copy);
+  $("editReset")?.addEventListener("click", reset);
 
-      fab.addEventListener("click", open);
-      $("editCloseTop")?.addEventListener("click", close);
-      $("editValidate")?.addEventListener("click", validate);
-      $("editSave")?.addEventListener("click", save);
-      $("editCopy")?.addEventListener("click", copy);
-      $("editReset")?.addEventListener("click", reset);
+  modal.addEventListener("click", (e) => { if(e.target === modal) close(); });
+  document.addEventListener("keydown", (e) => { if(e.key === "Escape" && modal.classList.contains("open")) close(); });
+})();
 
-      modal.addEventListener("click", (e) => { if(e.target === modal) close(); });
-      document.addEventListener("keydown", (e) => { if(e.key === "Escape" && modal.classList.contains("open")) close(); });
-    })();
 
     // boot
     load();
