@@ -569,6 +569,42 @@
     animation-duration: 18s;
   }
 }
+/* =========================
+   NAV CLEAN PREMIUM POLISH
+   ========================= */
+
+/* פחות עומס ויותר ריווח */
+.nav-side a{
+  font-weight: 600;
+  letter-spacing: .2px;
+}
+
+/* כפתורים משניים רגועים יותר */
+.nav-side a:not(.personal-btn):not(.btn-outline){
+  background: rgba(255,255,255,0.85);
+}
+
+/* Dark mode */
+html[data-theme="dark"] .nav-side a:not(.personal-btn):not(.btn-outline){
+  background: rgba(15,23,42,0.45);
+}
+
+/* Admin פחות בולט מהמרחב האישי */
+.nav-side .btn-outline{
+  opacity: .85;
+}
+
+/* Hover יותר אלגנטי */
+.nav-side a:hover{
+  transform: translateY(-1px);
+}
+
+/* מובייל – תפריט מרגיש רשמי ולא עמוס */
+@media (max-width:900px){
+  #nav-mobile.nav-mobile a{
+    font-weight: 600;
+  }
+}
 
   </style>
 </head>
@@ -596,65 +632,69 @@
   <script type="module" src="analytics.js"></script>
 
   <header class="header-main">
-    <div class="container">
-      <nav class="nav nav-centered" aria-label="ניווט ראשי">
+  <div class="container">
+    <nav class="nav nav-centered" aria-label="ניווט ראשי">
 
-        <!-- ימין (דסקטופ) -->
-        <div class="nav-side nav-right-links">
-          <a href="index.html#home-news">חדשות</a>
-          <a href="index.html#home-exams">מבחנים</a>
-          <a href="index.html#grades">השכבות</a>
-          <a href="polls.html">סקרים</a>
-          <a href="about.html">אודות</a>
-        </div>
+      <!-- ימין (דסקטופ) -->
+      <div class="nav-side nav-right-links">
+        <a href="index.html#home-news">חדשות</a>
+        <a href="index.html#home-exams">מבחנים</a>
+        <a href="index.html#grades">השכבות</a>
+        <a href="polls.html">סקרים</a>
+        <a href="about.html">אודות</a>
+      </div>
 
-        <!-- מרכז (לוגו) -->
-        <div class="nav-center">
-          <a href="index.html" class="logo-circle" aria-label="דף הבית">
-            <img
-              src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png"
-              alt="סמל יערת העמק"
-              class="logo-img"
-            />
-          </a>
-        </div>
+      <!-- מרכז (לוגו) -->
+      <div class="nav-center">
+        <a href="index.html" class="logo-circle" aria-label="דף הבית">
+          <img
+            src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png"
+            alt="סמל יערת העמק"
+            class="logo-img"
+          />
+        </a>
+      </div>
 
-        <!-- שמאל (דסקטופ) -->
-        <div class="nav-side nav-left-links">
-          <a href="index.html#contact">יצירת קשר</a>
-          <a href="news.html">כל החדשות</a>
-          <a href="exams.html">כל המבחנים</a>
-          <a href="redirect-edu.html" class="personal-btn">למרחב האישי</a>
-          <a href="admin.html" class="btn-outline">Admin</a>
-        </div>
+      <!-- שמאל (דסקטופ) -->
+      <div class="nav-side nav-left-links">
+        <a href="index.html#contact">יצירת קשר</a>
+        <a href="redirect-edu.html" class="personal-btn">למרחב האישי</a>
+        <a href="admin.html" class="btn-outline">Admin</a>
+      </div>
 
-        <!-- דארק מוד -->
-        <button id="theme-toggle" class="theme-toggle-btn" type="button" aria-label="מצב כהה/בהיר">
-          🌙
-        </button>
+      <!-- דארק מוד -->
+      <button id="theme-toggle" class="theme-toggle-btn" type="button" aria-label="מצב כהה/בהיר">
+        🌙
+      </button>
 
-        <!-- המבורגר (מובייל) -->
-        <button class="nav-toggle" id="nav-toggle" type="button" aria-label="פתח תפריט" aria-expanded="false" aria-controls="nav-mobile">
-          <span></span><span></span><span></span>
-        </button>
+      <!-- המבורגר (מובייל) -->
+      <button
+        class="nav-toggle"
+        id="nav-toggle"
+        type="button"
+        aria-label="פתח תפריט"
+        aria-expanded="false"
+        aria-controls="nav-mobile"
+      >
+        <span></span><span></span><span></span>
+      </button>
 
-        <!-- תפריט מובייל -->
-        <div class="nav-mobile" id="nav-mobile" aria-hidden="true">
-          <a href="index.html#home-news">חדשות</a>
-          <a href="index.html#home-exams">מבחנים</a>
-          <a href="index.html#grades">השכבות</a>
-          <a href="polls.html">סקרים</a>
-          <a href="about.html">אודות</a>
-          <a href="index.html#contact">יצירת קשר</a>
-          <a href="news.html">כל החדשות</a>
-          <a href="exams.html">כל המבחנים</a>
-          <a href="redirect-edu.html" class="personal-btn">למרחב האישי</a>
-          <a href="admin.html" class="btn-outline">Admin</a>
-        </div>
+      <!-- תפריט מובייל -->
+      <div class="nav-mobile" id="nav-mobile" aria-hidden="true">
+        <a href="index.html#home-news">חדשות</a>
+        <a href="index.html#home-exams">מבחנים</a>
+        <a href="index.html#grades">השכבות</a>
+        <a href="polls.html">סקרים</a>
+        <a href="about.html">אודות</a>
+        <a href="index.html#contact">יצירת קשר</a>
+        <a href="redirect-edu.html" class="personal-btn">למרחב האישי</a>
+        <a href="admin.html" class="btn-outline">Admin</a>
+      </div>
 
-      </nav>
-    </div>
-  </header>
+    </nav>
+  </div>
+</header>
+
 
   <!-- HERO -->
   <section class="hero hero-home">
