@@ -3347,3 +3347,76 @@ html, body, .grade-card, .card, header, .section-light, .section-dark-strong{
     margin: 0 auto;
   }
 }
+/* ===================================================
+   SAFE POLISH – PREMIUM TOUCH (NO HTML / NO JS)
+   Safe to remove anytime
+   =================================================== */
+
+/* אחידות טיפוגרפיה */
+.section-title{
+  letter-spacing: .2px;
+}
+.section-subtitle{
+  letter-spacing: .15px;
+}
+
+/* קו תחתון עדין לכותרות */
+.section-title::after{
+  opacity:.9;
+}
+
+/* כרטיסים – תחושת עומק עדינה */
+.grade-card,
+.card,
+.contact-box,
+.hero-side-card{
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    border-color .18s ease;
+}
+
+.grade-card:hover,
+.card:hover,
+.contact-box:hover{
+  transform: translateY(-3px);
+  box-shadow: 0 16px 34px rgba(15,23,42,.18);
+}
+
+/* כפתורים – תחושה חלקה */
+.btn,
+.btn-outline,
+.about-btn,
+.grade-btn{
+  transition:
+    transform .14s ease,
+    box-shadow .14s ease,
+    background-color .22s ease,
+    color .22s ease;
+}
+
+.btn:hover,
+.about-btn:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(37,99,235,.28);
+}
+
+/* ניווט – underline אלגנטי */
+.nav-right a::after{
+  opacity:.9;
+}
+
+/* לייט מוד – טיפה יותר חי, בלי לגעת בלוגיקה */
+:root[data-theme="light"] body{
+  background:
+    radial-gradient(900px 420px at 85% 10%, rgba(56,189,248,.12), transparent 60%),
+    radial-gradient(900px 420px at 15% 25%, rgba(37,99,235,.10), transparent 60%),
+    linear-gradient(180deg, #f8fbff 0%, #f2f6ff 100%);
+}
+
+/* לייט מוד – כרטיסים מרגישים “מרחפים” */
+:root[data-theme="light"] .grade-card,
+:root[data-theme="light"] .card{
+  background: rgba(255,255,255,.92);
+  box-shadow: 0 12px 28px rgba(15,23,42,.08);
+}
