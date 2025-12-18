@@ -615,6 +615,127 @@
       75%{ transform: translateX(6px); }
       100%{ transform: translateX(0); }
     }
+/* =========================
+   ADMINAPS – LIGHT MODE FIX
+   ========================= */
+html[data-theme="light"] body[data-page="adminaps"]{
+  background:
+    radial-gradient(circle at 70% -10%, rgba(56,189,248,.10), transparent 55%),
+    radial-gradient(circle at 12% 12%, rgba(96,165,250,.08), transparent 55%),
+    radial-gradient(circle at 92% 92%, rgba(16,185,129,.08), transparent 60%),
+    linear-gradient(180deg, #f6f9ff 0%, #eef4ff 50%, #eaf0ff 100%);
+  color:#0f172a;
+}
+
+/* כרטיסים – יותר עומק, פחות "פלסטיק לבן" */
+html[data-theme="light"] .adminaps-hero,
+html[data-theme="light"] .app-card,
+html[data-theme="light"] .stat{
+  background: rgba(255,255,255,.92);
+  border-color: rgba(15,23,42,.12);
+  box-shadow:
+    0 18px 45px rgba(15,23,42,.10),
+    0 1px 0 rgba(255,255,255,.65) inset;
+}
+
+/* טקסטים */
+html[data-theme="light"] .adminaps-title{ color:#0f172a; }
+html[data-theme="light"] .adminaps-sub,
+html[data-theme="light"] .app-desc,
+html[data-theme="light"] .stat .note{
+  color:#334155;
+}
+
+/* Badge – שיראה יוקרתי ולא "סתם תכלת" */
+html[data-theme="light"] .adminaps-badge{
+  background: rgba(56,189,248,.10);
+  border-color: rgba(56,189,248,.35);
+  color:#0f172a;
+}
+
+/* שורת חיפוש – גבול ברור + עומק */
+html[data-theme="light"] .adminaps-search{
+  background: rgba(255,255,255,.96);
+  border-color: rgba(15,23,42,.14);
+  box-shadow: 0 14px 34px rgba(15,23,42,.10);
+}
+html[data-theme="light"] .adminaps-search input{ color:#0f172a; }
+html[data-theme="light"] .adminaps-search input::placeholder{ color:#64748b; }
+
+/* כפתורים עליונים */
+html[data-theme="light"] .adminaps-btn{
+  background: rgba(255,255,255,.96);
+  border-color: rgba(15,23,42,.14);
+  box-shadow: 0 14px 34px rgba(15,23,42,.10);
+  color:#0f172a;
+}
+html[data-theme="light"] .adminaps-btn:hover{
+  background: rgba(255,255,255,1);
+  border-color: rgba(56,189,248,.28);
+}
+
+/* Primary נשאר חזק */
+html[data-theme="light"] .adminaps-btn.primary{
+  background: #10b981;
+  border-color: rgba(16,185,129,.85);
+  color: #052e23;
+}
+
+/* פילטרים – שיהיה ברור מה נבחר */
+html[data-theme="light"] .chip-btn{
+  background: rgba(255,255,255,.92);
+  border-color: rgba(15,23,42,.14);
+  color:#0f172a;
+  box-shadow: 0 10px 24px rgba(15,23,42,.08);
+}
+html[data-theme="light"] .chip-btn:hover{
+  border-color: rgba(56,189,248,.22);
+}
+html[data-theme="light"] .chip-btn.active{
+  background: rgba(56,189,248,.14);
+  border-color: rgba(56,189,248,.35);
+  color:#0f172a;
+}
+
+/* אייקון בכרטיס */
+html[data-theme="light"] .app-ico{
+  background: rgba(2,6,23,.03);
+  border-color: rgba(15,23,42,.14);
+  box-shadow: 0 10px 24px rgba(15,23,42,.08);
+}
+
+/* כפתור "פתח עכשיו" – יותר ברור */
+html[data-theme="light"] .app-link,
+html[data-theme="light"] .mini-btn{
+  background: rgba(255,255,255,.94);
+  border-color: rgba(15,23,42,.14);
+  color:#0f172a;
+  box-shadow: 0 12px 28px rgba(15,23,42,.08);
+}
+html[data-theme="light"] .app-link:hover,
+html[data-theme="light"] .mini-btn:hover{
+  border-color: rgba(56,189,248,.24);
+  box-shadow: 0 16px 34px rgba(15,23,42,.10);
+}
+
+/* צ'יפים (חשוב/אבטחה/מסוכן) בלייט – שיהיו צבעוניים אבל נקיים */
+html[data-theme="light"] .app-chip{
+  background: rgba(2,6,23,.03);
+  border-color: rgba(15,23,42,.14);
+  color:#0f172a;
+}
+html[data-theme="light"] .chip-hot{ background: rgba(16,185,129,.12); border-color: rgba(16,185,129,.28); }
+html[data-theme="light"] .chip-ai{ background: rgba(56,189,248,.12); border-color: rgba(56,189,248,.30); }
+html[data-theme="light"] .chip-sec{ background: rgba(251,191,36,.12); border-color: rgba(251,191,36,.30); }
+html[data-theme="light"] .chip-danger{ background: rgba(251,113,133,.12); border-color: rgba(251,113,133,.32); }
+
+/* Toast */
+html[data-theme="light"] .toast{
+  background: rgba(255,255,255,.96);
+  border-color: rgba(15,23,42,.14);
+  color:#0f172a;
+  box-shadow: 0 18px 45px rgba(15,23,42,.10);
+}
 
     /* Hide content while locked */
     body.pin-locked .adminaps-wrap{ filter: blur(10px); opacity: .25; pointer-events: none; user-select: none; }
@@ -702,8 +823,7 @@
         <div class="stats-row reveal" id="statsRow"></div>
 
         <div class="adminaps-foot">
-          הערה: ה־PIN הוא “מחסום”. אבטחה אמיתית = Firebase Auth + Rules.
-        </div>
+קוד הכניסה גלוי מכיוון שבמקרה של כניסת תלמידים לא מהאדמין פאנל לא יוכלו להכנס לדף זה        </div>
       </section>
 
       <section class="adminaps-grid" id="grid"></section>
