@@ -3,878 +3,399 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>אודות – חטיבת הנעורים יערת העמק</title>
 
   <link rel="icon" href="logo.png" />
   <link rel="stylesheet" href="style.css" />
 
   <style>
-    /* =========================================================
-       ABOUT – FULL VERSION (LONG + EDITABLE + LIGHT MODE FIXED)
-       ✅ נטען מ-Firestore: siteContent/about
-       ✅ fallback מלא אם אין נתונים
-       ✅ לייט מוד: טקסטים / borders / כפתורים / צ'יפס / כותרות / nav
-       ✅ הרבה סקשנים כדי שהעמוד יהיה "אמיתי" וארוך
-       ========================================================= */
+    /* ========= ABOUT – אותו דף ישן, טיפה יותר יפה + Edit Panel ========= */
 
     :root{
-      /* dark base */
-      --bg0:#0b1220;
-      --bg1:#020617;
-      --panel: rgba(2,6,23,.58);
-      --panel2: rgba(2,6,23,.42);
-      --stroke: rgba(148,163,184,.20);
-      --stroke2: rgba(148,163,184,.30);
-      --txt: rgba(241,245,249,.94);
-      --muted: rgba(226,232,240,.78);
-      --muted2: rgba(226,232,240,.62);
-
-      /* accents */
-      --blue: rgba(59,130,246,1);
-      --blue2: rgba(59,130,246,.16);
-      --green: rgba(16,185,129,1);
-      --green2: rgba(16,185,129,.16);
-      --amber: rgba(245,158,11,1);
-      --amber2: rgba(245,158,11,.16);
-      --pink: rgba(236,72,153,1);
-      --pink2: rgba(236,72,153,.14);
-
-      --shadow: 0 26px 90px rgba(0,0,0,.40);
-      --shadow2: 0 16px 45px rgba(0,0,0,.25);
-
-      --radius: 26px;
-      --radius2: 20px;
-      --radius3: 16px;
-
-      --container: 1180px;
-
-      --focus: 0 0 0 4px rgba(59,130,246,.22);
+      --ab-bg1:#020617;
+      --ab-bg2:#000;
+      --ab-card: rgba(15, 23, 42, 0.92);
+      --ab-stroke: rgba(148, 163, 184, 0.58);
+      --ab-text: #e5f0ff;
+      --ab-muted:#cbd5f5;
+      --ab-muted2:#9ca3af;
+      --ab-shadow: 0 26px 70px rgba(0,0,0,.55);
+      --ab-shadow2: 0 18px 45px rgba(0,0,0,.35);
+      --ab-radius: 28px;
+      --ab-radius2: 20px;
+      --ab-focus: 0 0 0 4px rgba(56, 189, 248, .22);
     }
 
-    /* ===== Base ===== */
-    body[data-page="about"]{
+    body[data-page="about"] {
       background:
-        radial-gradient(1200px 700px at 78% -10%, rgba(59,130,246,.24), transparent 58%),
-        radial-gradient(950px 620px at 12% 0%, rgba(16,185,129,.16), transparent 60%),
-        radial-gradient(900px 620px at 55% 112%, rgba(245,158,11,.18), transparent 62%),
-        linear-gradient(180deg, rgba(2,6,23,.82), rgba(2,6,23,.96)),
-        var(--bg0);
-      color: var(--txt);
+        radial-gradient(circle at 70% -10%, rgba(56, 189, 248, 0.20), transparent 55%),
+        radial-gradient(circle at 10% 0%, rgba(96, 165, 250, 0.14), transparent 55%),
+        radial-gradient(circle at 90% 95%, rgba(52, 211, 153, 0.12), transparent 60%),
+        radial-gradient(circle at top, #1f2937 0, var(--ab-bg1) 55%, var(--ab-bg2) 100%);
+      color: var(--ab-text);
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
       text-rendering: geometricPrecision;
     }
 
-    .container{
-      width: min(var(--container), calc(100% - 32px));
-      margin: 0 auto;
-    }
-
-    /* Reduce motion */
-    @media (prefers-reduced-motion: reduce){
-      *{ animation:none !important; transition:none !important; scroll-behavior:auto !important; }
-    }
-
-    /* Accessibility focus */
-    a:focus-visible, button:focus-visible, input:focus-visible{
+    a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible{
       outline: none;
-      box-shadow: var(--focus);
+      box-shadow: var(--ab-focus);
       border-radius: 14px;
     }
 
-    /* ===== scroll progress bar ===== */
-    .scroll-progress{
-      position: fixed;
-      top:0; left:0; right:0;
-      height: 3px;
-      z-index: 3000;
-      background: transparent;
-    }
-    .scroll-progress > i{
-      display:block;
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, rgba(59,130,246,1), rgba(16,185,129,1), rgba(245,158,11,1));
-      box-shadow: 0 6px 18px rgba(59,130,246,.22);
-    }
-
-    /* =========================================================
-       HEADER / NAV FIX (כפילויות + מובייל)
-       ========================================================= */
-    body[data-page="about"] .header-main{
-      position: sticky;
-      top: 0;
-      z-index: 200;
-      background: rgba(2,6,23,.62);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--stroke);
-    }
-
-    body[data-page="about"] .nav.nav-centered{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 14px;
-      padding: 10px 0;
-      position: relative;
-    }
-
-    body[data-page="about"] .nav-side{
-      display:flex;
-      align-items:center;
-      gap: 12px;
-      flex-wrap: nowrap;
-      min-width: 0;
-    }
-
-    body[data-page="about"] .nav-side a{
-      text-decoration:none;
-      color: rgba(241,245,249,.92);
-      font-weight: 900;
-      font-size: .95rem;
-      padding: 8px 10px;
-      border-radius: 999px;
-      transition: background .15s ease, transform .15s ease, border-color .15s ease;
-      white-space: nowrap;
-      border: 1px solid transparent;
-    }
-
-    body[data-page="about"] .nav-side a:hover{
-      background: rgba(148,163,184,.12);
-      transform: translateY(-1px);
-      border-color: rgba(148,163,184,.18);
-    }
-
-    body[data-page="about"] .nav-side a.active{
-      background: rgba(59,130,246,.16);
-      border: 1px solid rgba(59,130,246,.28);
-    }
-
-    body[data-page="about"] .nav-center{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      flex: 0 0 auto;
-    }
-
-    body[data-page="about"] .logo-circle{
-      display:grid;
-      place-items:center;
-      width: 46px;
-      height: 46px;
-      border-radius: 999px;
-      border: 1px solid rgba(148,163,184,.22);
-      background: rgba(15,23,42,.55);
-      box-shadow: 0 12px 26px rgba(0,0,0,.18);
-      overflow:hidden;
-    }
-
-    body[data-page="about"] .logo-img{
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display:block;
-    }
-
-    /* header buttons */
-    body[data-page="about"] .theme-toggle-btn{
-      border:none;
-      cursor:pointer;
-      width: 42px;
-      height: 42px;
-      border-radius: 999px;
-      background: rgba(15,23,42,.55);
-      border: 1px solid rgba(148,163,184,.22);
-      color: rgba(241,245,249,.92);
-      display:grid;
-      place-items:center;
-      box-shadow: 0 12px 26px rgba(0,0,0,.16);
-      transition: transform .15s ease, background .15s ease, border-color .15s ease;
-    }
-    body[data-page="about"] .theme-toggle-btn:hover{
-      transform: translateY(-1px);
-      border-color: rgba(191,219,254,.28);
-      background: rgba(15,23,42,.62);
-    }
-
-    /* important: hide mobile menu on desktop */
-    body[data-page="about"] .nav-mobile{
-      display:none !important;
-    }
-
-    body[data-page="about"] .nav-toggle{
-      display:none;
-      border:none;
-      cursor:pointer;
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
-      background: rgba(15,23,42,.55);
-      border: 1px solid rgba(148,163,184,.22);
-      box-shadow: 0 12px 26px rgba(0,0,0,.16);
-      padding: 10px;
-      gap: 6px;
-      flex-direction: column;
-      justify-content:center;
-      align-items:stretch;
-    }
-    body[data-page="about"] .nav-toggle span{
-      display:block;
-      height: 2px;
-      border-radius: 999px;
-      background: rgba(241,245,249,.90);
-      opacity:.95;
-    }
-
-    @media (max-width: 980px){
-      body[data-page="about"] .nav-right-links,
-      body[data-page="about"] .nav-left-links{
-        display:none;
-      }
-
-      body[data-page="about"] .nav-toggle{
-        display:flex;
-      }
-
-      body[data-page="about"] .nav-mobile{
-        display:flex !important;
-        flex-direction: column;
-        gap: 8px;
-        position:absolute;
-        top: calc(100% + 10px);
-        right: 0;
-        left: 0;
-        padding: 12px;
-        border-radius: 18px;
-        border: 1px solid rgba(148,163,184,.22);
-        background: rgba(2,6,23,.86);
-        backdrop-filter: blur(14px);
-        -webkit-backdrop-filter: blur(14px);
-        box-shadow: 0 22px 70px rgba(0,0,0,.45);
-        transform: translateY(-6px);
-        opacity: 0;
-        pointer-events:none;
-        transition: opacity .18s ease, transform .18s ease;
-      }
-
-      body[data-page="about"] .nav-mobile a{
-        display:flex;
-        justify-content:space-between;
-        align-items:center;
-        text-decoration:none;
-        color: rgba(241,245,249,.92);
-        font-weight: 950;
-        padding: 12px 12px;
-        border-radius: 14px;
-        border: 1px solid rgba(148,163,184,.14);
-        background: rgba(15,23,42,.42);
-      }
-
-      body[data-page="about"] .nav-mobile a:hover{
-        border-color: rgba(191,219,254,.28);
-        background: rgba(59,130,246,.12);
-      }
-
-      body[data-page="about"] .nav-mobile.open{
-        opacity: 1;
-        transform: translateY(0);
-        pointer-events:auto;
-      }
-    }
-
-    /* ===== Layout primitives ===== */
-    .about-wrapper{
-      padding: 18px 0 64px;
+    .about-wrapper {
+      padding-top: 90px;
       min-height: 100vh;
     }
 
-    .glass{
-      border-radius: var(--radius);
-      border: 1px solid var(--stroke);
-      background: var(--panel);
-      box-shadow: var(--shadow);
-      overflow:hidden;
-    }
-
-    .panel{
-      border-radius: 22px;
-      border: 1px solid rgba(148,163,184,.18);
-      background: rgba(2,6,23,.40);
-      box-shadow: var(--shadow2);
-      padding: 14px;
-    }
-
+    /* ===== reveal animation קטן ===== */
     .reveal{
-      opacity: 0;
-      transform: translateY(14px);
+      opacity:0;
+      transform: translateY(12px);
       filter: blur(6px);
       transition: opacity .7s cubic-bezier(.2,.8,.2,1),
                   transform .7s cubic-bezier(.2,.8,.2,1),
                   filter .7s cubic-bezier(.2,.8,.2,1);
       will-change: transform, opacity, filter;
     }
-    .reveal.in{ opacity:1; transform: translateY(0); filter: blur(0); }
+    .reveal.in{ opacity:1; transform:none; filter:none; }
 
-    /* =========================================================
-       HERO
-       ========================================================= */
-    .hero{
-      margin-top: 18px;
-      padding: 16px;
-      position: relative;
-      background:
-        radial-gradient(900px 520px at 80% 0%, rgba(59,130,246,.22), transparent 58%),
-        radial-gradient(700px 420px at 10% 0%, rgba(16,185,129,.18), transparent 60%),
-        var(--panel);
+    /* ===== HERO ===== */
+    .about-hero {
+      padding: 28px 0 10px;
     }
 
-    .hero-grid{
-      display:grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap: 14px;
+    .about-hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1.8fr);
+      gap: 20px;
       align-items: stretch;
     }
-    @media (max-width: 980px){ .hero-grid{ grid-template-columns: 1fr; } }
 
-    .hero h1{
-      margin: 0 0 8px;
-      font-size: clamp(1.7rem, 2.8vw, 2.8rem);
-      line-height: 1.12;
-      letter-spacing: .01em;
+    @media (max-width: 900px) {
+      .about-hero-grid { grid-template-columns: minmax(0, 1fr); }
     }
 
-    .lead{
-      margin: 0;
-      color: rgba(226,232,240,.86);
-      line-height: 1.9;
-      font-size: 1.02rem;
-    }
-
-    .hero-actions{
-      display:flex;
-      flex-wrap:wrap;
-      gap: 10px;
-      margin-top: 14px;
-      align-items:center;
-    }
-
-    .btn{
-      text-decoration:none;
-      border-radius: 999px;
-      padding: 10px 14px;
-      font-weight: 1000;
-      font-size: .9rem;
-      border: 1px solid rgba(148,163,184,.22);
-      background: rgba(15,23,42,.55);
-      color: rgba(241,245,249,.92);
-      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease;
-      box-shadow: 0 10px 22px rgba(0,0,0,.16);
-      display:inline-flex;
-      align-items:center;
-      gap: 8px;
-    }
-    .btn:hover{
-      transform: translateY(-1px);
-      border-color: rgba(191,219,254,.30);
-      box-shadow: 0 14px 32px rgba(0,0,0,.2);
-      background: rgba(15,23,42,.62);
-    }
-    .btn.primary{ background: #10b981; border-color: rgba(16,185,129,.85); color: #052e23; }
-    .btn.secondary{ background: rgba(59,130,246,.14); border-color: rgba(59,130,246,.35); color: rgba(219,234,254,.95); }
-    .btn.ghost{ background: transparent; border-color: rgba(148,163,184,.28); }
-
-    .chips{
-      display:flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 12px;
-    }
-    .chip{
-      display:inline-flex;
-      align-items:center;
-      gap: 8px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(148,163,184,.20);
-      background: rgba(15,23,42,.50);
-      font-weight: 950;
-      font-size: .88rem;
-      color: rgba(241,245,249,.92);
-    }
-
-    .chip.blue{ border-color: rgba(59,130,246,.30); background: rgba(59,130,246,.14); color: rgba(219,234,254,.95); }
-    .chip.green{ border-color: rgba(16,185,129,.30); background: rgba(16,185,129,.14); color: rgba(209,250,229,.96); }
-    .chip.amber{ border-color: rgba(245,158,11,.30); background: rgba(245,158,11,.14); color: rgba(254,243,199,.96); }
-    .chip.pink{ border-color: rgba(236,72,153,.30); background: rgba(236,72,153,.14); color: rgba(251,207,232,.95); }
-
-    .hero-media{
-      border-radius: 18px;
-      border: 1px solid rgba(148,163,184,.18);
-      overflow:hidden;
-      background: rgba(0,0,0,.22);
-      height: 350px;
-      position: relative;
-    }
-    .hero-media img{
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display:block;
-      transform: scale(1.02);
-      transition: transform .7s cubic-bezier(.2,.8,.2,1);
-    }
-    .hero-media:hover img{ transform: scale(1.06); }
-
-    .hero-badge{
-      position:absolute;
-      bottom: 12px;
-      right: 12px;
-      left: 12px;
-      padding: 10px 12px;
-      border-radius: 18px;
-      border: 1px solid rgba(148,163,184,.18);
-      background: rgba(2,6,23,.52);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 10px;
-    }
-    .hero-badge strong{ font-weight: 1000; }
-    .hero-badge span{ color: rgba(226,232,240,.80); font-weight: 900; font-size:.9rem; }
-
-    @media (max-width: 520px){
-      .hero-media{ height: 250px; }
-      .hero-badge{ border-radius: 16px; }
-    }
-
-    /* =========================================================
-       SECTION HEADERS
-       ========================================================= */
-    .section{
-      margin-top: 22px;
-    }
-
-    .section-head{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-end;
-      gap: 12px;
-      margin: 0 0 10px;
-    }
-
-    .section-head h2{
-      margin: 0;
-      font-size: 1.28rem;
-      letter-spacing: .01em;
-    }
-
-    .section-head p{
-      margin: 6px 0 0;
-      color: rgba(226,232,240,.70);
-      line-height: 1.8;
-      max-width: 820px;
-      font-size: .96rem;
-    }
-
-    .section-tools{
-      display:flex;
-      gap: 8px;
-      flex-wrap:wrap;
-      align-items:center;
-      justify-content:flex-end;
-    }
-
-    .pill{
-      border-radius: 999px;
-      border: 1px solid rgba(148,163,184,.22);
-      background: rgba(15,23,42,.50);
-      padding: 8px 10px;
-      font-weight: 1000;
-      color: rgba(241,245,249,.92);
-      cursor:pointer;
-      transition: transform .15s ease, border-color .15s ease, background .15s ease;
-      display:inline-flex;
-      align-items:center;
-      gap: 8px;
-      font-size: .88rem;
-    }
-    .pill:hover{ transform: translateY(-1px); border-color: rgba(191,219,254,.28); background: rgba(15,23,42,.58); }
-    .pill.active{ border-color: rgba(59,130,246,.36); background: rgba(59,130,246,.14); }
-
-    .search{
-      width: min(340px, 100%);
-      display:flex;
-      align-items:center;
-      gap: 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(148,163,184,.22);
-      background: rgba(15,23,42,.50);
-      padding: 8px 12px;
-    }
-    .search input{
-      flex:1;
-      border:none;
-      outline:none;
-      background: transparent;
-      color: rgba(241,245,249,.92);
-      font-weight: 900;
-      font-size: .92rem;
-    }
-    .search i{ opacity:.8; }
-
-    /* =========================================================
-       CARDS / GRIDS
-       ========================================================= */
-    .grid3{
-      display:grid;
-      grid-template-columns: repeat(3, minmax(0,1fr));
-      gap: 12px;
-    }
-    @media (max-width: 980px){ .grid3{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
-    @media (max-width: 640px){ .grid3{ grid-template-columns: 1fr; } }
-
-    .card{
-      border-radius: 20px;
-      border: 1px solid rgba(148,163,184,.18);
-      background: rgba(2,6,23,.42);
-      box-shadow: var(--shadow2);
-      padding: 14px;
-      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
-    }
-    .card:hover{
-      transform: translateY(-3px);
-      border-color: rgba(191,219,254,.26);
-      box-shadow: 0 24px 65px rgba(0,0,0,.26);
-    }
-    .card .tag{
-      color: rgba(148,163,184,.92);
-      font-weight: 1000;
-      font-size: .82rem;
-      margin-bottom: 6px;
-    }
-    .card h3{ margin: 0 0 6px; font-size: 1.02rem; }
-    .card p{ margin:0; color: rgba(226,232,240,.80); font-size:.92rem; line-height:1.75; }
-
-    /* =========================================================
-       STATS
-       ========================================================= */
-    .stats{
-      display:grid;
-      grid-template-columns: repeat(4, minmax(0,1fr));
-      gap: 12px;
-      margin-top: 10px;
-    }
-    @media (max-width: 980px){ .stats{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
-    @media (max-width: 640px){ .stats{ grid-template-columns: 1fr; } }
-
-    .stat{
-      border-radius: 20px;
-      border: 1px solid rgba(59,130,246,.20);
+    .about-hero-main {
+      border-radius: var(--ab-radius);
+      padding: 22px 22px 18px;
       background:
-        radial-gradient(700px 360px at 10% 0%, rgba(59,130,246,.20), transparent 55%),
-        rgba(2,6,23,.42);
-      box-shadow: var(--shadow2);
-      padding: 14px;
-      transition: transform .18s ease, border-color .18s ease;
-    }
-    .stat:hover{ transform: translateY(-3px); border-color: rgba(191,219,254,.26); }
-    .stat .label{ color: rgba(191,219,254,.95); font-weight: 1000; font-size: .86rem; }
-    .stat .value{ margin-top: 8px; font-size: 2.15rem; font-weight: 1000; line-height: 1; }
-    .stat .note{ margin-top: 8px; color: rgba(226,232,240,.70); font-size: .86rem; }
-
-    /* =========================================================
-       TEAM
-       ========================================================= */
-    .team-wrap{
-      margin-top: 10px;
+        radial-gradient(circle at top right, rgba(56, 189, 248, 0.18), transparent 55%),
+        radial-gradient(circle at bottom left, rgba(96, 165, 250, 0.14), transparent 55%),
+        var(--ab-card);
+      border: 1px solid var(--ab-stroke);
+      box-shadow: var(--ab-shadow);
     }
 
-    .team-grid{
-      display:grid;
-      grid-template-columns: repeat(4, minmax(0,1fr));
-      gap: 12px;
-    }
-    @media (max-width:1100px){ .team-grid{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
-    @media (max-width:640px){ .team-grid{ grid-template-columns: 1fr; } }
-
-    .team-list{
-      display:flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .member{
-      display:flex;
-      gap: 12px;
-      align-items:flex-start;
-      border-radius: 20px;
-      border: 1px solid rgba(148,163,184,.18);
-      background: rgba(2,6,23,.42);
-      box-shadow: var(--shadow2);
-      padding: 14px;
-      transition: transform .18s ease, border-color .18s ease;
-    }
-    .member:hover{ transform: translateY(-2px); border-color: rgba(191,219,254,.26); }
-
-    .avatar{
-      width: 50px;
-      height: 50px;
-      border-radius: 18px;
-      border: 1px solid rgba(148,163,184,.18);
-      background: rgba(15,23,42,.55);
-      display:grid;
-      place-items:center;
-      flex: 0 0 auto;
-      overflow:hidden;
-    }
-    .avatar img{
-      width:100%;
-      height:100%;
-      object-fit: cover;
-      display:block;
-    }
-    .avatar .circle{
-      width: 40px;
-      height: 40px;
+    .about-hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
       border-radius: 999px;
-      display:grid;
-      place-items:center;
-      font-weight: 1000;
-      background: rgba(59,130,246,.16);
-      border: 1px solid rgba(59,130,246,.30);
-      color: rgba(219,234,254,.95);
+      padding: 6px 13px;
+      font-size: 0.82rem;
+      background: rgba(56, 189, 248, 0.10);
+      border: 1px solid rgba(56, 189, 248, 0.75);
+      color: #7dd3fc;
+      margin-bottom: 10px;
+      white-space: nowrap;
     }
 
-    .role{
-      font-weight: 950;
-      font-size: .88rem;
-      color: rgba(209,250,229,.92);
-      margin-top: 2px;
+    .about-hero-title {
+      font-size: 1.95rem;
+      font-weight: 800;
+      letter-spacing: 0.01em;
+      line-height: 1.18;
+      margin: 0;
     }
 
-    .m-body p{
-      margin: 8px 0 0;
-      color: rgba(226,232,240,.80);
-      font-size: .92rem;
+    .about-hero-subtitle {
+      margin-top: 10px;
+      font-size: 1rem;
+      color: var(--ab-muted);
+      max-width: 620px;
       line-height: 1.75;
     }
 
-    .member-meta{
-      display:flex;
+    .about-hero-tags {
+      margin-top: 16px;
+      display: flex;
+      flex-wrap: wrap;
       gap: 8px;
-      flex-wrap:wrap;
-      margin-top: 10px;
+      font-size: 0.82rem;
     }
-    .badge{
-      font-size: .82rem;
-      font-weight: 950;
-      padding: 6px 10px;
+
+    .about-tag {
       border-radius: 999px;
-      border: 1px solid rgba(148,163,184,.20);
-      background: rgba(15,23,42,.45);
-      color: rgba(241,245,249,.90);
+      padding: 6px 10px;
+      background: rgba(2, 6, 23, 0.25);
+      border: 1px solid rgba(148, 163, 184, 0.55);
+      color: #e5f0ff;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      backdrop-filter: blur(10px);
     }
 
-    /* =========================================================
-       FACILITIES / PROGRAMS
-       ========================================================= */
-    .split{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 10px;
+    .about-hero-note {
+      margin-top: 14px;
+      font-size: 0.83rem;
+      color: var(--ab-muted2);
+      line-height: 1.7;
     }
-    @media (max-width: 980px){ .split{ grid-template-columns: 1fr; } }
 
-    .mini-grid{
-      display:grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
-      gap: 12px;
-      margin-top: 10px;
-    }
-    @media (max-width: 980px){ .mini-grid{ grid-template-columns: 1fr; } }
-
-    .mini{
-      border-radius: 20px;
-      border: 1px solid rgba(148,163,184,.18);
-      background: rgba(2,6,23,.42);
-      box-shadow: var(--shadow2);
-      padding: 14px;
-      display:flex;
-      gap: 12px;
-      align-items:flex-start;
-    }
-    .mini .ico{
-      width: 42px;
-      height: 42px;
-      border-radius: 16px;
-      border: 1px solid rgba(148,163,184,.18);
-      background: rgba(15,23,42,.52);
-      display:grid;
-      place-items:center;
-      font-size: 1.15rem;
-      flex: 0 0 auto;
-    }
-    .mini h3{ margin:0; font-size: 1.02rem; }
-    .mini p{ margin:6px 0 0; color: rgba(226,232,240,.80); line-height:1.75; font-size:.92rem; }
-
-    /* =========================================================
-       TIMELINE
-       ========================================================= */
-    .timeline{
-      margin-top: 12px;
-      display:flex;
+    .about-hero-media {
+      border-radius: 26px;
+      padding: 16px 16px 14px;
+      background:
+        radial-gradient(circle at top left, rgba(251, 191, 36, 0.17), transparent 55%),
+        rgba(15, 23, 42, 0.94);
+      border: 1px solid rgba(250, 204, 21, 0.62);
+      box-shadow: var(--ab-shadow2);
+      display: flex;
       flex-direction: column;
       gap: 10px;
     }
-    .t-item{
+
+    .about-media-title {
+      font-size: 0.98rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .about-media-text {
+      font-size: 0.84rem;
+      color: #e5e7eb;
+      line-height: 1.65;
+    }
+
+    .about-media-image-wrapper {
+      margin-top: 6px;
       border-radius: 20px;
-      border: 1px solid rgba(148,163,184,.18);
-      background: rgba(2,6,23,.42);
-      box-shadow: var(--shadow2);
-      padding: 14px;
-      display:flex;
-      gap: 12px;
-      align-items:flex-start;
-    }
-    .t-dot{
-      width: 14px; height:14px; margin-top: 6px;
-      border-radius:999px;
-      background: rgba(59,130,246,1);
-      box-shadow: 0 0 0 4px rgba(59,130,246,.18);
-      flex:0 0 auto;
-    }
-    .t-body strong{ font-weight:1000; }
-    .t-body p{ margin:6px 0 0; color: rgba(226,232,240,.80); line-height:1.75; font-size:.92rem; }
-
-    /* =========================================================
-       TESTIMONIALS (slider)
-       ========================================================= */
-    .testi{
-      margin-top: 10px;
-      border-radius: var(--radius);
-      border: 1px solid rgba(148,163,184,.18);
-      background: rgba(2,6,23,.42);
-      box-shadow: var(--shadow);
-      padding: 14px;
-      overflow:hidden;
-      position: relative;
-    }
-    .testi-track{
-      display:flex;
-      gap: 12px;
-      transition: transform .35s ease;
-      will-change: transform;
-    }
-    .quote{
-      min-width: min(520px, 92vw);
-      border-radius: 20px;
-      border: 1px solid rgba(148,163,184,.18);
-      background: rgba(15,23,42,.42);
-      padding: 14px;
-    }
-    .quote p{ margin:0; color: rgba(241,245,249,.90); line-height:1.9; }
-    .quote .by{ margin-top: 10px; color: rgba(226,232,240,.72); font-weight: 950; font-size:.9rem; }
-
-    .testi-controls{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap: 10px;
-      margin-top: 12px;
-    }
-    .dots{ display:flex; gap: 8px; }
-    .dot{
-      width: 10px; height:10px;
-      border-radius:999px;
-      border: 1px solid rgba(148,163,184,.30);
-      background: rgba(148,163,184,.18);
-      cursor:pointer;
-    }
-    .dot.active{ background: rgba(59,130,246,.95); border-color: rgba(59,130,246,.35); }
-
-    .arrow{
-      border:none;
-      cursor:pointer;
-      border-radius: 14px;
-      padding: 10px 12px;
-      font-weight: 1000;
-      color: rgba(241,245,249,.92);
-      background: rgba(15,23,42,.55);
-      border: 1px solid rgba(148,163,184,.22);
-      transition: transform .15s ease, border-color .15s ease, background .15s ease;
-    }
-    .arrow:hover{ transform: translateY(-1px); border-color: rgba(191,219,254,.28); background: rgba(15,23,42,.62); }
-
-    /* =========================================================
-       GALLERY + LIGHTBOX
-       ========================================================= */
-    .gallery{
-      display:grid;
-      grid-template-columns: 1.45fr 1fr;
-      gap: 12px;
-      margin-top: 10px;
-    }
-    @media (max-width: 980px){ .gallery{ grid-template-columns: 1fr; } }
-
-    .g-main, .ph{
+      overflow: hidden;
+      border: 1px solid rgba(148, 163, 184, 0.65);
+      box-shadow: 0 14px 34px rgba(0,0,0,.22);
       cursor: zoom-in;
-      border-radius: 18px;
-      overflow:hidden;
-      border: 1px solid rgba(148,163,184,.18);
-      background: rgba(0,0,0,.18);
-      box-shadow: 0 14px 30px rgba(0,0,0,.18);
-      transition: transform .18s ease, border-color .18s ease;
-      position: relative;
     }
-    .g-main:hover, .ph:hover{ transform: translateY(-3px); border-color: rgba(191,219,254,.28); }
 
-    .g-main img{
-      width:100%;
-      height: 370px;
+    .about-media-image {
+      width: 100%;
+      height: 260px;
       object-fit: cover;
-      display:block;
+      display: block;
       transform: scale(1.01);
       transition: transform .7s cubic-bezier(.2,.8,.2,1);
     }
-    .g-main:hover img, .ph:hover img{ transform: scale(1.06); }
-    @media (max-width: 640px){ .g-main img{ height: 260px; } }
+    .about-media-image-wrapper:hover .about-media-image{ transform: scale(1.06); }
 
-    .cap{
-      position:absolute;
-      bottom: 10px;
-      right: 10px;
-      left: 10px;
-      border-radius: 16px;
-      padding: 10px 12px;
-      border: 1px solid rgba(148,163,184,.18);
-      background: rgba(2,6,23,.55);
-      color: rgba(241,245,249,.92);
-      font-weight: 950;
-      font-size: .92rem;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+    @media (max-width: 500px) {
+      .about-media-image { height: 210px; }
     }
 
-    .g-mini{
-      display:grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
+    /* ===== section ===== */
+    .about-section { padding: 22px 0 8px; }
+    .about-section-header { margin-bottom: 14px; }
+    .about-section-title { font-size: 1.42rem; font-weight: 900; margin-bottom: 6px; }
+    .about-section-subtitle { font-size: 0.92rem; color: var(--ab-muted2); max-width: 620px; line-height: 1.7; }
+
+    .about-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    @media (max-width: 900px) { .about-grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 640px) { .about-grid-3 { grid-template-columns: minmax(0, 1fr); } }
+
+    .about-card {
+      border-radius: 20px;
+      padding: 14px 14px 12px;
+      background: rgba(15, 23, 42, 0.94);
+      border: 1px solid rgba(148, 163, 184, 0.55);
+      box-shadow: 0 16px 40px rgba(0,0,0,.35);
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+    }
+    .about-card:hover{
+      transform: translateY(-3px);
+      border-color: rgba(191, 219, 254, 0.35);
+      box-shadow: 0 24px 55px rgba(0,0,0,.45);
+    }
+
+    .about-card-tag { font-size: 0.8rem; color: var(--ab-muted2); margin-bottom: 6px; font-weight: 700; }
+    .about-card-title { font-size: 1rem; font-weight: 900; margin-bottom: 6px; }
+    .about-card-text { font-size: 0.86rem; color: #e5e7eb; line-height: 1.75; }
+
+    /* ===== stats ===== */
+    .about-stats-row {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+    @media (max-width: 900px) { .about-stats-row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 640px) { .about-stats-row { grid-template-columns: minmax(0, 1fr); } }
+
+    .about-stat-card {
+      border-radius: 18px;
+      padding: 12px 12px;
+      background:
+        radial-gradient(circle at top, rgba(59, 130, 246, 0.24), transparent 55%),
+        rgba(15, 23, 42, 0.92);
+      border: 1px solid rgba(96, 165, 250, 0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      transition: transform .18s ease, border-color .18s ease;
+    }
+    .about-stat-card:hover{ transform: translateY(-3px); border-color: rgba(191, 219, 254, 0.35); }
+
+    .about-stat-label { font-size: 0.8rem; color: #bfdbfe; font-weight: 800; }
+    .about-stat-value { font-size: 1.45rem; font-weight: 950; letter-spacing: 0.02em; }
+    .about-stat-note { font-size: 0.78rem; color: #d1d5db; line-height: 1.5; }
+
+    /* ===== gallery ===== */
+    .about-gallery-grid {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: 2fr 1.5fr;
       gap: 10px;
     }
+    @media (max-width: 900px) { .about-gallery-grid { grid-template-columns: minmax(0, 1fr); } }
 
-    .ph img{
-      width:100%;
-      height: 165px;
+    .about-gallery-main,
+    .about-gallery-mini{
+      position: relative;
+      overflow: hidden;
+      cursor: zoom-in;
+      background: rgba(0,0,0,.15);
+      transition: transform .18s ease, border-color .18s ease;
+    }
+
+    .about-gallery-main { border-radius: 20px; border: 1px solid rgba(148, 163, 184, 0.8); }
+    .about-gallery-main:hover{ transform: translateY(-3px); border-color: rgba(191,219,254,.35); }
+    .about-gallery-main img {
+      width: 100%;
+      height: 260px;
       object-fit: cover;
-      display:block;
+      display: block;
       transform: scale(1.01);
       transition: transform .7s cubic-bezier(.2,.8,.2,1);
     }
-    @media (max-width: 640px){ .ph img{ height: 145px; } }
+    .about-gallery-main:hover img{ transform: scale(1.06); }
 
+    @media (max-width: 640px) { .about-gallery-main img { height: 220px; } }
+
+    .about-gallery-mini-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .about-gallery-mini { border-radius: 14px; border: 1px solid rgba(148, 163, 184, 0.65); }
+    .about-gallery-mini:hover{ transform: translateY(-2px); border-color: rgba(191,219,254,.35); }
+    .about-gallery-mini img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      display: block;
+      transform: scale(1.01);
+      transition: transform .7s cubic-bezier(.2,.8,.2,1);
+    }
+    .about-gallery-mini:hover img{ transform: scale(1.07); }
+
+    /* ===== list ===== */
+    .about-list {
+      margin-top: 8px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    @media (max-width: 800px) { .about-list { grid-template-columns: minmax(0, 1fr); } }
+
+    .about-list-item {
+      border-radius: 18px;
+      padding: 12px 12px;
+      background: rgba(15, 23, 42, 0.94);
+      border: 1px solid rgba(148, 163, 184, 0.55);
+      font-size: 0.88rem;
+      color: #e5e7eb;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      box-shadow: 0 14px 34px rgba(0,0,0,.25);
+      transition: transform .18s ease, border-color .18s ease;
+    }
+    .about-list-item:hover{ transform: translateY(-2px); border-color: rgba(191,219,254,.32); }
+    .about-list-bullet { font-size: 1.15rem; margin-top: -2px; }
+
+    /* ===== CTA ===== */
+    .about-cta {
+      margin: 22px 0 32px;
+      border-radius: 24px;
+      padding: 16px 18px 14px;
+      background:
+        radial-gradient(circle at top left, rgba(52, 211, 153, 0.18), transparent 55%),
+        radial-gradient(circle at 85% 25%, rgba(56, 189, 248, 0.12), transparent 60%),
+        rgba(15, 23, 42, 0.94);
+      border: 1px solid rgba(52, 211, 153, 0.75);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: var(--ab-shadow2);
+    }
+
+    .about-cta-text { font-size: 0.92rem; color: #e5fdf4; max-width: 620px; line-height: 1.7; }
+    .about-cta-text strong { font-size: 1.05rem; }
+
+    .about-cta-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    .about-cta-btn {
+      border-radius: 999px;
+      padding: 9px 14px;
+      border: 1px solid rgba(16, 185, 129, 0.85);
+      background: #10b981;
+      color: #052e23;
+      font-size: 0.86rem;
+      font-weight: 900;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+      box-shadow: 0 10px 22px rgba(0,0,0,.20);
+    }
+    .about-cta-btn:hover{ transform: translateY(-1px); box-shadow: 0 14px 32px rgba(0,0,0,.25); }
+
+    .about-cta-btn.secondary {
+      background: rgba(16, 185, 129, 0.10);
+      color: #a7f3d0;
+      border-color: rgba(16, 185, 129, 0.55);
+    }
+
+    /* ===== back to top ===== */
+    .to-top{
+      position: fixed;
+      left: 16px;
+      bottom: 16px;
+      z-index: 1200;
+      opacity: 0;
+      pointer-events:none;
+      transform: translateY(10px);
+      transition: opacity .18s ease, transform .18s ease;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,.55);
+      background: rgba(15,23,42,.72);
+      color: #e5f0ff;
+      padding: 10px 12px;
+      font-weight: 950;
+      box-shadow: 0 18px 45px rgba(0,0,0,.30);
+      text-decoration:none;
+    }
+    .to-top.show{ opacity:1; pointer-events:auto; transform:none; }
+
+    /* ===== Lightbox ===== */
     .lightbox{
       position: fixed;
       inset: 0;
@@ -888,12 +409,11 @@
       z-index: 2000;
     }
     .lightbox.open{ display:flex; }
-
     .lightbox-inner{
       width: min(980px, 96vw);
       border-radius: 22px;
       border: 1px solid rgba(148,163,184,.22);
-      background: rgba(2,6,23,.65);
+      background: rgba(2,6,23,.70);
       box-shadow: 0 34px 120px rgba(0,0,0,.55);
       overflow:hidden;
     }
@@ -912,7 +432,7 @@
       padding: 10px 12px;
       border-top: 1px solid rgba(148,163,184,.18);
       color: rgba(241,245,249,.92);
-      font-weight: 950;
+      font-weight: 900;
       font-size: .9rem;
     }
     .lb-close{
@@ -923,139 +443,30 @@
       color: rgba(241,245,249,.92);
       border-radius: 12px;
       padding: 8px 10px;
-      font-weight: 1000;
-    }
-
-    /* =========================================================
-       FAQ
-       ========================================================= */
-    .faq{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 10px;
-    }
-    @media (max-width: 980px){ .faq{ grid-template-columns: 1fr; } }
-
-    .qa{
-      border-radius: 20px;
-      border: 1px solid rgba(148,163,184,.18);
-      background: rgba(2,6,23,.42);
-      box-shadow: var(--shadow2);
-      overflow:hidden;
-    }
-    .qa button{
-      width: 100%;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 12px;
-      padding: 14px;
-      border:none;
-      background: transparent;
-      color: rgba(241,245,249,.92);
-      cursor:pointer;
-      font-weight: 1000;
-      font-size: .98rem;
-      text-align:right;
-    }
-    .qa button span{ color: rgba(191,219,254,.95); font-weight: 1000; }
-    .qa .a{
-      padding: 0 14px 14px;
-      color: rgba(226,232,240,.80);
-      line-height: 1.85;
-      font-size: .92rem;
-      display:none;
-    }
-    .qa.open .a{ display:block; }
-    .qa .chev{ opacity:.8; transition: transform .18s ease; }
-    .qa.open .chev{ transform: rotate(180deg); }
-
-    .faq-empty{
-      display:none;
-      margin-top: 10px;
-      color: rgba(226,232,240,.78);
-      font-weight: 900;
-      padding: 12px 14px;
-      border-radius: 18px;
-      border: 1px dashed rgba(148,163,184,.30);
-      background: rgba(15,23,42,.42);
-    }
-
-    /* =========================================================
-       CTA + FOOTER
-       ========================================================= */
-    .cta{
-      margin-top: 22px;
-      border-radius: var(--radius);
-      border: 1px solid rgba(16,185,129,.30);
-      background:
-        radial-gradient(900px 420px at 10% 0%, rgba(16,185,129,.20), transparent 58%),
-        radial-gradient(900px 420px at 90% 0%, rgba(59,130,246,.16), transparent 58%),
-        rgba(2,6,23,.50);
-      box-shadow: var(--shadow);
-      padding: 16px;
-      display:flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      align-items:center;
-      justify-content:space-between;
-    }
-    .cta .txt{
-      max-width: 860px;
-      color: rgba(236,253,245,.92);
-      line-height: 1.9;
-      font-size: .98rem;
-    }
-    .cta .txt strong{ display:inline-block; margin-bottom: 4px; font-size: 1.1rem; }
-    .cta .actions{ display:flex; gap: 10px; flex-wrap: wrap; }
-
-    footer{ margin-top: 22px; }
-    footer .container{
-      padding: 16px 0;
-      border-top: 1px solid rgba(148,163,184,.18);
-      color: rgba(226,232,240,.75);
       font-weight: 900;
     }
 
-    /* back to top */
-    .to-top{
-      position: fixed;
-      bottom: 18px;
-      left: 18px;
-      z-index: 2500;
-      opacity: 0;
-      pointer-events:none;
-      transform: translateY(8px);
-      transition: opacity .18s ease, transform .18s ease;
-    }
-    .to-top.show{
-      opacity: 1;
-      pointer-events:auto;
-      transform: translateY(0);
-    }
-
-    /* =========================================================
-       EDIT MODE (JSON editor) — מופיע רק עם ?edit=1
-       ========================================================= */
+    /* =========================
+       EDIT PANEL (רק ?edit=1)
+       ========================= */
     .edit-fab{
       position: fixed;
-      right: 18px;
-      bottom: 18px;
-      z-index: 2600;
+      right: 16px;
+      bottom: 16px;
+      z-index: 2100;
       display:none;
       align-items:center;
       gap: 8px;
       padding: 10px 12px;
       border-radius: 999px;
-      border: 1px solid rgba(148,163,184,.22);
-      background: rgba(15,23,42,.70);
+      border: 1px solid rgba(148,163,184,.55);
+      background: rgba(15,23,42,.80);
       color: rgba(241,245,249,.92);
-      font-weight: 1000;
+      font-weight: 950;
       cursor:pointer;
-      box-shadow: 0 18px 45px rgba(0,0,0,.28);
+      box-shadow: 0 18px 45px rgba(0,0,0,.30);
     }
-    .edit-fab:hover{ transform: translateY(-1px); border-color: rgba(191,219,254,.28); }
+    .edit-fab:hover{ transform: translateY(-1px); border-color: rgba(191,219,254,.32); }
 
     .edit-modal{
       position: fixed;
@@ -1067,7 +478,7 @@
       background: rgba(0,0,0,.62);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-      z-index: 2700;
+      z-index: 2200;
     }
     .edit-modal.open{ display:flex; }
 
@@ -1075,7 +486,7 @@
       width: min(980px, 96vw);
       border-radius: 22px;
       border: 1px solid rgba(148,163,184,.22);
-      background: rgba(2,6,23,.78);
+      background: rgba(2,6,23,.82);
       box-shadow: 0 34px 120px rgba(0,0,0,.55);
       overflow:hidden;
     }
@@ -1088,19 +499,16 @@
       padding: 12px;
       border-bottom: 1px solid rgba(148,163,184,.18);
       color: rgba(241,245,249,.92);
-      font-weight: 1000;
+      font-weight: 950;
     }
     .edit-top .hint{
       color: rgba(226,232,240,.72);
-      font-weight: 900;
+      font-weight: 850;
       font-size: .9rem;
+      margin-top: 4px;
     }
 
-    .edit-body{
-      padding: 12px;
-      display:grid;
-      gap: 10px;
-    }
+    .edit-body{ padding: 12px; display:grid; gap: 10px; }
 
     .edit-area{
       width: 100%;
@@ -1110,7 +518,7 @@
       border: 1px solid rgba(148,163,184,.20);
       background: rgba(15,23,42,.55);
       color: rgba(241,245,249,.92);
-      font-weight: 900;
+      font-weight: 800;
       font-size: .9rem;
       line-height: 1.55;
       padding: 12px;
@@ -1124,7 +532,6 @@
       justify-content:space-between;
       align-items:center;
     }
-
     .edit-actions .left,
     .edit-actions .right{
       display:flex;
@@ -1135,149 +542,136 @@
 
     .edit-status{
       color: rgba(226,232,240,.80);
-      font-weight: 900;
+      font-weight: 850;
       font-size: .9rem;
     }
 
-    .btn.small{
+    .edit-btn{
+      border-radius: 999px;
       padding: 9px 12px;
       font-size: .88rem;
+      font-weight: 950;
+      border: 1px solid rgba(148,163,184,.22);
+      background: rgba(15,23,42,.60);
+      color: rgba(241,245,249,.92);
+      cursor:pointer;
+      transition: transform .15s ease, border-color .15s ease, background .15s ease;
     }
+    .edit-btn:hover{ transform: translateY(-1px); border-color: rgba(191,219,254,.28); background: rgba(15,23,42,.72); }
+    .edit-btn.primary{ background:#10b981; border-color: rgba(16,185,129,.85); color:#052e23; }
+    .edit-btn.secondary{ background: rgba(56,189,248,.14); border-color: rgba(56,189,248,.32); color: rgba(219,234,254,.95); }
 
-    /* =========================================================
-       LIGHT THEME (FULL FIX)
-       ========================================================= */
-    html[data-theme="light"] body[data-page="about"]{
+    /* ===== לייט מוד ===== */
+    html[data-theme="light"] body[data-page="about"] {
       background:
-        radial-gradient(1200px 700px at 78% -10%, rgba(59,130,246,.14), transparent 58%),
-        radial-gradient(950px 620px at 12% 0%, rgba(16,185,129,.10), transparent 60%),
-        radial-gradient(900px 620px at 55% 112%, rgba(245,158,11,.10), transparent 62%),
-        #f3f7ff;
+        radial-gradient(circle at 70% -10%, rgba(56, 189, 248, 0.14), transparent 55%),
+        radial-gradient(circle at 10% 0%, rgba(96, 165, 250, 0.10), transparent 55%),
+        radial-gradient(circle at 90% 95%, rgba(52, 211, 153, 0.10), transparent 60%),
+        radial-gradient(circle at top, #ffffff 0, #e5efff 45%, #dde7fb 100%);
       color: #0f172a;
     }
 
-    html[data-theme="light"] body[data-page="about"] .header-main{
-      background: rgba(255,255,255,.86);
-      border-bottom-color: rgba(148,163,184,.40);
-    }
-
-    html[data-theme="light"] body[data-page="about"] .nav-side a{ color:#0f172a; }
-    html[data-theme="light"] body[data-page="about"] .nav-side a:hover{
-      background: rgba(2,6,23,.05);
-      border-color: rgba(148,163,184,.30);
-    }
-
-    html[data-theme="light"] body[data-page="about"] .theme-toggle-btn{
-      background: rgba(255,255,255,.92);
+    html[data-theme="light"] .about-hero-main,
+    html[data-theme="light"] .about-hero-media,
+    html[data-theme="light"] .about-card,
+    html[data-theme="light"] .about-list-item,
+    html[data-theme="light"] .about-cta,
+    html[data-theme="light"] .about-stat-card,
+    html[data-theme="light"] .about-gallery-main,
+    html[data-theme="light"] .about-gallery-mini {
+      background: #ffffff;
+      border-color: #d4ddf4;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
       color: #0f172a;
-      border-color: rgba(148,163,184,.45);
-      box-shadow: 0 12px 26px rgba(15,23,42,.08);
     }
 
-    html[data-theme="light"] body[data-page="about"] .glass,
-    html[data-theme="light"] body[data-page="about"] .panel,
-    html[data-theme="light"] body[data-page="about"] .card,
-    html[data-theme="light"] body[data-page="about"] .stat,
-    html[data-theme="light"] body[data-page="about"] .qa,
-    html[data-theme="light"] body[data-page="about"] .member,
-    html[data-theme="light"] body[data-page="about"] .mini,
-    html[data-theme="light"] body[data-page="about"] .t-item,
-    html[data-theme="light"] body[data-page="about"] .testi,
-    html[data-theme="light"] body[data-page="about"] .quote{
-      background: rgba(255,255,255,.94);
-      border-color: rgba(148,163,184,.45);
-      box-shadow: 0 18px 45px rgba(15,23,42,.08);
-      color:#0f172a;
+    html[data-theme="light"] .about-hero-subtitle,
+    html[data-theme="light"] .about-section-subtitle,
+    html[data-theme="light"] .about-card-text,
+    html[data-theme="light"] .about-hero-note,
+    html[data-theme="light"] .about-media-text,
+    html[data-theme="light"] .about-list-item,
+    html[data-theme="light"] .about-stat-note {
+      color: #4b5563;
     }
 
-    html[data-theme="light"] body[data-page="about"] .lead,
-    html[data-theme="light"] body[data-page="about"] .section-head p,
-    html[data-theme="light"] body[data-page="about"] .card p,
-    html[data-theme="light"] body[data-page="about"] .stat .note,
-    html[data-theme="light"] body[data-page="about"] .qa .a,
-    html[data-theme="light"] body[data-page="about"] .m-body p,
-    html[data-theme="light"] body[data-page="about"] .mini p,
-    html[data-theme="light"] body[data-page="about"] .t-body p,
-    html[data-theme="light"] body[data-page="about"] .quote .by{
-      color:#475569;
+    html[data-theme="light"] .about-tag {
+      background: #f3f4ff;
+      border-color: #d4ddf4;
+      color: #111827;
     }
 
-    html[data-theme="light"] body[data-page="about"] .chip{
-      background: rgba(2,6,23,.04);
-      color:#0f172a;
-      border-color: rgba(148,163,184,.50);
-    }
-    html[data-theme="light"] body[data-page="about"] .chip.blue{ background: rgba(59,130,246,.10); border-color: rgba(59,130,246,.28); color:#0f172a; }
-    html[data-theme="light"] body[data-page="about"] .chip.green{ background: rgba(16,185,129,.10); border-color: rgba(16,185,129,.28); color:#0f172a; }
-    html[data-theme="light"] body[data-page="about"] .chip.amber{ background: rgba(245,158,11,.10); border-color: rgba(245,158,11,.30); color:#0f172a; }
-    html[data-theme="light"] body[data-page="about"] .chip.pink{ background: rgba(236,72,153,.10); border-color: rgba(236,72,153,.28); color:#0f172a; }
-
-    html[data-theme="light"] body[data-page="about"] .cap{
-      background: rgba(255,255,255,.92);
-      border-color: rgba(148,163,184,.45);
-      color:#0f172a;
-    }
-
-    html[data-theme="light"] body[data-page="about"] .btn{
-      background: rgba(255,255,255,.92);
-      color:#0f172a;
-      border-color: rgba(148,163,184,.50);
-      box-shadow: 0 10px 22px rgba(15,23,42,.08);
-    }
-    html[data-theme="light"] body[data-page="about"] .btn:hover{
-      background: rgba(255,255,255,.98);
-      border-color: rgba(59,130,246,.30);
-    }
-    html[data-theme="light"] body[data-page="about"] .btn.primary{ background:#10b981; color:#052e23; border-color: rgba(16,185,129,.85); }
-    html[data-theme="light"] body[data-page="about"] .btn.secondary{ background: rgba(59,130,246,.12); color:#0f172a; border-color: rgba(59,130,246,.28); }
-
-    html[data-theme="light"] body[data-page="about"] .pill,
-    html[data-theme="light"] body[data-page="about"] .search{
-      background: rgba(255,255,255,.92);
-      border-color: rgba(148,163,184,.45);
-      color:#0f172a;
-    }
-    html[data-theme="light"] body[data-page="about"] .search input{ color:#0f172a; }
-    html[data-theme="light"] body[data-page="about"] .pill.active{
-      background: rgba(59,130,246,.12);
-      border-color: rgba(59,130,246,.28);
-    }
-
-    html[data-theme="light"] body[data-page="about"] .nav-mobile{
-      background: rgba(255,255,255,.96);
-      border-color: rgba(148,163,184,.45);
-    }
-    html[data-theme="light"] body[data-page="about"] .nav-mobile a{
-      background: rgba(2,6,23,.04);
-      color:#0f172a;
-      border-color: rgba(148,163,184,.24);
-    }
-
-    html[data-theme="light"] body[data-page="about"] footer .container{
-      border-top-color: rgba(148,163,184,.40);
-      color:#475569;
-    }
-
-    html[data-theme="light"] body[data-page="about"] .edit-fab{
-      background: rgba(255,255,255,.92);
-      border-color: rgba(148,163,184,.45);
+    html[data-theme="light"] .about-hero-badge {
+      background: #e0f2fe;
+      border-color: #7dd3fc;
       color: #0f172a;
+    }
+
+    html[data-theme="light"] .about-stat-card {
+      background: linear-gradient(135deg, #ffffff, #e0edff);
+      border-color: #bfdbfe;
+    }
+
+    html[data-theme="light"] .about-cta {
+      background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+      border-color: #6ee7b7;
+    }
+
+    html[data-theme="light"] .about-cta-text,
+    html[data-theme="light"] .about-cta-text strong { color: #065f46; }
+
+    html[data-theme="light"] .about-cta-btn {
+      background: #10b981;
+      border-color: #059669;
+      color: #ecfdf5;
+    }
+
+    html[data-theme="light"] .about-cta-btn.secondary {
+      background: #ecfdf5;
+      border-color: #a7f3d0;
+      color: #047857;
+    }
+
+    html[data-theme="light"] .about-stat-label { color: #1d4ed8; }
+
+    html[data-theme="light"] .to-top{
+      background: rgba(255,255,255,.92);
+      color:#0f172a;
+      border-color: rgba(148,163,184,.45);
       box-shadow: 0 18px 45px rgba(15,23,42,.10);
     }
-    html[data-theme="light"] body[data-page="about"] .edit-card{
+
+    html[data-theme="light"] .lightbox-inner{
       background: rgba(255,255,255,.98);
       border-color: rgba(148,163,184,.45);
     }
-    html[data-theme="light"] body[data-page="about"] .edit-top{
+    html[data-theme="light"] .lb-bar{ color:#0f172a; }
+    html[data-theme="light"] .lb-close{
+      background: rgba(2,6,23,.04);
+      border-color: rgba(148,163,184,.35);
       color:#0f172a;
-      border-bottom-color: rgba(148,163,184,.35);
     }
-    html[data-theme="light"] body[data-page="about"] .edit-top .hint,
-    html[data-theme="light"] body[data-page="about"] .edit-status{
-      color:#475569;
+
+    html[data-theme="light"] .edit-fab{
+      background: rgba(255,255,255,.92);
+      border-color: rgba(148,163,184,.45);
+      color:#0f172a;
+      box-shadow: 0 18px 45px rgba(15,23,42,.10);
     }
-    html[data-theme="light"] body[data-page="about"] .edit-area{
+    html[data-theme="light"] .edit-card{
+      background: rgba(255,255,255,.98);
+      border-color: rgba(148,163,184,.45);
+    }
+    html[data-theme="light"] .edit-top{ color:#0f172a; border-bottom-color: rgba(148,163,184,.35); }
+    html[data-theme="light"] .edit-top .hint,
+    html[data-theme="light"] .edit-status{ color:#475569; }
+    html[data-theme="light"] .edit-area{
       background: rgba(2,6,23,.03);
+      border-color: rgba(148,163,184,.45);
+      color:#0f172a;
+    }
+    html[data-theme="light"] .edit-btn{
+      background: rgba(255,255,255,.92);
       border-color: rgba(148,163,184,.45);
       color:#0f172a;
     }
@@ -1285,241 +679,177 @@
 </head>
 
 <body data-page="about">
-  <div class="scroll-progress" aria-hidden="true"><i id="scrollBar"></i></div>
-
+  <!-- אנליטיקות -->
   <script type="module" src="analytics.js"></script>
 
   <!-- HEADER -->
   <header class="header-main">
     <div class="container">
-      <nav class="nav nav-centered" aria-label="ניווט ראשי">
+      <nav class="nav">
+        <div class="nav-left">
+          <div class="logo-circle">
+            <img
+              src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png"
+              alt="סמל בית הספר יערת העמק"
+              class="logo-img"
+              id="logo-img"
+            >
+          </div>
 
-        <div class="nav-side nav-right-links">
+          <div>
+            <div class="school-title-main">חטיבת הנעורים – יערת העמק</div>
+            <div class="school-title-sub">סביבת למידה בטוחה, תומכת ומצמיחה – עבור כל תלמיד ותלמידה.</div>
+
+            <div class="back-btn-wrap">
+              <a href="index.html" class="back-btn"> חזרה לדף התלמידים</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="nav-right">
           <a href="index.html#home-news">חדשות</a>
           <a href="index.html#home-exams">מבחנים</a>
           <a href="index.html#grades">השכבות</a>
           <a href="polls.html">סקרים</a>
           <a href="about.html" class="active">אודות</a>
-        </div>
-
-        <div class="nav-center">
-          <a href="index.html" class="logo-circle" aria-label="דף הבית">
-            <img src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png" alt="סמל יערת העמק" class="logo-img" />
-          </a>
-        </div>
-
-        <div class="nav-side nav-left-links">
           <a href="index.html#contact">יצירת קשר</a>
-          <a href="news.html">כל החדשות</a>
-          <a href="exams.html">כל המבחנים</a>
           <a href="redirect-edu.html" class="personal-btn">למרחב האישי</a>
           <a href="admin.html" class="btn-outline">Admin</a>
         </div>
 
-        <button id="theme-toggle" class="theme-toggle-btn" type="button" aria-label="מצב כהה/בהיר">🌙</button>
+        <button id="theme-toggle" class="theme-toggle" type="button">🌙</button>
 
-        <button class="nav-toggle" id="nav-toggle" type="button" aria-label="פתח תפריט" aria-expanded="false" aria-controls="nav-mobile">
+        <button class="nav-toggle" type="button" aria-label="פתח תפריט" aria-expanded="false">
           <span></span><span></span><span></span>
         </button>
-
-        <div class="nav-mobile" id="nav-mobile" aria-hidden="true">
-          <a href="index.html#home-news">חדשות</a>
-          <a href="index.html#home-exams">מבחנים</a>
-          <a href="index.html#grades">השכבות</a>
-          <a href="polls.html">סקרים</a>
-          <a href="about.html">אודות</a>
-          <a href="index.html#contact">יצירת קשר</a>
-          <a href="news.html">כל החדשות</a>
-          <a href="exams.html">כל המבחנים</a>
-          <a href="redirect-edu.html" class="personal-btn">למרחב האישי</a>
-          <a href="admin.html" class="btn-outline">Admin</a>
-        </div>
-
       </nav>
     </div>
   </header>
 
-  <main class="about-wrapper">
-    <div class="container">
-
-      <!-- HERO -->
-      <section class="glass hero reveal" id="hero">
-        <div class="hero-grid">
-          <div class="panel">
-            <h1 id="heroTitle">אודות חטיבת הנעורים יערת העמק</h1>
-            <p class="lead" id="heroLead"></p>
-
-            <div class="chips" id="heroChips"></div>
-
-            <div class="hero-actions" id="heroActions"></div>
-          </div>
-
-          <div class="panel">
-            <div class="hero-media" id="heroMedia">
-              <img id="heroImg" src="" alt="תמונת אווירה">
-              <div class="hero-badge">
-                <strong id="heroBadgeStrong">קהילה חזקה</strong>
-                <span id="heroBadgeText">למידה • ערכים • יוזמות</span>
-              </div>
+  <main class="about-wrapper" id="top">
+    <!-- HERO -->
+    <section class="about-hero">
+      <div class="container">
+        <div class="about-hero-grid">
+          <div class="about-hero-main reveal">
+            <div class="about-hero-badge" id="heroBadge">
+              <span>🏫</span>
+              <span id="heroBadgeText">חטיבת הנעורים יערת העמק – הבית של השכבה</span>
             </div>
-          </div>
-        </div>
-      </section>
 
-      <!-- VALUES -->
-      <section class="section" id="values">
-        <div class="section-head reveal">
-          <div>
-            <h2 id="valuesTitle"></h2>
-            <p id="valuesSubtitle"></p>
-          </div>
-        </div>
-        <div class="grid3" id="valuesGrid"></div>
-      </section>
+            <h1 class="about-hero-title" id="heroTitle">מקום שנותן לתלמידים להרגיש שייכים, נראים ומשמעותיים.</h1>
 
-      <!-- STATS -->
-      <section class="section" id="stats">
-        <div class="section-head reveal">
-          <div>
-            <h2 id="statsTitle"></h2>
-            <p id="statsSubtitle"></p>
-          </div>
-        </div>
-        <div class="stats" id="statsGrid"></div>
-      </section>
+            <p class="about-hero-subtitle" id="heroSubtitle">
+              יערת העמק היא חטיבת נעורים במגדל העמק שמחברת בין מצוינות לימודית,
+              חוויה חברתית עשירה ותמיכה רגשית אמיתית. אנחנו מאמינים שתלמידים שמרגישים טוב –
+              לומדים טוב, יוזמים, מובילים ומשפיעים.
+            </p>
 
-      <!-- FACILITIES -->
-      <section class="section" id="facilities">
-        <div class="section-head reveal">
-          <div>
-            <h2 id="facTitle"></h2>
-            <p id="facSubtitle"></p>
-          </div>
-        </div>
+            <div class="about-hero-tags" id="heroTags"></div>
 
-        <div class="split">
-          <div class="panel reveal">
-            <h3 id="facPanelTitle" style="margin:0 0 8px;">מבט מקרוב</h3>
-            <p id="facPanelText" style="margin:0;color:rgba(226,232,240,.80);line-height:1.85;"></p>
-            <div class="mini-grid" id="facGrid"></div>
+            <p class="about-hero-note" id="heroNote">
+              באתר זה תמצאו חדשות, לוח מבחנים, סקרים לתלמידים, מידע לשכבות ז׳–ט׳ ודרכים ליצור קשר עם הצוות.
+            </p>
           </div>
 
-          <div class="panel reveal">
-            <h3 style="margin:0 0 8px;">מה מקבלים ביום-יום</h3>
-            <div class="mini-grid" id="dailyGrid"></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- PROGRAMS -->
-      <section class="section" id="programs">
-        <div class="section-head reveal">
-          <div>
-            <h2 id="progTitle"></h2>
-            <p id="progSubtitle"></p>
-          </div>
-        </div>
-
-        <div class="grid3" id="progGrid"></div>
-      </section>
-
-      <!-- TIMELINE -->
-      <section class="section" id="timeline">
-        <div class="section-head reveal">
-          <div>
-            <h2 id="timeTitle"></h2>
-            <p id="timeSubtitle"></p>
-          </div>
-        </div>
-
-        <div class="timeline" id="timeList"></div>
-      </section>
-
-      <!-- TESTIMONIALS -->
-      <section class="section" id="testimonials">
-        <div class="section-head reveal">
-          <div>
-            <h2 id="testiTitle"></h2>
-            <p id="testiSubtitle"></p>
-          </div>
-        </div>
-
-        <div class="testi reveal">
-          <div class="testi-track" id="testiTrack"></div>
-
-          <div class="testi-controls">
-            <button class="arrow" id="testiPrev" type="button">‹ קודם</button>
-            <div class="dots" id="testiDots" aria-label="מעבר ציטוטים"></div>
-            <button class="arrow" id="testiNext" type="button">הבא ›</button>
-          </div>
-        </div>
-      </section>
-
-      <!-- TEAM -->
-      <section class="section" id="team">
-        <div class="section-head reveal">
-          <div>
-            <h2 id="teamTitle"></h2>
-            <p id="teamSubtitle"></p>
-          </div>
-
-          <div class="section-tools">
-            <button class="pill active" id="teamGridBtn" type="button">🔳 Grid</button>
-            <button class="pill" id="teamListBtn" type="button">📃 List</button>
-          </div>
-        </div>
-
-        <div class="team-wrap">
-          <div class="team-grid" id="teamGrid"></div>
-        </div>
-      </section>
-
-      <!-- GALLERY -->
-      <section class="section" id="gallery">
-        <div class="section-head reveal">
-          <div>
-            <h2 id="galleryTitle"></h2>
-            <p id="gallerySubtitle"></p>
-          </div>
-        </div>
-
-        <div class="gallery">
-          <div class="g-main reveal" id="gMain" data-lb="" data-title="">
-            <img id="gMainImg" src="" alt="">
-            <div class="cap" id="gMainCap"></div>
-          </div>
-
-          <div class="g-mini" id="gMini"></div>
-        </div>
-      </section>
-
-      <!-- FAQ -->
-      <section class="section" id="faq">
-        <div class="section-head reveal">
-          <div>
-            <h2 id="faqTitle"></h2>
-            <p id="faqSubtitle"></p>
-          </div>
-
-          <div class="section-tools">
-            <div class="search" title="חיפוש שאלות">
-              <i>🔎</i>
-              <input id="faqSearch" type="text" placeholder="חפש שאלה (למשל: מועצה / קשר / מבחנים)" />
+          <aside class="about-hero-media reveal">
+            <div>
+              <div class="about-media-title" id="mediaTitle">יום לימודים ביערת העמק</div>
+              <p class="about-media-text" id="mediaText">
+                שיעורי עומק, מעבדות, למידה דיגיטלית, פרויקטים, מועצת תלמידים, הפסקות פעילות,
+                וחוויה חברתית שממשיכה גם מחוץ ללימודים.
+              </p>
             </div>
-          </div>
+
+            <div class="about-media-image-wrapper" data-lb="images/about-hero.png" data-title="מבט אל חצר בית הספר">
+              <img
+                src="images/about-hero.png"
+                alt="מבט אל חצר בית הספר יערת העמק"
+                class="about-media-image"
+                id="heroImage"
+              >
+            </div>
+          </aside>
         </div>
+      </div>
+    </section>
 
-        <div class="faq" id="faqGrid"></div>
-        <div class="faq-empty" id="faqEmpty">לא נמצאו שאלות שמתאימות לחיפוש.</div>
-      </section>
+    <!-- מי אנחנו -->
+    <section class="about-section">
+      <div class="container">
+        <header class="about-section-header reveal">
+          <h2 class="about-section-title" id="whoTitle">מי אנחנו – יערת העמק מקרוב</h2>
+          <p class="about-section-subtitle" id="whoSubtitle">
+            החטיבה משלבת בין סטנדרט לימודי גבוה לאווירה משפחתית, עם דגש על קשר אישי,
+            שיתוף פעולה עם ההורים ועולם שלם של הזדמנויות לתלמידים.
+          </p>
+        </header>
 
-      <!-- CTA -->
-      <section class="cta reveal" id="cta">
-        <div class="txt" id="ctaText"></div>
-        <div class="actions" id="ctaActions"></div>
-      </section>
+        <div class="about-grid-3" id="whoCards"></div>
+      </div>
+    </section>
 
-    </div>
+    <!-- במספרים -->
+    <section class="about-section">
+      <div class="container">
+        <header class="about-section-header reveal">
+          <h2 class="about-section-title" id="statsTitle">יערת העמק – במספרים</h2>
+          <p class="about-section-subtitle" id="statsSubtitle">
+            מאחורי כל מספר יש תלמידים, מחנכים וסיפורים קטנים של הצלחה. הנתונים כאן הם כלליים
+            ויכולים להשתנות משנה לשנה.
+          </p>
+        </header>
+
+        <div class="about-stats-row" id="statsRow"></div>
+      </div>
+    </section>
+
+    <!-- גלריה -->
+    <section class="about-section">
+      <div class="container">
+        <header class="about-section-header reveal">
+          <h2 class="about-section-title" id="galleryTitle">רגעים מהחיים בבית הספר</h2>
+          <p class="about-section-subtitle" id="gallerySubtitle">
+            טיולים, ימי שיא, חצר – זה המקום שלכם. כאן אפשר לראות תמונות מאירועים,
+            מהשגרה ומהחוויות הגדולות של התלמידים.
+          </p>
+        </header>
+
+        <div class="about-gallery-grid">
+          <div class="about-gallery-main reveal" data-lb="images/PIC-HATZER.png" data-title="תלמידים בחצר בית הספר">
+            <img src="images/PIC-HATZER.png" alt="תלמידים בחצר בית הספר" id="galleryMainImg">
+          </div>
+
+          <div class="about-gallery-mini-grid" id="galleryMini"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- למה לבחור -->
+    <section class="about-section">
+      <div class="container">
+        <header class="about-section-header reveal">
+          <h2 class="about-section-title" id="whyTitle">למה תלמידים אוהבים ללמוד כאן?</h2>
+          <p class="about-section-subtitle" id="whySubtitle">כמה סיבות שחוזרות שוב ושוב בשיחות עם תלמידים, הורים וצוות.</p>
+        </header>
+
+        <div class="about-list" id="whyList"></div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="about-section">
+      <div class="container">
+        <div class="about-cta reveal">
+          <div class="about-cta-text" id="ctaText">
+            <strong>רוצים להמשיך להכיר את יערת העמק?</strong><br>
+            אפשר לחזור לדף הבית, לעיין בחדשות, לראות את לוח המבחנים או להיכנס לעמוד הסקרים ולהשפיע על מה שקורה בחטיבה.
+          </div>
+
+          <div class="about-cta-actions" id="ctaActions"></div>
+        </div>
+      </div>
+    </section>
   </main>
 
   <footer>
@@ -1528,8 +858,8 @@
     </div>
   </footer>
 
-  <!-- back to top -->
-  <a href="#hero" class="btn to-top" id="toTop" aria-label="חזרה למעלה">⬆️ למעלה</a>
+  <!-- Back to top -->
+  <a class="to-top" id="toTop" href="#top" aria-label="חזרה למעלה">⬆️ למעלה</a>
 
   <!-- Lightbox -->
   <div class="lightbox" id="lightbox" aria-hidden="true">
@@ -1542,17 +872,17 @@
     </div>
   </div>
 
-  <!-- ✏️ Edit FAB + Modal (מופיע רק עם ?edit=1) -->
-  <button class="edit-fab" id="editFab" type="button" aria-label="עריכת תוכן אודות">✏️ עריכה</button>
+  <!-- ✏️ Edit FAB + Modal (רק עם ?edit=1) -->
+  <button class="edit-fab" id="editFab" type="button" aria-label="עריכת תוכן אודות">✏️ עריכת מלל</button>
 
   <div class="edit-modal" id="editModal" aria-hidden="true">
     <div class="edit-card" role="dialog" aria-modal="true" aria-label="עורך תוכן אודות">
       <div class="edit-top">
         <div>
-          <div style="font-size:1rem;">עורך JSON — siteContent/about</div>
-          <div class="hint">טיפ: תערוך רק מה שאתה מבין. זה עושה שמירה ל-Firestore.</div>
+          <div style="font-size:1rem;">עורך JSON — siteContent/aboutSimple</div>
+          <div class="hint">נפתח רק עם ?edit=1. אם אין הרשאה ל-Firestore זה ישמור מקומית.</div>
         </div>
-        <button class="btn small" id="editCloseTop" type="button">✕ סגור</button>
+        <button class="edit-btn" id="editCloseTop" type="button">✕ סגור</button>
       </div>
 
       <div class="edit-body">
@@ -1560,590 +890,345 @@
 
         <div class="edit-actions">
           <div class="left">
-            <button class="btn small ghost" id="editCopy" type="button">📋 העתק</button>
-            <button class="btn small ghost" id="editReset" type="button">↩️ החזר (מה שמוטען)</button>
+            <button class="edit-btn" id="editCopy" type="button">📋 העתק</button>
+            <button class="edit-btn" id="editReset" type="button">↩️ החזר</button>
           </div>
 
           <div class="right">
             <span class="edit-status" id="editStatus">מוכן.</span>
-            <button class="btn small secondary" id="editValidate" type="button">✅ בדוק JSON</button>
-            <button class="btn small primary" id="editSave" type="button">💾 שמור</button>
+            <button class="edit-btn secondary" id="editValidate" type="button">✅ בדוק JSON</button>
+            <button class="edit-btn primary" id="editSave" type="button">💾 שמור</button>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- =========================================================
-       SCRIPTS (Firestore load + render + UI)
-       ========================================================= -->
+  <script src="accessibility.js"></script>
+  <script type="module" src="app.js"></script>
+
+  <!-- =========================
+       ABOUT CONTENT + EDITOR
+       ========================= -->
   <script type="module">
     import { db } from "./firebase-config.js";
     import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
-    /* ======================
-       Helpers
-       ====================== */
     const $ = (id) => document.getElementById(id);
+
     const esc = (s) => String(s ?? "")
       .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
       .replaceAll('"',"&quot;").replaceAll("'","&#039;");
 
     const isArr = Array.isArray;
 
-    /* ======================
-       Fallback Data (BIG)
-       ====================== */
     const fallback = {
       hero: {
-        title: "אודות חטיבת הנעורים יערת העמק",
-        lead:
-          "מקום שמרים תלמידים — לימודים ברמה גבוהה, אווירה חברתית חזקה וצוות שמכיר אותך באמת. " +
-          "פה לא “שורדים בית ספר” — פה גדלים. האתר הזה נבנה כדי לתת לתלמידים מידע מסודר: חדשות, מבחנים, שכבות, סקרים ועוד.",
-        chips: [
-          { text:"🏫 מגדל העמק", tone:"blue" },
-          { text:"🤝 יחס אישי", tone:"green" },
-          { text:"🚀 יוזמות תלמידים", tone:"amber" },
-          { text:"💡 חדשנות דיגיטלית", tone:"pink" }
+        badgeText: "חטיבת הנעורים יערת העמק – הבית של השכבה",
+        title: "מקום שנותן לתלמידים להרגיש שייכים, נראים ומשמעותיים.",
+        subtitle:
+          "יערת העמק היא חטיבת נעורים במגדל העמק שמחברת בין מצוינות לימודית, " +
+          "חוויה חברתית עשירה ותמיכה רגשית אמיתית. אנחנו מאמינים שתלמידים שמרגישים טוב – " +
+          "לומדים טוב, יוזמים, מובילים ומשפיעים.",
+        tags: [
+          { icon:"🎓", text:"למידה איכותית ומותאמת" },
+          { icon:"🤝", text:"קשר אישי עם הצוות" },
+          { icon:"🚀", text:"מנהיגות, חדשנות ויוזמות תלמידים" }
         ],
-        actions: [
-          { text:"לחדשות", href:"index.html#home-news", type:"secondary", icon:"📰" },
-          { text:"למבחנים", href:"index.html#home-exams", type:"ghost", icon:"📝" },
-          { text:"חזרה לדף הבית", href:"index.html", type:"primary", icon:"🏠" }
-        ],
-        imageUrl: "images/about-hero.png",
-        imageAlt: "מבט אל חצר בית הספר",
-        badgeStrong: "קהילה חזקה",
-        badgeText: "למידה • ערכים • יוזמות"
+        note:
+          "באתר זה תמצאו חדשות, לוח מבחנים, סקרים לתלמידים, מידע לשכבות ז׳–ט׳ ודרכים ליצור קשר עם הצוות.",
+        mediaTitle: "יום לימודים ביערת העמק",
+        mediaText:
+          "שיעורי עומק, מעבדות, למידה דיגיטלית, פרויקטים, מועצת תלמידים, הפסקות פעילות, " +
+          "וחוויה חברתית שממשיכה גם מחוץ ללימודים.",
+        heroImageUrl: "images/about-hero.png",
+        heroImageAlt: "מבט אל חצר בית הספר יערת העמק"
       },
 
-      values: {
+      who: {
         title: "מי אנחנו – יערת העמק מקרוב",
         subtitle:
-          "שלושה דברים שמגדירים אותנו: ערכים, למידה, וקהילה. " +
-          "הקטע הוא לא רק ציונים — אלא מי אתה נהיה בדרך.",
+          "החטיבה משלבת בין סטנדרט לימודי גבוה לאווירה משפחתית, עם דגש על קשר אישי, " +
+          "שיתוף פעולה עם ההורים ועולם שלם של הזדמנויות לתלמידים.",
         cards: [
-          { tag:"ערכים וחינוך", title:"מקום בטוח לגדול בו", text:"כבוד הדדי, הקשבה וקבלה. צוות שמלווה מקרוב ושומר על קשר עם הבית." },
-          { tag:"למידה וחדשנות", title:"מצוינות שמתאימה להיום", text:"למידה דיגיטלית, חקר ופרויקטים — עם חשיבה ביקורתית ועבודת צוות." },
-          { tag:"חברה וקהילה", title:"התלמידים משפיעים", text:"מועצת תלמידים, סקרים, ימי שיא ומעורבות חברתית — הקול של התלמידים נשמע." }
+          {
+            tag:"ערכים וחינוך",
+            title:"מקום בטוח לגדול בו",
+            text:
+              "אנחנו מחנכים לאחריות, כבוד הדדי, קבלה והקשבה. צוות המחנכים מלווה את התלמידים " +
+              "מקרוב, שומר על קשר עם הבית ודואג שכל תלמיד ותלמידה ירגישו שיש מי שרואה אותם."
+          },
+          {
+            tag:"למידה וחדשנות",
+            title:"מצוינות שמתאימה למאה ה-21",
+            text:
+              "שיעורים מגוונים, למידה דיגיטלית, חקר, פרויקטים בין-תחומיים והכנה אמיתית לעתיד. " +
+              "אנחנו משלבים כלים מתקדמים, עבודה בצוות וחשיבה ביקורתית."
+          },
+          {
+            tag:"חברה וקהילה",
+            title:"תלמידים משפיעים על מה שקורה",
+            text:
+              "מועצת תלמידים פעילה, סקרים דיגיטליים, טיולים, ימי שיא, מעורבות חברתית בפרויקטים " +
+              "בעיר ועוד. הקול של התלמידים באמת נשמע – וגם משפיע."
+          }
         ]
       },
 
       stats: {
         title: "יערת העמק – במספרים",
-        subtitle: "נתונים כלליים להמחשה (אפשר לשנות דרך האדמין).",
-        items: [
-          { label:"תלמידים בחטיבה", count:383, note:"196 בנים · 187 בנות" },
-          { label:"צוות חינוכי", count:43, note:"36 מורות · 7 מורים" },
-          { label:"שכבות לימוד", count:3, note:"ז׳ · ח׳ · ט׳" },
-          { label:"שביעות רצון", count:94, suffix:"%", note:"על בסיס משובים פנימיים" }
-        ]
-      },
-
-      facilities: {
-        title: "המרחב שלנו",
         subtitle:
-          "הסביבה משפיעה על הכל: אנרגיה, מוטיבציה, ותחושה שאתה במקום שמכבד אותך. " +
-          "פה יש דגש על סדר, נראות, ותחנות למידה אמיתיות.",
-        panelTitle: "מה יש פה באמת",
-        panelText:
-          "כיתות, מרחבים, מעבדות ואזורי ישיבה. המטרה היא שתלמיד לא ירגיש “סתם עוד אחד”, " +
-          "אלא שיש לו מקום, רמה, ושגרה שמרימה אותו.",
+          "מאחורי כל מספר יש תלמידים, מחנכים וסיפורים קטנים של הצלחה. הנתונים כאן הם כלליים " +
+          "ויכולים להשתנות משנה לשנה.",
         items: [
-          { icon:"🧪", title:"מעבדות ומרחבי חקר", text:"פעילות מעשית, ניסויים, פרויקטים קבוצתיים." },
-          { icon:"💻", title:"מרחב מחשבים ודיגיטל", text:"למידה מתוקשבת, תרגול, וכלים לעבודת צוות." },
-          { icon:"📚", title:"פינות קריאה ושקט", text:"מקום ללמוד בלי רעש, להתמקד ולהתקדם." },
-          { icon:"⚽", title:"ספורט וחוגים", text:"אימונים, טורנירים, ופעילות שמחברת." }
-        ],
-        daily: [
-          { icon:"🕘", title:"שגרה ברורה", text:"לוח זמנים מסודר, תיאום מבחנים והודעות." },
-          { icon:"🤝", title:"אפס לבד", text:"יועצת/מחנכים זמינים לתלמידים — גם ברגעים קשים." },
-          { icon:"🎯", title:"יעדים", text:"מגדירים מטרות ומתקדמים אליהן עם ליווי." },
-          { icon:"🧠", title:"למידה חכמה", text:"לא רק לשנן — להבין, ליישם, ולעבוד נכון." }
-        ]
-      },
-
-      programs: {
-        title: "תוכניות, יוזמות ומה שקורה מעבר לשיעורים",
-        subtitle:
-          "הקטע בחטיבה חזקה זה שיש עומק: מנהיגות, פרויקטים, ימים מיוחדים, ודברים שתלמידים יוזמים בעצמם.",
-        cards: [
-          { tag:"מנהיגות", title:"מועצת תלמידים", text:"מעורבות, החלטות, יוזמות, וסקרים שמזיזים דברים באמת." },
-          { tag:"חברה", title:"ימי שיא וטיולים", text:"חיבור בין שכבות, ערכים, חוויות וזיכרונות." },
-          { tag:"לימודים", title:"תגבור וקידום", text:"מי שצריך עזרה מקבל. מי שרוצה להצטיין — מקבל את הכלים." }
-        ]
-      },
-
-      timeline: {
-        title: "איך נראה תהליך לאורך השנה",
-        subtitle:
-          "כדי שתבין מה הולך: לאן זה מתקדם, מתי יש עומסים, ומתי יש רגעים של אווירה.",
-        items: [
-          { title:"תחילת שנה", text:"היכרות, שגרה, הגדרת ציפיות, והתחלה חזקה." },
-          { title:"אמצע סמסטר", text:"פרויקטים, מבחנים, ולמידה עמוקה יותר." },
-          { title:"תקופת שיא", text:"ריכוז מבחנים + עבודה קבוצתית. פה מנצחים עם סדר." },
-          { title:"סיום מחצית", text:"סיכומים, משוב, יעדים חדשים ושיפור." }
-        ]
-      },
-
-      testimonials: {
-        title: "מה תלמידים אומרים",
-        subtitle: "משפטים קצרים שעושים את העמוד חי (אפשר לערוך באדמין).",
-        items: [
-          { text:"הדבר הכי טוב פה זה שאתה מרגיש שיש למי לפנות. זה לא רק שיעורים.", by:"תלמיד/ה משכבה ח׳" },
-          { text:"הסקרים והמועצה באמת משנים דברים. כשמקשיבים לנו — אנחנו עפים.", by:"תלמיד/ה משכבה ט׳" },
-          { text:"כשהתארגנות למבחנים מסודרת באתר — זה מוריד לחץ ברמות.", by:"תלמיד/ה משכבה ז׳" }
-        ]
-      },
-
-      team: {
-        title: "צוות מוביל",
-        subtitle:
-          "הצוות שמוביל את החטיבה קדימה — אפשר לערוך שמות, תפקידים, תיאורים ואפילו תמונות דרך Firestore/אדמין.",
-        members: [
-          { name:"אורית", role:"מנהלת החטיבה", bio:"מובילה מצוינות + יחס אישי. יודעת להרים תלמידים גם כשקשה.", initials:"א", tags:["מנהיגות","משמעת","אכפתיות"] },
-          { name:"דני", role:"רכז שכבה", bio:"שומר על סדר, עוקב אחרי התקדמות ועוזר לתלמידים להתיישר למסלול.", initials:"ד", tags:["סדר","ליווי","שכבה"] },
-          { name:"רחל", role:"יועצת", bio:"מקום בטוח לשיחה והכוונה. אין מצב שתישאר לבד עם משהו.", initials:"ר", tags:["תמיכה","שיחה","רוגע"] },
-          { name:"נועה", role:"מחנכת", bio:"מחברת כיתה, שייכות והתקדמות. דואגת שאף אחד לא ייפול.", initials:"נ", tags:["כיתה","שייכות","חוזק"] }
+          { label:"תלמידים בחטיבה", value:"383", note:"196 בנים · 187 בנות" },
+          { label:"צוות חינוכי", value:"43", note:"36 מורות · 7 מורים" },
+          { label:"שכבות לימוד", value:"3", note:"ז׳ · ח׳ · ט׳" },
+          { label:"אוכלוסיית תלמידים", value:"93%", note:"תושבי העיר · 7% עולים" }
         ]
       },
 
       gallery: {
         title: "רגעים מהחיים בבית הספר",
-        subtitle: "טיולים, ימי שיא, חצר ושגרה — האנרגיה של המקום בתמונות.",
-        main: {
-          url:"images/PIC-HATZER.png",
-          title:"חצר בית הספר – רגעים של שגרה טובה",
-          caption:"📸 חצר בית הספר – רגעים של שגרה טובה",
-          alt:"תלמידים בחצר בית הספר"
-        },
-        items: [
-          { url:"images/about-gallery-1.png", title:"פעילות חברתית בכיתה", alt:"פעילות חברתית בכיתה" },
-          { url:"images/pic2.png", title:"יום שיא / טקס בית ספרי", alt:"יום שיא או טקס" },
-          { url:"images/pic3-demo.png", title:"למידה במעבדה / מחשבים", alt:"למידה במעבדה" },
-          { url:"images/PIC4-TIOL.png", title:"טיול שנתי / פעילות חוץ", alt:"טיול שנתי" }
+        subtitle:
+          "טיולים, ימי שיא, חצר – זה המקום שלכם. כאן אפשר לראות תמונות מאירועים, " +
+          "מהשגרה ומהחוויות הגדולות של התלמידים.",
+        main: { url:"images/PIC-HATZER.png", alt:"תלמידים בחצר בית הספר", title:"תלמידים בחצר בית הספר" },
+        mini: [
+          { url:"images/about-gallery-1.png", alt:"פעילות חברתית בכיתה", title:"פעילות חברתית בכיתה" },
+          { url:"images/pic2.png", alt:"יום שיא או טקס בית ספרי", title:"יום שיא / טקס" },
+          { url:"images/pic3-demo.png", alt:"למידה במעבדה / מחשבים", title:"למידה במעבדה" },
+          { url:"images/PIC4-TIOL.png", alt:"טיול שנתי או פעילות מחוץ לבית הספר", title:"טיול שנתי" }
         ]
       },
 
-      faq: {
-        title: "שאלות נפוצות",
-        subtitle: "שאלות שבאמת חוסכות לך זמן. יש פה גם חיפוש כדי שזה יהיה מקצועי.",
+      why: {
+        title: "למה תלמידים אוהבים ללמוד כאן?",
+        subtitle: "כמה סיבות שחוזרות שוב ושוב בשיחות עם תלמידים, הורים וצוות.",
         items: [
-          { q:"מה מיוחד ביערת העמק?", a:"קהילה חזקה, יחס אישי, ומלא יוזמות של תלמידים — לא רק שיעורים." },
-          { q:"יש מועצת תלמידים פעילה?", a:"כן. מועצה + סקרים + פעילויות — לתלמידים יש השפעה אמיתית." },
-          { q:"איך אני יודע מתי יש מבחנים?", a:"דרך דף הבית/דף כל המבחנים. המטרה שכל זה יהיה מסודר וברור." },
-          { q:"יש דגש על דיגיטל ופרויקטים?", a:"כן. שילוב כלים דיגיטליים, עבודה בקבוצות, וחקר — כדי ללמוד כמו היום." },
-          { q:"איך יוצרים קשר?", a:"דרך עמוד יצירת קשר באתר (index.html#contact) או דרך הנהלת בית הספר." },
-          { q:"אפשר להציע רעיון לבית הספר?", a:"כן. דרך מועצת תלמידים/סקרים/פנייה למחנך או רכז." }
+          {
+            icon:"✅",
+            title:"יחס אישי ותמיכה רגשית.",
+            text:"מחנכים וצוות שמכירים כל תלמיד, עוזרים ברגעים קשים ומלווים גם מעבר לשעות הלימודים."
+          },
+          {
+            icon:"💡",
+            title:"למידה חווייתית ומאתגרת.",
+            text:"שיעורים יצירתיים, פרויקטים, חקר, למידה בשטח ומתן מקום לחוזקות האישיות של כל אחד."
+          },
+          {
+            icon:"🤝",
+            title:"אווירה חברתית וקהילתית.",
+            text:"חברויות, עבודת צוות, מועצת תלמידים פעילה והרגשה של בית אחד גדול."
+          },
+          {
+            icon:"🚀",
+            title:"הזדמנויות להתפתח ולהוביל.",
+            text:"תוכניות מנהיגות, פרויקטים מיוחדים, סקרים דיגיטליים והשפעה אמיתית על מה שקורה בבית הספר."
+          }
         ]
       },
 
       cta: {
         textHtml:
           "<strong>רוצים להמשיך להכיר את יערת העמק?</strong><br>" +
-          "חזרו לדף הבית, הציצו בחדשות, עברו על לוח המבחנים או כנסו לעמוד הסקרים והשפיעו על מה שקורה בחטיבה.",
+          "אפשר לחזור לדף הבית, לעיין בחדשות, לראות את לוח המבחנים או להיכנס לעמוד הסקרים ולהשפיע על מה שקורה בחטיבה.",
         actions: [
-          { text:"חזרה לדף הבית", href:"index.html", type:"primary", icon:"🏠" },
-          { text:"לעמוד הסקרים »", href:"polls.html", type:"secondary", icon:"📊" },
-          { text:"כל החדשות", href:"news.html", type:"ghost", icon:"📰" }
+          { text:"חזרה לדף הבית", href:"index.html", type:"primary" },
+          { text:"לעמוד הסקרים »", href:"polls.html", type:"secondary" }
         ]
       }
     };
 
-    /* ======================
-       Render
-       ====================== */
-    let currentTestimonialsIndex = 0;
-    let testimonialsTimer = null;
-    let teamMode = "grid"; // grid | list
-
     function render(data){
       const d = data || fallback;
 
-      /* HERO */
+      // HERO
       const hero = d.hero || fallback.hero;
-      $("heroTitle").textContent = hero.title || fallback.hero.title;
-      $("heroLead").textContent  = hero.lead || fallback.hero.lead;
-
-      const chips = isArr(hero.chips) ? hero.chips : fallback.hero.chips;
-      $("heroChips").innerHTML = chips.map(c => {
-        const tone = esc(c.tone || "");
-        const cls = tone ? `chip ${tone}` : "chip";
-        return `<span class="${cls}">${esc(c.text)}</span>`;
-      }).join("");
-
-      const actions = isArr(hero.actions) ? hero.actions : fallback.hero.actions;
-      $("heroActions").innerHTML = actions.map(a => {
-        const cls = `btn ${esc(a.type||"")}`;
-        return `<a href="${esc(a.href)}" class="${cls}">${esc(a.icon||"")} ${esc(a.text)}</a>`;
-      }).join("");
-
-      $("heroImg").src = hero.imageUrl || fallback.hero.imageUrl;
-      $("heroImg").alt = hero.imageAlt || fallback.hero.imageAlt;
-      $("heroBadgeStrong").textContent = hero.badgeStrong || fallback.hero.badgeStrong;
       $("heroBadgeText").textContent = hero.badgeText || fallback.hero.badgeText;
+      $("heroTitle").textContent = hero.title || fallback.hero.title;
+      $("heroSubtitle").textContent = hero.subtitle || fallback.hero.subtitle;
+      $("heroNote").textContent = hero.note || fallback.hero.note;
+      $("mediaTitle").textContent = hero.mediaTitle || fallback.hero.mediaTitle;
+      $("mediaText").textContent = hero.mediaText || fallback.hero.mediaText;
 
-      // אם תמונה לא נטענת – לא נשבר
-      $("heroImg").addEventListener("error", () => {
-        $("heroImg").src = fallback.hero.imageUrl;
-        $("heroImg").alt = fallback.hero.imageAlt;
+      const img = $("heroImage");
+      img.src = hero.heroImageUrl || fallback.hero.heroImageUrl;
+      img.alt = hero.heroImageAlt || fallback.hero.heroImageAlt;
+      img.addEventListener("error", () => {
+        img.src = fallback.hero.heroImageUrl;
+        img.alt = fallback.hero.heroImageAlt;
       }, { once:true });
 
-      /* VALUES */
-      const values = d.values || fallback.values;
-      $("valuesTitle").textContent = values.title || fallback.values.title;
-      $("valuesSubtitle").textContent = values.subtitle || fallback.values.subtitle;
-      const vCards = isArr(values.cards) ? values.cards : fallback.values.cards;
-      $("valuesGrid").innerHTML = vCards.map(c => `
-        <article class="card reveal">
-          <div class="tag">${esc(c.tag)}</div>
-          <h3>${esc(c.title)}</h3>
-          <p>${esc(c.text)}</p>
+      const tags = isArr(hero.tags) ? hero.tags : fallback.hero.tags;
+      $("heroTags").innerHTML = tags.map(t => `
+        <div class="about-tag">
+          <span>${esc(t.icon||"✨")}</span>
+          <span>${esc(t.text||"")}</span>
+        </div>
+      `).join("");
+
+      // WHO
+      const who = d.who || fallback.who;
+      $("whoTitle").textContent = who.title || fallback.who.title;
+      $("whoSubtitle").textContent = who.subtitle || fallback.who.subtitle;
+      const cards = isArr(who.cards) ? who.cards : fallback.who.cards;
+      $("whoCards").innerHTML = cards.map(c => `
+        <article class="about-card reveal">
+          <div class="about-card-tag">${esc(c.tag||"")}</div>
+          <h3 class="about-card-title">${esc(c.title||"")}</h3>
+          <p class="about-card-text">${esc(c.text||"")}</p>
         </article>
       `).join("");
 
-      /* STATS */
+      // STATS
       const stats = d.stats || fallback.stats;
       $("statsTitle").textContent = stats.title || fallback.stats.title;
       $("statsSubtitle").textContent = stats.subtitle || fallback.stats.subtitle;
-      const sItems = isArr(stats.items) ? stats.items : fallback.stats.items;
-      $("statsGrid").innerHTML = sItems.map(it => `
-        <div class="stat reveal">
-          <div class="label">${esc(it.label)}</div>
-          <div class="value" data-count="${Number(it.count||0)}" data-suffix="${esc(it.suffix||"")}">0</div>
-          <div class="note">${esc(it.note||"")}</div>
+      const items = isArr(stats.items) ? stats.items : fallback.stats.items;
+      $("statsRow").innerHTML = items.map(s => `
+        <div class="about-stat-card reveal">
+          <div class="about-stat-label">${esc(s.label||"")}</div>
+          <div class="about-stat-value">${esc(s.value||"")}</div>
+          <div class="about-stat-note">${esc(s.note||"")}</div>
         </div>
       `).join("");
 
-      /* FACILITIES */
-      const fac = d.facilities || fallback.facilities;
-      $("facTitle").textContent = fac.title || fallback.facilities.title;
-      $("facSubtitle").textContent = fac.subtitle || fallback.facilities.subtitle;
-      $("facPanelTitle").textContent = fac.panelTitle || fallback.facilities.panelTitle;
-      $("facPanelText").textContent = fac.panelText || fallback.facilities.panelText;
+      // GALLERY
+      const gal = d.gallery || fallback.gallery;
+      $("galleryTitle").textContent = gal.title || fallback.gallery.title;
+      $("gallerySubtitle").textContent = gal.subtitle || fallback.gallery.subtitle;
 
-      const facItems = isArr(fac.items) ? fac.items : fallback.facilities.items;
-      $("facGrid").innerHTML = facItems.map(x => `
-        <div class="mini reveal">
-          <div class="ico">${esc(x.icon||"✨")}</div>
+      const main = gal.main || fallback.gallery.main;
+      $("galleryMainImg").src = main.url || fallback.gallery.main.url;
+      $("galleryMainImg").alt = main.alt || fallback.gallery.main.alt;
+      document.querySelector(".about-gallery-main")?.setAttribute("data-lb", main.url || fallback.gallery.main.url);
+      document.querySelector(".about-gallery-main")?.setAttribute("data-title", main.title || "");
+
+      const mini = isArr(gal.mini) ? gal.mini : fallback.gallery.mini;
+      $("galleryMini").innerHTML = mini.map(m => `
+        <div class="about-gallery-mini reveal" data-lb="${esc(m.url)}" data-title="${esc(m.title||"")}">
+          <img src="${esc(m.url)}" alt="${esc(m.alt||m.title||"תמונה")}">
+        </div>
+      `).join("");
+
+      // WHY
+      const why = d.why || fallback.why;
+      $("whyTitle").textContent = why.title || fallback.why.title;
+      $("whySubtitle").textContent = why.subtitle || fallback.why.subtitle;
+      const wItems = isArr(why.items) ? why.items : fallback.why.items;
+      $("whyList").innerHTML = wItems.map(x => `
+        <div class="about-list-item reveal">
+          <span class="about-list-bullet">${esc(x.icon||"✅")}</span>
           <div>
-            <h3>${esc(x.title)}</h3>
-            <p>${esc(x.text)}</p>
+            <strong>${esc(x.title||"")}</strong><br>
+            ${esc(x.text||"")}
           </div>
         </div>
       `).join("");
 
-      const daily = isArr(fac.daily) ? fac.daily : fallback.facilities.daily;
-      $("dailyGrid").innerHTML = daily.map(x => `
-        <div class="mini reveal">
-          <div class="ico">${esc(x.icon||"✅")}</div>
-          <div>
-            <h3>${esc(x.title)}</h3>
-            <p>${esc(x.text)}</p>
-          </div>
-        </div>
-      `).join("");
-
-      /* PROGRAMS */
-      const prog = d.programs || fallback.programs;
-      $("progTitle").textContent = prog.title || fallback.programs.title;
-      $("progSubtitle").textContent = prog.subtitle || fallback.programs.subtitle;
-      const pCards = isArr(prog.cards) ? prog.cards : fallback.programs.cards;
-      $("progGrid").innerHTML = pCards.map(c => `
-        <article class="card reveal">
-          <div class="tag">${esc(c.tag)}</div>
-          <h3>${esc(c.title)}</h3>
-          <p>${esc(c.text)}</p>
-        </article>
-      `).join("");
-
-      /* TIMELINE */
-      const time = d.timeline || fallback.timeline;
-      $("timeTitle").textContent = time.title || fallback.timeline.title;
-      $("timeSubtitle").textContent = time.subtitle || fallback.timeline.subtitle;
-      const tItems = isArr(time.items) ? time.items : fallback.timeline.items;
-      $("timeList").innerHTML = tItems.map((x) => `
-        <div class="t-item reveal">
-          <div class="t-dot"></div>
-          <div class="t-body">
-            <strong>${esc(x.title)}</strong>
-            <p>${esc(x.text)}</p>
-          </div>
-        </div>
-      `).join("");
-
-      /* TESTIMONIALS */
-      const testi = d.testimonials || fallback.testimonials;
-      $("testiTitle").textContent = testi.title || fallback.testimonials.title;
-      $("testiSubtitle").textContent = testi.subtitle || fallback.testimonials.subtitle;
-      const qItems = isArr(testi.items) ? testi.items : fallback.testimonials.items;
-
-      $("testiTrack").innerHTML = qItems.map(q => `
-        <div class="quote">
-          <p>“${esc(q.text)}”</p>
-          <div class="by">— ${esc(q.by || "תלמיד/ה")}</div>
-        </div>
-      `).join("");
-
-      $("testiDots").innerHTML = qItems.map((_, i) => `
-        <button class="dot ${i===0 ? "active":""}" type="button" aria-label="ציטוט ${i+1}" data-dot="${i}"></button>
-      `).join("");
-
-      currentTestimonialsIndex = 0;
-      moveTestimonials(0, true);
-
-      /* TEAM */
-      const team = d.team || fallback.team;
-      $("teamTitle").textContent = team.title || fallback.team.title;
-      $("teamSubtitle").textContent = team.subtitle || fallback.team.subtitle;
-      const members = isArr(team.members) ? team.members : fallback.team.members;
-
-      renderTeam(members);
-
-      /* GALLERY */
-      const gallery = d.gallery || fallback.gallery;
-      $("galleryTitle").textContent = gallery.title || fallback.gallery.title;
-      $("gallerySubtitle").textContent = gallery.subtitle || fallback.gallery.subtitle;
-
-      const main = gallery.main || fallback.gallery.main;
-      $("gMain").setAttribute("data-lb", main.url);
-      $("gMain").setAttribute("data-title", main.title || "");
-      $("gMainImg").src = main.url;
-      $("gMainImg").alt = main.alt || main.title || "תמונה";
-      $("gMainCap").textContent = main.caption || main.title || "תמונה";
-
-      const items = isArr(gallery.items) ? gallery.items : fallback.gallery.items;
-      $("gMini").innerHTML = items.map(g => `
-        <div class="ph reveal" data-lb="${esc(g.url)}" data-title="${esc(g.title||"")}">
-          <img src="${esc(g.url)}" alt="${esc(g.alt || g.title || "תמונה")}">
-        </div>
-      `).join("");
-
-      /* FAQ */
-      const faq = d.faq || fallback.faq;
-      $("faqTitle").textContent = faq.title || fallback.faq.title;
-      $("faqSubtitle").textContent = faq.subtitle || fallback.faq.subtitle;
-      const faqItems = isArr(faq.items) ? faq.items : fallback.faq.items;
-
-      $("faqGrid").innerHTML = faqItems.map((x, idx) => `
-        <div class="qa reveal" data-faq="${idx}">
-          <button type="button" class="q">
-            ${esc(x.q)}
-            <span class="chev">▾</span>
-          </button>
-          <div class="a">${esc(x.a)}</div>
-        </div>
-      `).join("");
-
-      $("faqEmpty").style.display = "none";
-
-      /* CTA */
+      // CTA
       const cta = d.cta || fallback.cta;
       $("ctaText").innerHTML = cta.textHtml || fallback.cta.textHtml;
       const acts = isArr(cta.actions) ? cta.actions : fallback.cta.actions;
-      $("ctaActions").innerHTML = acts.map(a => `
-        <a href="${esc(a.href)}" class="btn ${esc(a.type||"")}">${esc(a.icon||"")} ${esc(a.text)}</a>
+      $("ctaActions").innerHTML = acts.map((a, i) => `
+        <a href="${esc(a.href)}" class="about-cta-btn ${a.type==='secondary' ? 'secondary':''}">
+          ${esc(a.text)}
+        </a>
       `).join("");
 
-      // after render: reveal observer + counters
+      // reveal
       initReveal();
-      initCounters();
-      initFaqSearch(faqItems);
-      startTestimonialsAuto(qItems);
+
+      // store last data
+      window.__aboutSimpleLast = d;
     }
 
-    function renderTeam(members){
-      const wrap = document.querySelector(".team-wrap");
-      wrap.innerHTML = ""; // rebuild
-
-      const el = document.createElement("div");
-      el.id = "teamGrid";
-      el.className = teamMode === "grid" ? "team-grid" : "team-list";
-
-      el.innerHTML = members.map(m => {
-        const hasImg = !!m.photoUrl;
-        const avatar = hasImg
-          ? `<div class="avatar"><img src="${esc(m.photoUrl)}" alt="${esc(m.name)}"></div>`
-          : `<div class="avatar"><div class="circle">${esc(m.initials || (m.name||"").slice(0,1))}</div></div>`;
-
-        const tags = isArr(m.tags) ? m.tags : [];
-        const tagHtml = tags.length
-          ? `<div class="member-meta">${tags.map(t => `<span class="badge">${esc(t)}</span>`).join("")}</div>`
-          : "";
-
-        return `
-          <div class="member reveal">
-            ${avatar}
-            <div class="m-body">
-              <h3 style="margin:0;">${esc(m.name)}</h3>
-              <div class="role">${esc(m.role)}</div>
-              <p>${esc(m.bio)}</p>
-              ${tagHtml}
-            </div>
-          </div>
-        `;
-      }).join("");
-
-      wrap.appendChild(el);
-    }
-
-    /* ======================
-       Firestore load
-       ====================== */
     async function load(){
+      const ref = doc(db, "siteContent", "aboutSimple");
+
+      // local draft first (if exists)
+      const localKey = "aboutSimpleDraft";
+      const local = localStorage.getItem(localKey);
+      if(local){
+        try{
+          const parsed = JSON.parse(local);
+          window.__aboutSimpleLocal = parsed;
+        }catch{}
+      }
+
       try{
-        const ref = doc(db, "siteContent", "about");
         const snap = await getDoc(ref);
         if(snap.exists()){
-          render(snap.data());
-        }else{
-          render(fallback);
+          const data = snap.data();
+          window.__aboutSimpleLast = data;
+          render(data);
+          return;
         }
       }catch(e){
-        console.error(e);
+        // ignore, fallback below
+      }
+
+      // if no firestore, but has local draft -> use it
+      if(window.__aboutSimpleLocal){
+        window.__aboutSimpleLast = window.__aboutSimpleLocal;
+        render(window.__aboutSimpleLocal);
+      }else{
+        window.__aboutSimpleLast = fallback;
         render(fallback);
       }
     }
 
-    /* ======================
-       Reveal
-       ====================== */
     function initReveal(){
-      const els = Array.from(document.querySelectorAll('.reveal'));
-      if (!('IntersectionObserver' in window) || els.length === 0) {
-        els.forEach(e => e.classList.add('in'));
+      const els = Array.from(document.querySelectorAll(".reveal"));
+      if(!("IntersectionObserver" in window) || els.length === 0){
+        els.forEach(e => e.classList.add("in"));
         return;
       }
       const io = new IntersectionObserver((entries) => {
-        entries.forEach((en) => {
-          if (en.isIntersecting) {
-            en.target.classList.add('in');
+        entries.forEach(en => {
+          if(en.isIntersecting){
+            en.target.classList.add("in");
             io.unobserve(en.target);
           }
         });
-      }, { threshold: 0.12, rootMargin: "0px 0px -10% 0px" });
+      }, { threshold: 0.12, rootMargin:"0px 0px -10% 0px" });
       els.forEach(e => io.observe(e));
     }
 
-    /* ======================
-       Counters
-       ====================== */
-    function initCounters(){
-      const nodes = Array.from(document.querySelectorAll('.value[data-count]'));
-      if (nodes.length === 0) return;
-
-      const animate = (el) => {
-        const target = Number(el.getAttribute('data-count') || '0');
-        const suffix = el.getAttribute('data-suffix') || '';
-        const dur = 950;
-        const t0 = performance.now();
-
-        const step = (t) => {
-          const p = Math.min(1, (t - t0) / dur);
-          const eased = 1 - Math.pow(1 - p, 3);
-          const val = Math.round(target * eased);
-          el.textContent = String(val) + suffix;
-          if (p < 1) requestAnimationFrame(step);
-        };
-        requestAnimationFrame(step);
-      };
-
-      if (!('IntersectionObserver' in window)) { nodes.forEach(animate); return; }
-
-      const io = new IntersectionObserver((entries) => {
-        entries.forEach((en) => {
-          if (en.isIntersecting) { animate(en.target); io.unobserve(en.target); }
-        });
-      }, { threshold: 0.35 });
-
-      nodes.forEach(n => io.observe(n));
-    }
-
-    /* ======================
-       Mobile menu
-       ====================== */
+    // Back to top show/hide
     (function(){
-      const btn = document.getElementById('nav-toggle');
-      const menu = document.getElementById('nav-mobile');
-      if(!btn || !menu) return;
-
-      const close = () => {
-        menu.classList.remove('open');
-        btn.setAttribute('aria-expanded','false');
-        menu.setAttribute('aria-hidden','true');
+      const toTop = $("toTop");
+      const onScroll = () => {
+        const y = window.scrollY || document.documentElement.scrollTop || 0;
+        toTop?.classList.toggle("show", y > 650);
       };
-
-      btn.addEventListener('click', () => {
-        const isOpen = menu.classList.toggle('open');
-        btn.setAttribute('aria-expanded', String(isOpen));
-        menu.setAttribute('aria-hidden', String(!isOpen));
-      });
-
-      document.addEventListener('click', (e) => {
-        if (!menu.classList.contains('open')) return;
-        const inside = menu.contains(e.target) || btn.contains(e.target);
-        if (!inside) close();
-      });
-
-      menu.querySelectorAll('a').forEach(a => a.addEventListener('click', close));
+      window.addEventListener("scroll", onScroll, { passive:true });
+      onScroll();
     })();
 
-    /* ======================
-       FAQ accordion + search
-       ====================== */
-    document.addEventListener("click", (e) => {
-      const btn = e.target.closest(".qa button");
-      if(!btn) return;
-      btn.closest(".qa").classList.toggle("open");
-    });
-
-    function initFaqSearch(faqItems){
-      const input = $("faqSearch");
-      if(!input) return;
-
-      const apply = () => {
-        const q = input.value.trim().toLowerCase();
-        const boxes = Array.from(document.querySelectorAll(".qa"));
-        let shown = 0;
-
-        boxes.forEach((box, idx) => {
-          const item = faqItems[idx];
-          const text = ((item?.q||"") + " " + (item?.a||"")).toLowerCase();
-          const ok = q === "" ? true : text.includes(q);
-          box.style.display = ok ? "" : "none";
-          if(ok) shown++;
-        });
-
-        $("faqEmpty").style.display = shown === 0 ? "block" : "none";
-      };
-
-      input.addEventListener("input", apply);
-      apply();
-    }
-
-    /* ======================
-       Lightbox
-       ====================== */
+    // Lightbox
     (function(){
-      const lb = document.getElementById('lightbox');
-      const lbImg = document.getElementById('lbImg');
-      const lbTitle = document.getElementById('lbTitle');
-      const lbClose = document.getElementById('lbClose');
+      const lb = $("lightbox");
+      const lbImg = $("lbImg");
+      const lbTitle = $("lbTitle");
+      const lbClose = $("lbClose");
       if(!lb || !lbImg || !lbClose) return;
 
       const open = (src, title) => {
-        lb.classList.add('open');
-        lb.setAttribute('aria-hidden','false');
+        lb.classList.add("open");
+        lb.setAttribute("aria-hidden","false");
         lbImg.src = src;
-        lbImg.alt = title || 'תמונה';
-        lbTitle.textContent = title || 'תמונה';
-        document.body.style.overflow = 'hidden';
+        lbImg.alt = title || "תמונה";
+        lbTitle.textContent = title || "תמונה";
+        document.body.style.overflow = "hidden";
       };
+
       const close = () => {
-        lb.classList.remove('open');
-        lb.setAttribute('aria-hidden','true');
-        lbImg.src = '';
-        document.body.style.overflow = '';
+        lb.classList.remove("open");
+        lb.setAttribute("aria-hidden","true");
+        lbImg.src = "";
+        document.body.style.overflow = "";
       };
 
       document.addEventListener("click", (e) => {
@@ -2154,118 +1239,12 @@
         if(src) open(src, title);
       });
 
-      lbClose.addEventListener('click', close);
-      lb.addEventListener('click', (e) => { if(e.target === lb) close(); });
-      document.addEventListener('keydown', (e) => { if(e.key === 'Escape') close(); });
+      lbClose.addEventListener("click", close);
+      lb.addEventListener("click", (e) => { if(e.target === lb) close(); });
+      document.addEventListener("keydown", (e) => { if(e.key === "Escape") close(); });
     })();
 
-    /* ======================
-       Testimonials slider
-       ====================== */
-    function moveTestimonials(idx, instant=false){
-      const track = $("testiTrack");
-      const dots = Array.from(document.querySelectorAll(".dot"));
-      if(!track) return;
-
-      const cards = track.children.length;
-      if(cards === 0) return;
-
-      currentTestimonialsIndex = Math.max(0, Math.min(cards-1, idx));
-
-      const card = track.children[0];
-      const gap = 12;
-      const moveBy = (card.getBoundingClientRect().width + gap) * currentTestimonialsIndex;
-
-      track.style.transition = instant ? "none" : "transform .35s ease";
-      track.style.transform = `translateX(${moveBy}px)`;
-
-      dots.forEach((d, i) => d.classList.toggle("active", i === currentTestimonialsIndex));
-    }
-
-    function startTestimonialsAuto(items){
-      if(testimonialsTimer) clearInterval(testimonialsTimer);
-      if(!items || items.length <= 1) return;
-
-      testimonialsTimer = setInterval(() => {
-        const next = (currentTestimonialsIndex + 1) % items.length;
-        moveTestimonials(next);
-      }, 5200);
-    }
-
-    document.addEventListener("click", (e) => {
-      const d = e.target.closest(".dot");
-      if(d){
-        const idx = Number(d.getAttribute("data-dot"));
-        if(Number.isFinite(idx)) moveTestimonials(idx);
-      }
-    });
-
-    $("testiPrev")?.addEventListener("click", () => moveTestimonials(currentTestimonialsIndex - 1));
-    $("testiNext")?.addEventListener("click", () => moveTestimonials(currentTestimonialsIndex + 1));
-
-    /* ======================
-       Team view toggle
-       ====================== */
-    function setTeamMode(mode){
-      teamMode = mode;
-      $("teamGridBtn").classList.toggle("active", mode==="grid");
-      $("teamListBtn").classList.toggle("active", mode==="list");
-
-      if(window.__aboutLastData){
-        const members = (window.__aboutLastData.team?.members && Array.isArray(window.__aboutLastData.team.members))
-          ? window.__aboutLastData.team.members
-          : fallback.team.members;
-        renderTeam(members);
-        initReveal();
-      }
-    }
-
-    $("teamGridBtn")?.addEventListener("click", () => setTeamMode("grid"));
-    $("teamListBtn")?.addEventListener("click", () => setTeamMode("list"));
-
-    /* ======================
-       Scroll progress + to top
-       ====================== */
-    (function(){
-      const bar = $("scrollBar");
-      const toTop = $("toTop");
-
-      const onScroll = () => {
-        const h = document.documentElement;
-        const scrolled = h.scrollTop || document.body.scrollTop;
-        const max = (h.scrollHeight - h.clientHeight) || 1;
-        const pct = Math.max(0, Math.min(1, scrolled / max));
-        if(bar) bar.style.width = (pct * 100).toFixed(2) + "%";
-
-        if(toTop){
-          toTop.classList.toggle("show", scrolled > 800);
-        }
-      };
-
-      window.addEventListener("scroll", onScroll, { passive:true });
-      onScroll();
-    })();
-
-    /* ======================
-       Theme toggle icon sync (optional)
-       ====================== */
-    (function(){
-      const btn = $("theme-toggle");
-      if(!btn) return;
-
-      const sync = () => {
-        const isLight = document.documentElement.getAttribute("data-theme") === "light";
-        btn.textContent = isLight ? "☀️" : "🌙";
-      };
-
-      const mo = new MutationObserver(sync);
-      mo.observe(document.documentElement, { attributes:true, attributeFilter:["data-theme"] });
-      sync();
-    })();
-
-    /* ======================
-       Edit Mode (JSON) — ?edit=1
-       ====================== */
+    // Edit Mode (?edit=1)
     (function(){
       const params = new URLSearchParams(location.search);
       const enabled = params.has("edit");
@@ -2273,19 +1252,20 @@
       const modal = $("editModal");
       const area = $("editArea");
       const status = $("editStatus");
-
       if(!enabled || !fab || !modal || !area) return;
+
       fab.style.display = "inline-flex";
 
-      const ref = doc(db, "siteContent", "about");
+      const ref = doc(db, "siteContent", "aboutSimple");
+      const localKey = "aboutSimpleDraft";
 
-      const setStatus = (txt) => { if(status) status.textContent = txt; };
+      const setStatus = (t) => { if(status) status.textContent = t; };
 
       const open = () => {
         modal.classList.add("open");
         modal.setAttribute("aria-hidden","false");
         document.body.style.overflow = "hidden";
-        area.value = JSON.stringify(window.__aboutLastData || fallback, null, 2);
+        area.value = JSON.stringify(window.__aboutSimpleLast || fallback, null, 2);
         setStatus("מוכן.");
       };
 
@@ -2308,18 +1288,29 @@
         try{
           const parsed = JSON.parse(area.value);
           setStatus("שומר...");
-          await setDoc(ref, parsed); // ריפלייס מלא
-          window.__aboutLastData = parsed;
-          render(parsed);
-          setStatus("✅ נשמר! (Firestore עודכן)");
-        }catch(e){
-          console.error(e);
-          const msg = String(e?.message || e || "שגיאה");
-          if(msg.toLowerCase().includes("permission")){
-            setStatus("❌ אין הרשאה לשמור (Firestore rules).");
-          }else{
-            setStatus("❌ שגיאה בשמירה: " + msg);
+          // try firestore
+          try{
+            await setDoc(ref, parsed); // replace full
+            localStorage.removeItem(localKey);
+            window.__aboutSimpleLast = parsed;
+            render(parsed);
+            setStatus("✅ נשמר! (Firestore עודכן)");
+            return;
+          }catch(e){
+            // fallback local
+            localStorage.setItem(localKey, JSON.stringify(parsed));
+            window.__aboutSimpleLast = parsed;
+            render(parsed);
+            const msg = String(e?.message || e || "");
+            if(msg.toLowerCase().includes("permission")){
+              setStatus("⚠️ אין הרשאה ל-Firestore, נשמר מקומית (localStorage).");
+            }else{
+              setStatus("⚠️ נשמר מקומית (בעיה בשמירה ל-Firestore).");
+            }
+            return;
           }
+        }catch(e){
+          setStatus("❌ JSON לא תקין, לא שמרתי.");
         }
       };
 
@@ -2333,13 +1324,12 @@
       };
 
       const reset = () => {
-        area.value = JSON.stringify(window.__aboutLastData || fallback, null, 2);
+        area.value = JSON.stringify(window.__aboutSimpleLast || fallback, null, 2);
         setStatus("↩️ הוחזר.");
       };
 
       fab.addEventListener("click", open);
       $("editCloseTop")?.addEventListener("click", close);
-
       $("editValidate")?.addEventListener("click", validate);
       $("editSave")?.addEventListener("click", save);
       $("editCopy")?.addEventListener("click", copy);
@@ -2349,27 +1339,8 @@
       document.addEventListener("keydown", (e) => { if(e.key === "Escape" && modal.classList.contains("open")) close(); });
     })();
 
-    /* ======================
-       Load
-       ====================== */
-    async function boot(){
-      try{
-        const ref = doc(db, "siteContent", "about");
-        const snap = await getDoc(ref);
-        const data = snap.exists() ? snap.data() : fallback;
-        window.__aboutLastData = data;
-        render(data);
-      }catch(e){
-        console.error(e);
-        window.__aboutLastData = fallback;
-        render(fallback);
-      }
-    }
-
-    boot();
+    // boot
+    load();
   </script>
-
-  <script src="accessibility.js"></script>
-  <script type="module" src="app.js"></script>
 </body>
 </html>
