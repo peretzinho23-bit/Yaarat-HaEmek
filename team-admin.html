@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>אדמין – צוות מוביל (אודות)</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel: rgba(2,6,23,.70);
+      --panel2: rgba(15,23,42,.55);
+      --stroke: rgba(148,163,184,.22);
+      --txt:#f1f5f9;
+      --muted: rgba(226,232,240,.75);
+      --ok:#34d399;
+      --bad:#fb7185;
+      --radius:18px;
+    }
+    body{ background:var(--bg); color:var(--txt); font-family: system-ui, Arial; }
+    .wrap{ width:min(1100px, calc(100% - 24px)); margin: 18px auto 40px; }
+    .topbar{
+      display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;
+      margin-bottom: 12px;
+    }
+    h1{ margin:0; font-size: 1.25rem; }
+    .hint{ color:var(--muted); font-size: .92rem; line-height:1.6; }
+    .box{
+      background: var(--panel);
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+      padding: 14px;
+      margin-bottom: 12px;
+      box-shadow: 0 18px 55px rgba(0,0,0,.28);
+    }
+    .row{ display:grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media (max-width: 900px){ .row{ grid-template-columns: 1fr; } }
+
+    label{ display:block; font-weight: 900; margin: 10px 0 6px; }
+    input, textarea, button{
+      width:100%;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(148,163,184,.25);
+      background: var(--panel2);
+      color:var(--txt);
+      outline:none;
+    }
+    textarea{ min-height: 80px; resize: vertical; }
+    input::placeholder, textarea::placeholder{ color: rgba(226,232,240,.45); }
+
+    .btns{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+    .btn{ cursor:pointer; font-weight: 1000; }
+    .btn.primary{ background:#10b981; border-color: rgba(16,185,129,.85); color:#052e23; }
+    .btn.ghost{ background: transparent; }
+    .btn.danger{ background: rgba(239,68,68,.18); border-color: rgba(239,68,68,.35); }
+    .status{ margin-top: 10px; font-weight: 900; }
+    .ok{ color:var(--ok); }
+    .bad{ color:var(--bad); }
+
+    .members{
+      display:flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .card{
+      background: rgba(2,6,23,.55);
+      border: 1px solid rgba(148,163,184,.18);
+      border-radius: 16px;
+      padding: 12px;
+    }
+    .card-head{
+      display:flex; gap:10px; align-items:center; justify-content:space-between;
+      margin-bottom: 8px;
+    }
+    .drag{
+      cursor: grab;
+      user-select: none;
+      font-weight: 1000;
+      opacity: .85;
+      border:1px dashed rgba(148,163,184,.35);
+      border-radius: 12px;
+      padding: 8px 10px;
+      background: rgba(15,23,42,.35);
+      width: fit-content;
+    }
+    .actions{ display:flex; gap:8px; flex-wrap:wrap; }
+
+    .avatarPrev{
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+      margin-top: 8px;
+    }
+    .avatarPrev img{
+      width: 96px; height: 72px; object-fit: cover;
+      border-radius: 14px;
+      border: 1px solid rgba(148,163,184,.25);
+    }
+    .small{ font-size:.9rem; }
+    code{ background: rgba(2,6,23,.80); padding: 2px 8px; border-radius: 10px; border:1px solid rgba(148,163,184,.22); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <h1>אדמין – צוות מוביל (אודות)</h1>
+        <div class="hint">
+          נשמר ב־<code>siteContent/about</code> תחת <code>team</code> (Firestore).<br>
+          תמונות עולות ל־Storage ומקבלות <code>photoUrl</code>.
+        </div>
+      </div>
+      <div class="btns">
+        <button class="btn ghost" id="loadBtn">טען</button>
+        <button class="btn primary" id="saveBtn">שמור</button>
+        <button class="btn" id="addBtn">+ הוסף חבר צוות</button>
+      </div>
+    </div>
+
+    <div class="box">
+      <div class="row">
+        <div>
+          <label>כותרת</label>
+          <input id="teamTitle" placeholder="צוות מוביל" />
+        </div>
+        <div>
+          <label>תת כותרת</label>
+          <input id="teamSubtitle" placeholder="הצוות שמוביל את החטיבה קדימה..." />
+        </div>
+      </div>
+
+      <div class="status" id="status"></div>
+    </div>
+
+    <div class="box">
+      <h2 style="margin:0 0 8px;">חברי צוות</h2>
+      <div class="hint small">גרור כדי לשנות סדר. Tags מופרדים בפסיקים.</div>
+
+      <div class="members" id="members"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { db } from "./firebase-config.js";
+    import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-storage.js";
+
+    const storage = getStorage();
+
+    const $ = (id) => document.getElementById(id);
+    const statusEl = $("status");
+    const membersEl = $("members");
+
+    const show = (ok, msg) => {
+      statusEl.className = "status " + (ok ? "ok" : "bad");
+      statusEl.textContent = msg;
+    };
+
+    const esc = (s) => String(s ?? "")
+      .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+
+    let members = []; // in-memory
+
+    function makeMember(){
+      return { name:"", role:"", bio:"", initials:"", photoUrl:"", tags:[] };
+    }
+
+    function parseTags(s){
+      return String(s||"")
+        .split(",")
+        .map(x => x.trim())
+        .filter(Boolean)
+        .slice(0, 12);
+    }
+
+    async function uploadImage(file, pathPrefix="about/team"){
+      const safeName = `${Date.now()}_${file.name}`.replaceAll(" ", "_");
+      const r = ref(storage, `${pathPrefix}/${safeName}`);
+      await uploadBytes(r, file);
+      return await getDownloadURL(r);
+    }
+
+    function render(){
+      membersEl.innerHTML = members.map((m, idx) => `
+        <div class="card" draggable="true" data-idx="${idx}">
+          <div class="card-head">
+            <div class="drag" title="גרור לשינוי סדר">↕ גרור</div>
+            <div class="actions">
+              <button class="btn danger" type="button" data-del="${idx}">מחק</button>
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label>שם</label>
+              <input data-k="name" data-i="${idx}" value="${esc(m.name)}" placeholder="למשל: אורית" />
+            </div>
+            <div>
+              <label>תפקיד</label>
+              <input data-k="role" data-i="${idx}" value="${esc(m.role)}" placeholder="למשל: מנהלת החטיבה" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label>ראשי תיבות</label>
+              <input data-k="initials" data-i="${idx}" value="${esc(m.initials)}" placeholder="למשל: א" />
+              <div class="hint small">אם ריק — נלקח מהאות הראשונה של השם.</div>
+            </div>
+            <div>
+              <label>Tags (פסיקים)</label>
+              <input data-k="tags" data-i="${idx}" value="${esc((m.tags||[]).join(", "))}" placeholder="מנהיגות, אכפתיות, סדר" />
+            </div>
+          </div>
+
+          <label>תיאור</label>
+          <textarea data-k="bio" data-i="${idx}" placeholder="משפט קצר...">${esc(m.bio)}</textarea>
+
+          <label>תמונה (אופציונלי)</label>
+          <div class="row">
+            <div>
+              <input data-k="photoUrl" data-i="${idx}" value="${esc(m.photoUrl||"")}" placeholder="URL של תמונה" />
+            </div>
+            <div>
+              <input type="file" accept="image/*" data-upload="${idx}" />
+            </div>
+          </div>
+
+          <div class="avatarPrev" id="prev-${idx}">
+            ${m.photoUrl ? `<img src="${esc(m.photoUrl)}" alt="">` : ""}
+            ${m.photoUrl ? `<div class="hint small">photoUrl שמור ✅</div>` : `<div class="hint small">אפשר להשאיר בלי תמונה — יוצג עיגול עם אות.</div>`}
+          </div>
+        </div>
+      `).join("");
+
+      wireInputs();
+      wireDeletes();
+      wireUploads();
+      wireDnD();
+    }
+
+    function wireInputs(){
+      membersEl.querySelectorAll("[data-k]").forEach(el => {
+        el.addEventListener("input", () => {
+          const i = Number(el.getAttribute("data-i"));
+          const k = el.getAttribute("data-k");
+          if(!Number.isFinite(i) || !members[i]) return;
+
+          if(k === "tags"){
+            members[i].tags = parseTags(el.value);
+          }else{
+            members[i][k] = el.value;
+          }
+        });
+      });
+    }
+
+    function wireDeletes(){
+      membersEl.querySelectorAll("[data-del]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const i = Number(btn.getAttribute("data-del"));
+          if(!Number.isFinite(i)) return;
+          members.splice(i, 1);
+          render();
+        });
+      });
+    }
+
+    function wireUploads(){
+      membersEl.querySelectorAll("[data-upload]").forEach(inp => {
+        inp.addEventListener("change", async () => {
+          const idx = Number(inp.getAttribute("data-upload"));
+          const file = inp.files?.[0];
+          if(!file || !members[idx]) return;
+
+          show(true, "מעלה תמונה...");
+          try{
+            const url = await uploadImage(file, "about/team");
+            members[idx].photoUrl = url;
+            show(true, "תמונה עלתה ✅ (אל תשכח לשמור)");
+            render();
+          }catch(e){
+            console.error(e);
+            show(false, "שגיאה בהעלאה (בדוק Storage Rules)");
+          }finally{
+            inp.value = "";
+          }
+        });
+      });
+    }
+
+    // Drag & Drop reorder
+    function wireDnD(){
+      const cards = Array.from(membersEl.querySelectorAll(".card"));
+      let dragFrom = null;
+
+      cards.forEach(card => {
+        card.addEventListener("dragstart", (e) => {
+          dragFrom = Number(card.dataset.idx);
+          e.dataTransfer.effectAllowed = "move";
+          card.style.opacity = "0.75";
+        });
+
+        card.addEventListener("dragend", () => {
+          card.style.opacity = "";
+        });
+
+        card.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = "move";
+        });
+
+        card.addEventListener("drop", (e) => {
+          e.preventDefault();
+          const to = Number(card.dataset.idx);
+          if(!Number.isFinite(dragFrom) || !Number.isFinite(to) || dragFrom === to) return;
+
+          const item = members.splice(dragFrom, 1)[0];
+          members.splice(to, 0, item);
+          render();
+        });
+      });
+    }
+
+    async function loadData(){
+      try{
+        const refDoc = doc(db, "siteContent", "about");
+        const snap = await getDoc(refDoc);
+        const data = snap.exists() ? (snap.data() || {}) : {};
+
+        $("teamTitle").value = data.team?.title ?? "";
+        $("teamSubtitle").value = data.team?.subtitle ?? "";
+
+        const arr = data.team?.members;
+        members = Array.isArray(arr) ? arr : [];
+
+        if(members.length === 0){
+          members = [
+            { name:"אורית", role:"מנהלת החטיבה", bio:"מובילה מצוינות + יחס אישי.", initials:"א", photoUrl:"", tags:["מנהיגות","אכפתיות"] },
+            { name:"דני", role:"רכז שכבה", bio:"שומר על שגרה חדה ועוזר לתלמידים.", initials:"ד", photoUrl:"", tags:["סדר","ליווי"] },
+          ];
+        }
+
+        render();
+        show(true, snap.exists() ? "נטען ✅" : "אין נתונים עדיין — תערוך ותשמור");
+      }catch(e){
+        console.error(e);
+        show(false, "שגיאה בטעינה (בדוק firebase-config / Firestore rules)");
+      }
+    }
+
+    async function saveData(){
+      try{
+        // ניקוי קל
+        const cleanMembers = members.map(m => ({
+          name: String(m.name||"").trim(),
+          role: String(m.role||"").trim(),
+          bio: String(m.bio||"").trim(),
+          initials: String(m.initials||"").trim(),
+          photoUrl: String(m.photoUrl||"").trim(),
+          tags: Array.isArray(m.tags) ? m.tags.map(x => String(x||"").trim()).filter(Boolean) : []
+        })).filter(m => m.name || m.role || m.bio || m.photoUrl);
+
+        const payload = {
+          team: {
+            title: $("teamTitle").value.trim(),
+            subtitle: $("teamSubtitle").value.trim(),
+            members: cleanMembers
+          },
+          updatedAt: Date.now()
+        };
+
+        await setDoc(doc(db, "siteContent", "about"), payload, { merge: true });
+        show(true, "נשמר ✅ תפתח about.html ותראה שינוי");
+      }catch(e){
+        console.error(e);
+        show(false, "שגיאה בשמירה (בדוק Firestore rules)");
+      }
+    }
+
+    $("loadBtn").addEventListener("click", loadData);
+    $("saveBtn").addEventListener("click", saveData);
+
+    $("addBtn").addEventListener("click", () => {
+      members.unshift(makeMember());
+      render();
+    });
+
+    loadData();
+  </script>
+</body>
+</html>
