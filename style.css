@@ -3515,23 +3515,3 @@ body[data-page="announcements"] .nav-center{
 body[data-page="announcements"] .nav-side{
   position: static !important;
 }
-.ann-card {
-  max-width: 820px;
-  margin: 0 auto 28px;
-  padding: 22px 24px;
-  border-radius: 22px;
-}
-
-.ann-title {
-  font-size: 1.35rem;
-}
-
-.ann-body {
-  font-size: 1rem;
-  line-height: 1.7;
-}
-
-.ann-image img {
-  width: 100%;
-  border-radius: 16px;
-}
