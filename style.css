@@ -3497,3 +3497,41 @@ html[data-theme="dark"] .ann-date{
 body[data-page]:not([data-page="home"]) header.header-main:not([data-static-header]){
   display:none;
 }
+/* ===============================
+   FIX: prevent double centered nav
+   on inner pages (announcements)
+   =============================== */
+
+body[data-page="announcements"] .nav.nav-centered{
+  align-items: center;
+  justify-content: space-between;
+}
+
+body[data-page="announcements"] .nav-center{
+  position: static !important;
+  transform: none !important;
+}
+
+body[data-page="announcements"] .nav-side{
+  position: static !important;
+}
+.ann-card {
+  max-width: 820px;
+  margin: 0 auto 28px;
+  padding: 22px 24px;
+  border-radius: 22px;
+}
+
+.ann-title {
+  font-size: 1.35rem;
+}
+
+.ann-body {
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.ann-image img {
+  width: 100%;
+  border-radius: 16px;
+}
