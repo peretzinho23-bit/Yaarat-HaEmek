@@ -696,7 +696,7 @@
           <button class="chip-btn" data-filter="hot" type="button">חשוב</button>
           <button class="chip-btn" data-filter="sec" type="button">אבטחה</button>
           <button class="chip-btn" data-filter="content" type="button">תוכן</button>
-          <button class="chip-btn" data-filter="danger" type="button">מסוכן</button>
+          <button class="chip-btn" data-filter="danger" type="button">לוג</button>
         </div>
 
         <div class="stats-row reveal" id="statsRow"></div>
@@ -771,7 +771,7 @@
       { title:"עריכת מלל בדף האודות", desc:"העורך נפתח רק עם edit=1 ומנסה לשמור ל-Firestore.", href:"about.html?edit=1", icon:"✏️", chip:{text:"תוכן", cls:"chip-ai"}, group:"content", keywords:"אודות about edit content מלל" },
       { title:"ניהול משתמשי Admin", desc:"עמוד הרשאות / משתמשי אדמין (רשאות).", href:"admin.html", icon:"👤", chip:{text:"אבטחה", cls:"chip-sec"}, group:"sec", keywords:"admin משתמשים הרשאות users" },
       { title:"דף האדמין הראשי", desc:"מרכז האדמין הקיים (עוד כלים).", href:"admin.html", icon:"🧩", chip:{text:"מרכז", cls:""}, group:"all", keywords:"admin פאנל ניהול panel" },
-      { title:"יומן שינויים", desc:"מעקב מה השתנה באתר ומתי.", href:"logs.html", icon:"🧾", chip:{text:"מסוכן", cls:"chip-danger"}, group:"danger", keywords:"לוגים logs שינויים audit" }
+      { title:"יומן שינויים", desc:"מעקב מה השתנה באתר ומתי.", href:"logs.html", icon:"🧾", chip:{text:"לוגים", cls:"chip-danger"}, group:"danger", keywords:"לוגים logs שינויים audit" }
     ];
 
     /* =========================
@@ -810,7 +810,7 @@
        ========================= */
     function card(app){
       const chip = app.chip ? `<span class="app-chip ${app.chip.cls||""}">${app.chip.text||""}</span>` : "";
-      const dangerFlag = (app.group === "danger") ? `<span class="app-chip chip-danger">⚠️ מסוכן</span>` : "";
+      const dangerFlag = (app.group === "danger") ? `<span class="app-chip chip-danger">⚠️ לוגים</span>` : "";
 
       return `
         <article class="app-card reveal" data-k="${(app.keywords||"").toLowerCase()}" data-group="${app.group||"all"}">
@@ -855,7 +855,7 @@
         <div class="stat"><div class="label">סה״כ קיצורים</div><div class="value">${total}</div><div class="note">כלים בדף הזה</div></div>
         <div class="stat"><div class="label">חשוב</div><div class="value">${hot}</div><div class="note">דברים שמשנים יום-יום</div></div>
         <div class="stat"><div class="label">אבטחה</div><div class="value">${sec}</div><div class="note">הרשאות / Admin</div></div>
-        <div class="stat"><div class="label">מסוכן</div><div class="value">${danger}</div><div class="note">תבדוק פעמיים לפני</div></div>
+        <div class="stat"><div class="label">לוגים</div><div class="value">${danger}</div><div class="note">תבדוק פעמיים לפני</div></div>
       `;
     }
 
