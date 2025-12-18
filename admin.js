@@ -595,6 +595,21 @@ function setupNewsForms() {
     });
   }
 }
+const imgInput = document.getElementById("ann-image");
+const preview = document.getElementById("ann-preview");
+
+if (imgInput && preview) {
+  imgInput.addEventListener("input", () => {
+    const url = imgInput.value.trim();
+    if (!url) {
+      preview.hidden = true;
+      preview.innerHTML = "";
+      return;
+    }
+    preview.hidden = false;
+    preview.innerHTML = `<img src="${url}" alt="">`;
+  });
+}
 
 
 /* ------------ EXAMS ------------ */

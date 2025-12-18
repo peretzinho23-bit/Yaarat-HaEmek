@@ -3420,3 +3420,80 @@ html, body, .grade-card, .card, header, .section-light, .section-dark-strong{
   background: rgba(255,255,255,.92);
   box-shadow: 0 12px 28px rgba(15,23,42,.08);
 }
+/* =========================
+   ANNOUNCEMENTS – PREMIUM UI
+   ========================= */
+
+.ann-card{
+  position: relative;
+  overflow: hidden;
+  border-radius: 22px;
+  padding: 18px 18px 20px;
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.96),
+    rgba(248,250,252,0.96)
+  );
+  border: 1px solid rgba(148,163,184,.35);
+  box-shadow: 0 18px 40px rgba(15,23,42,.08);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.ann-card:hover{
+  transform: translateY(-3px);
+  box-shadow: 0 28px 60px rgba(15,23,42,.14);
+}
+
+html[data-theme="dark"] .ann-card{
+  background: linear-gradient(
+    180deg,
+    rgba(2,6,23,.85),
+    rgba(15,23,42,.85)
+  );
+  border-color: rgba(148,163,184,.25);
+}
+
+.ann-date{
+  display:inline-block;
+  margin-bottom:8px;
+  font-size:.78rem;
+  font-weight:700;
+  letter-spacing:.3px;
+  padding:4px 10px;
+  border-radius:999px;
+  background: rgba(37,99,235,.12);
+  color:#1d4ed8;
+}
+
+html[data-theme="dark"] .ann-date{
+  background: rgba(56,189,248,.18);
+  color:#bae6fd;
+}
+
+.ann-title{
+  font-size:1.15rem;
+  font-weight:800;
+  margin-bottom:6px;
+}
+
+.ann-image{
+  margin:10px 0 12px;
+  border-radius:16px;
+  overflow:hidden;
+}
+
+.ann-image img{
+  width:100%;
+  height:auto;
+  display:block;
+}
+
+.ann-body{
+  font-size:.95rem;
+  line-height:1.6;
+  opacity:.9;
+}
+/* 🛡️ Prevent duplicated header rendering on inner pages */
+body[data-page]:not([data-page="home"]) header.header-main:not([data-static-header]){
+  display:none;
+}

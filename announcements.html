@@ -1,45 +1,164 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>הודעות הנהלה – חטיבת הנעורים יערת העמק</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- SEO בסיסי -->
+  <meta name="description" content="הודעות הנהלה ועדכונים רשמיים מחטיבת הנעורים יערת העמק." />
+
+  <!-- עיצוב ראשי -->
+  <link rel="stylesheet" href="style.css" />
 </head>
 
-<body>
+<body data-page="announcements">
 
-<header class="header-main">
-  <!-- אפשר להעתיק את אותו HEADER מהאינדקס -->
-</header>
+  <!-- ================= HEADER ================= -->
+<header class="header-main" data-static-header>
+    <div class="container">
+      <nav class="nav nav-centered" aria-label="ניווט ראשי">
 
-<section class="section-light">
-  <div class="container">
-    <div class="section-header">
-      <h1 class="section-title">הודעות הנהלה</h1>
-      <p class="section-subtitle">
-        הודעות רשמיות ועדכונים חשובים מטעם הנהלת בית הספר.
-      </p>
+        <!-- ימין -->
+        <div class="nav-side nav-right-links">
+          <a href="index.html#home-news">חדשות</a>
+          <a href="index.html#home-exams">מבחנים</a>
+          <a href="index.html#grades">השכבות</a>
+          <a href="polls.html">סקרים</a>
+          <a href="about.html">אודות</a>
+        </div>
+
+        <!-- מרכז -->
+        <div class="nav-center">
+          <a href="index.html" class="logo-circle" aria-label="דף הבית">
+            <img
+              src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png"
+              alt="סמל יערת העמק"
+              class="logo-img"
+            />
+          </a>
+        </div>
+
+        <!-- שמאל -->
+        <div class="nav-side nav-left-links">
+          <a href="index.html#contact">יצירת קשר</a>
+          <a href="redirect-edu.html" class="personal-btn">למרחב האישי</a>
+          <a href="admin.html" class="btn-outline">Admin</a>
+        </div>
+
+        <!-- Dark / Light -->
+        <button
+          id="theme-toggle"
+          class="theme-toggle-btn"
+          type="button"
+          aria-label="מצב כהה / בהיר"
+        >
+          🌙
+        </button>
+
+        <!-- מובייל -->
+        <button
+          class="nav-toggle"
+          id="nav-toggle"
+          type="button"
+          aria-label="פתח תפריט"
+          aria-expanded="false"
+          aria-controls="nav-mobile"
+        >
+          <span></span><span></span><span></span>
+        </button>
+
+        <div class="nav-mobile" id="nav-mobile" aria-hidden="true">
+          <a href="index.html#home-news">חדשות</a>
+          <a href="index.html#home-exams">מבחנים</a>
+          <a href="index.html#grades">השכבות</a>
+          <a href="polls.html">סקרים</a>
+          <a href="about.html">אודות</a>
+          <a href="index.html#contact">יצירת קשר</a>
+          <a href="redirect-edu.html" class="personal-btn">למרחב האישי</a>
+          <a href="admin.html" class="btn-outline">Admin</a>
+        </div>
+
+      </nav>
     </div>
-<div id="announcements-list" class="home-grid"></div>
+  </header>
 
-    <div class="home-grid">
-      <div class="grade-card">
-        <h3>אין הודעות כרגע</h3>
-        <p style="font-size:0.9rem;">
-          כאשר תפורסם הודעה רשמית – היא תופיע כאן.
+  <!-- ================= HERO קטן ================= -->
+  <section class="section-dark-strong">
+    <div class="container">
+      <div class="section-header">
+        <h1 class="section-title">הודעות הנהלה</h1>
+        <p class="section-subtitle">
+          הודעות רשמיות, עדכונים חשובים ומידע מטעם הנהלת בית הספר.
         </p>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<footer>
-  <div class="container">
-    <p>© כל הזכויות שמורות לבית ספר יערת העמק</p>
-  </div>
-</footer>
-<script type="module" src="announcements.js"></script>
+  <!-- ================= תוכן ================= -->
+  <section class="section-light reveal-on-scroll">
+    <div class="container">
+
+      <!-- ההודעות נטענות לפה -->
+      <div id="announcements-list" class="home-grid"></div>
+
+      <!-- fallback אם JS לא נטען -->
+      <noscript>
+        <div class="home-grid">
+          <div class="grade-card">
+            <h3>לא ניתן לטעון הודעות</h3>
+            <p style="font-size:0.9rem;">
+              יש להפעיל JavaScript כדי לצפות בהודעות ההנהלה.
+            </p>
+          </div>
+        </div>
+      </noscript>
+
+    </div>
+  </section>
+
+  <!-- ================= FOOTER ================= -->
+  <footer>
+    <div class="container">
+      <p>© כל הזכויות שמורות לבית ספר יערת העמק</p>
+    </div>
+  </footer>
+
+  <!-- ================= סקריפטים ================= -->
+
+  <!-- תפריט מובייל + דארק מוד (אותו קוד כמו באינדקס) -->
+  <script>
+    (function () {
+      const btn = document.getElementById("nav-toggle");
+      const menu = document.getElementById("nav-mobile");
+      if (!btn || !menu) return;
+
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const isOpen = menu.classList.toggle("open");
+        btn.setAttribute("aria-expanded", String(isOpen));
+        menu.setAttribute("aria-hidden", String(!isOpen));
+      });
+
+      menu.querySelectorAll("a").forEach((a) => {
+        a.addEventListener("click", () => {
+          menu.classList.remove("open");
+          btn.setAttribute("aria-expanded", "false");
+          menu.setAttribute("aria-hidden", "true");
+        });
+      });
+
+      document.addEventListener("click", (e) => {
+        if (menu.contains(e.target) || btn.contains(e.target)) return;
+        menu.classList.remove("open");
+        btn.setAttribute("aria-expanded", "false");
+        menu.setAttribute("aria-hidden", "true");
+      });
+    })();
+  </script>
+
+  <!-- טעינת הודעות -->
+  <script type="module" src="announcements.js"></script>
 
 </body>
 </html>
