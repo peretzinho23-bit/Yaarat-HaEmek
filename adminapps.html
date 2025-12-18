@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Apps – יערת העמק</title>
+  <link rel="icon" href="logo.png" />
+  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    /* =========================
+       THEME TOKENS (FIXED)
+       ========================= */
+    :root{
+      /* base */
+      --r1: 26px; --r2: 18px;
+      --shadow: 0 26px 80px rgba(0,0,0,.45);
+      --shadow2: 0 16px 44px rgba(0,0,0,.28);
+      --focus: 0 0 0 4px rgba(56,189,248,.22);
+
+      /* accents */
+      --green:#10b981;
+      --blue:#38bdf8;
+      --amber:#fbbf24;
+      --red:#fb7185;
+
+      /* dark defaults */
+      --bg1:#020617; --bg2:#000;
+      --txt: rgba(241,245,249,.95);
+      --muted: rgba(226,232,240,.72);
+      --muted2: rgba(148,163,184,.75);
+      --card: rgba(15, 23, 42, .86);
+      --card2: rgba(15,23,42,.78);
+      --stroke: rgba(148,163,184,.42);
+      --stroke2: rgba(148,163,184,.30);
+      --glass: rgba(2,6,23,.22);
+      --glass2: rgba(2,6,23,.16);
+      --chipBg: rgba(2,6,23,.18);
+      --chipBorder: rgba(148,163,184,.30);
+    }
+
+    html[data-theme="light"]{
+      --bg1:#ffffff; --bg2:#dde7fb;
+      --txt:#0f172a;
+      --muted:#475569;
+      --muted2:#64748b;
+      --card: rgba(255,255,255,.96);
+      --card2: rgba(255,255,255,.96);
+      --stroke: rgba(148,163,184,.45);
+      --stroke2: rgba(148,163,184,.45);
+      --glass: rgba(255,255,255,.92);
+      --glass2: rgba(255,255,255,.92);
+      --chipBg: rgba(2,6,23,.03);
+      --chipBorder: rgba(148,163,184,.45);
+      --shadow: 0 18px 45px rgba(15,23,42,.10);
+      --shadow2: 0 14px 32px rgba(15,23,42,.08);
+      --focus: 0 0 0 4px rgba(59,130,246,.18);
+    }
+
+    /* page background */
+    body[data-page="adminaps"]{
+      background:
+        radial-gradient(circle at 70% -10%, rgba(56,189,248,.20), transparent 55%),
+        radial-gradient(circle at 12% 12%, rgba(96,165,250,.12), transparent 55%),
+        radial-gradient(circle at 92% 92%, rgba(16,185,129,.12), transparent 60%),
+        radial-gradient(circle at top, #1f2937 0, var(--bg1) 55%, var(--bg2) 100%);
+      color: var(--txt);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: geometricPrecision;
+    }
+    html[data-theme="light"] body[data-page="adminaps"]{
+      background:
+        radial-gradient(circle at 70% -10%, rgba(56,189,248,.14), transparent 55%),
+        radial-gradient(circle at 12% 12%, rgba(96,165,250,.10), transparent 55%),
+        radial-gradient(circle at 92% 92%, rgba(16,185,129,.10), transparent 60%),
+        radial-gradient(circle at top, #ffffff 0, #e5efff 45%, #dde7fb 100%);
+      color: var(--txt);
+    }
+
+    a:focus-visible, button:focus-visible, input:focus-visible{
+      outline:none; box-shadow: var(--focus); border-radius: 14px;
+    }
+
+    .adminaps-wrap{ padding-top: 92px; min-height: 100vh; }
+    .adminaps-container{ max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+
+    /* ===== reveal ===== */
+    .reveal{
+      opacity:0;
+      transform: translateY(10px);
+      filter: blur(7px);
+      transition: opacity .7s cubic-bezier(.2,.8,.2,1),
+                  transform .7s cubic-bezier(.2,.8,.2,1),
+                  filter .7s cubic-bezier(.2,.8,.2,1);
+      will-change: transform, opacity, filter;
+    }
+    .reveal.in{ opacity:1; transform:none; filter:none; }
+
+    /* ===== HERO ===== */
+    .adminaps-hero{
+      border-radius: var(--r1);
+      padding: 18px 18px 16px;
+      background:
+        radial-gradient(circle at 85% 10%, rgba(56,189,248,.18), transparent 55%),
+        radial-gradient(circle at 10% 90%, rgba(16,185,129,.14), transparent 60%),
+        var(--card);
+      border: 1px solid var(--stroke);
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+    .adminaps-hero::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background: radial-gradient(circle at 30% 0%, rgba(251,191,36,.09), transparent 55%);
+      pointer-events:none;
+    }
+    .adminaps-hero::after{
+      content:"";
+      position:absolute;
+      width: 420px; height: 420px;
+      right: -210px; top: -210px;
+      background: radial-gradient(circle, rgba(56,189,248,.18), transparent 60%);
+      filter: blur(6px);
+      pointer-events:none;
+    }
+
+    .adminaps-badge{
+      display:inline-flex; align-items:center; gap:10px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(56,189,248,.55);
+      background: rgba(56,189,248,.10);
+      color: rgba(219,234,254,.95);
+      font-weight: 950;
+      font-size: .86rem;
+      margin-bottom: 10px;
+      white-space: nowrap;
+    }
+    html[data-theme="light"] .adminaps-badge{
+      color: var(--txt);
+      background: rgba(59,130,246,.08);
+      border-color: rgba(59,130,246,.30);
+    }
+
+    .adminaps-title{
+      margin: 0;
+      font-size: 2.05rem;
+      font-weight: 950;
+      line-height: 1.12;
+      letter-spacing: .2px;
+      text-shadow: 0 0 24px rgba(56,189,248,.12);
+    }
+
+    .adminaps-sub{
+      margin: 10px 0 0;
+      color: var(--muted);
+      line-height: 1.75;
+      max-width: 920px;
+      font-weight: 750;
+      font-size: .98rem;
+    }
+
+    .adminaps-toolbar{
+      margin-top: 14px;
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+    .adminaps-search{
+      flex: 1;
+      min-width: 240px;
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      border-radius: 999px;
+      border: 1px solid var(--stroke2);
+      background: var(--glass);
+      padding: 10px 12px;
+      box-shadow: var(--shadow2);
+    }
+    .adminaps-search .ico{ font-size: 1rem; opacity:.95; }
+    .adminaps-search input{
+      width: 100%;
+      border: none;
+      background: transparent;
+      color: var(--txt);
+      outline:none;
+      font-weight: 850;
+      font-size: .95rem;
+    }
+    .adminaps-search input::placeholder{ color: var(--muted2); }
+
+    .adminaps-actions{ display:flex; gap: 8px; flex-wrap: wrap; }
+
+    .adminaps-btn{
+      border-radius: 999px;
+      padding: 10px 12px;
+      border: 1px solid var(--stroke2);
+      background: rgba(15,23,42,.55);
+      color: var(--txt);
+      font-weight: 950;
+      cursor:pointer;
+      transition: transform .15s ease, border-color .15s ease, background .15s ease, box-shadow .15s ease;
+      box-shadow: var(--shadow2);
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+    }
+    html[data-theme="light"] .adminaps-btn{ background: var(--card); }
+    .adminaps-btn:hover{ transform: translateY(-1px); border-color: rgba(191,219,254,.28); background: rgba(15,23,42,.72); }
+    html[data-theme="light"] .adminaps-btn:hover{ background: rgba(255,255,255,1); border-color: rgba(59,130,246,.18); }
+
+    .adminaps-btn.primary{
+      background: var(--green);
+      border-color: rgba(16,185,129,.85);
+      color:#052e23;
+    }
+    html[data-theme="light"] .adminaps-btn.primary{ color:#053f2f; }
+
+    /* ===== Stats row ===== */
+    .stats-row{
+      margin-top: 14px;
+      display:grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+    @media (max-width: 900px){ .stats-row{ grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 520px){ .stats-row{ grid-template-columns: 1fr; } }
+
+    .stat{
+      border-radius: 18px;
+      padding: 12px 12px;
+      background:
+        radial-gradient(circle at top, rgba(59,130,246,.18), transparent 55%),
+        var(--card2);
+      border: 1px solid var(--stroke2);
+      box-shadow: var(--shadow2);
+    }
+    .stat .label{ color: rgba(191,219,254,.9); font-weight: 950; font-size: .8rem; }
+    html[data-theme="light"] .stat .label{ color:#1d4ed8; }
+    .stat .value{ font-weight: 950; font-size: 1.5rem; margin-top: 2px; letter-spacing:.2px; }
+    .stat .note{ color: var(--muted2); font-weight: 850; font-size: .82rem; margin-top: 4px; }
+
+    /* ===== Filters chips ===== */
+    .filters{
+      margin-top: 12px;
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .chip-btn{
+      border-radius: 999px;
+      padding: 8px 12px;
+      border: 1px solid var(--chipBorder);
+      background: var(--chipBg);
+      color: var(--txt);
+      font-weight: 950;
+      cursor:pointer;
+      transition: transform .14s ease, border-color .14s ease, background .14s ease;
+      user-select:none;
+    }
+    .chip-btn:hover{ transform: translateY(-1px); border-color: rgba(191,219,254,.28); background: rgba(15,23,42,.55); }
+    html[data-theme="light"] .chip-btn:hover{ background: rgba(255,255,255,1); border-color: rgba(59,130,246,.18); }
+    .chip-btn.active{
+      background: rgba(56,189,248,.14);
+      border-color: rgba(56,189,248,.32);
+      color: rgba(219,234,254,.95);
+    }
+    html[data-theme="light"] .chip-btn.active{
+      background: rgba(59,130,246,.12);
+      border-color: rgba(59,130,246,.28);
+      color: #0f172a;
+    }
+
+    /* ===== Grid ===== */
+    .adminaps-grid{
+      margin: 16px 0 32px;
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+    @media (max-width: 980px){ .adminaps-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 640px){ .adminaps-grid{ grid-template-columns: 1fr; } }
+
+    .app-card{
+      border-radius: var(--r2);
+      padding: 14px 14px 12px;
+      background: var(--card2);
+      border: 1px solid var(--stroke2);
+      box-shadow: var(--shadow2);
+      position: relative;
+      overflow: hidden;
+      transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease, background .16s ease;
+      min-height: 130px;
+    }
+    .app-card::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(56,189,248,.16), transparent 55%),
+        radial-gradient(circle at 90% 90%, rgba(16,185,129,.12), transparent 60%);
+      opacity:.9;
+      pointer-events:none;
+    }
+    .app-card:hover{
+      transform: translateY(-2px);
+      border-color: rgba(191,219,254,.28);
+      box-shadow: 0 22px 60px rgba(0,0,0,.34);
+      background: rgba(15,23,42,.86);
+    }
+    html[data-theme="light"] .app-card:hover{
+      background: rgba(255,255,255,1);
+      box-shadow: 0 20px 55px rgba(15,23,42,.12);
+      border-color: rgba(59,130,246,.18);
+    }
+
+    .app-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .app-ico{
+      width: 46px; height: 46px;
+      border-radius: 14px;
+      display:flex; align-items:center; justify-content:center;
+      background: var(--glass2);
+      border: 1px solid var(--stroke2);
+      font-size: 1.3rem;
+      box-shadow: 0 14px 34px rgba(0,0,0,.22);
+      flex: 0 0 auto;
+    }
+
+    .app-meta{ flex:1; min-width:0; }
+    .app-title{
+      margin: 0;
+      font-weight: 950;
+      font-size: 1.02rem;
+      letter-spacing: .2px;
+      line-height: 1.25;
+      color: var(--txt);
+    }
+    .app-desc{
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-weight: 750;
+      font-size: .9rem;
+      line-height: 1.6;
+    }
+
+    .app-chip{
+      position: relative;
+      z-index: 1;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: .78rem;
+      font-weight: 950;
+      white-space: nowrap;
+      border: 1px solid var(--chipBorder);
+      background: var(--chipBg);
+      color: var(--txt);
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+    }
+    .chip-hot{ border-color: rgba(16,185,129,.35); background: rgba(16,185,129,.10); color: rgba(167,243,208,.95); }
+    .chip-ai{ border-color: rgba(56,189,248,.35); background: rgba(56,189,248,.12); color: rgba(219,234,254,.95); }
+    .chip-sec{ border-color: rgba(251,191,36,.35); background: rgba(251,191,36,.10); color: rgba(254,243,199,.95); }
+    .chip-danger{ border-color: rgba(251,113,133,.40); background: rgba(251,113,133,.12); color: rgba(255,228,230,.95); }
+
+    .app-actions{
+      margin-top: 10px;
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+
+    .app-link{
+      flex: 1;
+      min-width: 150px;
+      border-radius: 14px;
+      padding: 10px 12px;
+      text-decoration:none;
+      font-weight: 950;
+      border: 1px solid var(--stroke2);
+      background: var(--glass);
+      color: var(--txt);
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      transition: transform .15s ease, border-color .15s ease, background .15s ease, box-shadow .15s ease;
+    }
+    .app-link:hover{
+      transform: translateY(-1px);
+      border-color: rgba(191,219,254,.28);
+      background: rgba(15,23,42,.55);
+      box-shadow: 0 14px 32px rgba(0,0,0,.22);
+    }
+    html[data-theme="light"] .app-link:hover{
+      background: rgba(255,255,255,1);
+      border-color: rgba(59,130,246,.18);
+      box-shadow: 0 14px 32px rgba(15,23,42,.10);
+    }
+    .app-link .go{ opacity:.95; }
+
+    .mini-btn{
+      border-radius: 14px;
+      padding: 10px 12px;
+      border: 1px solid var(--stroke2);
+      background: var(--glass2);
+      color: var(--txt);
+      cursor:pointer;
+      font-weight: 950;
+      transition: transform .15s ease, border-color .15s ease, background .15s ease, box-shadow .15s ease;
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+    }
+    .mini-btn:hover{
+      transform: translateY(-1px);
+      border-color: rgba(191,219,254,.28);
+      background: rgba(15,23,42,.55);
+      box-shadow: 0 14px 32px rgba(0,0,0,.18);
+    }
+    html[data-theme="light"] .mini-btn:hover{
+      background: rgba(255,255,255,1);
+      border-color: rgba(59,130,246,.18);
+      box-shadow: 0 14px 32px rgba(15,23,42,.10);
+    }
+
+    .adminaps-foot{
+      margin-top: 10px;
+      color: var(--muted2);
+      font-weight: 800;
+      font-size: .86rem;
+      line-height: 1.7;
+    }
+
+    /* ===== Toast ===== */
+    .toast{
+      position: fixed;
+      left: 16px;
+      bottom: 16px;
+      z-index: 9999;
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: opacity .18s ease, transform .18s ease;
+      border-radius: 16px;
+      padding: 10px 12px;
+      background: var(--card2);
+      border: 1px solid var(--stroke2);
+      color: var(--txt);
+      box-shadow: var(--shadow2);
+      font-weight: 950;
+    }
+    .toast.show{ opacity: 1; transform: none; }
+
+    /* =========================
+       PIN GATE (1992)
+       ========================= */
+    .pin-gate{
+      position: fixed;
+      inset: 0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 16px;
+      background: rgba(0,0,0,.62);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 99999;
+    }
+    .pin-gate.open{ display:flex; }
+
+    .pin-card{
+      width: min(560px, 96vw);
+      border-radius: 22px;
+      border: 1px solid rgba(148,163,184,.22);
+      background: rgba(2,6,23,.82);
+      box-shadow: 0 34px 120px rgba(0,0,0,.55);
+      overflow:hidden;
+      position: relative;
+    }
+    html[data-theme="light"] .pin-card{
+      background: rgba(255,255,255,.98);
+      border-color: rgba(148,163,184,.45);
+      box-shadow: 0 28px 90px rgba(15,23,42,.18);
+    }
+
+    .pin-top{
+      padding: 14px 14px 10px;
+      border-bottom: 1px solid rgba(148,163,184,.18);
+      display:flex;
+      align-items:flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    html[data-theme="light"] .pin-top{ border-bottom-color: rgba(148,163,184,.35); }
+
+    .pin-title{
+      font-weight: 950;
+      font-size: 1.05rem;
+      color: var(--txt);
+      margin: 0;
+    }
+    .pin-sub{
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-weight: 850;
+      line-height: 1.65;
+      font-size: .92rem;
+    }
+
+    .pin-body{ padding: 14px; display:grid; gap: 10px; }
+
+    .pin-row{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items:center;
+    }
+
+    .pin-input{
+      flex: 1;
+      min-width: 220px;
+      border-radius: 16px;
+      border: 1px solid var(--stroke2);
+      background: var(--glass);
+      color: var(--txt);
+      padding: 12px 12px;
+      font-weight: 950;
+      font-size: 1.05rem;
+      letter-spacing: .35em;
+      text-align: center;
+      outline: none;
+    }
+    .pin-input::placeholder{ color: var(--muted2); letter-spacing: normal; }
+    html[data-theme="light"] .pin-input{ background: rgba(2,6,23,.03); }
+
+    .pin-actions{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items:center;
+      justify-content: space-between;
+    }
+
+    .pin-btn{
+      border-radius: 999px;
+      padding: 10px 12px;
+      border: 1px solid var(--stroke2);
+      background: var(--glass2);
+      color: var(--txt);
+      font-weight: 950;
+      cursor:pointer;
+      transition: transform .15s ease, border-color .15s ease, background .15s ease;
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+    }
+    .pin-btn:hover{ transform: translateY(-1px); border-color: rgba(191,219,254,.28); background: rgba(15,23,42,.72); }
+    html[data-theme="light"] .pin-btn:hover{ background: rgba(255,255,255,1); border-color: rgba(59,130,246,.18); }
+
+    .pin-btn.primary{
+      background: var(--green);
+      border-color: rgba(16,185,129,.85);
+      color:#052e23;
+    }
+    .pin-hint{
+      color: var(--muted2);
+      font-weight: 850;
+      font-size: .86rem;
+      line-height: 1.6;
+    }
+
+    .pin-remember{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-weight: 850;
+      font-size: .9rem;
+    }
+    .pin-remember input{ transform: translateY(1px); }
+
+    .pin-status{
+      color: var(--muted);
+      font-weight: 900;
+      font-size: .92rem;
+    }
+    .pin-status.err{ color: rgba(255,228,230,.95); }
+    html[data-theme="light"] .pin-status.err{ color: #be123c; }
+
+    .shake{
+      animation: shake .28s linear;
+    }
+    @keyframes shake{
+      0%{ transform: translateX(0); }
+      25%{ transform: translateX(6px); }
+      50%{ transform: translateX(-6px); }
+      75%{ transform: translateX(6px); }
+      100%{ transform: translateX(0); }
+    }
+
+    /* Hide content while locked */
+    body.pin-locked .adminaps-wrap{ filter: blur(10px); opacity: .25; pointer-events: none; user-select: none; }
+  </style>
+</head>
+
+<body data-page="adminaps">
+  <script type="module" src="analytics.js"></script>
+
+  <header class="header-main">
+    <div class="container">
+      <nav class="nav">
+        <div class="nav-left">
+          <div class="logo-circle">
+            <img
+              src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png"
+              alt="סמל בית הספר יערת העמק"
+              class="logo-img"
+              id="logo-img"
+            >
+          </div>
+
+          <div>
+            <div class="school-title-main">Admin Apps – יערת העמק</div>
+            <div class="school-title-sub">מרכז שליטה מהיר לכל העמודים החשובים</div>
+
+            <div class="back-btn-wrap">
+              <a href="index.html" class="back-btn">חזרה לדף הבית</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="nav-right">
+          <a href="index.html#home-news">חדשות</a>
+          <a href="index.html#home-exams">מבחנים</a>
+          <a href="index.html#grades">השכבות</a>
+          <a href="polls.html">סקרים</a>
+          <a href="about.html">אודות</a>
+          <a href="index.html#contact">יצירת קשר</a>
+          <a href="redirect-edu.html" class="personal-btn">למרחב האישי</a>
+          <a href="admin.html" class="btn-outline">Admin</a>
+        </div>
+
+        <button id="theme-toggle" class="theme-toggle" type="button">🌙</button>
+
+        <button class="nav-toggle" type="button" aria-label="פתח תפריט" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="adminaps-wrap">
+    <div class="adminaps-container">
+
+      <section class="adminaps-hero reveal">
+        <div class="adminaps-badge">🛡️ מרכז ניהול • מהיר • מסודר • וואו</div>
+        <h1 class="adminaps-title">כל הניהול של האתר — בדף אחד</h1>
+        <p class="adminaps-sub">
+          חיפוש מסנן את הכרטיסים. טיפ: <b>/</b> פותח חיפוש מיד, <b>Esc</b> מנקה.
+          פילטרים למטה נותנים לך “בום” על מה שאתה צריך.
+        </p>
+
+        <div class="adminaps-toolbar">
+          <div class="adminaps-search" role="search">
+            <span class="ico">🔎</span>
+            <input id="q" type="text" placeholder="חפש: סקרים / מערכת שעות / אודות / יומן..." autocomplete="off" />
+          </div>
+
+          <div class="adminaps-actions">
+            <a class="adminaps-btn primary" href="admin.html"><span>⚙️</span><span>כניסה לאדמין</span></a>
+            <a class="adminaps-btn" href="logs.html"><span>🧾</span><span>יומן שינויים</span></a>
+            <button class="adminaps-btn" id="lockBtn" type="button"><span>🔒</span><span>נעל</span></button>
+          </div>
+        </div>
+
+        <div class="filters" id="filters">
+          <button class="chip-btn active" data-filter="all" type="button">הכל</button>
+          <button class="chip-btn" data-filter="hot" type="button">חשוב</button>
+          <button class="chip-btn" data-filter="sec" type="button">אבטחה</button>
+          <button class="chip-btn" data-filter="content" type="button">תוכן</button>
+          <button class="chip-btn" data-filter="danger" type="button">מסוכן</button>
+        </div>
+
+        <div class="stats-row reveal" id="statsRow"></div>
+
+        <div class="adminaps-foot">
+          הערה: ה־PIN הוא “מחסום”. אבטחה אמיתית = Firebase Auth + Rules.
+        </div>
+      </section>
+
+      <section class="adminaps-grid" id="grid"></section>
+    </div>
+  </main>
+
+  <div class="toast" id="toast">✅ בוצע</div>
+
+  <!-- PIN Gate -->
+  <div class="pin-gate" id="pinGate" aria-hidden="true">
+    <div class="pin-card" id="pinCard" role="dialog" aria-modal="true" aria-label="כניסה למרכז הניהול">
+      <div class="pin-top">
+        <div>
+          <h2 class="pin-title">🔐 כניסה למרכז הניהול</h2>
+          <p class="pin-sub">
+            הכנס PIN של בית הספר.<br>
+            רמז: שנת הפתיחה 😉
+          </p>
+        </div>
+        <div class="pin-status" id="pinStatus">ממתין לקוד…</div>
+      </div>
+
+      <div class="pin-body">
+        <div class="pin-row">
+          <input
+            id="pinInput"
+            class="pin-input"
+            type="password"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            maxlength="4"
+            placeholder="••••"
+            autocomplete="off"
+          />
+        </div>
+
+        <div class="pin-actions">
+          <div class="pin-remember">
+            <label style="display:flex; gap:8px; align-items:center; cursor:pointer;">
+              <input id="pinRemember" type="checkbox" checked />
+              זכור אותי ל־12 שעות
+            </label>
+            <span class="pin-hint">Enter לאישור • Esc לניקוי</span>
+          </div>
+
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="pin-btn" id="pinClear" type="button">🧼 נקה</button>
+            <button class="pin-btn primary" id="pinEnter" type="button">✅ כניסה</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="accessibility.js"></script>
+  <script type="module" src="app.js"></script>
+
+  <script>
+    /* =========================
+       DATA
+       ========================= */
+    const apps = [
+      { title:"דף עריכת מערכת שעות", desc:"עדכון שעות לכל שכבה / כיתות. הכי ביום-יום.", href:"timetable-admin.html", icon:"🗓️", chip:{text:"חשוב", cls:"chip-hot"}, group:"hot", keywords:"מערכת שעות timetable schedule" },
+      { title:"ניהול סקרים", desc:"יצירה, עריכה, פתיחה/סגירה ותוצאות. שליטה מלאה.", href:"polls-admin.html", icon:"📊", chip:{text:"חשוב", cls:"chip-hot"}, group:"hot", keywords:"סקרים polls votes תוצאות" },
+      { title:"עריכת מלל בדף האודות", desc:"העורך נפתח רק עם edit=1 ומנסה לשמור ל-Firestore.", href:"about.html?edit=1", icon:"✏️", chip:{text:"תוכן", cls:"chip-ai"}, group:"content", keywords:"אודות about edit content מלל" },
+      { title:"ניהול משתמשי Admin", desc:"עמוד הרשאות / משתמשי אדמין (רשאות).", href:"admin.html", icon:"👤", chip:{text:"אבטחה", cls:"chip-sec"}, group:"sec", keywords:"admin משתמשים הרשאות users" },
+      { title:"דף האדמין הראשי", desc:"מרכז האדמין הקיים (עוד כלים).", href:"admin.html", icon:"🧩", chip:{text:"מרכז", cls:""}, group:"all", keywords:"admin פאנל ניהול panel" },
+      { title:"יומן שינויים", desc:"מעקב מה השתנה באתר ומתי.", href:"logs.html", icon:"🧾", chip:{text:"מסוכן", cls:"chip-danger"}, group:"danger", keywords:"לוגים logs שינויים audit" }
+    ];
+
+    /* =========================
+       UI refs
+       ========================= */
+    const grid = document.getElementById("grid");
+    const q = document.getElementById("q");
+    const toast = document.getElementById("toast");
+    const statsRow = document.getElementById("statsRow");
+    const filters = document.getElementById("filters");
+    const lockBtn = document.getElementById("lockBtn");
+
+    // pin gate
+    const pinGate = document.getElementById("pinGate");
+    const pinCard = document.getElementById("pinCard");
+    const pinInput = document.getElementById("pinInput");
+    const pinEnter = document.getElementById("pinEnter");
+    const pinClear = document.getElementById("pinClear");
+    const pinRemember = document.getElementById("pinRemember");
+    const pinStatus = document.getElementById("pinStatus");
+
+    let activeFilter = "all";
+
+    /* =========================
+       Toast
+       ========================= */
+    const showToast = (msg) => {
+      toast.textContent = msg;
+      toast.classList.add("show");
+      clearTimeout(window.__t);
+      window.__t = setTimeout(() => toast.classList.remove("show"), 1400);
+    };
+
+    /* =========================
+       Cards
+       ========================= */
+    function card(app){
+      const chip = app.chip ? `<span class="app-chip ${app.chip.cls||""}">${app.chip.text||""}</span>` : "";
+      const dangerFlag = (app.group === "danger") ? `<span class="app-chip chip-danger">⚠️ מסוכן</span>` : "";
+
+      return `
+        <article class="app-card reveal" data-k="${(app.keywords||"").toLowerCase()}" data-group="${app.group||"all"}">
+          <div class="app-top">
+            <div class="app-ico">${app.icon || "⚡"}</div>
+            <div class="app-meta">
+              <h3 class="app-title">${app.title}</h3>
+              <p class="app-desc">${app.desc}</p>
+            </div>
+            <div style="display:flex; gap:6px; align-items:center;">
+              ${dangerFlag || chip}
+              ${dangerFlag ? chip : ""}
+            </div>
+          </div>
+
+          <div class="app-actions">
+            <a class="app-link" href="${app.href}">
+              <span>פתח עכשיו</span>
+              <span class="go">↗</span>
+            </a>
+
+            <button class="mini-btn" type="button" data-copy="${app.href}">📋 העתק קישור</button>
+            <button class="mini-btn" type="button" data-newtab="${app.href}">🧠 טאב חדש</button>
+          </div>
+        </article>
+      `;
+    }
+
+    function render(){
+      grid.innerHTML = apps.map(card).join("");
+      initReveal();
+      renderStats();
+    }
+
+    function renderStats(){
+      const total = apps.length;
+      const hot = apps.filter(a => a.group === "hot").length;
+      const sec = apps.filter(a => a.group === "sec").length;
+      const danger = apps.filter(a => a.group === "danger").length;
+
+      statsRow.innerHTML = `
+        <div class="stat"><div class="label">סה״כ קיצורים</div><div class="value">${total}</div><div class="note">כלים בדף הזה</div></div>
+        <div class="stat"><div class="label">חשוב</div><div class="value">${hot}</div><div class="note">דברים שמשנים יום-יום</div></div>
+        <div class="stat"><div class="label">אבטחה</div><div class="value">${sec}</div><div class="note">הרשאות / Admin</div></div>
+        <div class="stat"><div class="label">מסוכן</div><div class="value">${danger}</div><div class="note">תבדוק פעמיים לפני</div></div>
+      `;
+    }
+
+    function applyFilters(){
+      const term = (q.value || "").trim().toLowerCase();
+      const cards = grid.querySelectorAll(".app-card");
+
+      cards.forEach(c => {
+        const k = c.getAttribute("data-k") || "";
+        const group = c.getAttribute("data-group") || "all";
+        const title = c.querySelector(".app-title")?.textContent?.toLowerCase() || "";
+
+        const matchText = !term || k.includes(term) || title.includes(term);
+        const matchGroup = (activeFilter === "all") || (group === activeFilter);
+
+        c.style.display = (matchText && matchGroup) ? "" : "none";
+      });
+    }
+
+    function initReveal(){
+      const els = Array.from(document.querySelectorAll(".reveal"));
+      if(!("IntersectionObserver" in window) || els.length === 0){
+        els.forEach(e => e.classList.add("in"));
+        return;
+      }
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(en => {
+          if(en.isIntersecting){
+            en.target.classList.add("in");
+            io.unobserve(en.target);
+          }
+        });
+      }, { threshold: 0.12, rootMargin:"0px 0px -10% 0px" });
+      els.forEach(e => io.observe(e));
+    }
+
+    /* =========================
+       PIN GATE LOGIC (1992)
+       ========================= */
+    const PIN = "1992";
+    const KEY = "yaarat_adminaps_pin_ok_v1"; // store expiry timestamp
+    const TTL_MS = 12 * 60 * 60 * 1000; // 12h
+
+    const setLockedUI = (locked) => {
+      document.body.classList.toggle("pin-locked", locked);
+      pinGate.classList.toggle("open", locked);
+      pinGate.setAttribute("aria-hidden", locked ? "false" : "true");
+      if(locked){
+        pinStatus.classList.remove("err");
+        pinStatus.textContent = "ממתין לקוד…";
+        pinInput.value = "";
+        setTimeout(() => pinInput.focus(), 50);
+      }
+    };
+
+    const isRememberedValid = () => {
+      try{
+        const exp = Number(localStorage.getItem(KEY) || "0");
+        return exp && Date.now() < exp;
+      }catch{ return false; }
+    };
+
+    const remember = () => {
+      try{
+        localStorage.setItem(KEY, String(Date.now() + TTL_MS));
+      }catch{}
+    };
+
+    const forget = () => {
+      try{ localStorage.removeItem(KEY); }catch{}
+    };
+
+    const unlock = () => {
+      setLockedUI(false);
+      showToast("🔓 נפתח");
+    };
+
+    const lock = () => {
+      forget();
+      setLockedUI(true);
+      showToast("🔒 ננעל");
+    };
+
+    const tryPin = () => {
+      const val = (pinInput.value || "").trim();
+      if(val === PIN){
+        pinStatus.classList.remove("err");
+        pinStatus.textContent = "✅ נכון. נכנסת.";
+        if(pinRemember.checked) remember(); else forget();
+        setTimeout(unlock, 120);
+      }else{
+        pinStatus.classList.add("err");
+        pinStatus.textContent = "❌ לא נכון. נסה שוב.";
+        pinCard.classList.remove("shake");
+        void pinCard.offsetWidth;
+        pinCard.classList.add("shake");
+        pinInput.select();
+      }
+    };
+
+    // init lock state
+    (function(){
+      const ok = isRememberedValid();
+      setLockedUI(!ok);
+      if(ok) showToast("✅ זוהית. פתוח.");
+    })();
+
+    pinEnter.addEventListener("click", tryPin);
+    pinClear.addEventListener("click", () => {
+      pinInput.value = "";
+      pinStatus.classList.remove("err");
+      pinStatus.textContent = "נוקה. הכנס שוב.";
+      pinInput.focus();
+    });
+    lockBtn.addEventListener("click", lock);
+
+    document.addEventListener("keydown", (e) => {
+      // PIN keys when gate open
+      if(pinGate.classList.contains("open")){
+        if(e.key === "Enter"){ e.preventDefault(); tryPin(); }
+        if(e.key === "Escape"){
+          e.preventDefault();
+          pinInput.value = "";
+          pinStatus.classList.remove("err");
+          pinStatus.textContent = "ממתין לקוד…";
+        }
+        return;
+      }
+
+      // page hotkeys
+      if (e.key === "/" && document.activeElement !== q){
+        e.preventDefault();
+        q.focus();
+      }
+      if (e.key === "Escape"){
+        q.value = "";
+        activeFilter = "all";
+        filters.querySelectorAll(".chip-btn").forEach(b => b.classList.toggle("active", b.getAttribute("data-filter")==="all"));
+        applyFilters();
+        q.blur();
+        showToast("🧼 נוקה");
+      }
+      // quick lock
+      if (e.key.toLowerCase() === "l" && (e.ctrlKey || e.metaKey)){
+        e.preventDefault();
+        lock();
+      }
+    });
+
+    /* =========================
+       EVENTS
+       ========================= */
+    render();
+    q.addEventListener("input", applyFilters);
+
+    filters.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-filter]");
+      if(!btn) return;
+      activeFilter = btn.getAttribute("data-filter") || "all";
+      filters.querySelectorAll(".chip-btn").forEach(b => b.classList.toggle("active", b === btn));
+      applyFilters();
+      showToast("🔎 פילטר: " + btn.textContent.trim());
+    });
+
+    document.addEventListener("click", async (e) => {
+      const copyBtn = e.target.closest("[data-copy]");
+      if(copyBtn){
+        const href = copyBtn.getAttribute("data-copy");
+        const full = new URL(href, location.href).toString();
+        try{
+          await navigator.clipboard.writeText(full);
+          showToast("📋 הועתק: " + href);
+        }catch{
+          showToast("❌ לא הצלחתי להעתיק");
+        }
+        return;
+      }
+
+      const nt = e.target.closest("[data-newtab]");
+      if(nt){
+        const href = nt.getAttribute("data-newtab");
+        window.open(href, "_blank", "noopener,noreferrer");
+        showToast("🧠 נפתח בטאב חדש");
+        return;
+      }
+    });
+  </script>
+</body>
+</html>
