@@ -774,6 +774,102 @@ html[data-theme="light"] .logo-circle {
     background: rgba(248,250,252,0.95);
   }
 }
+/* =========================
+   REMOVE EMPTY SECTION BARS
+   ========================= */
+
+/* אם section ריק או כמעט ריק – אין ריווח מיותר */
+.section-light:empty,
+.section-dark-strong:empty {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* sections רצופים – פחות רווח ביניהם */
+.section-light + .section-light,
+.section-light + .section-dark-strong,
+.section-dark-strong + .section-light {
+  margin-top: -20px;
+}
+
+/* במובייל – עוד יותר הדוק */
+@media (max-width: 768px) {
+  .section-light + .section-light,
+  .section-light + .section-dark-strong,
+  .section-dark-strong + .section-light {
+    margin-top: -28px;
+  }
+}
+/* פסי רקע מיותרים בלייט מוד */
+html[data-theme="light"] .section-light {
+  background: transparent;
+}
+.section-header {
+  margin-top: 0 !important;
+}
+/* ===== LIGHT MODE – SOFT DEPTH ===== */
+html[data-theme="light"] body {
+  background:
+    radial-gradient(1200px 600px at 50% -200px, #e0ecff 0%, transparent 60%),
+    #f6f8fc;
+}
+html[data-theme="light"] .section-light {
+  background: transparent;
+  position: relative;
+}
+
+html[data-theme="light"] .section-light::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.75),
+    rgba(255,255,255,0.35)
+  );
+  z-index: 0;
+}
+
+.section-light > .container {
+  position: relative;
+  z-index: 1;
+}
+html[data-theme="light"] .grade-card {
+  background: linear-gradient(
+    180deg,
+    #ffffff,
+    #f9fbff
+  );
+  border: 1px solid rgba(37,99,235,0.08);
+}
+
+html[data-theme="light"] .grade-card:hover {
+  box-shadow:
+    0 12px 30px rgba(37,99,235,0.12),
+    0 2px 6px rgba(0,0,0,0.04);
+}
+html[data-theme="light"] .section-title {
+  position: relative;
+}
+
+html[data-theme="light"] .section-title::after {
+  content: "";
+  display: block;
+  width: 64px;
+  height: 3px;
+  margin: 10px auto 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #2563eb, #38bdf8);
+}
+html[data-theme="light"] .btn,
+html[data-theme="light"] .btn-outline {
+  box-shadow: 0 6px 18px rgba(37,99,235,0.18);
+}
+
+html[data-theme="light"] .btn:hover,
+html[data-theme="light"] .btn-outline:hover {
+  transform: translateY(-1px);
+}
 
   </style>
 </head>
