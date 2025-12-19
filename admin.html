@@ -61,79 +61,6 @@
       padding: 6px 8px;
       margin-bottom: 6px;
     }
-    /* =========================
-   ADMIN – ANNOUNCEMENTS UI
-   ========================= */
-
-.ann-admin-card{
-  background: linear-gradient(
-    180deg,
-    rgba(2,6,23,.75),
-    rgba(15,23,42,.85)
-  );
-  border: 1px solid rgba(148,163,184,.25);
-  border-radius: 24px;
-  padding: 18px;
-  box-shadow: 0 30px 80px rgba(0,0,0,.45);
-}
-
-.ann-admin-top{
-  display:flex;
-  gap:10px;
-  align-items:center;
-  flex-wrap:wrap;
-  margin-bottom:12px;
-}
-
-.ann-input{
-  background: rgba(2,6,23,.65);
-  border: 1px solid rgba(148,163,184,.35);
-  border-radius: 14px;
-  padding: 10px 12px;
-  color:#e5e7eb;
-  font-size:.9rem;
-}
-
-.ann-input::placeholder{
-  color:#94a3b8;
-}
-
-.ann-input.title{ flex:1.5; }
-.ann-input.date{ width:160px; }
-.ann-input.image{ width:100%; margin-bottom:10px; }
-
-.ann-textarea{
-  width:100%;
-  min-height:140px;
-  resize:vertical;
-  background: rgba(2,6,23,.65);
-  border: 1px solid rgba(148,163,184,.35);
-  border-radius: 18px;
-  padding: 12px 14px;
-  color:#e5e7eb;
-  font-size:.95rem;
-}
-
-.ann-admin-card .btn.publish{
-  white-space:nowrap;
-  padding: 10px 18px;
-  border-radius: 999px;
-  font-weight:800;
-}
-
-/* תצוגה מקדימה לתמונה */
-.ann-image-preview{
-  margin:10px 0;
-  border-radius: 16px;
-  overflow:hidden;
-  border:1px solid rgba(148,163,184,.25);
-}
-
-.ann-image-preview img{
-  width:100%;
-  display:block;
-}
-
   </style>
 </head>
 
@@ -371,43 +298,6 @@
   </section>
 
 </div>
-<section class="section-dark-strong">
-  <div class="container">
-
-    <div class="section-header">
-      <h2 class="section-title">הודעות הנהלה</h2>
-      <p class="section-subtitle">פרסום הודעה רשמית שתופיע באתר</p>
-    </div>
-
-    <div class="ann-admin-card">
-
-      <!-- שורה עליונה -->
-      <div class="ann-admin-top">
-        <input id="ann-title" class="ann-input title" placeholder="כותרת ההודעה" />
-        <input id="ann-date" type="date" class="ann-input date" />
-        <button id="add-announcement" class="btn publish">
-          פרסם
-        </button>
-      </div>
-
-      <!-- תמונה -->
-      <input
-        id="ann-image"
-        class="ann-input image"
-        placeholder="קישור לתמונה (אופציונלי)"
-      />
-      <div id="ann-preview" class="ann-image-preview" hidden></div>
-
-      <!-- תוכן -->
-      <textarea
-        id="ann-body"
-        class="ann-textarea"
-        placeholder="כתוב כאן את תוכן ההודעה…"
-      ></textarea>
-
-    </div>
-  </div>
-</section>
 
 
 
