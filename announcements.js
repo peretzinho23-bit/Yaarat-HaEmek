@@ -13,18 +13,18 @@ if (!root) {
   console.error("announcements-list not found");
 }
 
-/* ===============================
-   Firestore Query
-   =============================== */
+root.innerHTML = `
+  <div class="ann-card">
+    <div class="ann-title">טוען הודעות…</div>
+  </div>
+`;
+
 const q = query(
   collection(db, "announcements"),
   where("active", "==", true),
   orderBy("date", "desc")
 );
 
-/* ===============================
-   Render
-   =============================== */
 onSnapshot(q, (snap) => {
   root.innerHTML = "";
 
@@ -43,31 +43,22 @@ onSnapshot(q, (snap) => {
   snap.forEach(doc => {
     const d = doc.data();
 
-    const dateText = d.date
-      ? `📅 ${d.date}`
-      : "";
-
-    const imageBlock = d.image
-      ? `
-        <div class="ann-image">
-          <img src="${d.image}" alt="תמונה להודעת הנהלה" loading="lazy">
-        </div>
-      `
-      : "";
+    let dateText = "";
+    if (d.date?.toDate) {
+      dateText = d.date.toDate().toLocaleDateString("he-IL");
+    } else if (typeof d.date === "string") {
+      dateText = d.date;
+    }
 
     root.insertAdjacentHTML("beforeend", `
       <article class="ann-card">
-        ${dateText ? `<div class="ann-date">${dateText}</div>` : ""}
-
-        <h3 class="ann-title">
-          ${d.title || "הודעת הנהלה"}
-        </h3>
-
-        ${imageBlock}
-
-        <div class="ann-body">
-          ${d.body || ""}
-        </div>
+        ${dateText ? `<div class="ann-date">📅 ${dateText}</div>` : ""}
+        <h3 class="ann-title">${d.title || "הודעת הנהלה"}</h3>
+        ${d.image ? `
+          <div class="ann-image">
+            <img src="${d.image}" loading="lazy">
+          </div>` : ""}
+        <div class="ann-body">${d.body || ""}</div>
       </article>
     `);
   });
