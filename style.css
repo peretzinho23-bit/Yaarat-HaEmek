@@ -3420,21 +3420,4 @@ html, body, .grade-card, .card, header, .section-light, .section-dark-strong{
   background: rgba(255,255,255,.92);
   box-shadow: 0 12px 28px rgba(15,23,42,.08);
 }
-/* קרוב טיפה את הטקסטים ללוגו */
 
-.header-main .nav {
-  gap: 16px; /* אם יש gap גדול – מצמצם */
-}
-
-.header-main .nav-side {
-  gap: 8px; /* רווח בין הכפתורים עצמם */
-}
-
-/* מקרב את הצדדים ללוגו */
-.header-main .nav-right-links {
-  margin-left: -12px;
-}
-
-.header-main .nav-left-links {
-  margin-right: -12px;
-}

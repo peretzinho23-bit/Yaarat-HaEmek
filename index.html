@@ -605,6 +605,72 @@ html[data-theme="dark"] .nav-side a:not(.personal-btn):not(.btn-outline){
     font-weight: 600;
   }
 }
+/* קרוב טיפה את הטקסטים ללוגו */
+
+.header-main .nav {
+  gap: 16px; /* אם יש gap גדול – מצמצם */
+}
+
+.header-main .nav-side {
+  gap: 8px; /* רווח בין הכפתורים עצמם */
+}
+
+/* מקרב את הצדדים ללוגו */
+.header-main .nav-right-links {
+  margin-left: -12px;
+}
+
+.header-main .nav-left-links {
+  margin-right: -12px;
+}
+.hero-glow-line {
+  width: 160px;
+  height: 4px;
+  margin: 14px auto 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #2563eb, #38bdf8, #2563eb);
+  background-size: 200% 100%;
+  animation: glowMove 4s linear infinite;
+}
+
+@keyframes glowMove {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+.grade-card {
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+
+.grade-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 45px rgba(0,0,0,0.18);
+}
+.badge-mini {
+  display: inline-block;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 999px;
+  background: rgba(37,99,235,0.15);
+  color: #2563eb;
+}
+html, body, .header-main, .section-light, .section-dark-strong, .grade-card {
+  transition:
+    background-color 0.35s ease,
+    color 0.35s ease,
+    box-shadow 0.35s ease;
+}
+.glass-card {
+  background: rgba(255,255,255,0.65);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,0.35);
+}
+
+html[data-theme="dark"] .glass-card {
+  background: rgba(15,23,42,0.6);
+  border-color: rgba(148,163,184,0.25);
+}
 
   </style>
 </head>
@@ -722,7 +788,7 @@ html[data-theme="dark"] .nav-side a:not(.personal-btn):not(.btn-outline){
       </div>
 
       <div class="hero-home-cards">
-        <div class="grade-card">
+<div class="grade-card glass-card">
           <h3>שעות פעילות</h3>
           <p style="font-size:0.9rem; margin-top:4px;">
             א'–ה': 08:00–15:00 · ו': 08:00–12:00
