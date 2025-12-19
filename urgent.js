@@ -124,9 +124,9 @@ function showTicker() {
 
 // מהירות לפי "מרחק" בפיקסלים כדי שיהיה חלק תמיד
 function calcDurationByDistancePx(distancePx) {
-  const pxPerSec = 120; // יותר גבוה = יותר מהר
+  const pxPerSec = 100; // יותר גבוה = יותר מהר
   const s = distancePx / pxPerSec;
-  return Math.max(5, Math.min(16, s));
+  return Math.max(20, Math.min(13, s));
 }
 
 let lastKey = "";
