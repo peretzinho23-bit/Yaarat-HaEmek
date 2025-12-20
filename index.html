@@ -653,6 +653,40 @@ html[data-theme="dark"] .hero-home-cards .grade-card:hover{
     background: rgba(15,23,42,0.70) !important;
   }
 }
+/* =========================
+   THEME SWITCH — NO UGLY TRANSITION
+   שים בסוף ה-style
+   ========================= */
+
+/* ברירת מחדל: שיהיה מעבר עדין רק בצבעים (לא פילטרים/blur) */
+html, body, .header-main, .section-light, .section-dark-strong, .grade-card,
+.nav-side a, .theme-toggle-btn, .btn, .btn-outline {
+  transition: background-color .22s ease, color .22s ease, border-color .22s ease, box-shadow .22s ease;
+}
+
+/* ✅ בזמן החלפת דארק/לייט: מבטל הכל כדי שלא תראה "ביניים" מכוער */
+html.theme-changing *,
+html.theme-changing *::before,
+html.theme-changing *::after {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* אם יש לך blur / filters איפשהו – זה מה שעושה את ה-flash */
+html.theme-changing .hero-overlay,
+html.theme-changing .hero-home-cards .grade-card {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  filter: none !important;
+}
+
+/* חשוב: אל תעשה כרטיסים חצי שקופים בזמן theme change */
+html.theme-changing .hero-home-cards .grade-card{
+  background-color: #ffffff !important;
+}
+html[data-theme="dark"].theme-changing .hero-home-cards .grade-card{
+  background-color: #0f172a !important;
+}
 
   </style>
 </head>
