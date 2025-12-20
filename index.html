@@ -602,6 +602,58 @@
       transform: translateY(-2px);
       box-shadow: 0 16px 44px rgba(37,99,235,0.45);
     }
+    /* =========================
+   SMOOTH CARD TRANSITION FIX
+   שים בסוף ה-style
+   ========================= */
+
+/* 1) להפוך את המעבר ל"חלק" */
+.hero-home-cards .grade-card{
+  will-change: transform, background-color, box-shadow, border-color;
+  transition:
+    transform .28s ease,
+    background-color .28s ease,
+    box-shadow .28s ease,
+    border-color .28s ease;
+}
+
+/* 2) לבטל את ה"קפיצה" שנגרמת מ-blur במעבר */
+.hero-home-cards .grade-card:hover{
+  /* במקום blur בזמן מעבר (גורם לקפיצה), נשאיר שקיפות חלקה */
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  background: rgba(255,255,255,0.78) !important; /* חלק ולא קיצוני */
+  transform: translateY(-4px) !important;
+  box-shadow: 0 18px 45px rgba(15,23,42,0.18) !important;
+  border-color: rgba(37,99,235,0.22) !important;
+}
+
+/* 3) בדארק – אותו רעיון */
+html[data-theme="dark"] .hero-home-cards .grade-card:hover{
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  background: rgba(15,23,42,0.70) !important;
+  transform: translateY(-4px) !important;
+  box-shadow: 0 18px 45px rgba(0,0,0,0.45) !important;
+  border-color: rgba(56,189,248,0.25) !important;
+}
+
+/* 4) במובייל אין hover אמיתי – תן "tap" חלק */
+@media (hover: none){
+  .hero-home-cards .grade-card:active,
+  .hero-home-cards .grade-card:focus-within{
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(255,255,255,0.78) !important;
+  }
+  html[data-theme="dark"] .hero-home-cards .grade-card:active,
+  html[data-theme="dark"] .hero-home-cards .grade-card:focus-within{
+    background: rgba(15,23,42,0.70) !important;
+  }
+}
+
   </style>
 </head>
 
