@@ -473,3 +473,147 @@ section {
   border-color: #2563eb;
   color: #f9fafb;
 }
+/* =========================
+   ADMIN HEADER – CENTER TITLE
+   ========================= */
+
+.header-main .nav{
+  position: relative;
+  justify-content: center; /* מרכז את התוכן */
+}
+
+/* הקבוצה של הלוגו – נשארת בצד */
+.header-main .nav-left{
+  position: absolute;
+  right: 0;                /* RTL – ימין */
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* הכותרות – באמצע אמיתי */
+.school-title-main,
+.school-title-sub{
+  text-align: center;
+  width: 100%;
+}
+
+/* מובייל – שלא יידחס */
+@media (max-width: 600px){
+  .header-main .nav{
+    min-height: 72px;
+  }
+}
+/* מרכז את כותרת האדמין למרכז הדף */
+.admin-header-center{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  
+  font-weight: 800;
+  font-size: 1.05rem;
+  white-space: nowrap;
+}
+
+/* ודא שה-header מאפשר absolute */
+.header-main{
+  position: relative;
+}
+/* =========================
+   ADMIN HEADER TITLE – CLEAN & PREMIUM
+   ========================= */
+
+.admin-header-title{
+  text-align: center;
+  font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+  font-weight: 900;
+  letter-spacing: 0.4px;
+  margin: 0 auto;
+
+  /* צבע */
+  color: #ffffff;
+
+  /* glow עדין (לא מועדון) */
+  text-shadow:
+    0 2px 10px rgba(0,0,0,0.65),
+    0 0 18px rgba(56,189,248,0.45);
+
+  position: relative;
+}
+
+/* קו תחתון אלגנטי */
+.admin-header-title::after{
+  content: "";
+  display: block;
+  width: 120px;
+  height: 3px;
+  margin: 10px auto 0;
+  border-radius: 999px;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #38bdf8,
+    #2563eb,
+    #38bdf8,
+    transparent
+  );
+
+  box-shadow:
+    0 0 16px rgba(56,189,248,0.45);
+}
+
+/* לייט מוד */
+html[data-theme="light"] .admin-header-title{
+  color: #0f172a;
+  text-shadow:
+    0 2px 8px rgba(15,23,42,0.15),
+    0 0 14px rgba(37,99,235,0.25);
+}
+
+/* לייט מוד – קו */
+html[data-theme="light"] .admin-header-title::after{
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #2563eb,
+    #38bdf8,
+    #2563eb,
+    transparent
+  );
+}
+/* =========================
+   ADMIN HEADER – CENTER REAL (FIX)
+   ========================= */
+
+/* ה-nav חייב להיות "במה" שמאפשרת אבסולוטי */
+.header-main .nav{
+  position: relative;
+  min-height: 84px; /* תתאים אם צריך */
+}
+
+/* הכותרת – מרכז מסך אמיתי */
+.admin-header-title{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0 !important;
+  width: max-content;
+  max-width: calc(100% - 140px); /* שלא יתנגש בלוגו/כפתורים */
+  text-align: center;
+  z-index: 2;
+}
+
+/* אם יש לוגו/אלמנט שמימין – שישב מעל אבל לא יפריע */
+.header-main .logo-circle{
+  position: relative;
+  z-index: 3;
+}
+
+/* מובייל – קצת יותר מקום */
+@media (max-width: 900px){
+  .header-main .nav{ min-height: 72px; }
+  .admin-header-title{ max-width: calc(100% - 110px); }
+}

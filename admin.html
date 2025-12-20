@@ -61,6 +61,146 @@
       padding: 6px 8px;
       margin-bottom: 6px;
     }
+    /* =========================
+   ADMIN PANEL – BASE
+   ========================= */
+body[data-page="admin"]{
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgba(56,189,248,.18), transparent 60%),
+    linear-gradient(180deg, #f8fafc, #eef2ff);
+}
+
+html[data-theme="dark"] body[data-page="admin"]{
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgba(56,189,248,.18), transparent 60%),
+    linear-gradient(180deg, #020617, #020617);
+}
+/* ADMIN CARDS */
+body[data-page="admin"] .admin-card,
+body[data-page="admin"] .grade-card,
+body[data-page="admin"] .panel{
+  background: rgba(255,255,255,.82);
+  border: 1px solid rgba(148,163,184,.35);
+  border-radius: 18px;
+  box-shadow: 0 14px 40px rgba(15,23,42,.12);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+
+body[data-page="admin"] .admin-card:hover{
+  transform: translateY(-4px);
+  box-shadow: 0 20px 55px rgba(15,23,42,.18);
+}
+
+/* DARK */
+html[data-theme="dark"] body[data-page="admin"] .admin-card{
+  background: rgba(15,23,42,.65);
+  border-color: rgba(148,163,184,.25);
+}
+/* ADMIN TITLES */
+body[data-page="admin"] h1,
+body[data-page="admin"] h2{
+  font-weight: 900;
+  letter-spacing: .3px;
+  background: linear-gradient(90deg,#2563eb,#38bdf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+html[data-theme="dark"] body[data-page="admin"] h1,
+html[data-theme="dark"] body[data-page="admin"] h2{
+  background: linear-gradient(90deg,#60a5fa,#38bdf8);
+}
+/* ADMIN PRIMARY BUTTON */
+body[data-page="admin"] .btn-primary,
+body[data-page="admin"] button[type="submit"]{
+  background: linear-gradient(135deg,#2563eb,#38bdf8);
+  color:#fff;
+  border:none;
+  border-radius:999px;
+  padding:10px 18px;
+  font-weight:800;
+  box-shadow:0 14px 36px rgba(37,99,235,.35);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+
+body[data-page="admin"] .btn-primary:hover{
+  transform: translateY(-2px);
+  box-shadow:0 20px 50px rgba(37,99,235,.45);
+}
+/* ADMIN SECONDARY */
+body[data-page="admin"] .btn-secondary{
+  background: rgba(124,58,237,.12);
+  color:#6d28d9;
+  border:1px solid rgba(124,58,237,.35);
+  border-radius:999px;
+  font-weight:700;
+}
+
+html[data-theme="dark"] body[data-page="admin"] .btn-secondary{
+  background: rgba(124,58,237,.22);
+  color:#ddd6fe;
+}
+/* ADMIN INPUTS */
+body[data-page="admin"] input,
+body[data-page="admin"] textarea,
+body[data-page="admin"] select{
+  border-radius:12px;
+  border:1px solid rgba(148,163,184,.45);
+  padding:10px 12px;
+  background: rgba(255,255,255,.9);
+  transition: border .2s ease, box-shadow .2s ease;
+}
+
+body[data-page="admin"] input:focus,
+body[data-page="admin"] textarea:focus{
+  outline:none;
+  border-color:#38bdf8;
+  box-shadow:0 0 0 3px rgba(56,189,248,.25);
+}
+
+html[data-theme="dark"] body[data-page="admin"] input,
+html[data-theme="dark"] body[data-page="admin"] textarea{
+  background: rgba(2,6,23,.6);
+  color:#fff;
+}
+/* STATUS BADGES */
+.admin-status{
+  padding:6px 12px;
+  border-radius:999px;
+  font-weight:800;
+  font-size:.75rem;
+}
+
+.admin-status.active{
+  background:rgba(34,197,94,.15);
+  color:#16a34a;
+}
+
+.admin-status.draft{
+  background:rgba(245,158,11,.18);
+  color:#b45309;
+}
+/* SUBTLE GLOW */
+body[data-page="admin"] .admin-card::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background: radial-gradient(
+    600px circle at 50% 0%,
+    rgba(56,189,248,.12),
+    transparent 40%
+  );
+  opacity:0;
+  transition:opacity .3s ease;
+  pointer-events:none;
+}
+
+body[data-page="admin"] .admin-card:hover::after{
+  opacity:1;
+}
+
   </style>
 </head>
 
@@ -71,16 +211,23 @@
   <header class="header-main">
     <div class="container">
       <nav class="nav">
-        <div class="nav-left">
-          <div class="logo-circle">
-            <span>יערת<br>העמק</span>
-          </div>
+           <div class="nav-center">
+        <a href="index.html" class="logo-circle" aria-label="דף הבית">
+          <img
+            src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png"
+            alt="סמל יערת העמק"
+            
+            class="logo-img"
+          />
+          
+        </a>
+      </div>
 
           <div>
-            <div class="school-title-main">לוח ניהול · יערת העמק</div>
+<div class="admin-header-title">
+מערכת ניהול · יערת העמק</div>
             <div class="school-title-sub">
               <div class="back-btn-wrap">
-                <a href="index.html" class="back-btn">← חזרה לדף התלמידים</a>
               </div>
             </div>
           </div>
@@ -153,9 +300,10 @@
         </div>
 
         <!-- NEWS -->
-<h3 class="section-title" style="font-size:1.2rem;margin-bottom:10px;">חדשות לפי שכבות</h3>
+<h3 class="section-title" style="font-size:1.2rem;margin-bottom:10px;">חדשות לפי כיתות</h3>
 <p class="section-subtitle">
   ניתן להוסיף עד שתי תמונות לידיעה (קישורים או קבצים) + צבע טקסט (אופציונלי).
+
 </p>
 
 <div class="admin-columns">
