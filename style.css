@@ -298,7 +298,7 @@ button#theme-toggle:active {
   background-position: center;
   background-repeat: no-repeat;
   opacity: 0;
-  animation: heroFade 25s infinite;
+  animation: heroFade 30s infinite;
 }
 
 .hero-slide:nth-child(1) {
@@ -324,6 +324,10 @@ button#theme-toggle:active {
 .hero-slide:nth-child(5) {
   background-image: url("img/school_aerial.jpg");
   animation-delay: 20s;
+}
+.hero-slide:nth-child(6) {
+  background-image: url("img/new_image.jpg"); /* שנה לשם האמיתי */
+  animation-delay: 25s;
 }
 
 @keyframes heroFade {
@@ -3640,4 +3644,173 @@ html[data-theme="dark"] a.personal-btn{
   .nav-right a.personal-btn{
     width: 100% !important;
   }
+}
+/* =========================
+   HERO FADE (Top + Bottom)
+   ========================= */
+
+.hero.hero-home{
+  position: relative;
+  overflow: hidden;
+}
+
+/* שכבה עליונה */
+.hero.hero-home::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  z-index:1;
+
+  /* שני פיידים: עליון + תחתון */
+  background:
+    linear-gradient(to bottom,
+      rgba(255,255,255,0.95) 0%,
+      rgba(255,255,255,0.55) 18%,
+      rgba(255,255,255,0.00) 45%
+    ),
+    linear-gradient(to top,
+      rgba(239,243,251,1.00) 0%,
+      rgba(239,243,251,0.65) 22%,
+      rgba(239,243,251,0.00) 55%
+    );
+}
+
+/* לוודא שהתוכן מעל הפייד */
+.hero.hero-home .hero-content,
+.hero.hero-home .hero-home-inner,
+.hero.hero-home > .container{
+  position: relative;
+  z-index: 2;
+}
+
+/* דארק מוד – אותו רעיון אבל כהה */
+html[data-theme="dark"] .hero.hero-home::before{
+  background:
+    linear-gradient(to bottom,
+      rgba(2,6,23,0.75) 0%,
+      rgba(2,6,23,0.35) 18%,
+      rgba(2,6,23,0.00) 45%
+    ),
+    linear-gradient(to top,
+      rgba(4,8,20,0.95) 0%,
+      rgba(4,8,20,0.55) 22%,
+      rgba(4,8,20,0.00) 55%
+    );
+}
+/* =========================
+   NO UGLY THEME TRANSITION
+   ========================= */
+
+/* אל תעשה transition לרקעים/פילטרים של ההירו והסליידים */
+.hero-home,
+.hero-home::before,
+.hero-home::after,
+.hero-overlay,
+.hero-slide,
+.hero-slides {
+  transition: none !important;
+}
+
+/* בזמן החלפת מצב – מבטלים טרנזישן/אנימציה לכל האתר */
+html.theme-switching *,
+html.theme-switching *::before,
+html.theme-switching *::after {
+  transition: none !important;
+  animation: none !important;
+}
+/* אם עדיין יש פייד קטן – מבטל מעבר על שינוי צבעים */
+body, .grade-card, .card, .contact-box, .hero-side-card, .hero-quick-card, header, section, footer {
+  transition: none !important;
+}
+/* ===== HERO ACTIONS – nicer in LIGHT MODE ===== */
+html[data-theme="light"] .hero-actions a{
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-weight: 800;
+  box-shadow: 0 10px 24px rgba(15,23,42,0.10);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+}
+
+html[data-theme="light"] .hero-actions a:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(15,23,42,0.14);
+  filter: brightness(1.03);
+}
+
+/* הכפתור הריק (מבחנים קרובים) – זכוכית לבנה עדינה */
+html[data-theme="light"] .hero-actions .btn-outline{
+  background: rgba(255,255,255,0.82) !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(148,163,184,0.55) !important;
+}
+
+/* הכפתור הכחול (חדשות ועדכונים) – כחול “פרימיום” */
+html[data-theme="light"] .hero-actions .btn{
+  background: linear-gradient(135deg, #2563eb, #38bdf8) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(37,99,235,0.25) !important;
+  box-shadow: 0 14px 34px rgba(37,99,235,0.22);
+}
+
+/* אם אתה משתמש ב-a בלי class btn/btn-outline, זה לפחות ייראה יפה */
+html[data-theme="light"] .hero-actions a:not(.btn):not(.btn-outline){
+  background: rgba(255,255,255,0.82);
+  color: #0f172a;
+  border: 1px solid rgba(148,163,184,0.55);
+}
+/* ===== HERO TITLE – glow עדין לקריאות על תמונות בהירות ===== */
+
+.hero-home .hero-text h1 {
+  color: #ffffff;
+  text-shadow:
+    0 2px 6px rgba(0,0,0,0.45),   /* צל רך לקריאות */
+    0 0 12px rgba(255,255,255,0.25); /* זוהר לבן עדין */
+}
+
+/* תת־כותרת */
+.hero-home .hero-text p {
+  color: #f8fafc;
+  text-shadow:
+    0 1px 4px rgba(0,0,0,0.35),
+    0 0 8px rgba(255,255,255,0.18);
+}
+/* ===== HERO – Fade bottom only (נמס למטה) ===== */
+
+.hero.hero-home{
+  position: relative;
+  overflow: hidden;
+}
+
+/* הפייד למטה */
+.hero.hero-home::after{
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  height: 160px;                 /* שחק עם זה: 120–220 */
+  pointer-events: none;
+  z-index: 3;                    /* מעל התמונה */
+
+  /* דארק מוד – יורד לרקע של האתר */
+  background: linear-gradient(
+    to bottom,
+    rgba(4, 8, 20, 0) 0%,
+    rgba(4, 8, 20, 0.55) 55%,
+    rgba(4, 8, 20, 0.95) 100%
+  );
+}
+
+/* לייט מוד – יורד ללבן/רקע */
+html[data-theme="light"] .hero.hero-home::after{
+  background: linear-gradient(
+    to bottom,
+    rgba(238, 243, 251, 0) 0%,
+    rgba(238, 243, 251, 0.70) 55%,
+    rgba(238, 243, 251, 1) 100%
+  );
 }
