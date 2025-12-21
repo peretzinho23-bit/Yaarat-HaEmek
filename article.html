@@ -116,11 +116,10 @@
             </div>
             <div class="school-title-sub">
               סביבת למידה בטוחה, תומכת ומצמיחה – עבור כל תלמיד ותלמידה.
-            
             </div>
             <div class="back-btn-wrap">
-  <a href="index.html" class="back-btn"> חזרה לדף התלמידים</a>
-</div>
+              <a href="index.html" class="back-btn"> חזרה לדף התלמידים</a>
+            </div>
           </div>
         </div>
 
@@ -135,7 +134,8 @@
           <a href="admin.html" class="btn-outline">Admin</a>
         </div>
 
-        <button id="theme-toggle" class="theme-toggle" type="button">
+        <!-- ✅ כפתור נושא (שומר על אותו ID כדי שהסקריפט יעבוד) -->
+        <button id="theme-toggle" class="theme-toggle-btn" type="button" aria-label="מצב כהה/בהיר">
           🌙
         </button>
 
@@ -180,10 +180,7 @@
   <!-- סקריפט שמביא את הכתבה לפי הפרמטרים ב-URL -->
   <script type="module">
     import { db } from "./firebase-config.js";
-    import {
-      doc,
-      getDoc
-    } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
     const GRADES = ["z", "h", "t"];
     const GRADE_LABELS = { z: "ז׳", h: "ח׳", t: "ט׳" };
@@ -195,7 +192,6 @@
         .replace(/>/g, "&gt;");
     }
 
-    // 🕒 כמה זמן עבר מאז התאריך
     function timeAgo(dateStr) {
       if (!dateStr) return "";
       const d = new Date(dateStr);
@@ -212,7 +208,6 @@
       return `לפני ${Math.floor(seconds / 31536000)} שנים`;
     }
 
-    // 📅 פורמט יפה ל־DD.MM.YYYY
     function formatLocalDate(d) {
       try {
         const day = String(d.getDate()).padStart(2, "0");
@@ -224,11 +219,9 @@
       }
     }
 
-    // ממיר כל ערך תאריך ל- Date (תומך גם ב-Firestore Timestamp)
     function toJsDate(raw) {
       if (!raw) return null;
 
-      // Timestamp של פיירסטור
       if (typeof raw === "object" && raw !== null && typeof raw.toDate === "function") {
         try {
           return raw.toDate();
@@ -247,7 +240,7 @@
     }
 
     async function loadArticle() {
-      const type = getQueryParam("type") || "news";   // news / board
+      const type = getQueryParam("type") || "news";
       const grade = getQueryParam("grade") || "z";
       const indexStr = getQueryParam("index");
       const index = indexStr ? parseInt(indexStr, 10) : NaN;
@@ -283,7 +276,6 @@
           return;
         }
 
-        // תמונות
         const images = Array.isArray(item.imageUrls) && item.imageUrls.length
           ? item.imageUrls
           : (item.imageUrl ? [item.imageUrl] : []);
@@ -296,7 +288,6 @@
           if (gradeLabel) metaPieces.push(`שכבה ${gradeLabel}`);
         }
 
-        // 🕒 תאריך הכתבה: קודם createdAt, אם אין אז date
         const rawDate = item.createdAt || item.date;
         const d = toJsDate(rawDate);
 
@@ -305,11 +296,8 @@
           const rel = timeAgo(iso);
           const abs = formatLocalDate(d);
 
-          if (rel && abs) {
-            metaPieces.push(`${rel} (${abs})`);
-          } else if (abs) {
-            metaPieces.push(abs);
-          }
+          if (rel && abs) metaPieces.push(`${rel} (${abs})`);
+          else if (abs) metaPieces.push(abs);
         }
 
         if (item.meta) metaPieces.push(item.meta);
@@ -321,9 +309,7 @@
         const imagesHtml = images.length
           ? `
             <div class="article-images">
-              <img src="${escapeHtml(images[0])}" alt="${escapeHtml(
-                item.title || ""
-              )}">
+              <img src="${escapeHtml(images[0])}" alt="${escapeHtml(item.title || "")}">
             </div>
           `
           : "";
@@ -335,13 +321,12 @@
           <div class="article-body">${escapeHtml(item.body || "")}</div>
         `;
 
-        // כותרת הטאב
         if (item.title) {
           document.title = String(item.title) + " – יערת העמק";
         }
       } catch (err) {
         console.error("שגיאה בטעינת כתבה:", err);
-        showNotFound(container);
+        showNotFound(document.getElementById("article-container"));
       }
     }
 
@@ -356,5 +341,34 @@
 
     loadArticle();
   </script>
+
+  <!-- ✅ THEME TOGGLE (חייב להיות כאן כדי שהכפתור יעבוד בעמוד הכתבה) -->
+  <script>
+    (function () {
+      const btn = document.getElementById("theme-toggle");
+      if (!btn) return;
+
+      const KEY = "yaar_theme";
+
+      function applyTheme(theme) {
+        document.documentElement.setAttribute("data-theme", theme);
+        btn.textContent = theme === "dark" ? "🌙" : "☀️";
+      }
+
+      // init: קודם localStorage, אם אין אז לפי מערכת
+      const saved = localStorage.getItem(KEY);
+      const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      applyTheme(saved || (prefersDark ? "dark" : "light"));
+
+      // toggle
+      btn.addEventListener("click", () => {
+        const current = document.documentElement.getAttribute("data-theme") || "light";
+        const next = current === "dark" ? "light" : "dark";
+        localStorage.setItem(KEY, next);
+        applyTheme(next);
+      });
+    })();
+  </script>
+
 </body>
 </html>
