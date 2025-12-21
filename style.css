@@ -3580,3 +3580,64 @@ html[data-theme="dark"] .nav a.personal-btn{
   background: linear-gradient(135deg, #38bdf8, #2563eb);
   color: #ffffff !important;
 }
+/* =========================
+   PERSONAL BTN – FINAL OVERRIDE
+   (put at VERY END of style.css)
+   ========================= */
+
+.header-main .nav .nav-right a.personal-btn,
+.header-main .nav .nav-side a.personal-btn,
+.header-main .nav a.personal-btn,
+a.personal-btn{
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding: 10px 20px !important;
+  border-radius: 999px !important;
+
+  font-size: 0.95rem !important;
+  font-weight: 800 !important;
+  letter-spacing: .2px !important;
+
+  color: #ffffff !important;
+  text-decoration: none !important;
+
+  border: 0 !important;
+  background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+
+  box-shadow: 0 10px 28px rgba(37,99,235,.35) !important;
+
+  transition:
+    transform .15s ease,
+    box-shadow .2s ease,
+    filter .2s ease !important;
+}
+
+.header-main .nav .nav-right a.personal-btn:hover,
+.header-main .nav a.personal-btn:hover,
+a.personal-btn:hover{
+  transform: translateY(-2px) !important;
+  filter: brightness(1.08) !important;
+  box-shadow: 0 16px 44px rgba(37,99,235,.50) !important;
+}
+
+.header-main .nav .nav-right a.personal-btn:active,
+.header-main .nav a.personal-btn:active,
+a.personal-btn:active{
+  transform: translateY(0) !important;
+  box-shadow: 0 8px 20px rgba(37,99,235,.35) !important;
+}
+
+/* גם בלייט וגם בדארק: טקסט תמיד לבן */
+html[data-theme="light"] a.personal-btn,
+html[data-theme="dark"] a.personal-btn{
+  color: #ffffff !important;
+}
+
+/* במובייל: שיראה “כפתור” מלא במגירה */
+@media (max-width: 900px){
+  .nav-right a.personal-btn{
+    width: 100% !important;
+  }
+}
