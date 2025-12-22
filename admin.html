@@ -6,237 +6,256 @@
 
   <title>לוח ניהול – יערת העמק</title>
 
-  <!-- האתר הכללי (רכיבים/כפתורים בסיסיים) -->
   <link rel="stylesheet" href="style.css" />
-  <!-- האדמין -->
   <link rel="stylesheet" href="admin.css" />
 
-  <!-- =========================
-       ADMIN THEME (ONLY ADMIN)
-       ========================= -->
+  <!-- ADMIN THEME (ONLY ADMIN) -->
   <script>
     (function () {
       try {
-        // תמה נפרדת לאדמין בלבד
         const key = "admin_theme";
         const saved = localStorage.getItem(key);
-        const theme = saved || "dark"; // ברירת מחדל: dark
+        const theme = saved || "dark";
         document.documentElement.setAttribute("data-theme", theme);
       } catch {}
     })();
   </script>
 
   <style>
-    /* =========================================
-       ADMIN OVERRIDES (WINS OVER style.css)
-       ========================================= */
+/* =========================
+   ADMIN – CLEAN TOP BAR (DARK ONLY)
+   ========================= */
 
-    /* רק לאדמין */
-    body.admin-page{
-      background: radial-gradient(1200px 600px at 50% -10%, rgba(56,189,248,.18), transparent 60%),
-                  linear-gradient(180deg, #020617, #020617);
-      color: #e3f2fd;
-    }
+/* רקע עמוד אדמין */
+body.admin-page{
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgba(56,189,248,.18), transparent 60%),
+    linear-gradient(180deg, #020617, #020617);
+  color: #e3f2fd;
+}
 
-    html[data-theme="light"] body.admin-page{
-      background: radial-gradient(1200px 600px at 50% -10%, rgba(37,99,235,.12), transparent 60%),
-                  linear-gradient(180deg, #f8fafc, #eef2ff);
-      color: #0f172a;
-    }
+/* container רחב */
+body.admin-page .container{
+  max-width: 1400px !important;
+  width: min(1400px, calc(100% - 40px)) !important;
+  margin-inline: auto !important;
+}
 
-    /* ✅ זה מה שגרם לך ל"עמודה אחת": container צר מדי ב-style.css */
-    body.admin-page .container{
-      max-width: 1400px !important;
-      width: min(1400px, calc(100% - 40px)) !important;
-      margin-inline: auto !important;
-    }
+/* HEADER */
+body.admin-page .header-main{
+  position: sticky;
+  top: 0;
+  z-index: 9999;
+  background: rgba(2,6,23,.75);
+  border-bottom: 1px solid rgba(148,163,184,.18);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
 
-    /* =========================
-       HEADER CENTER + THEME BTN
-       ========================= */
-    .header-main .nav.nav-centered{
-      position: relative;
-      min-height: 86px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+/* NAV STRUCTURE */
+body.admin-page .admin-nav{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 12px 0;
+}
 
-    .nav-center{
-      position: absolute;
-      right: 18px; /* RTL */
-      display: flex;
-      align-items: center;
-      z-index: 3;
-    }
+/* LEFT = LOGO */
+body.admin-page .admin-nav-left{
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
 
-    .admin-header-title{
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      font-weight: 900;
-      font-size: clamp(1.1rem, 2.2vw, 1.55rem);
-      white-space: nowrap;
-      z-index: 2;
-      text-align: center;
-      color: #ffffff;
-      text-shadow: 0 2px 10px rgba(0,0,0,0.65), 0 0 18px rgba(56,189,248,0.35);
-      padding-inline: 10px;
-      max-width: calc(100% - 220px);
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+body.admin-page .logo-circle{
+  width: 54px;
+  height: 54px;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 2px solid rgba(56,189,248,.35);
+  background: rgba(15,23,42,.55);
+  box-shadow: 0 10px 26px rgba(0,0,0,.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+body.admin-page .logo-img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 
-    html[data-theme="light"] .admin-header-title{
-      color: #0f172a;
-      text-shadow: 0 2px 8px rgba(15,23,42,0.15), 0 0 14px rgba(37,99,235,0.18);
-    }
+/* RIGHT = BUTTONS */
+body.admin-page .admin-nav-right{
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
 
-    /* כפתור תמה באדמין (שמאל ב-RTL) */
-    .admin-theme-toggle{
-      position: absolute;
-      left: 18px;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      border-radius: 999px;
-      padding: 8px 12px;
-      font-weight: 800;
-      cursor: pointer;
-      z-index: 4;
-      border: 1px solid rgba(148,163,184,.55);
-      background: rgba(15,23,42,.75);
-      color: #e5e7eb;
-      user-select: none;
-    }
+/* BUTTON LOOK */
+body.admin-page .admin-btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
-    html[data-theme="light"] .admin-theme-toggle{
-      background: rgba(255,255,255,.75);
-      color: #0f172a;
-      border-color: rgba(148,163,184,.45);
-    }
+  padding: 8px 16px;
+  border-radius: 999px;
 
-    /* =========================
-       3 CARDS IN A ROW (GRADES)
-       ========================= */
-    .admin-columns{
-      display: grid !important;
-      gap: 18px;
-      align-items: start;
-      margin-top: 10px;
-    }
+  font-size: .95rem;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
 
-    @media (min-width: 1100px){
-      .admin-columns{
-        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-      }
-    }
-    @media (min-width: 700px) and (max-width: 1099px){
-      .admin-columns{
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-      }
-    }
-    @media (max-width: 699px){
-      .admin-columns{
-        grid-template-columns: 1fr !important;
-      }
-      .admin-header-title{ max-width: calc(100% - 160px); }
-    }
+  color: #e5e7eb;
+  background: rgba(15,23,42,.55);
+  border: 1px solid rgba(148,163,184,.28);
 
-    /* כרטיסים - שלא יישברו */
-    .admin-grade-section,
-    .admin-columns > section,
-    .admin-columns > .card{
-      min-width: 0 !important;
-    }
+  box-shadow: 0 10px 26px rgba(0,0,0,.25);
+  transition: transform .15s ease, box-shadow .15s ease, background .2s ease, border-color .2s ease;
+}
 
-    /* ===========
-       LIST/IMAGES
-       =========== */
-    .admin-list .admin-item{
-      padding: 8px 10px;
-      margin-bottom: 8px;
-      border-radius: 12px;
-    }
+body.admin-page .admin-btn:hover{
+  transform: translateY(-1px);
+  background: rgba(15,23,42,.78);
+  border-color: rgba(96,165,250,.55);
+  box-shadow: 0 14px 34px rgba(0,0,0,.35);
+}
 
-    .admin-images-row{
-      display: flex;
-      gap: 6px;
-      margin-top: 4px;
-      flex-wrap: wrap;
-    }
+/* ACTIVE */
+body.admin-page .admin-btn.active{
+  background: linear-gradient(135deg,#2563eb,#38bdf8);
+  color: #fff;
+  border-color: rgba(56,189,248,.55);
+  box-shadow: 0 14px 42px rgba(37,99,235,.55);
+}
 
-    .admin-image-wrapper{
-      width: 90px;
-      height: 70px;
-      flex: 0 0 auto;
-      overflow: hidden;
-      border-radius: 8px;
-    }
+/* ✅ המרחק שאתה רוצה: כפתורים רחוקים מהלוגו */
+body.admin-page .admin-nav-right{
+  margin-inline-start: 42px; /* ב-RTL זה יוצר רווח מהלוגו */
+}
 
-    .admin-image-wrapper img.admin-image{
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
+/* MOBILE */
+@media (max-width: 900px){
+  body.admin-page .admin-nav{
+    gap: 12px;
+  }
+  body.admin-page .logo-circle{
+    width: 48px;
+    height: 48px;
+  }
+  body.admin-page .admin-btn{
+    padding: 8px 12px;
+    font-size: .9rem;
+  }
+  body.admin-page .admin-nav-right{
+    margin-inline-start: 18px;
+  }
+}
 
-    .admin-item-body{
-      font-size: 0.9rem;
-      line-height: 1.45;
-      max-height: 6.5em;
-      overflow-y: auto;
-    }
+/* =========================
+   ADMIN COLUMNS (כמו שהיה)
+   ========================= */
+.admin-columns{
+  display: grid !important;
+  gap: 18px;
+  align-items: start;
+  margin-top: 10px;
+}
+@media (min-width: 1100px){
+  .admin-columns{ grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+}
+@media (min-width: 700px) and (max-width: 1099px){
+  .admin-columns{ grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+}
+@media (max-width: 699px){
+  .admin-columns{ grid-template-columns: 1fr !important; }
+}
+.admin-grade-section,
+.admin-columns > section,
+.admin-columns > .card{
+  min-width: 0 !important;
+}
 
-    .admin-class-title{
-      font-size: 0.95rem;
-      margin-top: 10px;
-      margin-bottom: 4px;
-      opacity: 0.9;
-    }
+/* LIST/IMAGES */
+.admin-list .admin-item{
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  border-radius: 12px;
+}
+.admin-images-row{
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+.admin-image-wrapper{
+  width: 90px;
+  height: 70px;
+  flex: 0 0 auto;
+  overflow: hidden;
+  border-radius: 8px;
+}
+.admin-image-wrapper img.admin-image{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.admin-item-body{
+  font-size: 0.9rem;
+  line-height: 1.45;
+  max-height: 6.5em;
+  overflow-y: auto;
+}
+.admin-class-title{
+  font-size: 0.95rem;
+  margin-top: 10px;
+  margin-bottom: 4px;
+  opacity: 0.9;
+}
+.admin-exam-item{
+  border-radius: 10px;
+  padding: 6px 8px;
+  margin-bottom: 6px;
+}
 
-    .admin-exam-item{
-      border-radius: 10px;
-      padding: 6px 8px;
-      margin-bottom: 6px;
-    }
+
   </style>
 </head>
 
 <body class="admin-page" data-page="admin">
 
-  <!-- רק פעם אחת -->
   <script type="module" src="analytics.js"></script>
 
-  <!-- HEADER -->
-  <header class="header-main">
-    <div class="container">
-      <nav class="nav nav-centered" aria-label="כותרת אדמין">
+  <!-- ✅ HEADER: EXACT STRUCTURE LIKE INDEX -->
+<header class="header-main">
+  <div class="container">
+    <div class="admin-nav">
 
-        <!-- מרכז (לוגו) -->
-        <div class="nav-center">
-          <a href="index.html" class="logo-circle" aria-label="דף הבית">
-            <img
-              src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png"
-              alt="סמל יערת העמק"
-              class="logo-img"
-            />
-          </a>
-        </div>
+      <div class="admin-nav-left">
+        <a href="index.html" class="logo-circle" aria-label="דף הבית">
+          <img src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png" class="logo-img" alt="סמל יערת העמק">
+        </a>
+      </div>
 
-        <!-- כותרת באמצע -->
-        <div class="admin-header-title">מערכת ניהול · יערת העמק</div>
+      <div class="admin-nav-right">
+        <a href="admin.html" class="admin-btn active">Admin</a>
+        <a href="#news" class="admin-btn">חדשות</a>
+        <a href="#grades" class="admin-btn">השכבות</a>
+        <a href="#exams" class="admin-btn">מבחנים</a>
+        <a href="#board" class="admin-btn">מודעות</a>
+        <a href="adminapps.html" class="admin-btn">כלי עריכה</a>
+        <a href="#contact" class="admin-btn">יצירת קשר</a>
+      </div>
 
-        <!-- כפתור תמה -->
-        <button class="admin-theme-toggle" id="adminThemeToggle" type="button" aria-label="החלפת תצוגה">
-          <span id="adminThemeIcon">🌙</span>
-          <span id="adminThemeText">Dark</span>
-        </button>
-
-      </nav>
     </div>
-  </header>
+  </div>
+</header>
+
+
 
   <!-- סיידבר שכבות לאדמין -->
   <div class="admin-grade-switcher">
@@ -280,7 +299,7 @@
       <div id="admin-section" class="admin-layout" style="display:none;">
         <button id="logout-btn" class="btn-outline">התנתקות</button>
 
-        <div class="section-header">
+        <div class="section-header" id="contact">
           <h2 class="section-title">ניהול חדשות, מבחנים, מודעות ותוכן האתר</h2>
           <p class="section-subtitle">כל שינוי נשמר אוטומטית ונראה באתר התלמידים.</p>
         </div>
@@ -292,10 +311,11 @@
         </div>
 
         <!-- NEWS -->
+        <div id="news"></div>
         <h3 class="section-title" style="font-size:1.2rem;margin-bottom:10px;">חדשות לפי כיתות</h3>
         <p class="section-subtitle">ניתן להוסיף עד שתי תמונות לידיעה (קישורים או קבצים) + צבע טקסט (אופציונלי).</p>
 
-        <div class="admin-columns">
+        <div class="admin-columns" id="grades">
           <!-- NEWS Z -->
           <section class="admin-grade-section" data-grade="z">
             <div class="card">
@@ -437,6 +457,7 @@
         <br><br>
 
         <!-- EXAMS -->
+        <div id="exams"></div>
         <h3 class="section-title" style="font-size:1.2rem;margin-bottom:10px;">לוח מבחנים - נא לא למחוק מבחנים קיימים.</h3>
 
         <div class="admin-columns">
@@ -554,6 +575,7 @@
         </div>
 
         <!-- BOARD -->
+        <div id="board"></div>
         <h3 class="section-title" style="font-size:1.2rem;margin-bottom:10px;">
           לוח מודעות נא לא למחוק מודעות אחרות,זה מוחק את דף הכתבה
         </h3>
@@ -586,6 +608,7 @@
         <br><br>
 
         <!-- SITE CONTENT -->
+        <div id="sitecontent"></div>
         <h3 class="section-title" style="font-size:1.2rem;margin-bottom:10px;">ניהול תוכן האתר</h3>
         <p class="section-subtitle">כל השדות כאן נשמרים במסמך Firestore אחד (siteContent/main) ומוזנים לכל חלקי האתר.</p>
 
@@ -594,7 +617,6 @@
             <h3>טקסטים כלליים</h3>
 
             <form id="site-content-form" class="admin-form">
-              <!-- כל התוכן שלך נשאר כמו שהיה -->
               <h4>דף בית – אזור הירו (המשפטים הגדולים למעלה)</h4>
               <label>כותרת ראשית בהירו</label>
               <input name="homeHeroTitle" placeholder="ברוכים הבאים ליערת העמק" />
@@ -700,29 +722,48 @@
     </div><!-- /.container -->
   </section>
 
-  <!-- SCRIPTS -->
+  <!-- ✅ THEME + MOBILE NAV (ADMIN ONLY) -->
   <script>
     (function () {
       const key = "admin_theme";
-      const btn = document.getElementById("adminThemeToggle");
-      const icon = document.getElementById("adminThemeIcon");
-      const text = document.getElementById("adminThemeText");
+      const themeBtn = document.getElementById("admin-theme-toggle");
+      const navToggle = document.getElementById("navToggle");
+      const navMobile = document.getElementById("nav-mobile");
+
+      function setIcon(theme){
+        if (!themeBtn) return;
+        themeBtn.textContent = (theme === "dark") ? "🌙" : "☀️";
+      }
 
       function apply(theme){
         document.documentElement.setAttribute("data-theme", theme);
         try { localStorage.setItem(key, theme); } catch {}
-        if (icon) icon.textContent = theme === "dark" ? "🌙" : "☀️";
-        if (text) text.textContent = theme === "dark" ? "Dark" : "Light";
+        setIcon(theme);
       }
 
-      // init label
+      // init
       const current = document.documentElement.getAttribute("data-theme") || "dark";
       apply(current);
 
-      if (btn){
-        btn.addEventListener("click", function(){
+      if (themeBtn){
+        themeBtn.addEventListener("click", function(){
           const now = document.documentElement.getAttribute("data-theme") || "dark";
           apply(now === "dark" ? "light" : "dark");
+        });
+      }
+
+      // mobile menu toggle
+      if (navToggle && navMobile){
+        navToggle.addEventListener("click", () => navMobile.classList.toggle("open"));
+        // close on link click
+        navMobile.querySelectorAll("a").forEach(a=>{
+          a.addEventListener("click", ()=> navMobile.classList.remove("open"));
+        });
+        // click outside close
+        document.addEventListener("click", (e)=>{
+          if (!navMobile.classList.contains("open")) return;
+          const inside = navMobile.contains(e.target) || navToggle.contains(e.target);
+          if (!inside) navMobile.classList.remove("open");
         });
       }
     })();
