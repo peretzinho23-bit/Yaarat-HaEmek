@@ -1224,6 +1224,7 @@ function setupGradeFilter() {
 
 document.addEventListener("DOMContentLoaded", () => {
   initAuth();
+  setupForgotPassword(); // ✅ חדש
   setupNewsForms();
   setupExamForms();
   setupBoardForm();
@@ -1232,3 +1233,4 @@ document.addEventListener("DOMContentLoaded", () => {
   setupSiteContentForm();
   setupGradeFilter();
 });
+
