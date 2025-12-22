@@ -1,273 +1,506 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>אנליטיקות – יערת העמק</title>
 
+  <!-- ✅ חשוב: זה הדף של הדשבורד -->
+  <meta name="theme-color" content="#020617" />
+
   <style>
-    body {
-      background: #020617;
-      color: #e5e7eb;
-      font-family: system-ui, sans-serif;
+    :root{
+      --bg:#020617;
+      --card:#0b1120;
+      --card2:#0a1325;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --border:#1f2937;
+      --accent:#38bdf8;
+      --accent2:#22c55e;
+      --warn:#f97373;
+      --shadow: 0 18px 48px rgba(15,23,42,0.65);
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      background: radial-gradient(circle at 15% 10%, rgba(56,189,248,0.16), transparent 45%),
+                  radial-gradient(circle at 80% 20%, rgba(34,197,94,0.10), transparent 55%),
+                  var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, sans-serif;
       margin: 0;
-      padding: 20px;
+      padding: 18px;
+      min-height: 100vh;
     }
-    h1 {
-      text-align: center;
-      color: #38bdf8;
-      margin-bottom: 8px;
+
+    .wrap{ max-width: 1200px; margin: 0 auto; }
+
+    /* ===== Topbar ===== */
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom: 14px;
     }
-    .subtitle {
-      text-align: center;
-      font-size: 0.9rem;
-      color: #9ca3af;
-      margin-bottom: 20px;
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
     }
-    .status {
-      text-align: center;
-      margin-bottom: 15px;
+    .logo{
+      width:44px;height:44px;border-radius:14px;
+      background: rgba(56,189,248,0.12);
+      border:1px solid rgba(56,189,248,0.28);
+      box-shadow: 0 10px 28px rgba(56,189,248,0.10);
+      display:flex;align-items:center;justify-content:center;
+      font-size: 1.2rem;
+    }
+    h1{
+      font-size: 1.25rem;
+      margin: 0;
+      letter-spacing: .2px;
+    }
+    .subtitle{
+      font-size: .9rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .btn{
+      cursor:pointer;
+      padding: 9px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(56,189,248,0.35);
+      background: rgba(2,6,23,0.35);
+      color: var(--text);
+      text-decoration: none;
+      font-size: .9rem;
+      transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+      box-shadow: 0 10px 28px rgba(15,23,42,0.30);
+      user-select:none;
+    }
+    .btn:hover{
+      transform: translateY(-1px);
+      background: rgba(56,189,248,0.10);
+      box-shadow: 0 14px 36px rgba(15,23,42,0.40);
+    }
+    .btn.secondary{
+      border-color: rgba(148,163,184,0.26);
+    }
+    .btn.danger{
+      border-color: rgba(249,115,115,0.35);
+      background: rgba(249,115,115,0.08);
+    }
+
+    /* ===== Status ===== */
+    .status{
+      text-align:center;
+      margin: 10px 0 14px;
       font-size: 0.95rem;
+      color: var(--muted);
     }
-    .status.error {
-      color: #f97373;
+    .status.error{ color: var(--warn); }
+
+    /* ===== Filters ===== */
+    .filters{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:stretch;
+      margin-bottom: 14px;
     }
-    .layout {
-      display: grid;
-      grid-template-columns: minmax(0, 2fr) minmax(0, 1.5fr);
-      gap: 16px;
-    }
-    @media (max-width: 900px) {
-      .layout {
-        grid-template-columns: minmax(0, 1fr);
-      }
-    }
-    .card {
-      background: #0b1120;
+    .filter{
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(148,163,184,0.16);
       border-radius: 16px;
-      padding: 14px 16px;
-      border: 1px solid #1f2937;
-      box-shadow: 0 12px 30px rgba(15,23,42,0.65);
+      padding: 10px 12px;
+      min-width: 240px;
+      flex: 1;
+      box-shadow: var(--shadow);
     }
-    .card h2 {
+    .filter label{
+      display:block;
+      font-size: .85rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+    .filter select{
+      width:100%;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(148,163,184,0.18);
+      background: rgba(2,6,23,0.40);
+      color: var(--text);
+      outline:none;
+    }
+
+    /* ===== Layout ===== */
+    .layout{
+      display:grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1.5fr);
+      gap: 14px;
+    }
+    @media (max-width: 980px){
+      .layout{ grid-template-columns: 1fr; }
+      .filter{ min-width: 0; }
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(11,17,32,0.95), rgba(11,17,32,0.78));
+      border-radius: 18px;
+      padding: 14px 16px;
+      border: 1px solid rgba(148,163,184,0.16);
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before{
+      content:"";
+      position:absolute;
+      inset: -50% -50% auto auto;
+      width: 260px;
+      height: 260px;
+      background: radial-gradient(circle, rgba(56,189,248,0.16), transparent 60%);
+      filter: blur(2px);
+      pointer-events:none;
+    }
+
+    .card h2{
       font-size: 1rem;
       margin: 0 0 10px 0;
       color: #7dd3fc;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
     }
-    .metrics {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 10px;
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: .78rem;
+      border: 1px solid rgba(148,163,184,0.24);
+      color: var(--text);
+      background: rgba(2,6,23,0.25);
+      white-space: nowrap;
+    }
+    .pill.good{
+      border-color: rgba(34,197,94,0.30);
+      background: rgba(34,197,94,0.10);
+    }
+    .pill.info{
+      border-color: rgba(56,189,248,0.30);
+      background: rgba(56,189,248,0.10);
+    }
+
+    /* ===== Metrics ===== */
+    .metrics{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap:10px;
       margin-bottom: 6px;
     }
-    .metric {
-      background: #020617;
-      border-radius: 12px;
-      padding: 10px;
-      border: 1px solid #1f2937;
+    .metric{
+      background: rgba(2,6,23,0.55);
+      border-radius: 14px;
+      padding: 12px 10px;
+      border: 1px solid rgba(148,163,184,0.16);
       text-align: center;
     }
-    .metric-label {
-      font-size: 0.8rem;
-      color: #9ca3af;
-      margin-bottom: 4px;
+    .metric-label{
+      font-size: .82rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-weight: 700;
     }
-    .metric-value {
-      font-size: 1.2rem;
-      font-weight: 600;
+    .metric-value{
+      font-size: 1.35rem;
+      font-weight: 900;
+      letter-spacing: .2px;
     }
-    table {
-      width: 100%;
+    .metric-sub{
+      margin-top: 4px;
+      font-size: .8rem;
+      color: var(--muted);
+    }
+
+    /* ===== Tables ===== */
+    table{
+      width:100%;
       border-collapse: collapse;
       margin-top: 8px;
-      font-size: 0.8rem;
-    }
-    th, td {
-      padding: 6px 8px;
-      border-bottom: 1px solid #1f2937;
-      text-align: right;
-    }
-    th {
-      background: #020617;
-      color: #7dd3fc;
-      font-weight: 500;
-    }
-    tr:hover {
-      background: #111827;
-    }
-    .bar-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .bar-track {
-      flex: 1;
-      height: 8px;
-      background: #020617;
-      border-radius: 999px;
-      overflow: hidden;
-    }
-    .bar-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #38bdf8, #22c55e);
-    }
-    .bar-label {
-      min-width: 42px;
-      text-align: left;
-      font-size: 0.7rem;
-      color: #9ca3af;
-    }
-    .pill {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 999px;
-      font-size: 0.75rem;
-      border: 1px solid #4b5563;
-      color: #e5e7eb;
-    }
-    .btn-link {
-      display: inline-block;
-      margin-top: 10px;
-      padding: 8px 14px;
-      border-radius: 999px;
-      border: 1px solid #38bdf8;
-      color: #38bdf8;
-      text-decoration: none;
-      font-size: 0.9rem;
-    }
-    .section-title-sm {
       font-size: 0.85rem;
-      margin: 10px 0 4px;
-      color: #9ca3af;
+      table-layout: fixed;
+    }
+    th, td{
+      padding: 8px 10px;
+      border-bottom: 1px solid rgba(148,163,184,0.14);
+      text-align:right;
+      overflow:hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    th{
+      background: rgba(2,6,23,0.55);
+      color: #7dd3fc;
+      font-weight: 800;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    tbody tr:hover{ background: rgba(17,24,39,0.55); }
+
+    .section-title-sm{
+      font-size: 0.86rem;
+      margin: 12px 0 4px;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .bar-row{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+    }
+    .bar-track{
+      flex:1;
+      height: 9px;
+      background: rgba(2,6,23,0.60);
+      border-radius: 999px;
+      overflow:hidden;
+      border: 1px solid rgba(148,163,184,0.10);
+    }
+    .bar-fill{
+      height:100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      width: 0%;
+      transition: width .35s ease;
+    }
+    .bar-label{
+      min-width: 46px;
+      text-align:left;
+      font-size: 0.76rem;
+      color: var(--muted);
+    }
+
+    .empty{
+      color: var(--muted);
+      padding: 10px 0;
+      text-align:center;
+    }
+
+    /* ===== Footer hint ===== */
+    .foot{
+      margin-top: 14px;
+      text-align:center;
+      color: var(--muted);
+      font-size: .85rem;
+    }
+    .foot code{
+      background: rgba(2,6,23,0.55);
+      border: 1px solid rgba(148,163,184,0.14);
+      padding: 2px 8px;
+      border-radius: 10px;
+      color: #cbd5e1;
     }
   </style>
 </head>
-<body>
 
-  <h1>אנליטיקות – יערת העמק</h1>
-  <div class="subtitle">
-    מבוסס על Firestore – כניסות לפי דף, יום, שעה, שכבה וכיתה.
-  </div>
+<!-- ✅ הדאשבורד צריך את זה כדי ש-analytics.js לא ינסה ללוג -->
+<body data-page="analytics-dashboard">
 
-  <div id="status" class="status">בודק הרשאות...</div>
-
-  <div class="layout" id="layout" style="display:none;">
-    <!-- צד שמאל – סיכום + לפי ימים -->
-    <div>
-      <div class="card">
-        <h2>סיכום כללי</h2>
-        <div class="metrics">
-          <div class="metric">
-            <div class="metric-label">סה"כ צפיות</div>
-            <div class="metric-value" id="metric-total-views">-</div>
-          </div>
-          <div class="metric">
-            <div class="metric-label">דפים שונים</div>
-            <div class="metric-value" id="metric-unique-pages">-</div>
-          </div>
-          <div class="metric">
-            <div class="metric-label">ימים עם פעילות</div>
-            <div class="metric-value" id="metric-active-days">-</div>
-          </div>
+  <div class="wrap">
+    <!-- TOP -->
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo">📊</div>
+        <div>
+          <h1>אנליטיקות – יערת העמק</h1>
+          <div class="subtitle">Firestore · כניסות לפי דף / יום / שעה / שכבה / כיתה</div>
         </div>
-
-        <div class="section-title-sm">דף "מבחנים" – צפיות (pageId = home-exams)</div>
-        <div id="metric-exams-views" class="metric-value" style="font-size:1rem;">-</div>
-
-        <div class="section-title-sm">דף "מבחנים לפי כיתה" – צפיות (pageId = class-exams)</div>
-        <div id="metric-class-exams-views" class="metric-value" style="font-size:1rem;">-</div>
       </div>
 
-      <div class="card" style="margin-top:12px;">
-        <h2>צפיות לפי יום (כל הדפים)</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>תאריך</th>
-              <th>צפיות</th>
-              <th>גרף</th>
-            </tr>
-          </thead>
-          <tbody id="table-by-day"></tbody>
-        </table>
+      <div class="actions">
+        <a class="btn secondary" href="index.html">← דף הבית</a>
+        <button class="btn" id="refreshBtn" type="button">רענון</button>
+        <button class="btn danger" id="signOutBtn" type="button">התנתקות</button>
       </div>
     </div>
 
-    <!-- צד ימין – לפי דפים / שעות / שכבות / כיתות -->
-    <div>
-      <div class="card">
-        <h2>צפיות לפי דף</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>דף</th>
-              <th>צפיות</th>
-            </tr>
-          </thead>
-          <tbody id="table-by-page"></tbody>
-        </table>
+    <div id="status" class="status">בודק הרשאות...</div>
+
+    <!-- Filters (UI only, עובד על הנתונים שכבר נטענו) -->
+    <div class="filters" id="filters" style="display:none;">
+      <div class="filter">
+        <label for="rangeSelect">טווח נתונים להצגה</label>
+        <select id="rangeSelect">
+          <option value="all">הכול (מה שיש ב-DB)</option>
+          <option value="30">30 ימים אחרונים</option>
+          <option value="14">14 ימים אחרונים</option>
+          <option value="7">7 ימים אחרונים</option>
+          <option value="today">היום בלבד</option>
+        </select>
       </div>
 
-      <div class="card" style="margin-top:12px;">
-        <h2>פעילות לפי שעה / שכבה / כיתה</h2>
-
-        <div class="section-title-sm">לפי שעה (כל הדפים)</div>
-        <table>
-          <thead>
-            <tr>
-              <th>שעה</th>
-              <th>צפיות</th>
-              <th>פס</th>
-            </tr>
-          </thead>
-          <tbody id="table-by-hour"></tbody>
-        </table>
-
-        <div class="section-title-sm">לפי שכבה – כל הדפים</div>
-        <table>
-          <thead>
-            <tr>
-              <th>שכבה</th>
-              <th>צפיות</th>
-            </tr>
-          </thead>
-          <tbody id="table-by-grade"></tbody>
-        </table>
-
-        <div class="section-title-sm">לפי כיתה – כל הדפים</div>
-        <table>
-          <thead>
-            <tr>
-              <th>כיתה</th>
-              <th>צפיות</th>
-            </tr>
-          </thead>
-          <tbody id="table-by-class"></tbody>
-        </table>
-
-        <div class="section-title-sm">דף המבחנים הראשי – לפי שכבה</div>
-        <table>
-          <thead>
-            <tr>
-              <th>שכבה</th>
-              <th>צפיות (home-exams)</th>
-            </tr>
-          </thead>
-          <tbody id="table-exams-by-grade"></tbody>
-        </table>
-
-        <div class="section-title-sm">דף "מבחנים לפי כיתה" – לפי כיתה</div>
-        <table>
-          <thead>
-            <tr>
-              <th>כיתה</th>
-              <th>צפיות (class-exams)</th>
-            </tr>
-          </thead>
-          <tbody id="table-classExams-by-class"></tbody>
-        </table>
+      <div class="filter">
+        <label for="pageFocus">פוקוס דף (לסיכום קטן)</label>
+        <select id="pageFocus">
+          <option value="all">כל הדפים</option>
+          <option value="home">דף הבית</option>
+          <option value="home-exams">לוח מבחנים (ראשי)</option>
+          <option value="class-exams">מבחנים לפי כיתה</option>
+          <option value="classes">דף כיתה</option>
+          <option value="admin">פאנל ניהול</option>
+          <option value="analytics-dashboard">אנליטיקס</option>
+        </select>
       </div>
+    </div>
+
+    <div class="layout" id="layout" style="display:none;">
+      <!-- LEFT -->
+      <div>
+        <div class="card">
+          <h2>
+            סיכום כללי
+            <span class="pill info" id="pillRange">טווח: הכול</span>
+          </h2>
+
+          <div class="metrics">
+            <div class="metric">
+              <div class="metric-label">סה"כ צפיות</div>
+              <div class="metric-value" id="metric-total-views">-</div>
+              <div class="metric-sub" id="metric-total-note">—</div>
+            </div>
+
+            <div class="metric">
+              <div class="metric-label">דפים שונים</div>
+              <div class="metric-value" id="metric-unique-pages">-</div>
+              <div class="metric-sub">נספר מהנתונים</div>
+            </div>
+
+            <div class="metric">
+              <div class="metric-label">ימים עם פעילות</div>
+              <div class="metric-value" id="metric-active-days">-</div>
+              <div class="metric-sub">כמה תאריכים הופיעו</div>
+            </div>
+          </div>
+
+          <div class="section-title-sm">דף "מבחנים" – צפיות (pageId = home-exams)</div>
+          <div id="metric-exams-views" class="metric-value" style="font-size:1.05rem;">-</div>
+
+          <div class="section-title-sm">דף "מבחנים לפי כיתה" – צפיות (pageId = class-exams)</div>
+          <div id="metric-class-exams-views" class="metric-value" style="font-size:1.05rem;">-</div>
+        </div>
+
+        <div class="card" style="margin-top:12px;">
+          <h2>צפיות לפי יום (כל הדפים) <span class="pill good" id="pillDays">עדכון: —</span></h2>
+
+          <table>
+            <thead>
+              <tr>
+                <th style="width:120px">תאריך</th>
+                <th style="width:80px">צפיות</th>
+                <th>גרף</th>
+              </tr>
+            </thead>
+            <tbody id="table-by-day"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- RIGHT -->
+      <div>
+        <div class="card">
+          <h2>צפיות לפי דף</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>דף</th>
+                <th style="width:80px">צפיות</th>
+              </tr>
+            </thead>
+            <tbody id="table-by-page"></tbody>
+          </table>
+        </div>
+
+        <div class="card" style="margin-top:12px;">
+          <h2>פעילות לפי שעה / שכבה / כיתה</h2>
+
+          <div class="section-title-sm">לפי שעה (כל הדפים)</div>
+          <table>
+            <thead>
+              <tr>
+                <th style="width:90px">שעה</th>
+                <th style="width:80px">צפיות</th>
+                <th>פס</th>
+              </tr>
+            </thead>
+            <tbody id="table-by-hour"></tbody>
+          </table>
+
+          <div class="section-title-sm">לפי שכבה – כל הדפים</div>
+          <table>
+            <thead>
+              <tr>
+                <th>שכבה</th>
+                <th style="width:80px">צפיות</th>
+              </tr>
+            </thead>
+            <tbody id="table-by-grade"></tbody>
+          </table>
+
+          <div class="section-title-sm">לפי כיתה – כל הדפים</div>
+          <table>
+            <thead>
+              <tr>
+                <th>כיתה</th>
+                <th style="width:80px">צפיות</th>
+              </tr>
+            </thead>
+            <tbody id="table-by-class"></tbody>
+          </table>
+
+          <div class="section-title-sm">דף המבחנים הראשי – לפי שכבה</div>
+          <table>
+            <thead>
+              <tr>
+                <th>שכבה</th>
+                <th style="width:140px">צפיות (home-exams)</th>
+              </tr>
+            </thead>
+            <tbody id="table-exams-by-grade"></tbody>
+          </table>
+
+          <div class="section-title-sm">דף "מבחנים לפי כיתה" – לפי כיתה</div>
+          <table>
+            <thead>
+              <tr>
+                <th>כיתה</th>
+                <th style="width:140px">צפיות (class-exams)</th>
+              </tr>
+            </thead>
+            <tbody id="table-classExams-by-class"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="foot">
+      טיפ: כדי שהלוגים יתפסו בכל האתר, בכל עמוד תשים ב־<code>&lt;body data-page="..."&gt;</code> ואז למטה:
+      <code>&lt;script type="module" src="analytics.js"&gt;&lt;/script&gt;</code>
     </div>
   </div>
 
@@ -280,19 +513,30 @@
       orderBy
     } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
     import {
-      onAuthStateChanged
+      onAuthStateChanged,
+      signOut
     } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
-    const OWNER_EMAILS = ["nadavp1119@gmail.com"];
-
+    /* =======================
+      SETTINGS
+    ======================= */
+    const OWNER_EMAILS = ["nadavp1119@gmail.com"]; // ✅ תוסיף אם יש עוד
     const statusEl = document.getElementById("status");
     const layoutEl = document.getElementById("layout");
+    const filtersEl = document.getElementById("filters");
+
+    const refreshBtn = document.getElementById("refreshBtn");
+    const signOutBtn = document.getElementById("signOutBtn");
+
+    const pillRange = document.getElementById("pillRange");
+    const pillDays = document.getElementById("pillDays");
 
     const elTotalViews = document.getElementById("metric-total-views");
     const elUniquePages = document.getElementById("metric-unique-pages");
     const elActiveDays = document.getElementById("metric-active-days");
     const elExamsViews = document.getElementById("metric-exams-views");
     const elClassExamsViews = document.getElementById("metric-class-exams-views");
+    const elTotalNote = document.getElementById("metric-total-note");
 
     const tbodyByDay = document.getElementById("table-by-day");
     const tbodyByPage = document.getElementById("table-by-page");
@@ -302,14 +546,25 @@
     const tbodyExamsByGrade = document.getElementById("table-exams-by-grade");
     const tbodyClassExamsByClass = document.getElementById("table-classExams-by-class");
 
+    const rangeSelect = document.getElementById("rangeSelect");
+    const pageFocus = document.getElementById("pageFocus");
+
+    /* =======================
+      HELPERS
+    ======================= */
     function humanPageId(pageId) {
       if (!pageId) return "-";
       const map = {
-        "home": "דף הבית",
+        "index": "דף הבית",
+        "home": "דף הבית (home)",
+        "classes": "דפי כיתה (class.html)",
+        "class": "דפי כיתה (class)",
         "home-exams": "לוח מבחנים (עמוד ראשי)",
+        "exams": "לוח מבחנים",
         "class-exams": "מבחנים לפי כיתה",
         "admin": "פאנל ניהול",
-        "logs": "לוגים"
+        "logs": "לוגים",
+        "analytics-dashboard": "אנליטיקות"
       };
       return map[pageId] || pageId;
     }
@@ -320,34 +575,112 @@
         h1: "ח1", h2: "ח2", h3: "ח3", h4: "ח4", h5: "ח5", h6: "ח6",
         t1: "ט1", t2: "ט2", t3: "ט3", t4: "ט4", t5: "ט5"
       };
-      return map[classId] || classId || "-";
+      return map[String(classId || "").toLowerCase()] || classId || "-";
     }
 
     function gradeToLabel(grade) {
       const map = { z: "ז", h: "ח", t: "ט" };
-      return map[grade] || grade || "-";
+      return map[String(grade || "").toLowerCase()] || grade || "-";
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
 
     function renderBarCell(value, max) {
-      const pct = !max ? 0 : Math.max(5, Math.round((value / max) * 100));
+      const safeVal = Number(value || 0);
+      const safeMax = Number(max || 0);
+      const pct = !safeMax ? 0 : Math.max(4, Math.round((safeVal / safeMax) * 100));
       return `
         <div class="bar-row">
           <div class="bar-track">
             <div class="bar-fill" style="width:${pct}%;"></div>
           </div>
-          <div class="bar-label">${value}</div>
+          <div class="bar-label">${safeVal}</div>
         </div>
       `;
     }
 
-    async function loadAnalytics() {
-      // --------- pageViews (אגרגציה לפי דף+תאריך) ----------
-      const qViews = query(
-        collection(db, "analytics_pageViews"),
-        orderBy("dateKey", "asc")
-      );
+    function formatNow() {
+      const d = new Date();
+      const pad = (n) => String(n).padStart(2, "0");
+      return `${pad(d.getDate())}/${pad(d.getMonth()+1)} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+
+    function startOfToday() {
+      const d = new Date();
+      d.setHours(0,0,0,0);
+      return d;
+    }
+
+    function dayKeyFromDate(d){
+      const pad = (n)=>String(n).padStart(2,"0");
+      return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+    }
+
+    function withinRange(dateKey, rangeVal){
+      // rangeVal: all / 30 / 14 / 7 / today
+      if (rangeVal === "all") return true;
+      if (rangeVal === "today") {
+        return dateKey === dayKeyFromDate(new Date());
+      }
+      const days = Number(rangeVal);
+      if (!days || isNaN(days)) return true;
+
+      // dateKey is YYYY-MM-DD
+      const d = new Date(dateKey + "T00:00:00");
+      const cutoff = new Date();
+      cutoff.setHours(0,0,0,0);
+      cutoff.setDate(cutoff.getDate() - (days - 1));
+      return d >= cutoff;
+    }
+
+    /* =======================
+      DATA CACHE (כדי שהפילטרים יעבדו בלי לקרוא DB שוב)
+    ======================= */
+    let cachedViewsRows = [];
+    let cachedEvents = [];
+
+    /* =======================
+      LOAD + RENDER
+    ======================= */
+    async function fetchAll() {
+      // views (אגרגציה לפי דף+תאריך) - לפי הקוד המקורי שלך
+      const qViews = query(collection(db, "analytics_pageViews"), orderBy("dateKey", "asc"));
       const snapViews = await getDocs(qViews);
-      const viewsRows = snapViews.docs.map(d => d.data());
+      cachedViewsRows = snapViews.docs.map(d => d.data());
+
+      // events (שעה / שכבה / כיתה) - לפי הקוד המקורי שלך
+      const qEvents = query(collection(db, "analytics_events"), orderBy("dateKey", "desc"));
+      const snapEvents = await getDocs(qEvents);
+      cachedEvents = snapEvents.docs.map(d => d.data());
+    }
+
+    function render() {
+      const rangeVal = rangeSelect.value;
+      const focusVal = pageFocus.value;
+
+      pillRange.textContent = `טווח: ${
+        rangeVal === "all" ? "הכול" :
+        rangeVal === "today" ? "היום" :
+        `${rangeVal} ימים`
+      }`;
+
+      pillDays.textContent = `עדכון: ${formatNow()}`;
+
+      /* ---- Views aggregation ---- */
+      const viewsRows = cachedViewsRows
+        .filter(r => withinRange(String(r.dateKey || ""), rangeVal))
+        .filter(r => {
+          if (focusVal === "all") return true;
+          // פה זה רק "פוקוס" לסיכום קטן - לא מסנן את כל הטבלאות
+          return true;
+        });
 
       let totalViews = 0;
       const pagesSet = new Set();
@@ -357,15 +690,13 @@
       viewsRows.forEach(r => {
         const v = Number(r.views || 0);
         totalViews += v;
-
         if (r.pageId) pagesSet.add(r.pageId);
 
-        if (r.dateKey) {
-          daysMap.set(r.dateKey, (daysMap.get(r.dateKey) || 0) + v);
-        }
-        if (r.pageId) {
-          pagesMap.set(r.pageId, (pagesMap.get(r.pageId) || 0) + v);
-        }
+        const dk = String(r.dateKey || "");
+        if (dk) daysMap.set(dk, (daysMap.get(dk) || 0) + v);
+
+        const pid = String(r.pageId || "");
+        if (pid) pagesMap.set(pid, (pagesMap.get(pid) || 0) + v);
       });
 
       const examsViews = pagesMap.get("home-exams") || 0;
@@ -376,6 +707,9 @@
       elActiveDays.textContent = daysMap.size.toString();
       elExamsViews.textContent = examsViews.toString();
       elClassExamsViews.textContent = classExamsViews.toString();
+      elTotalNote.textContent = (focusVal === "all")
+        ? "כל הדפים"
+        : `פוקוס: ${humanPageId(focusVal)}`;
 
       // טבלת לפי ימים
       const daysArr = Array.from(daysMap.entries())
@@ -385,12 +719,12 @@
       const maxDayViews = daysArr.reduce((m, r) => Math.max(m, r.views), 0);
       tbodyByDay.innerHTML = "";
       if (!daysArr.length) {
-        tbodyByDay.innerHTML = `<tr><td colspan="3">אין נתונים עדיין.</td></tr>`;
+        tbodyByDay.innerHTML = `<tr><td colspan="3" class="empty">אין נתונים עדיין.</td></tr>`;
       } else {
         daysArr.forEach(r => {
           const tr = document.createElement("tr");
           tr.innerHTML = `
-            <td>${r.dateKey}</td>
+            <td>${escapeHtml(r.dateKey)}</td>
             <td>${r.views}</td>
             <td>${renderBarCell(r.views, maxDayViews)}</td>
           `;
@@ -405,25 +739,21 @@
 
       tbodyByPage.innerHTML = "";
       if (!pagesArr.length) {
-        tbodyByPage.innerHTML = `<tr><td colspan="2">אין נתונים עדיין.</td></tr>`;
+        tbodyByPage.innerHTML = `<tr><td colspan="2" class="empty">אין נתונים עדיין.</td></tr>`;
       } else {
         pagesArr.forEach(r => {
           const tr = document.createElement("tr");
           tr.innerHTML = `
-            <td>${humanPageId(r.pageId)}</td>
+            <td title="${escapeHtml(r.pageId)}">${escapeHtml(humanPageId(r.pageId))}</td>
             <td>${r.views}</td>
           `;
           tbodyByPage.appendChild(tr);
         });
       }
 
-      // --------- events (שעה / שכבה / כיתה / דפים ספציפיים) ----------
-      const qEvents = query(
-        collection(db, "analytics_events"),
-        orderBy("dateKey", "desc")
-      );
-      const snapEvents = await getDocs(qEvents);
-      const events = snapEvents.docs.map(d => d.data());
+      /* ---- Events aggregation ---- */
+      // מסננים events לפי טווח (dateKey) כדי שיתאים ל-filter
+      const events = cachedEvents.filter(ev => withinRange(String(ev.dateKey || ""), rangeVal));
 
       const hourMap = new Map();        // "00".."23" -> count
       const gradeMap = new Map();       // grade -> count (כל הדפים)
@@ -432,34 +762,40 @@
       const classExamsByClass = new Map(); // classId -> count (רק class-exams)
 
       events.forEach(ev => {
-        const h = ev.hour || "??";
+        const h = String(ev.hour ?? "??");
         hourMap.set(h, (hourMap.get(h) || 0) + 1);
 
         if (ev.grade) {
-          gradeMap.set(ev.grade, (gradeMap.get(ev.grade) || 0) + 1);
+          const g = String(ev.grade).toLowerCase();
+          gradeMap.set(g, (gradeMap.get(g) || 0) + 1);
         }
         if (ev.classId) {
-          classMap.set(ev.classId, (classMap.get(ev.classId) || 0) + 1);
+          const cid = String(ev.classId).toLowerCase();
+          classMap.set(cid, (classMap.get(cid) || 0) + 1);
         }
 
         if (ev.pageId === "home-exams" && ev.grade) {
-          examsByGrade.set(ev.grade, (examsByGrade.get(ev.grade) || 0) + 1);
+          const g = String(ev.grade).toLowerCase();
+          examsByGrade.set(g, (examsByGrade.get(g) || 0) + 1);
         }
 
         if (ev.pageId === "class-exams" && ev.classId) {
-          classExamsByClass.set(ev.classId, (classExamsByClass.get(ev.classId) || 0) + 1);
+          const cid = String(ev.classId).toLowerCase();
+          classExamsByClass.set(cid, (classExamsByClass.get(cid) || 0) + 1);
         }
       });
 
-      // לפי שעה
-      const hourArr = Array.from(hourMap.entries())
-        .map(([hour, count]) => ({ hour, count }))
-        .sort((a, b) => a.hour.localeCompare(b.hour));
-
+      // לפי שעה: מציג 00..23 גם אם ריק
+      const hourArr = [];
+      for (let i = 0; i < 24; i++) {
+        const hh = String(i).padStart(2, "0");
+        hourArr.push({ hour: hh, count: hourMap.get(hh) || 0 });
+      }
       const maxHour = hourArr.reduce((m, r) => Math.max(m, r.count), 0);
+
       tbodyByHour.innerHTML = "";
-      if (!hourArr.length) {
-        tbodyByHour.innerHTML = `<tr><td colspan="3">אין עדיין נתוני שעות.</td></tr>`;
+      if (!events.length) {
+        tbodyByHour.innerHTML = `<tr><td colspan="3" class="empty">אין עדיין נתוני שעות.</td></tr>`;
       } else {
         hourArr.forEach(r => {
           const tr = document.createElement("tr");
@@ -479,12 +815,12 @@
 
       tbodyByGrade.innerHTML = "";
       if (!gradeArr.length) {
-        tbodyByGrade.innerHTML = `<tr><td colspan="2">אין עדיין פעילויות עם grade.</td></tr>`;
+        tbodyByGrade.innerHTML = `<tr><td colspan="2" class="empty">אין עדיין פעילויות עם grade.</td></tr>`;
       } else {
         gradeArr.forEach(r => {
           const tr = document.createElement("tr");
           tr.innerHTML = `
-            <td><span class="pill">${gradeToLabel(r.grade)}</span></td>
+            <td><span class="pill">${escapeHtml(gradeToLabel(r.grade))}</span></td>
             <td>${r.count}</td>
           `;
           tbodyByGrade.appendChild(tr);
@@ -498,12 +834,12 @@
 
       tbodyByClass.innerHTML = "";
       if (!classArr.length) {
-        tbodyByClass.innerHTML = `<tr><td colspan="2">אין עדיין פעילויות עם classId.</td></tr>`;
+        tbodyByClass.innerHTML = `<tr><td colspan="2" class="empty">אין עדיין פעילויות עם classId.</td></tr>`;
       } else {
         classArr.forEach(r => {
           const tr = document.createElement("tr");
           tr.innerHTML = `
-            <td><span class="pill">${classIdToLabel(r.classId)}</span></td>
+            <td><span class="pill">${escapeHtml(classIdToLabel(r.classId))}</span></td>
             <td>${r.count}</td>
           `;
           tbodyByClass.appendChild(tr);
@@ -517,12 +853,12 @@
 
       tbodyExamsByGrade.innerHTML = "";
       if (!examsGradeArr.length) {
-        tbodyExamsByGrade.innerHTML = `<tr><td colspan="2">אין עדיין צפיות בדף המבחנים הראשי עם grade.</td></tr>`;
+        tbodyExamsByGrade.innerHTML = `<tr><td colspan="2" class="empty">אין עדיין צפיות בדף המבחנים הראשי עם grade.</td></tr>`;
       } else {
         examsGradeArr.forEach(r => {
           const tr = document.createElement("tr");
           tr.innerHTML = `
-            <td><span class="pill">${gradeToLabel(r.grade)}</span></td>
+            <td><span class="pill">${escapeHtml(gradeToLabel(r.grade))}</span></td>
             <td>${r.count}</td>
           `;
           tbodyExamsByGrade.appendChild(tr);
@@ -536,49 +872,86 @@
 
       tbodyClassExamsByClass.innerHTML = "";
       if (!classExamsArr.length) {
-        tbodyClassExamsByClass.innerHTML = `<tr><td colspan="2">אין עדיין צפיות בעמוד class-exams עם classId.</td></tr>`;
+        tbodyClassExamsByClass.innerHTML = `<tr><td colspan="2" class="empty">אין עדיין צפיות בעמוד class-exams עם classId.</td></tr>`;
       } else {
         classExamsArr.forEach(r => {
           const tr = document.createElement("tr");
           tr.innerHTML = `
-            <td><span class="pill">${classIdToLabel(r.classId)}</span></td>
+            <td><span class="pill">${escapeHtml(classIdToLabel(r.classId))}</span></td>
             <td>${r.count}</td>
           `;
           tbodyClassExamsByClass.appendChild(tr);
         });
       }
-
-      statusEl.textContent = "נטען בהצלחה.";
-      layoutEl.style.display = "";
     }
+
+    async function loadAllAndRender() {
+      statusEl.classList.remove("error");
+      statusEl.textContent = "טוען נתונים...";
+      refreshBtn.disabled = true;
+      try {
+        await fetchAll();
+        filtersEl.style.display = "";
+        layoutEl.style.display = "";
+        render();
+        statusEl.textContent = "נטען בהצלחה.";
+      } catch (err) {
+        console.error(err);
+        statusEl.classList.add("error");
+        statusEl.textContent = "שגיאה בטעינת הנתונים. תבדוק Console.";
+      } finally {
+        refreshBtn.disabled = false;
+      }
+    }
+
+    /* =======================
+      AUTH + UI
+    ======================= */
+    refreshBtn.addEventListener("click", () => loadAllAndRender());
+
+    signOutBtn.addEventListener("click", async () => {
+      try {
+        await signOut(auth);
+        location.href = "admin.html";
+      } catch (e) {
+        console.error(e);
+        alert("לא הצלחתי להתנתק. תבדוק Console.");
+      }
+    });
+
+    rangeSelect.addEventListener("change", () => render());
+    pageFocus.addEventListener("change", () => {
+      // כרגע זה רק טקסט קטן בסיכום (לא מסנן את כל הטבלאות)
+      // אם תרצה – אני אעשה מצב שמסנן טבלאות לפי דף ספציפי.
+      render();
+    });
 
     onAuthStateChanged(auth, (user) => {
       if (!user) {
         statusEl.classList.add("error");
         statusEl.innerHTML = `
           אין לך גישה. התחבר דרך עמוד הניהול.<br>
-          <a class="btn-link" href="admin.html">לעמוד ההתחברות</a>
+          <a class="btn secondary" href="admin.html">לעמוד ההתחברות</a>
         `;
         return;
       }
 
-      const email = (user.email || "").toLowerCase();
+      const email = String(user.email || "").toLowerCase();
       const allowed = OWNER_EMAILS.map(e => e.toLowerCase()).includes(email);
 
       if (!allowed) {
         statusEl.classList.add("error");
-        statusEl.textContent =
-          "המשתמש " + email + " אינו מורשה לצפות באנליטיקות.";
+        statusEl.textContent = "המשתמש " + email + " אינו מורשה לצפות באנליטיקות.";
         return;
       }
 
-      statusEl.textContent = "טוען נתונים...";
-      loadAnalytics().catch(err => {
-        console.error(err);
-        statusEl.classList.add("error");
-        statusEl.textContent = "שגיאה בטעינת הנתונים.";
-      });
+      loadAllAndRender();
     });
   </script>
+
+  <!-- ✅ שים את זה כדי שהדשבורד גם יופיע בסטטיסטיקות שלך (רק אם אתה רוצה),
+       אבל כרגע analytics.js שלך לא כותב בדאשבורד בגלל data-page=analytics-dashboard.
+       אם תרצה שכן ייספר — תגיד ואשנה לך לוגיקה. -->
+  <script type="module" src="analytics.js"></script>
 </body>
 </html>
