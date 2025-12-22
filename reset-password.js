@@ -33,7 +33,7 @@ if (!form || !emailInput || !statusEl) {
 
       await sendPasswordResetEmail(auth, email);
 
-      setStatus("נשלח למייל בהצלחה ✅", "success");
+      setStatus("✅ אם האימייל קיים – נשלח קישור (בדוק ספאם)", "success");
       console.log("✅ reset email sent");
     } catch (err) {
       console.error("❌ reset error:", err);
