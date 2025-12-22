@@ -3,15 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>מעביר אותך למרחב האישי….</title>
+  <title>מעביר אותך למרחב האישי…</title>
 
   <style>
     /* ===== בסיס ===== */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       min-height: 100vh;
@@ -45,10 +41,6 @@
       z-index: -2;
       animation: bgMove 18s ease-in-out infinite alternate;
     }
-.dynamic-line.fade {
-  opacity: 0;
-  transition: opacity 0.25s ease;
-}
 
     @keyframes bgMove {
       0%   { transform: translate3d(0,0,0) scale(1); }
@@ -72,7 +64,7 @@
       to   { opacity: 0.5;  }
     }
 
-    /* ===== קונטיינר מרכזי (כרטיס) ===== */
+    /* ===== כרטיס מרכזי ===== */
     .card {
       position: relative;
       max-width: 520px;
@@ -90,11 +82,12 @@
     }
 
     @keyframes cardFloat {
-      0%   { transform: translateY(0);     box-shadow: 0 22px 60px rgba(15,23,42,0.95); }
-      50%  { transform: translateY(-4px);  box-shadow: 0 28px 70px rgba(15,23,42,0.9);  }
-      100% { transform: translateY(-2px);  box-shadow: 0 24px 64px rgba(15,23,42,0.92); }
+      0%   { transform: translateY(0); }
+      50%  { transform: translateY(-4px); }
+      100% { transform: translateY(-2px); }
     }
 
+    /* badge עדין - לא צועק */
     .badge {
       position: absolute;
       top: 16px;
@@ -102,9 +95,9 @@
       font-size: 0.75rem;
       padding: 4px 10px;
       border-radius: 999px;
-      background: rgba(15,118,110,0.18);
-      color: #a7f3d0;
-      border: 1px solid rgba(45,212,191,0.4);
+      background: rgba(59,130,246,0.10);
+      color: #bfdbfe;
+      border: 1px solid rgba(147,197,253,0.28);
     }
 
     h1 {
@@ -124,8 +117,15 @@
       font-size: 1.1rem;
       margin-bottom: 20px;
       color: #bfdbfe;
-      min-height: 1.4em;
-      transition: opacity 0.25s ease;
+      min-height: 1.6em;
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity .28s ease, transform .28s ease;
+    }
+
+    .dynamic-line.fade {
+      opacity: 0;
+      transform: translateY(6px);
     }
 
     .countdown {
@@ -134,7 +134,7 @@
       margin-bottom: 18px;
     }
 
-    /* ===== ספינר “רגוע־עצבני” ===== */
+    /* ===== ספינר ===== */
     .spinner-wrap {
       display: inline-flex;
       align-items: center;
@@ -158,11 +158,11 @@
     }
 
     @keyframes orbitWobble {
-      0%   { transform: translateY(0) rotate(0deg);   }
+      0%   { transform: translateY(0) rotate(0deg); }
       25%  { transform: translateY(-2px) rotate(3deg); }
       50%  { transform: translateY(1px) rotate(-3deg); }
       75%  { transform: translateY(-1px) rotate(2deg); }
-      100% { transform: translateY(0) rotate(0deg);   }
+      100% { transform: translateY(0) rotate(0deg); }
     }
 
     .spinner-ring {
@@ -191,7 +191,6 @@
       100% { transform: rotate(360deg); }
     }
 
-    /* טקסט קטן למקרה של בעיית פופ־אפ */
     .hint {
       margin-top: 18px;
       font-size: 0.8rem;
@@ -218,17 +217,15 @@
   <div class="bg-noise"></div>
 
   <div class="card">
-    <div class="badge">🔒Powered by PERETZINHO ⚡</div>
+    <div class="badge">⚡ Powered by PERETZINHO</div>
 
     <h1>מעביר אותך למרחב האישי…</h1>
-    <p class="subtitle">תכף תעבור לאתר משרד החינוך. בינתיים, תראה כאילו המערכת עובדת קשה 😅</p>
+    <p class="subtitle">תכף תעבור לאתר משרד החינוך. בינתיים, נעשה כאילו המערכת עובדת קשה 😅</p>
 
-    <p id="dynamic-line" class="dynamic-line">
-      טוען נתונים סודיים של תלמידים מדהימים…
-    </p>
+    <p id="dynamic-line" class="dynamic-line">טוען נתונים…</p>
 
-    <p id="countdown" class="countdown">
-      קופצים למרחב האישי בעוד <strong>4</strong> שניות
+    <p class="countdown">
+      קופצים למרחב האישי בעוד <strong id="seconds">4</strong> שניות
     </p>
 
     <div class="spinner-wrap">
@@ -240,123 +237,142 @@
 
     <p class="hint">
       אם לא עבר אוטומטית – אפשר ללחוץ
-      <a id="manual-link" href="https://my.edu.gov.il/home" target="_self" rel="noopener">
-        כאן למעבר ידני
-      </a>.
+      <a id="manual-link" href="https://my.edu.gov.il/home" target="_self" rel="noopener">כאן למעבר ידני</a>.
     </p>
   </div>
 
   <script>
-    // ===== טקסטים מצחיקים =====
-  const lines = [
-  "מטפל בבירוקרטיה… מישהו חייב לעשות את זה 🤯",
-  "מחבר אותך לשרתים של משרד החינוך… מקווה שהם ערים 😴",
-  "בודק שהסיסמה שלך לא 1234… 👀",
-  "מנקה את הלוח לפני שמביאים מבחנים חדשים 🧽",
-  "מעלה את רמת הנמנום הכללית במערכת… 😴➡😵‍💫",
-  "מתאם בין היומן שלך לבין לוח המבחנים 📅",
-  "מנסה לזכור איפה שמנו את המשתמש שלך… 🤔",
-  "שולח בקשה רשמית לשרת: 'בבקשה תעבוד היום' 🙏",
-  "בודק אם אתה מוכן לעוד שיעור מתמטיקה 📐",
-  "סופר כמה פעמים אמרת 'אין לי כוח' השנה 🧮",
-  "עושה רענון חינוכי למערכת… ייקח שנייה 😇",
-  "מזניק את הטיל הדיגיטלי למרחב האישי 🚀",
-  "מכוון את האנטנה על 'תלמיד תותח מזוהה' 📡",
-  "בודק שציוני בחינות החורף לא נעלמו בדרך ❄️",
-  "מעלה את מפלס המוטיבציה ב־0.0001% 📈",
-  "מחפש קיצורי דרך… אבל רק במערכת, לא בחיים 😉",
-  "משכנע את השרת שלא לקרוס היום 🖥️",
-  "זורק קצת ביטים באוויר כדי להרשים אותך 💾✨",
-  "טוען מחדש את תקנות בית הספר… סבלנות 🧾",
-  "בודק אם מישהו שכח להגיש עבודה 🙃",
-  "שואל את המאגר אם אתה מוכן ללמוד היום… המאגר צוחק 😂",
-  "מתאם קו תקשורת עם השרת… הוא ענה 'מה?' 📡",
-  "פותח תיבת פנדורה של נתונים… נסגר מהר 😬",
-  "מעמיס קצת חכמה על הקו… זה כבד 💡",
-  "מכין קפה לשרת שיתעורר כבר ☕",
-  "בודק עומסים… המערכת בלחץ אבל מסתדרת 💪",
-  "מנסה להיזכר למה בכלל בנו את האתר הזה 🤨",
-  "מבצע התחברות טקטית… כמו נינג’ה 🥷",
-  "טוען קבצים שגדולים על המערכת… מתפלל שזה יעבור 🙏",
-
-  // 🔥 תוספות חדשות 🔥
-  "בודק אם היום יש מבחן פתע… לא מגלה לך 😈",
-  "מפעיל מצב 'תלמיד אחראי'… טעינה נכשלה 😅",
-  "מחפש את הכיתה שלך במערכת… יש הרבה 😵",
-  "בודק אם השעון מראה כבר הפסקה ⏰",
-  "מעדכן את המערכת: תלמיד עדיין אנושי 🤖❌",
-  "מטעין מצב הישרדות לשבוע לימודים 📚🛡️",
-  "בודק זמינות מוחית… חצי כוח 🧠",
-  "השרת שאל מי זה PERETZINHO… אמרנו לו אגדה 😎",
-  "מנסה לסנכרן בין רצון ללמוד למציאות 🤷‍♂️",
-  "טוען נתונים חשובים… ואז שוכח למה 🤦‍♂️",
-  "מפעיל פרוטוקול 'יהיה בסדר' 😌",
-  "בודק אם המורה כבר העלתה ציונים… עדיין לא 😬",
-  "סורק תירוצים אפשריים לשיעור הבא 🕵️‍♂️",
-  "מחשב סיכוי להברזה… גבוה מהרגיל 📊",
-  "מעלה מגן דיגיטלי מפני מבחנים 🛡️",
-  "בודק אם המערכת מזהה תלמיד עייף… זוהית 💤",
-  "מנסה לשכנע את הזמן לזוז קצת יותר מהר ⏩",
-  "טוען נתוני הצלחה עתידיים… ספוילר: יש 💙",
-  "מבצע חימום לפני כניסה למרחב האישי 🔥",
-  "בודק אם כבר סוף יום… כמעט 😮‍💨",
-  "מכין את המערכת לעוד יום של גיבורים 🎒⭐"
-];
-
-
+    // ===== משפטים (80) =====
+    // כלליים: ~72 | עליך/Peretzinho: ~8 (לא מוגזם)
+    const lines = [
+      "מטפל בבירוקרטיה… מישהו חייב לעשות את זה 🤯",
+      "מחבר אותך לשרתים של משרד החינוך… מקווה שהם ערים 😴",
+      "בודק שהסיסמה שלך לא 1234… 👀",
+      "מנקה את הלוח לפני שמביאים מבחנים חדשים 🧽",
+      "מתאם בין היומן שלך לבין לוח המבחנים 📅",
+      "מנסה לזכור איפה שמנו את המשתמש שלך… 🤔",
+      "שולח בקשה רשמית לשרת: 'בבקשה תעבוד היום' 🙏",
+      "בודק אם אתה מוכן לעוד שיעור מתמטיקה 📐",
+      "סופר כמה פעמים אמרת 'אין לי כוח' השנה 🧮",
+      "עושה רענון חינוכי למערכת… ייקח שנייה 😇",
+      "מזניק את הטיל הדיגיטלי למרחב האישי 🚀",
+      "מכוון את האנטנה על 'תלמיד תותח מזוהה' 📡",
+      "בודק שציוני החורף לא נעלמו בדרך ❄️",
+      "מעלה את מפלס המוטיבציה ב־0.0001% 📈",
+      "מחפש קיצורי דרך… אבל רק במערכת, לא בחיים 😉",
+      "משכנע את השרת שלא לקרוס היום 🖥️",
+      "טוען מחדש את תקנון בית הספר… סבלנות 🧾",
+      "בודק אם מישהו שכח להגיש עבודה 🙃",
+      "שואל את המאגר אם אתה מוכן ללמוד היום… המאגר צוחק 😂",
+      "מתאם קו תקשורת עם השרת… הוא ענה 'מה?' 📡",
+      "פותח תיבת פנדורה של נתונים… נסגר מהר 😬",
+      "מעמיס קצת חכמה על הקו… זה כבד 💡",
+      "מכין קפה לשרת שיתעורר כבר ☕",
+      "בודק עומסים… המערכת בלחץ אבל מסתדרת 💪",
+      "מבצע התחברות טקטית… כמו נינג’ה 🥷",
+      "טוען קבצים שגדולים על המערכת… מתפלל שזה יעבור 🙏",
+      "בודק אם היום יש מבחן פתע… לא מגלה לך 😈",
+      "מפעיל מצב 'תלמיד אחראי'… טעינה נכשלה 😅",
+      "מחפש את הכיתה שלך במערכת… יש הרבה 😵",
+      "בודק אם השעון מראה כבר הפסקה ⏰",
+      "מעדכן את המערכת: תלמיד עדיין אנושי 🤖❌",
+      "מטעין מצב הישרדות לשבוע לימודים 📚🛡️",
+      "בודק זמינות מוחית… חצי כוח 🧠",
+      "מנסה לסנכרן בין רצון ללמוד למציאות 🤷‍♂️",
+      "טוען נתונים חשובים… ואז שוכח למה 🤦‍♂️",
+      "מפעיל פרוטוקול 'יהיה בסדר' 😌",
+      "בודק אם המורה כבר העלתה ציונים… עדיין לא 😬",
+      "סורק תירוצים אפשריים לשיעור הבא 🕵️‍♂️",
+      "מחשב סיכוי להברזה… גבוה מהרגיל 📊",
+      "מעלה מגן דיגיטלי מפני מבחנים 🛡️",
+      "בודק אם המערכת מזהה תלמיד עייף… זוהית 💤",
+      "מנסה לשכנע את הזמן לזוז קצת יותר מהר ⏩",
+      "מבצע חימום לפני כניסה למרחב האישי 🔥",
+      "בודק אם כבר סוף יום… כמעט 😮‍💨",
+      "מטעין שיעורי בית… ואז מתחרט 🤝📚",
+      "מנסה להוריד באגים… הם עולים מחדש 🐛",
+      "רק רגע… המערכת עושה דרמה 🎭",
+      "בודק אם יש וייפ במערכת… רק ליתר ביטחון 🚫😅",
+      "מנסה לשכנע את השרת לא להיות עצבני היום 😇",
+      "מעביר בקשה ל'שקט בשיעור'… נדחתה מיד 🤐",
+      "טוען נתוני נוכחות… מי הבריז? 🕵️",
+      "מחשב כמה ימים נשארו עד החופש… בערך נצח 🏝️",
+      "מחליף הילוך מ'עצל' ל'קצת עובד' ⚙️",
+      "מפעיל מצב ריכוז… הפרעה זוהתה 📵",
+      "בודק אם המערכת ראתה כבר את היום הזה… כן 😭",
+      "מנסה להדליק את האור בקצה המנהרה 💡",
+      "טוען 'משמעת'… קובץ לא נמצא 😅",
+      "מפעיל סריקה: 'מי עשה בלגן במסדרון' 🧹",
+      "מתרגם את המערכת לשפה: 'סבלנות אחי' 🫠",
+      "מבצע עדכון: 'להפסיק לקרוס'… בהצלחה 🙏",
+      "מסדר הרשאות… שלא תיכנס לחשבון של המורה 😬",
+      "טוען ציונים… זהירות: רגשות מעורבים 💔",
+      "מכין מערכת שתעמוד בלחץ… היא ביקשה חופשה 🧳",
+      "מפעיל הגנה מפני 'איחור לשיעור' ⏱️🛡️",
+      "בודק אם המחשב בכיתה עדיין מהתקופה של נח 🦕",
+      "מנסה להיזכר איפה שמו את ה-Wi-Fi בבית ספר 📶",
+      "מכין תירוץ רשמי ל'המחשב נתקע' 🧾",
+      "טוען מצב שקט… ואז נשמעת צעקה במסדרון 😅",
+      "מפעיל מנגנון נגד שיעמום… כמעט עובד 🎮",
+      "בודק אם יש ריב היום… מקווה שלא 🫣",
+      "רק רגע… מסדר את הסטייל של המערכת ✨",
+      "טוען עדכונים… אם זה תקוע תעשה כאילו לא ראית 👀",
+      "מתאם כניסה חלקה… בלי מבטים של 'איפה היית' 😭",
+"מיאווווווווווווווווווווווווווווווווווווווווווווווווווו",
+"תגידו מה שתגידו אתר מטורף ",
+      "נדב נכנס… המערכת מסתדרת יפה פתאום 💪",
+      "PERETZINHO אמר לא להגזים… אז אנחנו רגועים 😄",
+      "PERETZINHO ביקש מעבר חלק… ביצענו."
+    ];
 
     const dynamicEl = document.getElementById("dynamic-line");
-    const countdownEl = document.getElementById("countdown").querySelector("strong");
+    const secondsEl = document.getElementById("seconds");
     const manualLink = document.getElementById("manual-link");
 
-    // בוחר משפט רנדומלי חדש כל ~900ms
+    // בחירה רנדומלית בלי לחזור על אותו משפט פעמיים
     let lastIndex = -1;
+    function pickRandomIndex(max) {
+      if (max <= 1) return 0;
+      let idx = Math.floor(Math.random() * max);
+      if (idx === lastIndex) idx = (idx + 1) % max;
+      lastIndex = idx;
+      return idx;
+    }
+
     function setRandomLine() {
-  let idx = Math.floor(Math.random() * lines.length);
-  if (idx === lastIndex) {
-    idx = (idx + 2) % lines.length;
-  }
-  lastIndex = idx;
+      const idx = pickRandomIndex(lines.length);
+      dynamicEl.classList.add("fade");
+      setTimeout(() => {
+        dynamicEl.textContent = lines[idx];
+        dynamicEl.classList.remove("fade");
+      }, 230);
+    }
 
-  // מוסיף אפקט הבהוב
-  dynamicEl.classList.add("fade");
-
-  setTimeout(() => {
-    dynamicEl.textContent = lines[idx];
-    dynamicEl.classList.remove("fade");
-  }, 250); // זמן הבהוב
-}
-
-
+    // מתחילים
     setRandomLine();
     const textInterval = setInterval(setRandomLine, 1500);
 
-    // ===== ספירה לאחור ומעבר =====
+    // ספירה לאחור + מעבר
     let secondsLeft = 4;
-    countdownEl.textContent = secondsLeft.toString();
+    secondsEl.textContent = String(secondsLeft);
+
+    const TARGET_URL = "https://my.edu.gov.il/home";
+    manualLink.href = TARGET_URL;
 
     const countdownTimer = setInterval(() => {
       secondsLeft--;
       if (secondsLeft <= 0) {
-        countdownEl.textContent = "רגע…";
+        secondsEl.textContent = "רגע…";
         clearInterval(countdownTimer);
         return;
       }
-      countdownEl.textContent = secondsLeft.toString();
+      secondsEl.textContent = String(secondsLeft);
     }, 1000);
-
-    // אחרי ~4 שניות – מעבר למרחב האישי באותו טאב
-    const TARGET_URL = "https://my.edu.gov.il/home";
 
     setTimeout(() => {
       clearInterval(textInterval);
-      // מעבר רגיל – באותו חלון, בלי לחזור לאתר
       window.location.href = TARGET_URL;
     }, 4000);
-
-    // קישור ידני שיהיה מסונכרן ל־URL
-    manualLink.href = TARGET_URL;
   </script>
-
 </body>
 </html>
