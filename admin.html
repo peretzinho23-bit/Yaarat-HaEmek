@@ -6,39 +6,168 @@
 
   <title>לוח ניהול – יערת העמק</title>
 
-  <!-- האתר הכללי (לרכיבים/כפתורים בסיסיים) -->
+  <!-- האתר הכללי (רכיבים/כפתורים בסיסיים) -->
   <link rel="stylesheet" href="style.css" />
-  <!-- האדמין (אמור לנצח הכל) -->
+  <!-- האדמין -->
   <link rel="stylesheet" href="admin.css" />
 
-  <!-- ✅ נועל את האדמין על DARK ולא נותן לאתר להשפיע -->
+  <!-- =========================
+       ADMIN THEME (ONLY ADMIN)
+       ========================= -->
   <script>
     (function () {
       try {
-        document.documentElement.setAttribute("data-theme", "dark");
-        document.documentElement.classList.remove("theme-changing");
+        // תמה נפרדת לאדמין בלבד
+        const key = "admin_theme";
+        const saved = localStorage.getItem(key);
+        const theme = saved || "dark"; // ברירת מחדל: dark
+        document.documentElement.setAttribute("data-theme", theme);
       } catch {}
     })();
   </script>
 
-  <!-- התאמות ספציפיות לאדמין: תמונות קטנות + רשימות קומפקטיות -->
   <style>
-    /* כרטיס אדמין כללי */
-    .admin-list .admin-item {
+    /* =========================================
+       ADMIN OVERRIDES (WINS OVER style.css)
+       ========================================= */
+
+    /* רק לאדמין */
+    body.admin-page{
+      background: radial-gradient(1200px 600px at 50% -10%, rgba(56,189,248,.18), transparent 60%),
+                  linear-gradient(180deg, #020617, #020617);
+      color: #e3f2fd;
+    }
+
+    html[data-theme="light"] body.admin-page{
+      background: radial-gradient(1200px 600px at 50% -10%, rgba(37,99,235,.12), transparent 60%),
+                  linear-gradient(180deg, #f8fafc, #eef2ff);
+      color: #0f172a;
+    }
+
+    /* ✅ זה מה שגרם לך ל"עמודה אחת": container צר מדי ב-style.css */
+    body.admin-page .container{
+      max-width: 1400px !important;
+      width: min(1400px, calc(100% - 40px)) !important;
+      margin-inline: auto !important;
+    }
+
+    /* =========================
+       HEADER CENTER + THEME BTN
+       ========================= */
+    .header-main .nav.nav-centered{
+      position: relative;
+      min-height: 86px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .nav-center{
+      position: absolute;
+      right: 18px; /* RTL */
+      display: flex;
+      align-items: center;
+      z-index: 3;
+    }
+
+    .admin-header-title{
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      font-weight: 900;
+      font-size: clamp(1.1rem, 2.2vw, 1.55rem);
+      white-space: nowrap;
+      z-index: 2;
+      text-align: center;
+      color: #ffffff;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.65), 0 0 18px rgba(56,189,248,0.35);
+      padding-inline: 10px;
+      max-width: calc(100% - 220px);
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    html[data-theme="light"] .admin-header-title{
+      color: #0f172a;
+      text-shadow: 0 2px 8px rgba(15,23,42,0.15), 0 0 14px rgba(37,99,235,0.18);
+    }
+
+    /* כפתור תמה באדמין (שמאל ב-RTL) */
+    .admin-theme-toggle{
+      position: absolute;
+      left: 18px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-weight: 800;
+      cursor: pointer;
+      z-index: 4;
+      border: 1px solid rgba(148,163,184,.55);
+      background: rgba(15,23,42,.75);
+      color: #e5e7eb;
+      user-select: none;
+    }
+
+    html[data-theme="light"] .admin-theme-toggle{
+      background: rgba(255,255,255,.75);
+      color: #0f172a;
+      border-color: rgba(148,163,184,.45);
+    }
+
+    /* =========================
+       3 CARDS IN A ROW (GRADES)
+       ========================= */
+    .admin-columns{
+      display: grid !important;
+      gap: 18px;
+      align-items: start;
+      margin-top: 10px;
+    }
+
+    @media (min-width: 1100px){
+      .admin-columns{
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      }
+    }
+    @media (min-width: 700px) and (max-width: 1099px){
+      .admin-columns{
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      }
+    }
+    @media (max-width: 699px){
+      .admin-columns{
+        grid-template-columns: 1fr !important;
+      }
+      .admin-header-title{ max-width: calc(100% - 160px); }
+    }
+
+    /* כרטיסים - שלא יישברו */
+    .admin-grade-section,
+    .admin-columns > section,
+    .admin-columns > .card{
+      min-width: 0 !important;
+    }
+
+    /* ===========
+       LIST/IMAGES
+       =========== */
+    .admin-list .admin-item{
       padding: 8px 10px;
       margin-bottom: 8px;
       border-radius: 12px;
     }
 
-    /* שורת תמונות קטנה בחדשות / מודעות */
-    .admin-images-row {
+    .admin-images-row{
       display: flex;
       gap: 6px;
       margin-top: 4px;
       flex-wrap: wrap;
     }
 
-    .admin-image-wrapper {
+    .admin-image-wrapper{
       width: 90px;
       height: 70px;
       flex: 0 0 auto;
@@ -46,42 +175,38 @@
       border-radius: 8px;
     }
 
-    .admin-image-wrapper img.admin-image {
+    .admin-image-wrapper img.admin-image{
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: block;
     }
 
-    /* טקסט קצר יותר כדי שלא ייקח חצי מסך */
-    .admin-item-body {
+    .admin-item-body{
       font-size: 0.9rem;
       line-height: 1.45;
       max-height: 6.5em;
       overflow-y: auto;
     }
 
-    /* כותרות מבחנים באדמין – קצת מרווח */
-    .admin-class-title {
+    .admin-class-title{
       font-size: 0.95rem;
       margin-top: 10px;
       margin-bottom: 4px;
       opacity: 0.9;
     }
 
-    .admin-exam-item {
+    .admin-exam-item{
       border-radius: 10px;
       padding: 6px 8px;
       margin-bottom: 6px;
     }
-
-    /* ✅ חשוב: לא לשים פה עיצובי light/dark של האדמין.
-       כל זה צריך להיות ב-admin.css כדי שלא יהיה ערבוב עם האתר. */
   </style>
 </head>
 
 <body class="admin-page" data-page="admin">
-  <!-- ✅ רק פעם אחת -->
+
+  <!-- רק פעם אחת -->
   <script type="module" src="analytics.js"></script>
 
   <!-- HEADER -->
@@ -100,14 +225,20 @@
           </a>
         </div>
 
-        <!-- כותרת באמצע אמיתי (ממומש ב-admin.css) -->
+        <!-- כותרת באמצע -->
         <div class="admin-header-title">מערכת ניהול · יערת העמק</div>
+
+        <!-- כפתור תמה -->
+        <button class="admin-theme-toggle" id="adminThemeToggle" type="button" aria-label="החלפת תצוגה">
+          <span id="adminThemeIcon">🌙</span>
+          <span id="adminThemeText">Dark</span>
+        </button>
 
       </nav>
     </div>
   </header>
 
-  <!-- סיידבר שכבות לאדמין (מחוץ ל-header) -->
+  <!-- סיידבר שכבות לאדמין -->
   <div class="admin-grade-switcher">
     <button class="grade-filter-btn active" data-grade="all">כל השכבות</button>
     <button class="grade-filter-btn" data-grade="z">שכבת ז'</button>
@@ -138,9 +269,7 @@
         </form>
 
         <div style="max-width:360px;margin:15px auto 0;text-align:center;">
-          <p class="section-subtitle" style="margin-bottom:8px;">
-            אין לך משתמש אדמין?
-          </p>
+          <p class="section-subtitle" style="margin-bottom:8px;">אין לך משתמש אדמין?</p>
           <a href="register.html" class="btn-outline" style="display:inline-block;padding:8px 16px;border-radius:999px;">
             בקשת הרשמה
           </a>
@@ -153,31 +282,20 @@
 
         <div class="section-header">
           <h2 class="section-title">ניהול חדשות, מבחנים, מודעות ותוכן האתר</h2>
-          <p class="section-subtitle">
-            כל שינוי נשמר אוטומטית ונראה באתר התלמידים.
-          </p>
+          <p class="section-subtitle">כל שינוי נשמר אוטומטית ונראה באתר התלמידים.</p>
         </div>
 
-        <!-- כפתורי ניהול מהירים -->
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;">
-          <a
-            href="adminapps.html"
-            target="_blank"
-            class="btn-outline"
-            style="display:inline-block;padding:8px 16px;border-radius:999px;"
-          >
-            כלי עריכה נוספים 🛠️    קוד כניסה - 1992
+          <a href="adminapps.html" target="_blank" class="btn-outline" style="display:inline-block;padding:8px 16px;border-radius:999px;">
+            כלי עריכה נוספים 🛠️ קוד כניסה - 1992
           </a>
         </div>
 
         <!-- NEWS -->
         <h3 class="section-title" style="font-size:1.2rem;margin-bottom:10px;">חדשות לפי כיתות</h3>
-        <p class="section-subtitle">
-          ניתן להוסיף עד שתי תמונות לידיעה (קישורים או קבצים) + צבע טקסט (אופציונלי).
-        </p>
+        <p class="section-subtitle">ניתן להוסיף עד שתי תמונות לידיעה (קישורים או קבצים) + צבע טקסט (אופציונלי).</p>
 
         <div class="admin-columns">
-
           <!-- NEWS Z -->
           <section class="admin-grade-section" data-grade="z">
             <div class="card">
@@ -314,7 +432,6 @@
               </form>
             </div>
           </section>
-
         </div>
 
         <br><br>
@@ -323,7 +440,7 @@
         <h3 class="section-title" style="font-size:1.2rem;margin-bottom:10px;">לוח מבחנים - נא לא למחוק מבחנים קיימים.</h3>
 
         <div class="admin-columns">
-          <!-- Z EXAMS -->
+          <!-- Z -->
           <section class="admin-grade-section" data-grade="z">
             <div class="card">
               <h3>מבחנים · ז'</h3>
@@ -332,35 +449,25 @@
               <form id="exams-form-z" class="admin-form" data-grade="z">
                 <label>תאריך המבחן</label>
                 <input name="date" type="text" placeholder="למשל: 22/10/24" required />
-
                 <label>שעת המבחן</label>
                 <input type="time" name="time" />
-
                 <label>מקצוע</label>
                 <input name="subject" />
-
                 <label>כיתה</label>
                 <select name="classId" required>
                   <option value="">בחר כיתה</option>
-                  <option value="z1">ז1</option>
-                  <option value="z2">ז2</option>
-                  <option value="z3">ז3</option>
-                  <option value="z4">ז4</option>
-                  <option value="z5">ז5</option>
+                  <option value="z1">ז1</option><option value="z2">ז2</option><option value="z3">ז3</option><option value="z4">ז4</option><option value="z5">ז5</option>
                 </select>
-
                 <label>נושא המבחן</label>
                 <textarea name="topic"></textarea>
-
                 <label>קישור לתמונה (אופציונלי)</label>
                 <input name="imageUrl" placeholder="https://..." />
-
                 <button type="submit">הוסף מבחן לז'</button>
               </form>
             </div>
           </section>
 
-          <!-- H EXAMS -->
+          <!-- H -->
           <section class="admin-grade-section" data-grade="h">
             <div class="card">
               <h3>מבחנים · ח'</h3>
@@ -369,34 +476,25 @@
               <form id="exams-form-h" class="admin-form" data-grade="h">
                 <label>תאריך המבחן</label>
                 <input name="date" type="text" placeholder="למשל: 22/10/24" required />
-
                 <label>שעת המבחן</label>
                 <input name="time" type="time" />
-
                 <label>מקצוע</label>
                 <input name="subject" />
-
                 <label>כיתה</label>
                 <select name="classId" required>
                   <option value="">בחר כיתה</option>
-                  <option value="h1">ח1/7</option>
-                  <option value="h4">ח4/8</option>
-                  <option value="h5">ח5/9</option>
-                  <option value="h6">ח6/10</option>
+                  <option value="h1">ח1/7</option><option value="h4">ח4/8</option><option value="h5">ח5/9</option><option value="h6">ח6/10</option>
                 </select>
-
                 <label>נושא המבחן</label>
                 <textarea name="topic"></textarea>
-
                 <label>קישור לתמונה (אופציונלי)</label>
                 <input name="imageUrl" placeholder="https://..." />
-
                 <button type="submit">הוסף מבחן לח'</button>
               </form>
             </div>
           </section>
 
-          <!-- T EXAMS -->
+          <!-- T -->
           <section class="admin-grade-section" data-grade="t">
             <div class="card">
               <h3>מבחנים · ט'</h3>
@@ -405,29 +503,19 @@
               <form id="exams-form-t" class="admin-form" data-grade="t">
                 <label>תאריך המבחן</label>
                 <input name="date" type="text" placeholder="למשל: 22/10/24" required />
-
                 <label>שעת המבחן</label>
                 <input name="time" type="time" />
-
                 <label>מקצוע</label>
                 <input name="subject" />
-
                 <label>כיתה</label>
                 <select name="classId" required>
                   <option value="">בחר כיתה</option>
-                  <option value="t1">ט1</option>
-                  <option value="t2">ט2</option>
-                  <option value="t3">ט3</option>
-                  <option value="t4">ט4</option>
-                  <option value="t5">ט5</option>
+                  <option value="t1">ט1</option><option value="t2">ט2</option><option value="t3">ט3</option><option value="t4">ט4</option><option value="t5">ט5</option>
                 </select>
-
                 <label>נושא המבחן</label>
                 <textarea name="topic"></textarea>
-
                 <label>קישור לתמונה (אופציונלי)</label>
                 <input name="imageUrl" placeholder="https://..." />
-
                 <button type="submit">הוסף מבחן לט'</button>
               </form>
             </div>
@@ -467,8 +555,7 @@
 
         <!-- BOARD -->
         <h3 class="section-title" style="font-size:1.2rem;margin-bottom:10px;">
-          לוח מודעות
-          נא לא למחוק מודעות אחרות,זה מוחק את דף הכתבה
+          לוח מודעות נא לא למחוק מודעות אחרות,זה מוחק את דף הכתבה
         </h3>
 
         <div class="admin-columns">
@@ -477,36 +564,20 @@
             <div id="admin-board" class="admin-list"></div>
 
             <form id="board-form">
-              <label>כותרת</label>
-              <input name="title" />
+              <label>כותרת</label><input name="title" />
+              <label>מידע קצר (מי קהל היעד, תאריך וכו')</label><input name="meta" />
+              <label>צבע הטקסט (אופציונלי)</label><input type="color" name="color" value="#ffffff" />
 
-              <label>מידע קצר (מי קהל היעד, תאריך וכו')</label>
-              <input name="meta" />
+              <label>קישור לתמונה 1 (אופציונלי)</label><input name="imageUrl" placeholder="https://..." />
+              <label>העלה קובץ תמונה 1 (אופציונלי)</label><input type="file" name="imageFile" accept="image/*" />
 
-              <label>צבע הטקסט (אופציונלי)</label>
-              <input type="color" name="color" value="#ffffff" />
+              <label>קישור לתמונה 2 (אופציונלי)</label><input name="imageUrl2" placeholder="https://..." />
+              <label>העלה קובץ תמונה 2 (אופציונלי)</label><input type="file" name="imageFile2" accept="image/*" />
 
-              <label>קישור לתמונה 1 (אופציונלי)</label>
-              <input name="imageUrl" placeholder="https://..." />
+              <label>קישור לתמונה 3 (אופציונלי)</label><input name="imageUrl3" placeholder="https://..." />
+              <label>העלה קובץ תמונה 3 (אופציונלי)</label><input type="file" name="imageFile3" accept="image/*" />
 
-              <label>העלה קובץ תמונה 1 (אופציונלי)</label>
-              <input type="file" name="imageFile" accept="image/*" />
-
-              <label>קישור לתמונה 2 (אופציונלי)</label>
-              <input name="imageUrl2" placeholder="https://..." />
-
-              <label>העלה קובץ תמונה 2 (אופציונלי)</label>
-              <input type="file" name="imageFile2" accept="image/*" />
-
-              <label>קישור לתמונה 3 (אופציונלי)</label>
-              <input name="imageUrl3" placeholder="https://..." />
-
-              <label>העלה קובץ תמונה 3 (אופציונלי)</label>
-              <input type="file" name="imageFile3" accept="image/*" />
-
-              <label>תוכן המודעה</label>
-              <textarea name="body"></textarea>
-
+              <label>תוכן המודעה</label><textarea name="body"></textarea>
               <button type="submit">הוסף מודעה</button>
             </form>
           </div>
@@ -516,49 +587,36 @@
 
         <!-- SITE CONTENT -->
         <h3 class="section-title" style="font-size:1.2rem;margin-bottom:10px;">ניהול תוכן האתר</h3>
-        <p class="section-subtitle">
-          כל השדות כאן נשמרים במסמך Firestore אחד (siteContent/main) ומוזנים לכל חלקי האתר.
-        </p>
+        <p class="section-subtitle">כל השדות כאן נשמרים במסמך Firestore אחד (siteContent/main) ומוזנים לכל חלקי האתר.</p>
 
         <div class="admin-columns">
           <div class="card">
             <h3>טקסטים כלליים</h3>
 
             <form id="site-content-form" class="admin-form">
-              <!-- HERO -->
+              <!-- כל התוכן שלך נשאר כמו שהיה -->
               <h4>דף בית – אזור הירו (המשפטים הגדולים למעלה)</h4>
-
               <label>כותרת ראשית בהירו</label>
               <input name="homeHeroTitle" placeholder="ברוכים הבאים ליערת העמק" />
-
               <label>תת־כותרת בהירו</label>
               <input name="homeHeroSubtitle" placeholder="סביבת למידה בטוחה, תומכת ומובילה..." />
 
               <h4 style="margin-top:16px;">תיבת "מידע מהיר" בהירו</h4>
-
               <label>כותרת התיבה</label>
               <input name="heroSideTitle" placeholder="מידע מהיר" />
-
               <label>שורות 'מידע מהיר' (כל שורה – שורה בנפרד ברשימה)</label>
-              <textarea
-                name="heroSideList"
-                rows="3"
-                placeholder="📍 מגדל העמק&#10;🧑‍🎓 שכבות ז'–ט'&#10;👩‍🏫 צוות חינוכי מסור&#10;🤝 שיתופי פעולה קהילתיים"
-              ></textarea>
+              <textarea name="heroSideList" rows="3"
+                placeholder="📍 מגדל העמק&#10;🧑‍🎓 שכבות ז'–ט'&#10;👩‍🏫 צוות חינוכי מסור&#10;🤝 שיתופי פעולה קהילתיים"></textarea>
 
               <h4 style="margin-top:16px;">אודות בית הספר</h4>
-
               <label>כותרת אודות</label>
               <input name="aboutTitle" placeholder="אודות בית הספר יערת העמק" />
-
               <label>טקסט אודות</label>
               <textarea name="aboutBody" rows="4" placeholder="כמה משפטים על בית הספר, הערכים, האווירה..."></textarea>
 
               <h4 style="margin-top:16px;">מדור "חשוב לדעת"</h4>
-
               <label>כותרת המדור</label>
               <input name="importantTitle" placeholder="חשוב לדעת" />
-
               <label>תת־כותרת המדור</label>
               <input name="importantSubtitle" placeholder="כמה דברים שימושיים לתלמידים – לפני שממשיכים לגלול." />
 
@@ -581,74 +639,54 @@
               <textarea name="importantCard3Body" rows="2"></textarea>
 
               <h4 style="margin-top:16px;">כותרות למדורי דף הבית</h4>
-
               <label>כותרת מדור חדשות</label>
               <input name="homeNewsTitle" placeholder="חדשות אחרונות" />
-
               <label>תת־כותרת מדור חדשות</label>
               <input name="homeNewsSubtitle" placeholder="שלושת העדכונים האחרונים מכל שכבה – ישר מול העיניים של התלמידים." />
-
               <label>כותרת מדור לוח מודעות</label>
               <input name="boardTitle" placeholder="לוח מודעות" />
-
               <label>תת־כותרת מדור לוח מודעות</label>
               <input name="boardSubtitle" placeholder="הודעות חשובות, פעילויות ואירועים לבית הספר." />
-
               <label>כותרת מדור מבחנים</label>
               <input name="homeExamsTitle" placeholder="מבחנים קרובים" />
-
               <label>תת־כותרת מדור מבחנים</label>
               <input name="homeExamsSubtitle" placeholder="תאריכים, מקצועות ונושאים – כדי שאף אחד לא יפספס." />
 
               <h4 style="margin-top:16px;">מדור "היכרות עם השכבות"</h4>
-
               <label>כותרת המדור</label>
               <input name="gradesSectionTitle" placeholder="היכרות עם השכבות" />
-
               <label>תת־כותרת המדור</label>
               <input name="gradesSectionSubtitle" placeholder="בחר שכבה כדי לראות חדשות, מבחנים ועדכונים שמתאימים אליך." />
 
               <h5 style="margin-top:10px;">תיאור שכבות</h5>
-
               <label>תיאור שכבת ז'</label>
               <textarea name="zDescription" rows="2" placeholder="משפט על שכבת ז'..."></textarea>
-
               <label>תיאור שכבת ח'</label>
               <textarea name="hDescription" rows="2" placeholder="משפט על שכבת ח'..."></textarea>
-
               <label>תיאור שכבת ט'</label>
               <textarea name="tDescription" rows="2" placeholder="משפט על שכבת ט'..."></textarea>
 
               <h4 style="margin-top:16px;">תיבת בקשות</h4>
-
               <label>כותרת המדור</label>
               <input name="requestsTitle" placeholder="תיבת בקשות" />
-
               <label>תת־כותרת</label>
               <input name="requestsSubtitle" placeholder="רוצים לבקש משהו? יש רעיון?" />
-
               <label>טקסט מעל הכפתור</label>
               <textarea name="requestsBody" rows="2" placeholder="למילוי טופס הבקשות – לחצו כאן:"></textarea>
 
               <h4 style="margin-top:16px;">יצירת קשר</h4>
-
               <label>כותרת המדור</label>
               <input name="contactSectionTitle" placeholder="יצירת קשר" />
-
               <label>תת־כותרת המדור</label>
               <input name="contactSectionSubtitle" placeholder="ניתן לפנות אלינו בכל שאלה, בקשה או התייעצות." />
-
               <label>טלפון</label>
               <input name="contactPhone" placeholder="04-XXXXXXX" />
-
               <label>אימייל</label>
               <input name="contactEmail" placeholder="school@example.com" />
-
               <label>כתובת</label>
               <input name="contactAddress" placeholder="רחוב..., מגדל העמק" />
 
               <h4 style="margin-top:16px;">פוטר</h4>
-
               <label>טקסט תחתון (פוטר)</label>
               <input name="footerText" placeholder="© כל הזכויות שמורות לבית ספר יערת העמק" />
 
@@ -661,6 +699,34 @@
 
     </div><!-- /.container -->
   </section>
+
+  <!-- SCRIPTS -->
+  <script>
+    (function () {
+      const key = "admin_theme";
+      const btn = document.getElementById("adminThemeToggle");
+      const icon = document.getElementById("adminThemeIcon");
+      const text = document.getElementById("adminThemeText");
+
+      function apply(theme){
+        document.documentElement.setAttribute("data-theme", theme);
+        try { localStorage.setItem(key, theme); } catch {}
+        if (icon) icon.textContent = theme === "dark" ? "🌙" : "☀️";
+        if (text) text.textContent = theme === "dark" ? "Dark" : "Light";
+      }
+
+      // init label
+      const current = document.documentElement.getAttribute("data-theme") || "dark";
+      apply(current);
+
+      if (btn){
+        btn.addEventListener("click", function(){
+          const now = document.documentElement.getAttribute("data-theme") || "dark";
+          apply(now === "dark" ? "light" : "dark");
+        });
+      }
+    })();
+  </script>
 
   <script type="module" src="admin.js?v=7"></script>
   <script type="module" src="./admin-urgent.js"></script>
