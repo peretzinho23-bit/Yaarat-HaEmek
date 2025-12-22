@@ -221,6 +221,34 @@ body.admin-page .admin-nav-right{
   padding: 6px 8px;
   margin-bottom: 6px;
 }
+/* ===== AUTH LINKS (LOGIN) ===== */
+.auth-links{
+  margin-top: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  font-size: .9rem;
+}
+
+.auth-links a{
+  color: #93c5fd;
+  text-decoration: none;
+  font-weight: 700;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: color .15s ease, background .15s ease;
+}
+
+.auth-links a:hover{
+  color: #bfdbfe;
+  background: rgba(59,130,246,.15);
+}
+
+.auth-links .divider{
+  color: rgba(148,163,184,.5);
+  font-weight: 700;
+}
 
 
   </style>
@@ -287,12 +315,12 @@ body.admin-page .admin-nav-right{
           <button type="submit" style="width:100%;margin-top:10px;">כניסה</button>
         </form>
 
-        <div style="max-width:360px;margin:15px auto 0;text-align:center;">
-          <p class="section-subtitle" style="margin-bottom:8px;">אין לך משתמש אדמין?</p>
-          <a href="register.html" class="btn-outline" style="display:inline-block;padding:8px 16px;border-radius:999px;">
-            בקשת הרשמה
-          </a>
-        </div>
+ <div class="auth-links">
+  <a href="#" id="forgotPasswordLink">שכחתי סיסמה</a>
+  <span class="divider">•</span>
+  <a href="register.html">בקשת הרשמה</a>
+</div>
+
       </div>
 
       <!-- ADMIN PANEL -->

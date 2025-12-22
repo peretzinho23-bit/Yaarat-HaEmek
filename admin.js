@@ -18,8 +18,10 @@ import {
 import {
   signInWithEmailAndPassword,
   onAuthStateChanged,
-  signOut
+  signOut,
+  sendPasswordResetEmail
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+
 
 import {
   ref,
@@ -304,6 +306,33 @@ function initAuth() {
     console.error("auth elements missing in admin.html");
     return;
   }
+/* ------------ FORGOT PASSWORD (reset email) ------------ */
+function setupForgotPassword() {
+  const link = document.getElementById("forgotPasswordLink");
+  if (!link) return; // אם אין HTML עדיין - לא שוברים כלום
+
+  link.addEventListener("click", async (e) => {
+    e.preventDefault();
+
+    // נעדיף את האימייל שנמצא בתוך הטופס שלך
+    const emailInput = document.querySelector('#login-form input[name="email"]');
+    const email = (emailInput?.value || "").trim();
+
+    if (!email) {
+      alert("תכניס אימייל ואז תלחץ על שכחתי סיסמה");
+      if (emailInput) emailInput.focus();
+      return;
+    }
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      alert("נשלח מייל לאיפוס סיסמה ✅ בדוק גם ספאם");
+    } catch (err) {
+      console.error("reset password error:", err);
+      alert("שגיאה באיפוס סיסמה: " + (err?.message || err?.code || "unknown"));
+    }
+  });
+}
 
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
