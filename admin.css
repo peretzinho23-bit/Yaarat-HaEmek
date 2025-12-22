@@ -837,3 +837,112 @@ body.admin-page .admin-grade-section{
   width: auto !important;
   min-width: 0 !important;
 }
+/* =========================
+   ADMIN – FIX CONTAINER WIDTH
+   ========================= */
+
+body.admin-page .container{
+  max-width: 1400px !important;
+  width: calc(100% - 48px);
+  margin-inline: auto;
+}
+
+/* =========================
+   ADMIN – 3 GRADES IN A ROW
+   ========================= */
+
+body.admin-page .admin-columns{
+  display: grid !important;
+  gap: 20px;
+  align-items: start;
+}
+
+/* דסקטופ */
+@media (min-width: 1100px){
+  body.admin-page .admin-columns{
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+/* טאבלט */
+@media (min-width: 700px) and (max-width: 1099px){
+  body.admin-page .admin-columns{
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+/* מובייל */
+@media (max-width: 699px){
+  body.admin-page .admin-columns{
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* אל תיתן לכרטיסים לחנוק */
+body.admin-page .admin-grade-section,
+body.admin-page .admin-columns > section,
+body.admin-page .admin-columns > .card{
+  min-width: 0 !important;
+  width: auto !important;
+}
+/* =========================
+   ADMIN – FORCE FULL WIDTH
+   (put at VERY END of admin.css)
+   ========================= */
+
+html, body { width: 100%; }
+
+body.admin-page,
+body[data-page="admin"]{
+  background: #040814 !important;
+  color: #e3f2fd !important;
+}
+
+/* תופס כל container אפשרי באדמין */
+body.admin-page .container,
+body[data-page="admin"] .container,
+body.admin-page header .container,
+body[data-page="admin"] header .container,
+body.admin-page section .container,
+body[data-page="admin"] section .container{
+  max-width: 1600px !important;
+  width: calc(100% - 40px) !important;
+  margin: 0 auto !important;
+}
+
+/* אם יש wrapper שמגביל רוחב */
+body.admin-page section,
+body[data-page="admin"] section{
+  width: 100% !important;
+}
+
+/* =========================
+   ADMIN – 3 CARDS IN ONE ROW
+   ========================= */
+
+body.admin-page .admin-columns,
+body[data-page="admin"] .admin-columns{
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(320px, 1fr)) !important;
+  gap: 18px !important;
+  align-items: start !important;
+}
+
+/* אם המסך צר – עדיין 3 בשורה עם גלילה אופקית (כמו “שורה גדולה”) */
+@media (max-width: 1100px){
+  body.admin-page .admin-columns,
+  body[data-page="admin"] .admin-columns{
+    grid-template-columns: repeat(3, minmax(280px, 1fr)) !important;
+    overflow-x: auto !important;
+    padding-bottom: 10px !important;
+  }
+  body.admin-page .admin-columns::-webkit-scrollbar{ height: 10px; }
+}
+
+/* למנוע “חניקה” של כרטיסים */
+body.admin-page .admin-grade-section,
+body.admin-page .admin-columns > section,
+body[data-page="admin"] .admin-grade-section,
+body[data-page="admin"] .admin-columns > section{
+  min-width: 0 !important;
+}
