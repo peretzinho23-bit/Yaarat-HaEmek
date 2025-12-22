@@ -1,175 +1,271 @@
 /* =========================================================
-   ADMIN.CSS — SCOPED, ALWAYS DARK (NO THEME INFLUENCE)
-   עובד רק בתוך עמודי אדמין/הרשמה/אפליקציות אדמין
+   admin.css — YA'ARAT HAEMEK ADMIN (FORCED DARK, ISOLATED)
+   מטרות:
+   1) האדמין תמיד שחור — לא מושפע מ-light/dark של האתר
+   2) האדר מסודר: לוגו לא דורך על הכותרת
+   3) select / inputs נראים אותו דבר
    ========================================================= */
 
-/* ---- 0) Scope selectors (הוסף פה עוד אם צריך) ---- */
-body[data-page="admin"],
-body[data-page="register"],
-body[data-page="adminapps"]{
-  /* Theme lock: לא משנה מה האתר עושה */
-  color-scheme: dark;
-
+/* ---------- 0) HARD RESET רק בתוך האדמין ---------- */
+body.admin-page{
   background: #040814 !important;
   color: #e3f2fd !important;
-
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
 }
 
-/* מנטרל כל “light theme” שמבוסס על html[data-theme="light"] */
-html[data-theme="light"] body[data-page="admin"],
-html[data-theme="light"] body[data-page="register"],
-html[data-theme="light"] body[data-page="adminapps"]{
+/* אם יש לך style.css שעושה light mode עם סלקטורים חזקים – נדרוס גם אותם */
+html[data-theme="light"] body.admin-page,
+html[data-theme="dark"]  body.admin-page{
   background: #040814 !important;
   color: #e3f2fd !important;
 }
 
-/* אל תיתן ל-style.css להפוך לך כרטיסים/סקשנים */
-body[data-page="admin"] section,
-body[data-page="register"] section,
-body[data-page="adminapps"] section{
+/* קישורים */
+body.admin-page a{ color: #7dd3fc; }
+body.admin-page a:hover{ opacity: .92; }
+
+/* ---------- 1) מרווחים כלליים ---------- */
+body.admin-page section{
   padding: 32px 0 40px;
 }
 
-/* קונטיינר אם אתה משתמש ב-.container מהאתר */
-body[data-page="admin"] .container,
-body[data-page="register"] .container,
-body[data-page="adminapps"] .container{
-  max-width: 1200px;
-}
-
-/* ---- 1) Auth status ---- */
-body[data-page="admin"] #auth-status,
-body[data-page="register"] #auth-status,
-body[data-page="adminapps"] #auth-status{
+/* טקסט סטטוס התחברות */
+body.admin-page #auth-status{
   text-align: center;
   font-size: 0.9rem;
   opacity: 0.85;
   margin-top: 8px;
 }
 
-/* =========================================================
-   LOGIN
-   ========================================================= */
-body[data-page="admin"] #login-section,
-body[data-page="register"] #login-section,
-body[data-page="adminapps"] #login-section{
+/* ---------- 2) HEADER (מסדר את הכותרת + הלוגו) ---------- */
+/* חשוב: זה דורס עיצובים מהאתר */
+body.admin-page .header-main{
+  background: linear-gradient(180deg, rgba(2,6,23,0.96), rgba(2,6,23,0.86)) !important;
+  border-bottom: 1px solid rgba(148,163,184,0.18);
+  position: sticky;
+  top: 0;
+  z-index: 2000;
+}
+
+/* הופכים את ה-nav לגריד: ימין (לוגו/כפתורים) | מרכז (כותרת) | שמאל (כפתורים) */
+body.admin-page .header-main .nav{
+  display: grid !important;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 12px;
+  min-height: 84px;
+  position: relative;
+  padding: 10px 0;
+}
+
+/* הלוגו — לא ידרוך על הכותרת */
+body.admin-page .logo-circle{
+  width: 58px;
+  height: 58px;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 2px solid rgba(56,189,248,0.35);
+  background: rgba(255,255,255,0.06);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: end; /* RTL: יושב בצד ימין של הגריד (העמודה הראשונה) */
+  z-index: 3;
+}
+body.admin-page .logo-img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* הכותרת — מרכז אמיתי */
+body.admin-page .admin-header-title{
+  grid-column: 2;
+  margin: 0 !important;
+  text-align: center;
+  font-weight: 900;
+  font-size: clamp(1.1rem, 2.2vw, 1.55rem);
+  letter-spacing: 0.4px;
+  color: #ffffff !important;
+  text-shadow:
+    0 2px 10px rgba(0,0,0,0.65),
+    0 0 18px rgba(56,189,248,0.35);
+  line-height: 1.1;
+  max-width: min(680px, 92vw);
+  justify-self: center;
+  z-index: 2;
+}
+
+/* קו תחתון עדין */
+body.admin-page .admin-header-title::after{
+  content: "";
+  display: block;
+  width: 140px;
+  height: 3px;
+  margin: 10px auto 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, #38bdf8, #2563eb, #38bdf8, transparent);
+  box-shadow: 0 0 14px rgba(56,189,248,0.35);
+  opacity: .95;
+}
+
+/* אם יש קישורים בצד השני */
+body.admin-page .nav-side,
+body.admin-page .nav-left,
+body.admin-page .nav-right{
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+body.admin-page .nav-side{ justify-self: start; } /* עמודה שלישית */
+body.admin-page .nav-side a{
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(15,23,42,0.55);
+  border: 1px solid rgba(148,163,184,0.28);
+  color: #e5e7eb;
+  font-weight: 700;
+  text-decoration: none;
+}
+body.admin-page .nav-side a:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.35);
+}
+
+/* מובייל */
+@media (max-width: 700px){
+  body.admin-page .header-main .nav{ min-height: 72px; }
+  body.admin-page .logo-circle{ width: 52px; height: 52px; }
+  body.admin-page .admin-header-title::after{ width: 110px; }
+}
+
+/* ---------- 3) LOGIN CARD ---------- */
+body.admin-page #login-section{
   max-width: 420px;
   margin: 40px auto 10px;
   background: rgba(3, 11, 25, 0.96);
   padding: 22px 24px;
   border-radius: 20px;
-  border: 1px solid rgba(129, 212, 250, 0.4);
+  border: 1px solid rgba(129, 212, 250, 0.35);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
 }
 
-body[data-page="admin"] #login-section .section-title,
-body[data-page="register"] #login-section .section-title,
-body[data-page="adminapps"] #login-section .section-title{
+body.admin-page #login-section .section-title{
   text-align: center;
 }
 
-body[data-page="admin"] #login-section label,
-body[data-page="register"] #login-section label,
-body[data-page="adminapps"] #login-section label{
+body.admin-page #login-section label{
   display: block;
   font-size: 0.85rem;
   margin-top: 10px;
   margin-bottom: 4px;
 }
 
-body[data-page="admin"] #login-section input,
-body[data-page="register"] #login-section input,
-body[data-page="adminapps"] #login-section input{
+/* ---------- 4) INPUTS / TEXTAREA / SELECT (אחיד) ---------- */
+body.admin-page input,
+body.admin-page textarea,
+body.admin-page select{
   width: 100%;
   padding: 8px 10px;
-  border-radius: 10px;
-  border: 1px solid rgba(129, 212, 250, 0.55);
-  background: rgba(1, 6, 18, 0.95);
+  border-radius: 12px;
+  border: 1px solid rgba(129, 212, 250, 0.38);
+  background: rgba(4, 10, 24, 0.95);
   color: #e3f2fd;
   font-size: 0.9rem;
   box-sizing: border-box;
+  outline: none;
 }
 
-body[data-page="admin"] #login-section input::placeholder,
-body[data-page="register"] #login-section input::placeholder,
-body[data-page="adminapps"] #login-section input::placeholder{
-  color: rgba(179, 229, 252, 0.7);
+body.admin-page input::placeholder,
+body.admin-page textarea::placeholder{
+  color: rgba(179, 229, 252, 0.65);
 }
 
-body[data-page="admin"] #login-section button[type="submit"],
-body[data-page="register"] #login-section button[type="submit"],
-body[data-page="adminapps"] #login-section button[type="submit"]{
-  margin-top: 14px;
-  width: 100%;
+body.admin-page textarea{
+  min-height: 70px;
+  resize: vertical;
 }
 
-/* =========================================================
-   ADMIN LAYOUT
-   ========================================================= */
-body[data-page="admin"] .admin-layout,
-body[data-page="adminapps"] .admin-layout{
+/* Fix ל-select שנראה לבן/מוזר */
+body.admin-page select{
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-left: 36px; /* מקום לחץ */
+  background-image:
+    linear-gradient(45deg, transparent 50%, rgba(227,242,253,0.9) 50%),
+    linear-gradient(135deg, rgba(227,242,253,0.9) 50%, transparent 50%);
+  background-position:
+    calc(16px) 50%,
+    calc(10px) 50%;
+  background-size:
+    6px 6px,
+    6px 6px;
+  background-repeat: no-repeat;
+}
+
+body.admin-page option{
+  background: #0b1120;
+  color: #e3f2fd;
+}
+
+/* ---------- 5) BUTTONS (אם style.css דורס) ---------- */
+body.admin-page button,
+body.admin-page .btn,
+body.admin-page .btn-outline{
+  border-radius: 12px;
+  font-weight: 800;
+}
+
+/* ---------- 6) MAIN LAYOUT ---------- */
+body.admin-page .admin-layout{
   margin-top: 30px;
 }
 
-/* כפתור יציאה */
-body[data-page="admin"] #logout-btn,
-body[data-page="adminapps"] #logout-btn{
+body.admin-page #logout-btn{
   float: left;
   margin-bottom: 10px;
 }
 
 /* כותרות משנה */
-body[data-page="admin"] .admin-layout h3.section-title,
-body[data-page="adminapps"] .admin-layout h3.section-title{
+body.admin-page .admin-layout h3.section-title{
   font-size: 1.1rem;
   margin-bottom: 8px;
 }
 
-/* גריד כרטיסים */
-body[data-page="admin"] .admin-columns,
-body[data-page="adminapps"] .admin-columns{
+/* גריד */
+body.admin-page .admin-columns{
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 18px;
   margin-top: 10px;
 }
 
-/* =========================================================
-   CARD (רק באדמין! לא לגעת בכרטיסי האתר)
-   ========================================================= */
-body[data-page="admin"] .card,
-body[data-page="register"] .card,
-body[data-page="adminapps"] .card{
-  background: rgba(3, 10, 26, 0.98) !important;
+/* קלפים */
+body.admin-page .card{
+  background: rgba(3, 10, 26, 0.98);
   border-radius: 18px;
   padding: 14px 16px;
-  border: 1px solid rgba(129, 212, 250, 0.4);
+  border: 1px solid rgba(129, 212, 250, 0.32);
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.65);
   font-size: 0.9rem;
-  color: #e3f2fd;
 }
 
-body[data-page="admin"] .card h3,
-body[data-page="register"] .card h3,
-body[data-page="adminapps"] .card h3{
+body.admin-page .card h3{
   margin-bottom: 8px;
   font-size: 1rem;
 }
 
-/* =========================================================
-   LISTS
-   ========================================================= */
-body[data-page="admin"] .admin-list,
-body[data-page="admin"] #admin-news-z,
-body[data-page="admin"] #admin-news-h,
-body[data-page="admin"] #admin-news-t,
-body[data-page="admin"] #admin-exams-z,
-body[data-page="admin"] #admin-exams-h,
-body[data-page="admin"] #admin-exams-t,
-body[data-page="admin"] #admin-board,
-body[data-page="adminapps"] .admin-list{
+/* רשימות */
+body.admin-page .admin-list,
+body.admin-page #admin-news-z,
+body.admin-page #admin-news-h,
+body.admin-page #admin-news-t,
+body.admin-page #admin-exams-z,
+body.admin-page #admin-exams-h,
+body.admin-page #admin-exams-t,
+body.admin-page #admin-board{
   max-height: 180px;
   overflow-y: auto;
   margin-bottom: 10px;
@@ -177,70 +273,38 @@ body[data-page="adminapps"] .admin-list{
   font-size: 0.85rem;
 }
 
-body[data-page="admin"] .admin-item,
-body[data-page="adminapps"] .admin-item{
-  background: rgba(0, 0, 0, 0.5);
-  border-radius: 10px;
-  padding: 6px 8px;
-  margin-bottom: 6px;
+/* פריט ברשימה */
+body.admin-page .admin-item{
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(148,163,184,0.14);
+  border-radius: 12px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
 }
 
-/* =========================================================
-   FORMS
-   ========================================================= */
-body[data-page="admin"] .admin-layout form label,
-body[data-page="register"] form label,
-body[data-page="adminapps"] .admin-layout form label{
+/* טפסים */
+body.admin-page .admin-layout form label{
   display: block;
   font-size: 0.8rem;
   margin-top: 8px;
   margin-bottom: 3px;
-  color: rgba(227,242,253,0.92);
 }
 
-body[data-page="admin"] .admin-layout form input,
-body[data-page="admin"] .admin-layout form textarea,
-body[data-page="register"] input,
-body[data-page="register"] textarea,
-body[data-page="adminapps"] .admin-layout form input,
-body[data-page="adminapps"] .admin-layout form textarea{
-  width: 100%;
-  padding: 7px 9px;
-  border-radius: 10px;
-  border: 1px solid rgba(129, 212, 250, 0.4);
-  background: rgba(4, 10, 24, 0.95);
-  color: #e3f2fd;
-  font-size: 0.9rem;
-  box-sizing: border-box;
-}
-
-body[data-page="admin"] .admin-layout form textarea,
-body[data-page="adminapps"] .admin-layout form textarea{
-  min-height: 70px;
-  resize: vertical;
-}
-
-body[data-page="admin"] .admin-layout form button[type="submit"],
-body[data-page="register"] button[type="submit"],
-body[data-page="adminapps"] .admin-layout form button[type="submit"]{
+body.admin-page .admin-layout form button[type="submit"]{
   margin-top: 10px;
   width: 100%;
 }
 
-body[data-page="admin"] .admin-empty,
-body[data-page="register"] .admin-empty,
-body[data-page="adminapps"] .admin-empty{
+/* ריק */
+body.admin-page .admin-empty{
   font-size: 0.8rem;
-  opacity: 0.8;
+  opacity: 0.78;
 }
 
-/* =========================================================
-   GRADE SWITCHER
-   ========================================================= */
-body[data-page="admin"] .admin-grade-switcher,
-body[data-page="adminapps"] .admin-grade-switcher{
+/* ---------- 7) GRADE SWITCHER ---------- */
+body.admin-page .admin-grade-switcher{
   position: fixed;
-  top: 80px;
+  top: 92px;
   right: 24px;
   display: flex;
   flex-direction: column;
@@ -248,80 +312,101 @@ body[data-page="adminapps"] .admin-grade-switcher{
   z-index: 1500;
 }
 
-body[data-page="admin"] .admin-grade-switcher .grade-filter-btn,
-body[data-page="adminapps"] .admin-grade-switcher .grade-filter-btn{
+body.admin-page .admin-grade-switcher .grade-filter-btn{
   padding: 8px 14px;
   border-radius: 999px;
-  border: 1px solid rgba(148, 163, 184, 0.7);
+  border: 1px solid rgba(148, 163, 184, 0.45);
   background: rgba(15, 23, 42, 0.92);
   color: #e5e7eb;
   font-size: 0.85rem;
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+  transition: transform 0.12s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
-body[data-page="admin"] .admin-grade-switcher .grade-filter-btn:hover,
-body[data-page="adminapps"] .admin-grade-switcher .grade-filter-btn:hover{
+body.admin-page .admin-grade-switcher .grade-filter-btn:hover{
   transform: translateY(-1px);
-  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.7);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.55);
 }
 
-body[data-page="admin"] .admin-grade-switcher .grade-filter-btn.active,
-body[data-page="adminapps"] .admin-grade-switcher .grade-filter-btn.active{
+body.admin-page .admin-grade-switcher .grade-filter-btn.active{
   background: linear-gradient(135deg, #38bdf8, #4ade80);
   color: #020617;
   border-color: transparent;
 }
 
-/* =========================================================
-   REGISTER PAGE
-   ========================================================= */
-body[data-page="register"] .register-wrapper{
+/* ---------- 8) RESPONSIVE ---------- */
+@media (max-width: 768px){
+  body.admin-page #login-section{
+    margin-top: 24px;
+    padding: 18px 16px;
+  }
+
+  body.admin-page #logout-btn{
+    float: none;
+    display: inline-block;
+    margin-bottom: 12px;
+  }
+
+  body.admin-page .admin-columns{
+    grid-template-columns: 1fr;
+  }
+
+  body.admin-page .admin-grade-switcher{
+    position: static;
+    margin: 8px auto 12px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  body.admin-page .admin-grade-switcher .grade-filter-btn{
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+}
+
+/* ---------- 9) REGISTER PAGE ---------- */
+body.admin-page .register-wrapper{
   max-width: 720px;
   margin: 0 auto;
 }
 
-body[data-page="register"] .register-card{
+body.admin-page .register-card{
   max-width: 520px;
   margin: 16px auto;
 }
 
-body[data-page="register"] .register-card .admin-form{
+body.admin-page .register-card .admin-form{
   display: block;
 }
 
-body[data-page="register"] .register-card .admin-form > * + *{
+body.admin-page .register-card .admin-form > * + *{
   margin-top: 10px;
 }
 
-body[data-page="register"] .register-submit-btn{
+body.admin-page .register-submit-btn{
   margin-top: 16px;
   width: 100%;
 }
 
-body[data-page="register"] .register-status{
+body.admin-page .register-status{
   text-align: center;
   margin-top: 8px;
   font-size: 0.85rem;
   opacity: 0.9;
 }
 
-/* =========================================================
-   POLLS ADMIN (רק בתוך אדמין)
-   ========================================================= */
-body[data-page="admin"] .polls-admin-card,
-body[data-page="adminapps"] .polls-admin-card{
+/* ---------- 10) POLLS ADMIN (שמרתי שלך, רק תחת admin-page) ---------- */
+body.admin-page .polls-admin-card{
   border-radius: 22px;
   padding: 18px 18px 20px;
-  background:
-    radial-gradient(circle at top left, rgba(59,130,246,0.14), transparent 55%),
-    rgba(15,23,42,0.96);
+  background: radial-gradient(circle at top left, rgba(59,130,246,0.14), transparent 55%),
+              rgba(15,23,42,0.96);
   border: 1px solid rgba(148,163,184,0.55);
   box-shadow: 0 20px 50px rgba(15,23,42,0.9);
 }
 
-body[data-page="admin"] .polls-admin-header,
-body[data-page="adminapps"] .polls-admin-header{
+body.admin-page .polls-admin-header{
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -329,15 +414,13 @@ body[data-page="adminapps"] .polls-admin-header{
   margin-bottom: 14px;
 }
 
-body[data-page="admin"] .polls-admin-sub,
-body[data-page="adminapps"] .polls-admin-sub{
+body.admin-page .polls-admin-sub{
   font-size: 0.85rem;
   color: #9ca3af;
   margin-top: 4px;
 }
 
-body[data-page="admin"] .polls-admin-badge,
-body[data-page="adminapps"] .polls-admin-badge{
+body.admin-page .polls-admin-badge{
   font-size: 0.75rem;
   padding: 6px 10px;
   border-radius: 999px;
@@ -347,166 +430,410 @@ body[data-page="adminapps"] .polls-admin-badge{
   white-space: nowrap;
 }
 
-body[data-page="admin"] .polls-form-row,
-body[data-page="adminapps"] .polls-form-row{
+body.admin-page .polls-form{ margin-top: 8px; margin-bottom: 10px; }
+
+body.admin-page .polls-form-row{
   display: grid;
   grid-template-columns: repeat(2, minmax(0,1fr));
   gap: 12px;
   margin-bottom: 10px;
 }
+body.admin-page .polls-form-row-full{ grid-template-columns: minmax(0,1fr); }
 
-body[data-page="admin"] .polls-form-row-full,
-body[data-page="adminapps"] .polls-form-row-full{
-  grid-template-columns: minmax(0,1fr);
+body.admin-page .polls-checkbox{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: #e5e7eb;
 }
 
-body[data-page="admin"] .polls-divider,
-body[data-page="adminapps"] .polls-divider{
+body.admin-page .polls-divider{
   margin: 16px 0 14px;
   border: none;
   border-top: 1px solid rgba(148,163,184,0.35);
 }
 
-/* =========================================================
-   CLASS FILTER (EXAMS)
-   ========================================================= */
-body[data-page="admin"] .admin-class-filter,
-body[data-page="adminapps"] .admin-class-filter{
+body.admin-page .polls-admin-list .admin-item{
+  background: rgba(15,23,42,0.9);
+  border-radius: 18px;
+  border: 1px solid rgba(55,65,81,0.9);
+}
+
+body.admin-page .admin-item-actions{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+body.admin-page .admin-item-actions .admin-remove{
+  background: rgba(239,68,68,0.1);
+  border-color: rgba(248,113,113,0.7);
+}
+
+body.admin-page .admin-toggle-poll{
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(59,130,246,0.8);
+  background: rgba(15,23,42,0.9);
+  color: #dbeafe;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+body.admin-page .admin-toggle-poll:hover{
+  background: rgba(59,130,246,0.25);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 720px){
+  body.admin-page .polls-admin-header{ flex-direction: column; align-items: flex-start; }
+  body.admin-page .polls-form-row{ grid-template-columns: minmax(0,1fr); }
+}
+
+/* ---------- 11) Class filters ---------- */
+body.admin-page .admin-class-filter{
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
   margin: 8px 0 10px;
 }
-
-body[data-page="admin"] .admin-class-filter button,
-body[data-page="adminapps"] .admin-class-filter button{
+body.admin-page .admin-class-filter button{
   border-radius: 999px;
   padding: 4px 10px;
-  border: 1px solid rgba(148, 163, 184, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.45);
   background: rgba(15, 23, 42, 0.9);
   color: #e5e7eb;
   font-size: 0.8rem;
   cursor: pointer;
 }
-
-body[data-page="admin"] .admin-class-filter button.active,
-body[data-page="adminapps"] .admin-class-filter button.active{
+body.admin-page .admin-class-filter button.active{
   background: #2563eb;
   border-color: #2563eb;
   color: #f9fafb;
 }
+/* =========================
+   FIX: ADMIN LAYOUT + DARK FIELDS
+   שים בסוף הקובץ
+   ========================= */
 
-/* =========================================================
-   ADMIN HEADER TITLE — ALWAYS DARK (no theme variants)
-   ========================================================= */
-body[data-page="admin"] .header-main,
-body[data-page="adminapps"] .header-main{
-  position: relative;
+/* 1) הגבלת רוחב כללית של האדמין שלא יימרח על 2000px */
+body.admin-page .container,
+body.admin-page main,
+body.admin-page .admin-layout{
+  width: min(1200px, calc(100% - 32px));
+  margin-inline: auto;
 }
 
-body[data-page="admin"] .header-main .nav,
-body[data-page="adminapps"] .header-main .nav{
-  position: relative;
-  min-height: 84px;
-  justify-content: center;
+/* 2) גריד יציב: 3 עמודות בדסקטופ, 2 בטאבלט, 1 במובייל */
+body.admin-page .admin-columns{
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+@media (max-width: 1100px){
+  body.admin-page .admin-columns{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 720px){
+  body.admin-page .admin-columns{ grid-template-columns: 1fr; }
 }
 
-body[data-page="admin"] .admin-header-title,
-body[data-page="adminapps"] .admin-header-title{
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  margin: 0 !important;
-  width: max-content;
-  max-width: calc(100% - 140px);
-  text-align: center;
-  z-index: 2;
-
-  font-size: clamp(1.2rem, 2.2vw, 1.6rem);
-  font-weight: 900;
-  letter-spacing: 0.4px;
-
-  color: #ffffff;
-  text-shadow:
-    0 2px 10px rgba(0,0,0,0.65),
-    0 0 18px rgba(56,189,248,0.45);
+/* 3) כרטיסים: קצת יותר פרימיום + פחות שטוחים */
+body.admin-page .card{
+  background: rgba(2, 6, 23, 0.82) !important;
+  border: 1px solid rgba(148,163,184,0.22) !important;
+  box-shadow: 0 18px 50px rgba(0,0,0,0.45) !important;
 }
 
-body[data-page="admin"] .admin-header-title::after,
-body[data-page="adminapps"] .admin-header-title::after{
-  content: "";
-  display: block;
-  width: 120px;
-  height: 3px;
-  margin: 10px auto 0;
+/* 4) הכי חשוב: להכריח שדות לדארק (כולל .select מהאתר) */
+body.admin-page input,
+body.admin-page textarea,
+body.admin-page select,
+body.admin-page .select,
+body.admin-page .input,
+body.admin-page .textarea{
+  background: rgba(2, 6, 23, 0.92) !important;
+  color: #e5e7eb !important;
+  border: 1px solid rgba(148,163,184,0.32) !important;
+}
+
+body.admin-page input::placeholder,
+body.admin-page textarea::placeholder{
+  color: rgba(226,232,240,0.55) !important;
+}
+
+/* select שלא יהיה לבן/משוגע */
+body.admin-page select,
+body.admin-page .select{
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  padding-left: 36px !important;
+  background-image:
+    linear-gradient(45deg, transparent 50%, rgba(226,232,240,0.9) 50%),
+    linear-gradient(135deg, rgba(226,232,240,0.9) 50%, transparent 50%) !important;
+  background-position: 16px 50%, 10px 50% !important;
+  background-size: 6px 6px, 6px 6px !important;
+  background-repeat: no-repeat !important;
+}
+
+body.admin-page option{
+  background: #0b1120 !important;
+  color: #e5e7eb !important;
+}
+
+/* 5) כפתורי "בחירת קובץ" בדארק */
+body.admin-page input[type="file"]{
+  padding: 10px !important;
+  border-radius: 12px !important;
+}
+body.admin-page input[type="file"]::file-selector-button{
   border-radius: 999px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    #38bdf8,
-    #2563eb,
-    #38bdf8,
-    transparent
-  );
-  box-shadow: 0 0 16px rgba(56,189,248,0.45);
+  border: 1px solid rgba(148,163,184,0.35);
+  background: rgba(37,99,235,0.22);
+  color: #e5e7eb;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+body.admin-page input[type="file"]::file-selector-button:hover{
+  background: rgba(37,99,235,0.35);
+}
+/* =========================
+   ADMIN WIDTH FIX (קריטי)
+   ========================= */
+
+body.admin-page,
+body.admin-page main,
+body.admin-page .admin-layout{
+  width: 100%;
+  max-width: 1400px;   /* ← זה המפתח ל־3 עמודות */
+  margin-inline: auto;
+  padding-inline: 24px;
+}
+
+/* גריד אמיתי */
+body.admin-page .admin-columns{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+/* טאבלט */
+@media (max-width: 1100px){
+  body.admin-page .admin-columns{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 /* מובייל */
-@media (max-width: 768px){
-  body[data-page="admin"] #login-section,
-  body[data-page="register"] #login-section,
-  body[data-page="adminapps"] #login-section{
-    margin-top: 24px;
-    padding: 18px 16px;
-  }
-
-  body[data-page="admin"] #logout-btn,
-  body[data-page="adminapps"] #logout-btn{
-    float: none;
-    display: inline-block;
-    margin-bottom: 12px;
-  }
-
-  body[data-page="admin"] .admin-columns,
-  body[data-page="adminapps"] .admin-columns{
+@media (max-width: 720px){
+  body.admin-page .admin-columns{
     grid-template-columns: 1fr;
   }
+}
+/* =========================
+   ADMIN FULL WIDTH OVERRIDE (קריטי)
+   ========================= */
 
-  body[data-page="admin"] .admin-grade-switcher,
-  body[data-page="adminapps"] .admin-grade-switcher{
-    position: static;
-    margin: 8px auto 12px;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
+html.admin-page,
+body.admin-page{
+  background: #040814 !important;
+  color: #e3f2fd !important;
+}
 
-  body[data-page="admin"] .admin-grade-switcher .grade-filter-btn,
-  body[data-page="adminapps"] .admin-grade-switcher .grade-filter-btn{
-    padding: 6px 10px;
-    font-size: 0.8rem;
-  }
+/* מבטל את כל ה־containers הצרים מהאתר */
+body.admin-page .container,
+body.admin-page main,
+body.admin-page section,
+body.admin-page .admin-layout{
+  max-width: none !important;
+  width: 100% !important;
+  margin: 0 !important;
+}
 
-  body[data-page="admin"] .header-main .nav,
-  body[data-page="adminapps"] .header-main .nav{
-    min-height: 72px;
-  }
+/* נותן עטיפה רחבה וממורכזת לאדמין */
+body.admin-page .admin-layout{
+  max-width: 1400px !important;
+  margin-inline: auto !important;
+  padding-inline: 24px !important;
+}
 
-  body[data-page="admin"] .admin-header-title,
-  body[data-page="adminapps"] .admin-header-title{
-    max-width: calc(100% - 110px);
+/* גריד 3 עמודות */
+body.admin-page .admin-columns{
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 18px !important;
+  align-items: start;
+}
+
+/* טאבלט */
+@media (max-width: 1100px){
+  body.admin-page .admin-columns{
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 }
 
-/* מובייל לעמוד הרשמה */
-@media (max-width: 600px){
-  body[data-page="register"] .register-wrapper{
-    max-width: 100%;
-    padding: 0 12px;
+/* מובייל */
+@media (max-width: 720px){
+  body.admin-page .admin-columns{
+    grid-template-columns: 1fr !important;
   }
+}
+/* =========================
+   FORCE FULL WIDTH (ADMIN)
+   ========================= */
 
-  body[data-page="register"] .register-card{
-    margin: 12px auto;
+/* תופס גם לפי class וגם לפי data-page */
+body.admin-page,
+body[data-page="admin"],
+body[data-page="adminapps"],
+body[data-page="register"]{
+  background:#040814 !important;
+  color:#e3f2fd !important;
+  width:100vw !important;
+  max-width:none !important;
+  margin:0 !important;
+}
+
+/* מבטל כל עטיפה צרה מהאתר */
+body.admin-page :where(.container, .wrap, .wrapper, main, section, .content, .page, .layout, .inner),
+body[data-page="admin"] :where(.container, .wrap, .wrapper, main, section, .content, .page, .layout, .inner){
+  width:100% !important;
+  max-width:none !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+}
+
+/* העטיפה הראשית של האדמין (תופס גם אם קראת לה אחרת) */
+body.admin-page :where(.admin-layout, .admin-wrapper, .admin-container),
+body[data-page="admin"] :where(.admin-layout, .admin-wrapper, .admin-container){
+  width:100% !important;
+  max-width:1400px !important;   /* פה קובע כמה רחב האדמין */
+  margin:0 auto !important;
+  padding:0 24px !important;
+  box-sizing:border-box !important;
+}
+
+/* הגריד של הכרטיסים */
+body.admin-page .admin-columns,
+body[data-page="admin"] .admin-columns{
+  width:100% !important;
+  max-width:none !important;
+  display:grid !important;
+  grid-template-columns:repeat(3, minmax(0, 1fr)) !important;
+  gap:18px !important;
+  align-items:start !important;
+}
+
+/* רספונסיביות */
+@media (max-width:1100px){
+  body.admin-page .admin-columns,
+  body[data-page="admin"] .admin-columns{
+    grid-template-columns:repeat(2, minmax(0, 1fr)) !important;
   }
+}
+@media (max-width:720px){
+  body.admin-page .admin-columns,
+  body[data-page="admin"] .admin-columns{
+    grid-template-columns:1fr !important;
+  }
+}
+/* =========================
+   ADMIN – WIDE ROW LAYOUT
+   ========================= */
+
+/* מבטל גריד של עמודות לאזורי תוכן */
+body.admin-page .admin-columns,
+body[data-page="admin"] .admin-columns{
+  display:block !important;
+}
+
+/* כל כרטיס אדמין – שורה רחבה */
+body.admin-page .card,
+body[data-page="admin"] .card{
+  width:100% !important;
+  max-width:none !important;
+  margin:0 0 24px 0 !important;
+}
+
+/* כרטיס “רחב” (אם קיים) */
+body.admin-page .admin-wide-card{
+  width:100% !important;
+  max-width:1400px !important;
+  margin:0 auto 28px auto !important;
+}
+
+/* טפסים – פריסה לרוחב */
+body.admin-page form,
+body[data-page="admin"] form{
+  display:block !important;
+}
+
+/* אינפוטים וטקסטאריה – רוחב מלא */
+body.admin-page input,
+body.admin-page textarea,
+body.admin-page select,
+body[data-page="admin"] input,
+body[data-page="admin"] textarea,
+body[data-page="admin"] select{
+  width:100% !important;
+  max-width:none !important;
+}
+
+/* טקסטאריה – גובה נורמלי */
+body.admin-page textarea{
+  min-height:140px;
+}
+
+/* ביטול הגבלה ממכולות של האתר */
+body.admin-page .container,
+body[data-page="admin"] .container{
+  max-width:none !important;
+  width:100% !important;
+  padding:0 24px !important;
+}
+/* =========================
+   ADMIN – FORCE 3 COLUMNS (GRADES)
+   שים בסוף admin.css
+   ========================= */
+
+/* תן לקונטיינר מקום אמיתי (אם style.css חונק אותו) */
+body.admin-page .container{
+  width: min(1400px, calc(100% - 48px));
+  margin-inline: auto;
+}
+
+/* הגריד של האדמין */
+body.admin-page .admin-columns{
+  display: grid !important;
+  gap: 18px;
+  align-items: start;
+}
+
+/* דסקטופ: 3 בשורה */
+@media (min-width: 1100px){
+  body.admin-page .admin-columns{
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+/* טאבלט: 2 בשורה */
+@media (min-width: 720px) and (max-width: 1099px){
+  body.admin-page .admin-columns{
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+/* מובייל: 1 בשורה */
+@media (max-width: 719px){
+  body.admin-page .admin-columns{
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* חשוב: שלא יהיה "רוחב" קשיח שדופק את הגריד */
+body.admin-page .admin-columns > section,
+body.admin-page .admin-columns > .card,
+body.admin-page .admin-grade-section{
+  width: auto !important;
+  min-width: 0 !important;
 }

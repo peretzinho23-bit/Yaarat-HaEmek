@@ -5,8 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>לוח ניהול – יערת העמק</title>
+
+  <!-- האתר הכללי (לרכיבים/כפתורים בסיסיים) -->
   <link rel="stylesheet" href="style.css" />
+  <!-- האדמין (אמור לנצח הכל) -->
   <link rel="stylesheet" href="admin.css" />
+
+  <!-- ✅ נועל את האדמין על DARK ולא נותן לאתר להשפיע -->
+  <script>
+    (function () {
+      try {
+        document.documentElement.setAttribute("data-theme", "dark");
+        document.documentElement.classList.remove("theme-changing");
+      } catch {}
+    })();
+  </script>
 
   <!-- התאמות ספציפיות לאדמין: תמונות קטנות + רשימות קומפקטיות -->
   <style>
@@ -61,178 +74,35 @@
       padding: 6px 8px;
       margin-bottom: 6px;
     }
-    /* =========================
-   ADMIN PANEL – BASE
-   ========================= */
-body[data-page="admin"]{
-  background:
-    radial-gradient(1200px 600px at 50% -10%, rgba(56,189,248,.18), transparent 60%),
-    linear-gradient(180deg, #f8fafc, #eef2ff);
-}
 
-html[data-theme="dark"] body[data-page="admin"]{
-  background:
-    radial-gradient(1200px 600px at 50% -10%, rgba(56,189,248,.18), transparent 60%),
-    linear-gradient(180deg, #020617, #020617);
-}
-/* ADMIN CARDS */
-body[data-page="admin"] .admin-card,
-body[data-page="admin"] .grade-card,
-body[data-page="admin"] .panel{
-  background: rgba(255,255,255,.82);
-  border: 1px solid rgba(148,163,184,.35);
-  border-radius: 18px;
-  box-shadow: 0 14px 40px rgba(15,23,42,.12);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  transition: transform .2s ease, box-shadow .2s ease;
-}
-
-body[data-page="admin"] .admin-card:hover{
-  transform: translateY(-4px);
-  box-shadow: 0 20px 55px rgba(15,23,42,.18);
-}
-
-/* DARK */
-html[data-theme="dark"] body[data-page="admin"] .admin-card{
-  background: rgba(15,23,42,.65);
-  border-color: rgba(148,163,184,.25);
-}
-/* ADMIN TITLES */
-body[data-page="admin"] h1,
-body[data-page="admin"] h2{
-  font-weight: 900;
-  letter-spacing: .3px;
-  background: linear-gradient(90deg,#2563eb,#38bdf8);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-html[data-theme="dark"] body[data-page="admin"] h1,
-html[data-theme="dark"] body[data-page="admin"] h2{
-  background: linear-gradient(90deg,#60a5fa,#38bdf8);
-}
-/* ADMIN PRIMARY BUTTON */
-body[data-page="admin"] .btn-primary,
-body[data-page="admin"] button[type="submit"]{
-  background: linear-gradient(135deg,#2563eb,#38bdf8);
-  color:#fff;
-  border:none;
-  border-radius:999px;
-  padding:10px 18px;
-  font-weight:800;
-  box-shadow:0 14px 36px rgba(37,99,235,.35);
-  transition: transform .2s ease, box-shadow .2s ease;
-}
-
-body[data-page="admin"] .btn-primary:hover{
-  transform: translateY(-2px);
-  box-shadow:0 20px 50px rgba(37,99,235,.45);
-}
-/* ADMIN SECONDARY */
-body[data-page="admin"] .btn-secondary{
-  background: rgba(124,58,237,.12);
-  color:#6d28d9;
-  border:1px solid rgba(124,58,237,.35);
-  border-radius:999px;
-  font-weight:700;
-}
-
-html[data-theme="dark"] body[data-page="admin"] .btn-secondary{
-  background: rgba(124,58,237,.22);
-  color:#ddd6fe;
-}
-/* ADMIN INPUTS */
-body[data-page="admin"] input,
-body[data-page="admin"] textarea,
-body[data-page="admin"] select{
-  border-radius:12px;
-  border:1px solid rgba(148,163,184,.45);
-  padding:10px 12px;
-  background: rgba(255,255,255,.9);
-  transition: border .2s ease, box-shadow .2s ease;
-}
-
-body[data-page="admin"] input:focus,
-body[data-page="admin"] textarea:focus{
-  outline:none;
-  border-color:#38bdf8;
-  box-shadow:0 0 0 3px rgba(56,189,248,.25);
-}
-
-html[data-theme="dark"] body[data-page="admin"] input,
-html[data-theme="dark"] body[data-page="admin"] textarea{
-  background: rgba(2,6,23,.6);
-  color:#fff;
-}
-/* STATUS BADGES */
-.admin-status{
-  padding:6px 12px;
-  border-radius:999px;
-  font-weight:800;
-  font-size:.75rem;
-}
-
-.admin-status.active{
-  background:rgba(34,197,94,.15);
-  color:#16a34a;
-}
-
-.admin-status.draft{
-  background:rgba(245,158,11,.18);
-  color:#b45309;
-}
-/* SUBTLE GLOW */
-body[data-page="admin"] .admin-card::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  background: radial-gradient(
-    600px circle at 50% 0%,
-    rgba(56,189,248,.12),
-    transparent 40%
-  );
-  opacity:0;
-  transition:opacity .3s ease;
-  pointer-events:none;
-}
-
-body[data-page="admin"] .admin-card:hover::after{
-  opacity:1;
-}
-
+    /* ✅ חשוב: לא לשים פה עיצובי light/dark של האדמין.
+       כל זה צריך להיות ב-admin.css כדי שלא יהיה ערבוב עם האתר. */
   </style>
 </head>
 
-<body data-page="admin">
-  
-<script type="module" src="analytics.js"></script>
+<body class="admin-page" data-page="admin">
+  <!-- ✅ רק פעם אחת -->
+  <script type="module" src="analytics.js"></script>
 
   <!-- HEADER -->
   <header class="header-main">
     <div class="container">
-      <nav class="nav">
-           <div class="nav-center">
-        <a href="index.html" class="logo-circle" aria-label="דף הבית">
-          <img
-            src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png"
-            alt="סמל יערת העמק"
-            
-            class="logo-img"
-          />
-          
-        </a>
-      </div>
+      <nav class="nav nav-centered" aria-label="כותרת אדמין">
 
-          <div>
-<div class="admin-header-title">
-מערכת ניהול · יערת העמק</div>
-            <div class="school-title-sub">
-              <div class="back-btn-wrap">
-              </div>
-            </div>
-          </div>
+        <!-- מרכז (לוגו) -->
+        <div class="nav-center">
+          <a href="index.html" class="logo-circle" aria-label="דף הבית">
+            <img
+              src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png"
+              alt="סמל יערת העמק"
+              class="logo-img"
+            />
+          </a>
         </div>
+
+        <!-- כותרת באמצע אמיתי (ממומש ב-admin.css) -->
+        <div class="admin-header-title">מערכת ניהול · יערת העמק</div>
+
       </nav>
     </div>
   </header>
@@ -296,159 +166,156 @@ body[data-page="admin"] .admin-card:hover::after{
             class="btn-outline"
             style="display:inline-block;padding:8px 16px;border-radius:999px;"
           >
-כלי עריכה נוספים 🛠️    קוד כניסה - 1992      </a>
-          
+            כלי עריכה נוספים 🛠️    קוד כניסה - 1992
+          </a>
         </div>
 
         <!-- NEWS -->
-<h3 class="section-title" style="font-size:1.2rem;margin-bottom:10px;">חדשות לפי כיתות</h3>
-<p class="section-subtitle">
-  ניתן להוסיף עד שתי תמונות לידיעה (קישורים או קבצים) + צבע טקסט (אופציונלי).
+        <h3 class="section-title" style="font-size:1.2rem;margin-bottom:10px;">חדשות לפי כיתות</h3>
+        <p class="section-subtitle">
+          ניתן להוסיף עד שתי תמונות לידיעה (קישורים או קבצים) + צבע טקסט (אופציונלי).
+        </p>
 
-</p>
+        <div class="admin-columns">
 
-<div class="admin-columns">
+          <!-- NEWS Z -->
+          <section class="admin-grade-section" data-grade="z">
+            <div class="card">
+              <h3>שכבת ז'</h3>
+              <div id="admin-news-z" class="admin-list"></div>
 
-  <!-- NEWS Z -->
-  <section class="admin-grade-section" data-grade="z">
-    <div class="card">
-      <h3>שכבת ז'</h3>
-      <div id="admin-news-z" class="admin-list"></div>
+              <form id="news-form-z">
+                <label>כיתה</label>
+                <select name="classId" required>
+                  <option value="">בחר כיתה</option>
+                  <option value="z1">ז1</option>
+                  <option value="z2">ז2</option>
+                  <option value="z3">ז3</option>
+                  <option value="z4">ז4</option>
+                  <option value="z5">ז5</option>
+                </select>
 
-      <form id="news-form-z">
-        <label>כיתה</label>
-        <select name="classId" required>
-          <option value="">בחר כיתה</option>
-          <option value="z1">ז1</option>
-          <option value="z2">ז2</option>
-          <option value="z3">ז3</option>
-          <option value="z4">ז4</option>
-          <option value="z5">ז5</option>
-        </select>
+                <label>כותרת</label>
+                <input name="title" />
 
-        <label>כותרת</label>
-        <input name="title" />
+                <label>מידע קצר (תאריך/אירוע)</label>
+                <input name="meta" />
 
-        <label>מידע קצר (תאריך/אירוע)</label>
-        <input name="meta" />
+                <label>קישור לתמונה 1 (אופציונלי)</label>
+                <input name="imageUrl" placeholder="https://..." />
 
-        <label>קישור לתמונה 1 (אופציונלי)</label>
-        <input name="imageUrl" placeholder="https://..." />
+                <label>תמונה 1 מקובץ (אופציונלי)</label>
+                <input type="file" name="imageFile" accept="image/*" />
 
-        <label>תמונה 1 מקובץ (אופציונלי)</label>
-        <input type="file" name="imageFile" accept="image/*" />
+                <label>קישור לתמונה 2 (אופציונלי)</label>
+                <input name="imageUrl2" placeholder="https://..." />
 
-        <label>קישור לתמונה 2 (אופציונלי)</label>
-        <input name="imageUrl2" placeholder="https://..." />
+                <label>תמונה 2 מקובץ (אופציונלי)</label>
+                <input type="file" name="imageFile2" accept="image/*" />
 
-        <label>תמונה 2 מקובץ (אופציונלי)</label>
-        <input type="file" name="imageFile2" accept="image/*" />
+                <label>צבע הטקסט (אופציונלי)</label>
+                <input type="color" name="color" value="#ffffff" />
 
-        <label>צבע הטקסט (אופציונלי)</label>
-        <input type="color" name="color" value="#ffffff" />
+                <label>תוכן הידיעה</label>
+                <textarea name="body"></textarea>
 
-        <label>תוכן הידיעה</label>
-        <textarea name="body"></textarea>
+                <button type="submit">הוסף חדשות לז'</button>
+              </form>
+            </div>
+          </section>
 
-        <button type="submit">הוסף חדשות לז'</button>
-      </form>
-    </div>
-  </section>
+          <!-- NEWS H -->
+          <section class="admin-grade-section" data-grade="h">
+            <div class="card">
+              <h3>שכבת ח'</h3>
+              <div id="admin-news-h" class="admin-list"></div>
 
-  <!-- NEWS H -->
-  <section class="admin-grade-section" data-grade="h">
-    <div class="card">
-      <h3>שכבת ח'</h3>
-      <div id="admin-news-h" class="admin-list"></div>
+              <form id="news-form-h">
+                <label>כיתה</label>
+                <select name="classId" required>
+                  <option value="">בחר כיתה</option>
+                  <option value="h1">ח1/7</option>
+                  <option value="h4">ח4/8</option>
+                  <option value="h5">ח5/9</option>
+                  <option value="h6">ח6/10</option>
+                </select>
 
-      <form id="news-form-h">
-        <label>כיתה</label>
-        <select name="classId" required>
-          <option value="">בחר כיתה</option>
-          <option value="h1">ח1/7</option>
-          <option value="h4">ח4/8</option>
-          <option value="h5">ח5/9</option>
-          <option value="h6">ח6/10</option>
-        </select>
+                <label>כותרת</label>
+                <input name="title" />
 
-        <label>כותרת</label>
-        <input name="title" />
+                <label>מידע קצר (תאריך/אירוע)</label>
+                <input name="meta" />
 
-        <label>מידע קצר (תאריך/אירוע)</label>
-        <input name="meta" />
+                <label>קישור לתמונה 1 (אופציונלי)</label>
+                <input name="imageUrl" placeholder="https://..." />
 
-        <label>קישור לתמונה 1 (אופציונלי)</label>
-        <input name="imageUrl" placeholder="https://..." />
+                <label>תמונה 1 מקובץ (אופציונלי)</label>
+                <input type="file" name="imageFile" accept="image/*" />
 
-        <label>תמונה 1 מקובץ (אופציונלי)</label>
-        <input type="file" name="imageFile" accept="image/*" />
+                <label>קישור לתמונה 2 (אופציונלי)</label>
+                <input name="imageUrl2" placeholder="https://..." />
 
-        <label>קישור לתמונה 2 (אופציונלי)</label>
-        <input name="imageUrl2" placeholder="https://..." />
+                <label>תמונה 2 מקובץ (אופציונלי)</label>
+                <input type="file" name="imageFile2" accept="image/*" />
 
-        <label>תמונה 2 מקובץ (אופציונלי)</label>
-        <input type="file" name="imageFile2" accept="image/*" />
+                <label>צבע הטקסט (אופציונלי)</label>
+                <input type="color" name="color" value="#ffffff" />
 
-        <label>צבע הטקסט (אופציונלי)</label>
-        <input type="color" name="color" value="#ffffff" />
+                <label>תוכן הידיעה</label>
+                <textarea name="body"></textarea>
 
-        <label>תוכן הידיעה</label>
-        <textarea name="body"></textarea>
+                <button type="submit">הוסף חדשות לח'</button>
+              </form>
+            </div>
+          </section>
 
-        <button type="submit">הוסף חדשות לח'</button>
-      </form>
-    </div>
-  </section>
+          <!-- NEWS T -->
+          <section class="admin-grade-section" data-grade="t">
+            <div class="card">
+              <h3>שכבת ט'</h3>
+              <div id="admin-news-t" class="admin-list"></div>
 
-  <!-- NEWS T -->
-  <section class="admin-grade-section" data-grade="t">
-    <div class="card">
-      <h3>שכבת ט'</h3>
-      <div id="admin-news-t" class="admin-list"></div>
+              <form id="news-form-t">
+                <label>כיתה</label>
+                <select name="classId" required>
+                  <option value="">בחר כיתה</option>
+                  <option value="t1">ט1</option>
+                  <option value="t2">ט2</option>
+                  <option value="t3">ט3</option>
+                  <option value="t4">ט4</option>
+                  <option value="t5">ט5</option>
+                </select>
 
-      <form id="news-form-t">
-        <label>כיתה</label>
-        <select name="classId" required>
-          <option value="">בחר כיתה</option>
-          <option value="t1">ט1</option>
-          <option value="t2">ט2</option>
-          <option value="t3">ט3</option>
-          <option value="t4">ט4</option>
-          <option value="t5">ט5</option>
-        </select>
+                <label>כותרת</label>
+                <input name="title" />
 
-        <label>כותרת</label>
-        <input name="title" />
+                <label>מידע קצר (תאריך/אירוע)</label>
+                <input name="meta" />
 
-        <label>מידע קצר (תאריך/אירוע)</label>
-        <input name="meta" />
+                <label>קישור לתמונה 1 (אופציונלי)</label>
+                <input name="imageUrl" placeholder="https://..." />
 
-        <label>קישור לתמונה 1 (אופציונלי)</label>
-        <input name="imageUrl" placeholder="https://..." />
+                <label>תמונה 1 מקובץ (אופציונלי)</label>
+                <input type="file" name="imageFile" accept="image/*" />
 
-        <label>תמונה 1 מקובץ (אופציונלי)</label>
-        <input type="file" name="imageFile" accept="image/*" />
+                <label>קישור לתמונה 2 (אופציונלי)</label>
+                <input name="imageUrl2" placeholder="https://..." />
 
-        <label>קישור לתמונה 2 (אופציונלי)</label>
-        <input name="imageUrl2" placeholder="https://..." />
+                <label>תמונה 2 מקובץ (אופציונלי)</label>
+                <input type="file" name="imageFile2" accept="image/*" />
 
-        <label>תמונה 2 מקובץ (אופציונלי)</label>
-        <input type="file" name="imageFile2" accept="image/*" />
+                <label>צבע הטקסט (אופציונלי)</label>
+                <input type="color" name="color" value="#ffffff" />
 
-        <label>צבע הטקסט (אופציונלי)</label>
-        <input type="color" name="color" value="#ffffff" />
+                <label>תוכן הידיעה</label>
+                <textarea name="body"></textarea>
 
-        <label>תוכן הידיעה</label>
-        <textarea name="body"></textarea>
+                <button type="submit">הוסף חדשות לט'</button>
+              </form>
+            </div>
+          </section>
 
-        <button type="submit">הוסף חדשות לט'</button>
-      </form>
-    </div>
-  </section>
-
-</div>
-
-
+        </div>
 
         <br><br>
 
@@ -490,7 +357,6 @@ body[data-page="admin"] .admin-card:hover::after{
 
                 <button type="submit">הוסף מבחן לז'</button>
               </form>
-
             </div>
           </section>
 
@@ -569,37 +435,41 @@ body[data-page="admin"] .admin-card:hover::after{
         </div>
 
         <br><br>
-<div class="card" style="margin-top:16px;">
-  <h3 style="margin:0 0 10px;">הודעה דחופה</h3>
 
-  <label style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
-    <input type="checkbox" id="urgentActive">
-    <span>פעילה</span>
-  </label>
+        <div class="card" style="margin-top:16px;">
+          <h3 style="margin:0 0 10px;">הודעה דחופה</h3>
 
-  <label style="display:block; margin-bottom:8px; font-weight:800;">סוג</label>
-  <select id="urgentType" style="width:100%; padding:10px; border-radius:12px; margin-bottom:10px;">
-    <option value="info">רגילה (כחול)</option>
-    <option value="warn">אזהרה (צהוב)</option>
-    <option value="danger">דחוף (אדום)</option>
-  </select>
+          <label style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
+            <input type="checkbox" id="urgentActive">
+            <span>פעילה</span>
+          </label>
 
-  <label style="display:block; margin-bottom:8px; font-weight:800;">טקסט</label>
-  <textarea id="urgentText" rows="3" style="width:100%; padding:10px; border-radius:12px;"></textarea>
-<label>צבע הודעה</label>
-<input id="urgentColor" type="color" value="#fbbf24">
+          <label style="display:block; margin-bottom:8px; font-weight:800;">סוג</label>
+          <select id="urgentType" style="width:100%; padding:10px; border-radius:12px; margin-bottom:10px;">
+            <option value="info">רגילה (כחול)</option>
+            <option value="warn">אזהרה (צהוב)</option>
+            <option value="danger">דחוף (אדום)</option>
+          </select>
 
-  <div style="display:flex; gap:10px; margin-top:10px;">
-    <button id="urgentSave" class="btn">שמירה</button>
-    <button id="urgentClear" class="btn" style="opacity:.85;">מחיקה</button>
-  </div>
+          <label style="display:block; margin-bottom:8px; font-weight:800;">טקסט</label>
+          <textarea id="urgentText" rows="3" style="width:100%; padding:10px; border-radius:12px;"></textarea>
 
-  <div id="urgentStatus" style="margin-top:10px; opacity:.8;"></div>
-</div>
+          <label>צבע הודעה</label>
+          <input id="urgentColor" type="color" value="#fbbf24">
+
+          <div style="display:flex; gap:10px; margin-top:10px;">
+            <button id="urgentSave" class="btn">שמירה</button>
+            <button id="urgentClear" class="btn" style="opacity:.85;">מחיקה</button>
+          </div>
+
+          <div id="urgentStatus" style="margin-top:10px; opacity:.8;"></div>
+        </div>
 
         <!-- BOARD -->
-        <h3 class="section-title" style="font-size:1.2rem;margin-bottom:10px;"> לוח מודעות
-           נא לא למחוק מודעות אחרות,זה מוחק את דף הכתבה</h3>
+        <h3 class="section-title" style="font-size:1.2rem;margin-bottom:10px;">
+          לוח מודעות
+          נא לא למחוק מודעות אחרות,זה מוחק את דף הכתבה
+        </h3>
 
         <div class="admin-columns">
           <div class="card">
@@ -616,21 +486,18 @@ body[data-page="admin"] .admin-card:hover::after{
               <label>צבע הטקסט (אופציונלי)</label>
               <input type="color" name="color" value="#ffffff" />
 
-              <!-- תמונה 1 -->
               <label>קישור לתמונה 1 (אופציונלי)</label>
               <input name="imageUrl" placeholder="https://..." />
 
               <label>העלה קובץ תמונה 1 (אופציונלי)</label>
               <input type="file" name="imageFile" accept="image/*" />
 
-              <!-- תמונה 2 -->
               <label>קישור לתמונה 2 (אופציונלי)</label>
               <input name="imageUrl2" placeholder="https://..." />
 
               <label>העלה קובץ תמונה 2 (אופציונלי)</label>
               <input type="file" name="imageFile2" accept="image/*" />
 
-              <!-- תמונה 3 -->
               <label>קישור לתמונה 3 (אופציונלי)</label>
               <input name="imageUrl3" placeholder="https://..." />
 
@@ -642,7 +509,6 @@ body[data-page="admin"] .admin-card:hover::after{
 
               <button type="submit">הוסף מודעה</button>
             </form>
-
           </div>
         </div>
 
@@ -668,7 +534,6 @@ body[data-page="admin"] .admin-card:hover::after{
               <label>תת־כותרת בהירו</label>
               <input name="homeHeroSubtitle" placeholder="סביבת למידה בטוחה, תומכת ומובילה..." />
 
-              <!-- HERO SIDE -->
               <h4 style="margin-top:16px;">תיבת "מידע מהיר" בהירו</h4>
 
               <label>כותרת התיבה</label>
@@ -681,7 +546,6 @@ body[data-page="admin"] .admin-card:hover::after{
                 placeholder="📍 מגדל העמק&#10;🧑‍🎓 שכבות ז'–ט'&#10;👩‍🏫 צוות חינוכי מסור&#10;🤝 שיתופי פעולה קהילתיים"
               ></textarea>
 
-              <!-- ABOUT -->
               <h4 style="margin-top:16px;">אודות בית הספר</h4>
 
               <label>כותרת אודות</label>
@@ -690,7 +554,6 @@ body[data-page="admin"] .admin-card:hover::after{
               <label>טקסט אודות</label>
               <textarea name="aboutBody" rows="4" placeholder="כמה משפטים על בית הספר, הערכים, האווירה..."></textarea>
 
-              <!-- IMPORTANT SECTION -->
               <h4 style="margin-top:16px;">מדור "חשוב לדעת"</h4>
 
               <label>כותרת המדור</label>
@@ -702,25 +565,21 @@ body[data-page="admin"] .admin-card:hover::after{
               <h5 style="margin-top:10px;">כרטיס 1</h5>
               <label>כותרת כרטיס 1</label>
               <input name="importantCard1Title" placeholder="לדוגמה: 💻 סביבת למידה דיגיטלית" />
-
               <label>טקסט כרטיס 1</label>
               <textarea name="importantCard1Body" rows="2"></textarea>
 
               <h5 style="margin-top:10px;">כרטיס 2</h5>
               <label>כותרת כרטיס 2</label>
               <input name="importantCard2Title" placeholder="לדוגמה: 🤝 עם מי מדברים?" />
-
               <label>טקסט כרטיס 2</label>
               <textarea name="importantCard2Body" rows="2"></textarea>
 
               <h5 style="margin-top:10px;">כרטיס 3</h5>
               <label>כותרת כרטיס 3</label>
               <input name="importantCard3Title" placeholder="לדוגמה: 📌 טיפ נוסף" />
-
               <label>טקסט כרטיס 3</label>
               <textarea name="importantCard3Body" rows="2"></textarea>
 
-              <!-- HOME SECTIONS TITLES -->
               <h4 style="margin-top:16px;">כותרות למדורי דף הבית</h4>
 
               <label>כותרת מדור חדשות</label>
@@ -741,7 +600,6 @@ body[data-page="admin"] .admin-card:hover::after{
               <label>תת־כותרת מדור מבחנים</label>
               <input name="homeExamsSubtitle" placeholder="תאריכים, מקצועות ונושאים – כדי שאף אחד לא יפספס." />
 
-              <!-- GRADES SECTION -->
               <h4 style="margin-top:16px;">מדור "היכרות עם השכבות"</h4>
 
               <label>כותרת המדור</label>
@@ -751,6 +609,7 @@ body[data-page="admin"] .admin-card:hover::after{
               <input name="gradesSectionSubtitle" placeholder="בחר שכבה כדי לראות חדשות, מבחנים ועדכונים שמתאימים אליך." />
 
               <h5 style="margin-top:10px;">תיאור שכבות</h5>
+
               <label>תיאור שכבת ז'</label>
               <textarea name="zDescription" rows="2" placeholder="משפט על שכבת ז'..."></textarea>
 
@@ -760,7 +619,6 @@ body[data-page="admin"] .admin-card:hover::after{
               <label>תיאור שכבת ט'</label>
               <textarea name="tDescription" rows="2" placeholder="משפט על שכבת ט'..."></textarea>
 
-              <!-- REQUESTS -->
               <h4 style="margin-top:16px;">תיבת בקשות</h4>
 
               <label>כותרת המדור</label>
@@ -772,7 +630,6 @@ body[data-page="admin"] .admin-card:hover::after{
               <label>טקסט מעל הכפתור</label>
               <textarea name="requestsBody" rows="2" placeholder="למילוי טופס הבקשות – לחצו כאן:"></textarea>
 
-              <!-- CONTACT -->
               <h4 style="margin-top:16px;">יצירת קשר</h4>
 
               <label>כותרת המדור</label>
@@ -790,7 +647,6 @@ body[data-page="admin"] .admin-card:hover::after{
               <label>כתובת</label>
               <input name="contactAddress" placeholder="רחוב..., מגדל העמק" />
 
-              <!-- FOOTER -->
               <h4 style="margin-top:16px;">פוטר</h4>
 
               <label>טקסט תחתון (פוטר)</label>
@@ -801,14 +657,13 @@ body[data-page="admin"] .admin-card:hover::after{
           </div>
         </div>
 
-      </div> <!-- /#admin-section -->
-    </div> <!-- /.container -->
+      </div><!-- /#admin-section -->
+
+    </div><!-- /.container -->
   </section>
 
   <script type="module" src="admin.js?v=7"></script>
-<script type="module" src="/analytics.js"></script>
-
- <script type="module" src="./admin-urgent.js"></script>
- <script src="accessibility.js"></script>
+  <script type="module" src="./admin-urgent.js"></script>
+  <script src="accessibility.js"></script>
 </body>
 </html>
