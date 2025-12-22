@@ -1,7 +1,6 @@
 // analytics.js – לוגים + דשבורד אנליטיקות ליערת העמק (Firestore)
-
-// NOTE: this file is intended to run in the browser.
-// It uses Firebase Firestore via your firebase-config.js (local module).
+// מצב מומלץ: analytics_pageViews = אגרגציה (מסמך אחד ליום+דף(+כיתה))
+// אופציונלי: analytics_events = לוג גולמי לכל כניסה (אם תרצה פירוט)
 
 import { db } from "./firebase-config.js";
 import {
@@ -12,14 +11,24 @@ import {
   query,
   orderBy,
   limit,
+  doc,
+  setDoc,
+  increment,
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
 /* =============================
    CONFIG
 ============================= */
 
-const LOGS_COLLECTION = "analytics_pageViews";
-const logsRef = collection(db, LOGS_COLLECTION);
+// ✅ אגרגציה (נקי, מעט מסמכים)
+const PAGEVIEWS_COLLECTION = "analytics_pageViews";
+
+// ✅ לוג גולמי (אפשר לכבות)
+const EVENTS_COLLECTION = "analytics_events";
+const ENABLE_RAW_EVENTS = false; // אם תרצה גם אירועים גולמיים, שנה ל-true
+
+const pageviewsRef = collection(db, PAGEVIEWS_COLLECTION);
+const eventsRef = collection(db, EVENTS_COLLECTION);
 
 // כמה זמן לא לרשום שוב אותו דף (מונע כפילויות מרענון/טעינות כפולות)
 const DEDUPE_WINDOW_MS = 12_000;
@@ -37,13 +46,10 @@ function getPathWithQuery() {
 }
 
 function getPageKeyFromPath(pathname) {
-  // Normalize
   const p = (pathname || "/").toLowerCase();
 
-  // Home
   if (p === "/" || p.endsWith("/index.html")) return "index";
 
-  // Common pages (תעדכן לפי שמות קבצים אצלך)
   if (p.includes("class.html")) return "class";
   if (p.includes("classes.html")) return "classes";
   if (p.includes("exams.html")) return "exams";
@@ -53,10 +59,8 @@ function getPageKeyFromPath(pathname) {
   if (p.includes("admin.html")) return "admin";
   if (p.includes("login.html")) return "login";
   if (p.includes("links.html")) return "links";
-  if (p.includes("analytics.html")) return "analytics-dashboard"; // הדשבורד
-  if (p.includes("personal") || p.includes("my.edu.gov.il")) return "personal";
+  if (p.includes("analytics.html")) return "analytics-dashboard";
 
-  // Fallback: file name or "page"
   const file = p.split("/").pop() || "";
   if (file.endsWith(".html")) return file.replace(".html", "");
   return "page";
@@ -65,14 +69,12 @@ function getPageKeyFromPath(pathname) {
 function parseGradeClassFromURL() {
   const usp = new URLSearchParams(location.search);
 
-  // classId: ?class=z1 / ?class=h3 / ?class=t5
   const classIdRaw =
     usp.get("class") ||
     usp.get("classId") ||
     usp.get("cid") ||
     null;
 
-  // grade: ?grade=z / h / t
   const gradeRaw =
     usp.get("grade") ||
     usp.get("g") ||
@@ -81,12 +83,10 @@ function parseGradeClassFromURL() {
   const classId = safeLower(classIdRaw);
   let grade = safeLower(gradeRaw);
 
-  // אם אין grade אבל יש classId כמו z3 -> נחלץ ממנו
   if (!grade && classId && /^[zht]\d+$/i.test(classId)) {
     grade = classId[0];
   }
 
-  // גם אם יש data-attributes על ה-body
   const body = document.body;
   const bodyGrade = safeLower(body?.dataset?.grade || null);
   const bodyClassId = safeLower(body?.dataset?.classId || null);
@@ -100,28 +100,17 @@ function parseGradeClassFromURL() {
 function getPageMeta() {
   const body = document.body;
   const pageFromBody = safeLower(body?.dataset?.page || null);
-
-  const page =
-    pageFromBody ||
-    getPageKeyFromPath(location.pathname);
-
+  const page = pageFromBody || getPageKeyFromPath(location.pathname);
   const { grade, classId } = parseGradeClassFromURL();
-
   return { page, grade, classId };
 }
 
 function shouldSkipLogging(page) {
-  // לא רושמים לוגים על הדשבורד עצמו
   if (page === "analytics-dashboard") return true;
-
-  // אם זה local file (לפעמים עושים בדיקות עם file://)
-  if (location.protocol === "file:") return false; // אפשר גם true אם אתה רוצה לא ללוג לוקאלית
-
   return false;
 }
 
 function dedupeKey() {
-  // נזהה יוניק לפי path + page + classId
   const meta = getPageMeta();
   return JSON.stringify({
     path: getPathWithQuery(),
@@ -139,13 +128,21 @@ function canLogNow() {
     localStorage.setItem(key, String(now));
     return true;
   } catch {
-    // אם localStorage חסום - נלוג בלי דדופ
     return true;
   }
 }
 
+function pad2(n) {
+  return String(n).padStart(2, "0");
+}
+
+// YYYY-MM-DD לפי השעון המקומי (ישראל)
+function dateKeyLocal(d) {
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+}
+
 /* =============================
-   1) LOG PAGE VIEW
+   1) LOG PAGE VIEW (AGGREGATED)
 ============================= */
 
 async function logPageView() {
@@ -154,50 +151,60 @@ async function logPageView() {
     if (shouldSkipLogging(page)) return;
     if (!canLogNow()) return;
 
-    await addDoc(logsRef, {
-      path: getPathWithQuery(),
-      page,
-      grade,
-      classId,
-      referrer: document.referrer || null,
-      userAgent: navigator.userAgent || null,
-      language: navigator.language || null,
-      screen: { w: window.screen?.width || null, h: window.screen?.height || null },
-      tzOffsetMin: new Date().getTimezoneOffset(), // ישראל לרוב -120
-      createdAt: serverTimestamp(),
-      createdAtClient: new Date().toISOString(),
-    });
+    const now = new Date();
+    const dateKey = dateKeyLocal(now);
+    const hour = pad2(now.getHours());
 
-    // console.log("✅ analytics log saved", { page, grade, classId, path: getPathWithQuery() });
+    const path = getPathWithQuery();
+
+    // ✅ 1) אגרגציה נקייה: מסמך אחד ליום+דף(+כיתה)
+    // אם אתה לא רוצה פיצול לפי כיתה, תוריד את classPart מה-docId
+    const classPart = classId ? `__${classId}` : "__all";
+    const docId = `${dateKey}__${page}${classPart}`;
+
+    await setDoc(
+      doc(db, PAGEVIEWS_COLLECTION, docId),
+      {
+        dateKey,
+        pageId: page,     // חשוב: תואם ל-analytics.html שלך (pageId)
+        grade: grade || null,
+        classId: classId || null,
+        views: increment(1),
+        lastPath: path,
+        lastHour: hour,
+        updatedAt: serverTimestamp(),
+      },
+      { merge: true }
+    );
+
+    // ✅ 2) אופציונלי: לוג גולמי (רק אם באמת צריך)
+    if (ENABLE_RAW_EVENTS) {
+      await addDoc(eventsRef, {
+        path,
+        pageId: page,
+        grade,
+        classId,
+        referrer: document.referrer || null,
+        userAgent: navigator.userAgent || null,
+        language: navigator.language || null,
+        screen: { w: window.screen?.width || null, h: window.screen?.height || null },
+        tzOffsetMin: new Date().getTimezoneOffset(),
+        dateKey,
+        hour,
+        createdAt: serverTimestamp(),
+        createdAtClient: new Date().toISOString(),
+      });
+    }
+
   } catch (err) {
-    console.error("שגיאה בשמירת לוג אנליטיקות:", err);
+    console.error("שגיאה בשמירת אנליטיקות:", err);
   }
 }
 
 /* =============================
-   2) DASHBOARD
+   2) DASHBOARD (reads AGGREGATION)
+   ✅ זה מיועד לעמוד analytics.html שלך (שקורא analytics_pageViews)
 ============================= */
-
-function safeGetDate(ts) {
-  if (!ts) return null;
-
-  // Firestore Timestamp has toDate()
-  if (typeof ts.toDate === "function") return ts.toDate();
-
-  // ISO string (createdAtClient)
-  if (typeof ts === "string") {
-    const d = new Date(ts);
-    return Number.isFinite(d.getTime()) ? d : null;
-  }
-
-  if (ts instanceof Date) return ts;
-  return null;
-}
-
-function formatDateKey(d) {
-  // YYYY-MM-DD
-  return d.toISOString().slice(0, 10);
-}
 
 function setText(id, value) {
   const el = document.getElementById(id);
@@ -205,84 +212,19 @@ function setText(id, value) {
   el.textContent = String(value);
 }
 
-function renderTopList(containerId, mapObj, maxItems, labelFormatter) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-
-  const entries = Array.from(mapObj.entries())
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, maxItems);
-
-  if (!entries.length) {
-    container.innerHTML = `<p class="analytics-empty">אין נתונים עדיין.</p>`;
-    return;
-  }
-
-  container.innerHTML = entries
-    .map(([key, count]) => {
-      const label = labelFormatter ? labelFormatter(key) : key;
-      return `
-        <div class="analytics-row">
-          <span class="analytics-label">${label}</span>
-          <span class="analytics-count">${count}</span>
-        </div>
-      `;
-    })
-    .join("");
-}
-
-function renderHourlyTable(containerId, hoursArr) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-
-  let rows = "";
-  for (let h = 0; h < 24; h++) {
-    const label = `${String(h).padStart(2, "0")}:00`;
-    rows += `
-      <tr>
-        <td>${label}</td>
-        <td>${hoursArr[h] || 0}</td>
-      </tr>
-    `;
-  }
-
-  container.innerHTML = `
-    <table class="analytics-table">
-      <thead>
-        <tr>
-          <th>שעה</th>
-          <th>כמות כניסות</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${rows}
-      </tbody>
-    </table>
-  `;
-}
-
 async function loadAnalyticsDashboard() {
   const statusEl = document.getElementById("analytics-status");
   if (statusEl) statusEl.textContent = "טוען נתוני אנליטיקות...";
 
   try {
-    // ✅ אם createdAt חסר אצל חלק מהמסמכים, orderBy יכול להפיל.
-    // אז: נביא לפי createdAt desc, אבל אם זה נופל – נביא בלי orderBy ונמיין מקומית.
-    let snap;
-    try {
-      const qLogs = query(logsRef, orderBy("createdAt", "desc"), limit(5000));
-      snap = await getDocs(qLogs);
-    } catch (e) {
-      console.warn("orderBy(createdAt) נכשל, מביא בלי orderBy וממיין מקומית…", e);
-      const qLogs = query(logsRef, limit(5000));
-      snap = await getDocs(qLogs);
-    }
+    // קוראים אגרגציה מסודרת
+    // שים לב: יש מסמכים עם views מספרי, לא “לוג לכל כניסה”
+    const qViews = query(pageviewsRef, orderBy("dateKey", "desc"), limit(6000));
+    const snap = await getDocs(qViews);
+    const rows = snap.docs.map(d => d.data());
 
-    const logs = [];
-    snap.forEach((docSnap) => logs.push(docSnap.data()));
-
-    if (!logs.length) {
-      if (statusEl) statusEl.textContent = "אין עדיין לוגים להצגה.";
+    if (!rows.length) {
+      if (statusEl) statusEl.textContent = "אין עדיין נתונים להצגה.";
       setText("analytics-total-visits", 0);
       setText("analytics-today-visits", 0);
       setText("analytics-unique-pages", 0);
@@ -290,77 +232,43 @@ async function loadAnalyticsDashboard() {
       return;
     }
 
-    // מיון מקומי לפי זמן (createdAt -> createdAtClient)
-    logs.sort((a, b) => {
-      const da = safeGetDate(a.createdAt) || safeGetDate(a.createdAtClient);
-      const dbb = safeGetDate(b.createdAt) || safeGetDate(b.createdAtClient);
-      return (dbb?.getTime() || 0) - (da?.getTime() || 0);
-    });
+    const today = dateKeyLocal(new Date());
 
-    const now = new Date();
-    const todayKey = formatDateKey(now);
+    let totalViews = 0;
+    let todayViews = 0;
 
-    let totalVisits = 0;
-    let todayVisits = 0;
+    const byPage = new Map();   // pageId -> views
+    const byClass = new Map();  // classId -> views
+    const byGrade = new Map();  // grade -> views
 
-    const byPage = new Map();   // path -> count
-    const byClass = new Map();  // classId -> count
-    const byGrade = new Map();  // z/h/t -> count
-    const byHour = new Array(24).fill(0);
+    rows.forEach(r => {
+      const v = Number(r.views || 0);
+      totalViews += v;
+      if (r.dateKey === today) todayViews += v;
 
-    logs.forEach((log) => {
-      totalVisits++;
+      const pageId = r.pageId || "(לא ידוע)";
+      byPage.set(pageId, (byPage.get(pageId) || 0) + v);
 
-      const d = safeGetDate(log.createdAt) || safeGetDate(log.createdAtClient);
-      if (d) {
-        const key = formatDateKey(d);
-        if (key === todayKey) todayVisits++;
-
-        const hour = d.getHours();
-        if (hour >= 0 && hour < 24) byHour[hour]++;
+      if (r.classId) {
+        const cid = safeLower(r.classId) || "(לא ידוע)";
+        byClass.set(cid, (byClass.get(cid) || 0) + v);
       }
 
-      const path = log.path || "(לא ידוע)";
-      byPage.set(path, (byPage.get(path) || 0) + 1);
-
-      if (log.classId) {
-        const classId = safeLower(log.classId) || "(לא ידוע)";
-        byClass.set(classId, (byClass.get(classId) || 0) + 1);
-      }
-
-      if (log.grade) {
-        const g = safeLower(log.grade) || "(לא ידוע)";
-        byGrade.set(g, (byGrade.get(g) || 0) + 1);
+      if (r.grade) {
+        const g = safeLower(r.grade) || "(לא ידוע)";
+        byGrade.set(g, (byGrade.get(g) || 0) + v);
       }
     });
 
-    setText("analytics-total-visits", totalVisits);
-    setText("analytics-today-visits", todayVisits);
+    setText("analytics-total-visits", totalViews);
+    setText("analytics-today-visits", todayViews);
     setText("analytics-unique-pages", byPage.size);
     setText("analytics-unique-classes", byClass.size);
 
-    renderTopList("analytics-top-pages", byPage, 12, (path) => path || "(לא ידוע)");
-
-    renderTopList("analytics-top-classes", byClass, 12, (classId) => {
-      const map = {
-        z1: "ז1", z2: "ז2", z3: "ז3", z4: "ז4", z5: "ז5",
-        h1: "ח1", h2: "ח2", h3: "ח3", h4: "ח4", h5: "ח5", h6: "ח6",
-        t1: "ט1", t2: "ט2", t3: "ט3", t4: "ט4", t5: "ט5",
-      };
-      return map[classId] || classId;
-    });
-
-    renderTopList("analytics-top-grades", byGrade, 3, (g) => {
-      const map = { z: "שכבת ז׳", h: "שכבת ח׳", t: "שכבת ט׳" };
-      return map[g] || g;
-    });
-
-    renderHourlyTable("analytics-by-hour", byHour);
-
-    if (statusEl) statusEl.textContent = `נטענו ${logs.length} לוגים אחרונים.`;
+    if (statusEl) statusEl.textContent = `נטענו ${rows.length} מסמכי סיכום.`;
   } catch (err) {
     console.error("שגיאה בטעינת האנליטיקות:", err);
-    if (statusEl) statusEl.textContent = "אירעה שגיאה בטעינת נתוני האנליטיקות. בדוק את ה־console.";
+    if (statusEl) statusEl.textContent = "אירעה שגיאה בטעינת נתוני האנליטיקות. בדוק את ה-console.";
   }
 }
 
@@ -370,8 +278,6 @@ async function loadAnalyticsDashboard() {
 
 document.addEventListener("DOMContentLoaded", () => {
   const pageType = safeLower(document.body?.dataset?.page || "") || null;
-
-  // אם אתה משתמש בעמוד דשבורד תן data-page="analytics-dashboard"
   const computed = getPageKeyFromPath(location.pathname);
   const finalPage = pageType || computed;
 
