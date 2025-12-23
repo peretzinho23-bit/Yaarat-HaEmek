@@ -470,6 +470,38 @@ body.admin-page .card{
     top: 60px !important;
   }
 }
+/* ✅ MOBILE: הכל לרוחב מלא, בלי רווח שחור בצד */
+@media (max-width: 900px){
+
+  /* הקונטיינר באמת 100% */
+  body.admin-page .container{
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 12px !important;  /* מרווח קטן מהקצוות */
+    margin: 0 auto !important;
+  }
+
+  /* הגריד תמיד טור אחד */
+  body.admin-page .admin-columns{
+    grid-template-columns: 1fr !important;
+    width: 100% !important;
+  }
+
+  /* כל ה-sections/כרטיסים יתפסו 100% */
+  body.admin-page .admin-grade-section,
+  body.admin-page .admin-columns > section,
+  body.admin-page .card{
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* למנוע “בריחה” שגורמת לרווחים */
+  body.admin-page *{
+    max-width: 100%;
+  }
+}
 
   </style>
 </head>
