@@ -502,6 +502,71 @@ body.admin-page .card{
     max-width: 100%;
   }
 }
+/* ✅ MOBILE TOPBAR: left hamburger | center logo | right grades (LOCK) */
+@media (max-width: 900px){
+
+  /* אבא */
+  body.admin-page .header-main{ position: sticky; top:0; z-index: 30000; }
+  body.admin-page .admin-nav{
+    position: relative !important;
+    min-height: 72px !important;
+    padding: 10px 0 !important;
+  }
+
+  /* המבורגר בשמאל */
+  body.admin-page .admin-mobile-toggle{
+    display:flex !important;
+    position:absolute !important;
+    left: 12px !important;
+    right: auto !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 30003 !important;
+  }
+
+  /* הלוגו במרכז */
+  body.admin-page .admin-nav-left{
+    display:flex !important;
+    position:absolute !important;
+    left: 50% !important;
+    right: auto !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: 30002 !important;
+  }
+
+  /* השכבות בימין */
+  body.admin-page .admin-grade-switcher{
+    position:absolute !important;
+    right: 12px !important;
+    left: auto !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 30003 !important;
+
+    display:flex !important;
+    gap: 8px !important;
+    max-width: 46vw !important;
+    overflow-x: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+
+  /* מסתירים ניווט דסקטופ */
+  body.admin-page .admin-nav-right{ display:none !important; }
+
+  /* התפריט נפתח משמאל */
+  body.admin-page .admin-mobile-menu{
+    position: fixed !important;
+    top: 76px !important;
+    left: 12px !important;
+    right: auto !important;
+    z-index: 30010 !important;
+  }
+}
 
   </style>
 </head>
