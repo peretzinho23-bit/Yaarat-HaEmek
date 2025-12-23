@@ -3814,3 +3814,165 @@ html[data-theme="light"] .hero.hero-home::after{
     rgba(238, 243, 251, 1) 100%
   );
 }
+/* =========================
+   REGISTER PAGE (Admin)
+   ========================= */
+
+body.admin-page.register-page{
+  min-height: 100vh;
+}
+
+.register-shell{
+  padding-top: 28px;
+  padding-bottom: 48px;
+}
+
+.register-hero{
+  text-align: center;
+  margin: 18px auto 18px;
+  max-width: 860px;
+}
+
+.register-title{
+  margin: 0 0 10px;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 900;
+  letter-spacing: .2px;
+}
+
+.register-subtitle{
+  margin: 0 auto;
+  max-width: 720px;
+  opacity: .88;
+  line-height: 1.6;
+  font-weight: 600;
+}
+
+.register-card{
+  max-width: 920px;
+  margin: 18px auto 0;
+  padding: 22px;
+  border-radius: 22px;
+  background: rgba(2,6,23,.55);
+  border: 1px solid rgba(148,163,184,.22);
+  box-shadow: 0 22px 70px rgba(0,0,0,.35);
+  backdrop-filter: blur(10px);
+}
+
+.register-form .field{
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.register-form label{
+  font-weight: 800;
+  font-size: .92rem;
+  color: rgba(226,232,240,.92);
+}
+
+.register-form .hint{
+  margin-top: -2px;
+  font-size: .82rem;
+  opacity: .78;
+}
+
+.register-grid{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.register-grid .full{
+  grid-column: 1 / -1;
+}
+
+.register-form input,
+.register-form textarea{
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(148,163,184,.25);
+  background: rgba(2,6,23,.35);
+  color: #e5e7eb;
+  outline: none;
+  font-weight: 650;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+}
+
+.register-form textarea{
+  resize: vertical;
+  min-height: 110px;
+}
+
+.register-form input::placeholder,
+.register-form textarea::placeholder{
+  color: rgba(226,232,240,.55);
+  font-weight: 600;
+}
+
+.register-form input:focus,
+.register-form textarea:focus{
+  border-color: rgba(56,189,248,.6);
+  box-shadow: 0 0 0 4px rgba(56,189,248,.14);
+  background: rgba(2,6,23,.5);
+}
+
+.register-actions{
+  margin-top: 16px;
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+}
+
+.register-submit-btn{
+  width: min(520px, 100%);
+  padding: 13px 18px;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 900;
+  font-size: 1rem;
+  color: #fff;
+  background: linear-gradient(135deg,#2563eb,#38bdf8);
+  box-shadow: 0 16px 44px rgba(37,99,235,.40);
+  transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+}
+
+.register-submit-btn:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 22px 60px rgba(37,99,235,.55);
+  filter: brightness(1.05);
+}
+
+.register-status{
+  margin: 0;
+  text-align: center;
+  font-weight: 800;
+  min-height: 22px;
+}
+
+/* ירוק הצלחה / אדום כשל */
+.register-status.ok{ color: #22c55e; }
+.register-status.err{ color: #ef4444; }
+
+.register-footer{
+  margin-top: 12px;
+  text-align: center;
+}
+
+.link-soft{
+  color: rgba(147,197,253,.95);
+  text-decoration: none;
+  font-weight: 750;
+}
+.link-soft:hover{
+  text-decoration: underline;
+}
+
+/* מובייל */
+@media (max-width: 720px){
+  .register-card{ padding: 18px; border-radius: 18px; }
+  .register-grid{ grid-template-columns: 1fr; }
+}
