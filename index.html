@@ -54,7 +54,6 @@
   <meta name="twitter:description" content="כל המידע על חטיבת הנעורים יערת העמק במקום אחד." />
   <meta name="twitter:image" content="https://yaarathaemek.online/og-image.png" />
 
-  <!-- STRUCTURED DATA (Logo for Google) -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -69,11 +68,8 @@
   <link rel="icon" href="logo.png" />
   <link rel="stylesheet" href="style.css" />
 
-  <!-- ===== סטיילים מקומיים לעמוד הבית ===== -->
+ 
   <style>
-    /* =========================================================
-   HOME INLINE CSS (CLEAN) – בלי כפילויות
-   ========================================================= */
 
     /* ---------- POLL (סקר השבוע) ---------- */
     #home-poll-mini{ padding:32px 0; }
@@ -133,7 +129,6 @@
     :root[data-theme="light"] .home-poll-link{ background:#eff6ff; border-color:#2563eb; color:#1d4ed8; }
     @media (max-width:640px){ .home-poll-card{ padding:16px 14px 12px; } }
 
-    /* ---------- HOME NEWS (רק אחרונה) ---------- */
     #home-news .home-board-list > *:not(:first-child){ display:none !important; }
     #home-news .home-board-list p{
       display:-webkit-box;
@@ -142,7 +137,6 @@
       overflow:hidden;
     }
 
-    /* ---------- MINI NEWS CARDS ---------- */
     .home-news-mini{ margin-top:8px; }
     .home-news-mini-item{ display:flex; align-items:center; gap:10px; }
     .home-news-mini-thumb-wrap{ flex:0 0 56px; height:56px; border-radius:12px; overflow:hidden; }
@@ -153,7 +147,6 @@
     .home-news-mini-empty{ font-size:.8rem; color:#6b7280; }
     .mini-link-inline{ display:inline-block; margin-top:4px; font-size:.78rem; }
 
-    /* ---------- HERO LAYOUT ---------- */
     .hero-home-inner{
       position:relative; z-index:1;
       padding-top:64px; padding-bottom:40px;
@@ -167,7 +160,6 @@
       .hero-home-cards{ grid-template-columns:1fr; }
     }
 
-    /* ---------- HERO TITLE (לבן + זוהר) ---------- */
     body[data-page="home"] .hero-home-header h1,
     body[data-page="home"] #hero-main-title{
       color:#fff;
@@ -181,12 +173,10 @@
       text-shadow: 0 2px 14px rgba(0,0,0,.45);
     }
 
-    /* Overlay – יותר רואים רקע */
     .hero.hero-home .hero-overlay{
       opacity: .38;
     }
 
-    /* ---------- HERO GLOW LINE (לא "פס טעינה") ---------- */
     .hero-home-header .hero-glow-line{
       display:block;
       width:min(680px, 92vw);
@@ -214,7 +204,6 @@
       .hero-home-header .hero-glow-line{ height:3px; }
     }
 
-    /* ---------- HERO BUTTONS (יפה גם בדארק) ---------- */
     .hero-actions a,
     .hero-actions .btn,
     .hero-actions .btn-outline{
@@ -246,7 +235,6 @@
       box-shadow:0 10px 30px rgba(0,0,0,0.35);
     }
 
-    /* ---------- HERO CARDS (רק זה! בלי 6 גרסאות) ---------- */
     .hero-home-cards .grade-card{
       border-radius:18px;
       padding:18px 18px 16px;
@@ -256,7 +244,6 @@
       transition: transform .2s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
     }
 
-    /* רק בהובר – שקוף ומעומעם */
     .hero-home-cards .grade-card:hover{
       background: rgba(255,255,255,0.55);
       backdrop-filter: blur(12px) saturate(135%);
@@ -266,7 +253,6 @@
       border-color: rgba(37,99,235,0.22);
     }
 
-    /* כותרות/טקסט קריא */
     .hero-home-cards .grade-card h3{
       margin:0 0 8px;
       font-size:1.05rem;
@@ -280,7 +266,6 @@
       line-height:1.55;
     }
 
-    /* כרטיס אמצעי – פס צד יפה */
     .hero-home-cards .grade-card:nth-child(2){
       border-color: rgba(37,99,235,0.20);
       box-shadow:0 14px 34px rgba(37,99,235,0.10);
@@ -312,7 +297,6 @@
     html[data-theme="dark"] .hero-home-cards .grade-card li{ color: rgba(255,255,255,0.74); }
     html[data-theme="dark"] .hero-home-cards .grade-card:nth-child(2)::before{ background: rgba(56,189,248,0.55); }
 
-    /* מובייל: פחות blur כדי שלא יכביד */
     @media (max-width:900px){
       .hero-home-cards .grade-card{
         padding:16px 14px 14px;
@@ -342,7 +326,6 @@
     :root[data-theme="dark"] .all-news-btn{ background:rgba(37,99,235,0.15); color:#93c5fd; border-color:rgba(37,99,235,0.4); }
     :root[data-theme="dark"] .all-news-btn:hover{ background:#2563eb; color:#fff; }
 
-    /* ---------- NAV (אחד!) ---------- */
     .nav.nav-centered{
       display:flex; align-items:center; justify-content:space-between;
       gap:12px; padding:10px 0; position:relative;
@@ -480,12 +463,10 @@
       }
     }
 
-    /* ---------- CLASS PICKER ---------- */
     .home-class-card{ width:100%; max-width:680px; margin:0 auto; text-align:center; padding:18px; }
     .home-class-row{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; align-items:center; }
     .home-class-row .select{ min-width:160px; }
 
-    /* ---------- URGENT BAR (ללא כפילויות) ---------- */
     #urgent-wrap{ width:100%; }
     .urgent-bar{
       width:min(1200px, calc(100% - 28px));
@@ -526,9 +507,6 @@
       .urgent-marquee-text{ animation-duration:22s; padding-right:24px; }
     }
 
-    /* =========================
-       DARK MODE – NAV BUTTONS
-       ========================= */
 
     /* ADMIN – כחול ברור */
     html[data-theme="dark"] .nav-side a.btn-outline,
@@ -549,7 +527,6 @@
       transform: translateY(-1px);
     }
 
-    /* PERSONAL AREA – PREMIUM */
     html[data-theme="dark"] .nav-side .personal-btn{
       background: linear-gradient(135deg,#38bdf8,#2563eb) !important;
       color: #ffffff !important;
@@ -586,7 +563,6 @@
       transform: translateY(-1px);
     }
 
-    /* PERSONAL AREA – Light Mode */
     html[data-theme="light"] .nav-side .personal-btn{
       background: linear-gradient(135deg,#2563eb,#38bdf8) !important;
       color: #ffffff !important;
@@ -602,10 +578,7 @@
       transform: translateY(-2px);
       box-shadow: 0 16px 44px rgba(37,99,235,0.45);
     }
-    /* =========================
-   SMOOTH CARD TRANSITION FIX
-   שים בסוף ה-style
-   ========================= */
+
 
 /* 1) להפוך את המעבר ל"חלק" */
 .hero-home-cards .grade-card{
@@ -617,9 +590,7 @@
     border-color .28s ease;
 }
 
-/* 2) לבטל את ה"קפיצה" שנגרמת מ-blur במעבר */
 .hero-home-cards .grade-card:hover{
-  /* במקום blur בזמן מעבר (גורם לקפיצה), נשאיר שקיפות חלקה */
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 
@@ -640,7 +611,6 @@ html[data-theme="dark"] .hero-home-cards .grade-card:hover{
   border-color: rgba(56,189,248,0.25) !important;
 }
 
-/* 4) במובייל אין hover אמיתי – תן "tap" חלק */
 @media (hover: none){
   .hero-home-cards .grade-card:active,
   .hero-home-cards .grade-card:focus-within{
@@ -653,10 +623,6 @@ html[data-theme="dark"] .hero-home-cards .grade-card:hover{
     background: rgba(15,23,42,0.70) !important;
   }
 }
-/* =========================
-   THEME SWITCH — NO UGLY TRANSITION
-   שים בסוף ה-style
-   ========================= */
 
 /* ברירת מחדל: שיהיה מעבר עדין רק בצבעים (לא פילטרים/blur) */
 html, body, .header-main, .section-light, .section-dark-strong, .grade-card,
@@ -694,7 +660,6 @@ html[data-theme="dark"].theme-changing .hero-home-cards .grade-card{
 
 <body data-page="index">
 
-  <!-- ✅ חייב להיות בתוך body -->
   <div id="update-banner" style="
     display:none;
     position:fixed;
@@ -718,7 +683,6 @@ html[data-theme="dark"].theme-changing .hero-home-cards .grade-card{
   <div class="container">
     <nav class="nav nav-centered" aria-label="ניווט ראשי">
 
-      <!-- ימין (דסקטופ) -->
       <div class="nav-side nav-right-links">
         <a href="index.html#home-news">חדשות</a>
         <a href="index.html#grades">השכבות</a>
@@ -726,7 +690,6 @@ html[data-theme="dark"].theme-changing .hero-home-cards .grade-card{
         <a href="about.html">אודות</a>
       </div>
 
-      <!-- מרכז (לוגו) -->
       <div class="nav-center">
         <a href="index.html" class="logo-circle" aria-label="דף הבית">
           <img
@@ -737,7 +700,6 @@ html[data-theme="dark"].theme-changing .hero-home-cards .grade-card{
         </a>
       </div>
 
-      <!-- שמאל (דסקטופ) -->
 <div class="nav-side nav-left-links">
   <a href="index.html#contact">יצירת קשר</a>
   <a href="redirect-edu.html" class="personal-btn">למרחב האישי</a>
@@ -745,12 +707,10 @@ html[data-theme="dark"].theme-changing .hero-home-cards .grade-card{
 </div>
 
 
-      <!-- דארק מוד -->
       <button id="theme-toggle" class="theme-toggle-btn" type="button" aria-label="מצב כהה/בהיר">
         🌙
       </button>
 
-      <!-- המבורגר (מובייל) -->
       <button
         class="nav-toggle"
         id="nav-toggle"
@@ -762,7 +722,6 @@ html[data-theme="dark"].theme-changing .hero-home-cards .grade-card{
         <span></span><span></span><span></span>
       </button>
 
-      <!-- תפריט מובייל -->
       <div class="nav-mobile" id="nav-mobile" aria-hidden="true">
         <a href="index.html#home-news">חדשות</a>
         <a href="index.html#home-exams">מבחנים</a>
@@ -779,7 +738,6 @@ html[data-theme="dark"].theme-changing .hero-home-cards .grade-card{
 </header>
 
 
-  <!-- HERO -->
   <section class="hero hero-home">
     <div class="hero-slides">
       <div class="hero-slide"></div>
@@ -834,7 +792,6 @@ html[data-theme="dark"].theme-changing .hero-home-cards .grade-card{
     </div>
   </section>
 
-  <!-- ABOUT -->
   <section id="about" class="section-light reveal-on-scroll">
     <div class="container">
       <div class="section-header">
@@ -863,11 +820,9 @@ html[data-theme="dark"].theme-changing .hero-home-cards .grade-card{
       </div>
     </div>
   </section>
-  <!-- ✅ הודעה דחופה (בין אודות לחשוב לדעת) -->
    
 <div id="urgent-wrap" class="urgent-wrap" style="display:none;"></div>
 
-  <!-- חשוב לדעת -->
   <section class="section-dark-strong reveal-on-scroll">
     <div class="container">
       <div class="section-header">
@@ -902,7 +857,6 @@ html[data-theme="dark"].theme-changing .hero-home-cards .grade-card{
     </div>
   </section>
 
-  <!-- חדשות -->
   <section id="home-news" class="section-light reveal-on-scroll">
     <div class="container">
       <div class="section-header">
@@ -923,7 +877,6 @@ html[data-theme="dark"].theme-changing .hero-home-cards .grade-card{
       </div>
     </div>
   </section>
-<!-- בחירת כיתה (מרוכז ונקי) -->
 <section id="home-class-picker" class="section-light reveal-on-scroll">
   <div class="container">
     <div class="card home-class-card">
@@ -960,8 +913,6 @@ html[data-theme="dark"].theme-changing .hero-home-cards .grade-card{
 <script src="home-class-picker.js" defer></script>
 
 
-
-  <!-- מבחנים -->
   <section id="home-exams" class="section-light reveal-on-scroll">
     <div class="container">
       <div class="section-header">
@@ -1025,7 +976,6 @@ html[data-theme="dark"].theme-changing .hero-home-cards .grade-card{
     </div>
   </section>
 
-  <!-- ✅ תיקון: היה לך SECTION כפול בתוך SECTION -->
   <section class="section-light reveal-on-scroll" id="grades-intro" style="padding-top:0; margin-top:-10px;">
     <div class="container">
       <div class="section-header">
@@ -1054,7 +1004,6 @@ html[data-theme="dark"].theme-changing .hero-home-cards .grade-card{
     </div>
   </section>
 
-  <!-- WEEKLY POLL -->
   <section id="home-poll-mini" class="section-light reveal-on-scroll">
     <div class="container">
       <div class="section-header">
@@ -1083,7 +1032,6 @@ html[data-theme="dark"].theme-changing .hero-home-cards .grade-card{
     </div>
   </section>
 
-  <!-- REQUEST BOX -->
   <section id="requests" class="section-light reveal-on-scroll">
     <div class="container">
       <div class="section-header">
@@ -1107,7 +1055,6 @@ html[data-theme="dark"].theme-changing .hero-home-cards .grade-card{
     </div>
   </section>
 
-  <!-- CONTACT -->
   <section id="contact" class="section-light reveal-on-scroll">
     <div class="container">
       <div class="section-header">
@@ -1141,12 +1088,8 @@ html[data-theme="dark"].theme-changing .hero-home-cards .grade-card{
 
   <div id="to-top">↑</div>
 
-  <!-- =========================
-       ✅ סקריפטים נקיים (בלי כפילויות)
-       ========================= -->
 
   <script>
-    // כניסת עמוד + reveal
     document.addEventListener("DOMContentLoaded", () => {
       document.body.classList.add("page-loaded");
 
@@ -1164,7 +1107,6 @@ html[data-theme="dark"].theme-changing .hero-home-cards .grade-card{
   </script>
 
   <script>
-    // ✅ תפריט מובייל - סקריפט יחיד שעובד
     (function () {
       const btn = document.getElementById("nav-toggle");
       const menu = document.getElementById("nav-mobile");
@@ -1177,7 +1119,6 @@ html[data-theme="dark"].theme-changing .hero-home-cards .grade-card{
         menu.setAttribute("aria-hidden", String(!isOpen));
       });
 
-      // סגירה בלחיצה על לינק
       menu.querySelectorAll("a").forEach((a) => {
         a.addEventListener("click", () => {
           menu.classList.remove("open");
@@ -1186,7 +1127,6 @@ html[data-theme="dark"].theme-changing .hero-home-cards .grade-card{
         });
       });
 
-      // סגירה בלחיצה מחוץ
       document.addEventListener("click", (e) => {
         if (menu.contains(e.target) || btn.contains(e.target)) return;
         menu.classList.remove("open");
@@ -1197,7 +1137,6 @@ html[data-theme="dark"].theme-changing .hero-home-cards .grade-card{
   </script>
 
   <script>
-    // Service Worker + באנר עדכון (גרסה אחת)
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.addEventListener('controllerchange', () => window.location.reload());
 
