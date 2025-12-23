@@ -338,6 +338,95 @@ body.admin-page .admin-nav-right{
   opacity: 0.8;
   cursor: default;
 }
+/* =========================
+   ADMIN NAV – MOBILE FIX
+   put at VERY END
+   ========================= */
+
+.admin-mobile-toggle,
+.admin-mobile-menu{ display:none; }
+
+@media (max-width: 900px){
+
+  /* מסתירים את שני הצדדים הרגילים של הניווט במובייל */
+  body.admin-page .nav-right-links,
+  body.admin-page .nav-left-links,
+  body.admin-page .admin-nav-right,
+  body.admin-page .admin-nav-left{
+    display:none !important;
+  }
+
+  /* nav נשאר עם הלוגו במרכז */
+  body.admin-page .nav.nav-centered{
+    justify-content:center !important;
+    min-height:72px;
+    position:relative;
+    padding: 10px 0;
+  }
+
+  /* כפתור המבורגר */
+  .admin-mobile-toggle{
+    display:flex;
+    position:absolute;
+    right:12px;   /* RTL */
+    top:50%;
+    transform: translateY(-50%);
+    width:44px;
+    height:44px;
+    border-radius: 14px;
+    border: 1px solid rgba(148,163,184,.28);
+    background: rgba(2,6,23,.45);
+    backdrop-filter: blur(10px);
+    align-items:center;
+    justify-content:center;
+    gap:4px;
+    cursor:pointer;
+  }
+
+  .admin-mobile-toggle span{
+    display:block;
+    width:20px;
+    height:2px;
+    background: rgba(226,232,240,.9);
+    border-radius: 3px;
+  }
+
+  /* תפריט נפתח */
+  .admin-mobile-menu{
+    display:none;
+    position:absolute;
+    top: calc(100% + 10px);
+    right: 12px; /* RTL */
+    width: min(260px, calc(100vw - 24px));
+    padding: 10px;
+    border-radius: 18px;
+    background: rgba(2,6,23,.88);
+    border: 1px solid rgba(148,163,184,.22);
+    box-shadow: 0 22px 55px rgba(0,0,0,.45);
+    backdrop-filter: blur(12px);
+    z-index: 9999;
+  }
+
+  .admin-mobile-menu.open{ display:block; }
+
+  .admin-mobile-menu a{
+    display:flex;
+    width:100%;
+    justify-content:center;
+    padding: 10px 12px;
+    margin: 8px 0;
+    border-radius: 999px;
+    text-decoration:none;
+    font-weight: 900;
+    color: #e5e7eb;
+    background: rgba(15,23,42,.55);
+    border: 1px solid rgba(148,163,184,.20);
+  }
+
+  .admin-mobile-menu a:hover{
+    background: rgba(15,23,42,.75);
+  }
+}
 
   </style>
 </head>
@@ -356,6 +445,20 @@ body.admin-page .admin-nav-right{
           <img src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png" class="logo-img" alt="סמל יערת העמק">
         </a>
       </div>
+<button class="admin-mobile-toggle" id="adminMobileToggle" aria-label="תפריט">
+  <span></span><span></span><span></span>
+</button>
+
+<div class="admin-mobile-menu" id="adminMobileMenu">
+  <!-- שים פה את אותם לינקים שיש לך בתפריט (copy/paste) -->
+  <a href="admin-panel.html" class="admin-btn">Admin</a>
+  <a href="all-grades.html" class="admin-btn">כל עריכה</a>
+  <a href="create-request.html" class="admin-btn">יצירת קשר</a>
+  <a href="news.html" class="admin-btn">חדשות</a>
+  <a href="exams.html" class="admin-btn">השכבות</a>
+  <a href="board.html" class="admin-btn">מבחנים</a>
+  <a href="announcements.html" class="admin-btn">מודעות</a>
+</div>
 
       <div class="admin-nav-right">
         <a href="admin.html" class="admin-btn active">Admin</a>

@@ -1219,6 +1219,22 @@ function setupGradeFilter() {
 
   setActiveGrade("all");
 }
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("adminMobileToggle");
+  const menu = document.getElementById("adminMobileMenu");
+  if (!btn || !menu) return;
+
+  btn.addEventListener("click", () => {
+    menu.classList.toggle("open");
+  });
+
+  // סגירה בלחיצה מחוץ לתפריט
+  document.addEventListener("click", (e) => {
+    if (!menu.classList.contains("open")) return;
+    if (menu.contains(e.target) || btn.contains(e.target)) return;
+    menu.classList.remove("open");
+  });
+});
 
 /* ------------ MAIN INIT ------------ */
 
