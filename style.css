@@ -3976,3 +3976,19 @@ body.admin-page.register-page{
   .register-card{ padding: 18px; border-radius: 18px; }
   .register-grid{ grid-template-columns: 1fr; }
 }
+@media (max-width: 600px){
+  .urgent-banner, .urgent-message, .urgent-pill, .urgent-alert{
+    font-size: 0.92rem !important;
+    padding: 10px 12px !important;
+  }
+
+  .urgent-banner .urgent-text,
+  .urgent-message .urgent-text,
+  .urgent-pill .urgent-text,
+  .urgent-alert .urgent-text{
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+  }
+}
