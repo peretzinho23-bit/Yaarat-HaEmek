@@ -1235,6 +1235,88 @@ document.addEventListener("DOMContentLoaded", () => {
     menu.classList.remove("open");
   });
 });
+  // ===== Mobile nav toggle (hamburger) =====
+  const navToggle = document.querySelector(".nav-toggle");
+  const navMobile = document.getElementById("nav-mobile");
+
+  function closeMobileNav() {
+    if (navMobile) navMobile.classList.remove("open");
+  }
+
+  if (navToggle && navMobile) {
+    navToggle.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      navMobile.classList.toggle("open");
+    });
+
+    // סוגר בלחיצה מחוץ לתפריט
+    document.addEventListener("click", (e) => {
+      if (!navMobile.classList.contains("open")) return;
+      const clickedInside = navMobile.contains(e.target) || navToggle.contains(e.target);
+      if (!clickedInside) closeMobileNav();
+    });
+
+    // סוגר אחרי לחיצה על לינק
+    navMobile.querySelectorAll("a").forEach((a) => {
+      a.addEventListener("click", () => closeMobileNav());
+    });
+  }
+// mobile nav toggle (safe)
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.querySelector(".nav-toggle");
+  const menu = document.getElementById("nav-mobile");
+  if (!btn || !menu) return;
+
+  btn.addEventListener("click", () => {
+    menu.classList.toggle("open");
+  });
+
+  // close on outside click
+  document.addEventListener("click", (e) => {
+    if (!menu.classList.contains("open")) return;
+    if (menu.contains(e.target) || btn.contains(e.target)) return;
+    menu.classList.remove("open");
+  });
+});
+// ===== Admin mobile menu toggle (hamburger) =====
+document.addEventListener("DOMContentLoaded", () => {
+  const toggle = document.getElementById("adminMobileToggle");
+  const menu = document.getElementById("adminMobileMenu");
+  if (!toggle || !menu) return;
+
+  function closeMenu() {
+    menu.classList.remove("open");
+    toggle.classList.remove("open");
+  }
+
+  function toggleMenu() {
+    menu.classList.toggle("open");
+    toggle.classList.toggle("open");
+  }
+
+  toggle.addEventListener("click", (e) => {
+    e.stopPropagation();
+    toggleMenu();
+  });
+
+  // סגירה בלחיצה מחוץ לתפריט
+  document.addEventListener("click", (e) => {
+    if (!menu.classList.contains("open")) return;
+    if (menu.contains(e.target) || toggle.contains(e.target)) return;
+    closeMenu();
+  });
+
+  // סגירה ב-Escape
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeMenu();
+  });
+
+  // סגירה כשלוחצים על לינק בתפריט
+  menu.querySelectorAll("a").forEach((a) => {
+    a.addEventListener("click", closeMenu);
+  });
+});
 
 /* ------------ MAIN INIT ------------ */
 

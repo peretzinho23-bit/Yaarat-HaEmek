@@ -427,6 +427,856 @@ body.admin-page .admin-nav-right{
     background: rgba(15,23,42,.75);
   }
 }
+/* =========================
+   ADMIN MOBILE MENU – FIXED
+   ========================= */
+@media (max-width: 900px){
+
+  /* כפתור ההמבורגר */
+  .admin-mobile-toggle{
+    display:flex;
+    position:absolute;
+    right:12px;
+    top:50%;
+    transform: translateY(-50%);
+    width:44px;
+    height:44px;
+    border-radius: 14px;
+    border: 1px solid rgba(148,163,184,.25);
+    background: rgba(2,6,23,.55);
+    backdrop-filter: blur(12px);
+    align-items:center;
+    justify-content:center;
+    gap:4px;
+    cursor:pointer;
+    z-index: 10000;
+  }
+  .admin-mobile-toggle span{
+    display:block;
+    width:20px;
+    height:2px;
+    background: rgba(226,232,240,.92);
+    border-radius: 3px;
+  }
+
+  /* שכבת רקע כהה (כדי שירגיש מודאל) */
+  .admin-mobile-backdrop{
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+    backdrop-filter: blur(2px);
+    z-index: 9998;
+    display:none;
+  }
+  .admin-mobile-backdrop.open{ display:block; }
+
+  /* התפריט עצמו – קטן, לא חונק */
+  .admin-mobile-menu{
+    position: fixed;
+    top: 72px;        /* מתחת לניווט */
+    right: 12px;
+    left: 12px;
+    max-width: 420px;
+    margin-left: auto; /* RTL */
+    padding: 12px;
+    border-radius: 18px;
+
+    background: rgba(2,6,23,.92);
+    border: 1px solid rgba(148,163,184,.18);
+    box-shadow: 0 22px 55px rgba(0,0,0,.55);
+    backdrop-filter: blur(14px);
+
+    display:none;
+    z-index: 9999;
+
+    /* ✅ גובה מוגבל + סקрол פנימי */
+    max-height: min(60vh, 520px);
+    overflow: auto;
+  }
+  .admin-mobile-menu.open{ display:block; }
+
+  /* כותרת + כפתור X */
+  .admin-mobile-menu .menu-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding: 6px 4px 12px;
+    border-bottom: 1px solid rgba(148,163,184,.12);
+    margin-bottom: 10px;
+  }
+  .admin-mobile-menu .menu-title{
+    font-weight: 900;
+    color:#e5e7eb;
+    opacity:.95;
+  }
+  .admin-mobile-menu .menu-close{
+    width:38px;height:38px;
+    border-radius: 12px;
+    border: 1px solid rgba(148,163,184,.18);
+    background: rgba(15,23,42,.55);
+    color:#e5e7eb;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    font-size: 18px;
+  }
+
+  /* כפתורים – קומפקטיים, לא ענקיים */
+  .admin-mobile-menu a{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    padding: 10px 12px;
+    margin: 8px 0;
+
+    border-radius: 14px;
+    text-decoration:none;
+    font-weight: 900;
+    font-size: 0.98rem;
+
+    color: #e5e7eb;
+    background: rgba(15,23,42,.55);
+    border: 1px solid rgba(148,163,184,.16);
+  }
+  .admin-mobile-menu a:active{
+    transform: scale(.98);
+  }
+
+  /* ACTIVE (אם יש לך class active) */
+  .admin-mobile-menu a.active,
+  .admin-mobile-menu a.is-active{
+    background: linear-gradient(135deg,#2563eb,#38bdf8);
+    border-color: rgba(56,189,248,.45);
+    color:#fff;
+  }
+}
+/* =========================
+   ADMIN NAV – MOBILE FIX
+   put at VERY END
+   ========================= */
+
+/* ננעל על ה-nav שלא יעשה wrap */
+body.admin-page .nav.nav-centered{
+  flex-wrap: nowrap;
+}
+
+/* נוודא שהצדדים לא נשברים */
+body.admin-page .nav-side{
+  flex-wrap: nowrap;
+}
+
+/* ===== Mobile layout ===== */
+@media (max-width: 900px){
+
+  /* מסתירים את הכפתורים הרגילים במובייל */
+  body.admin-page .nav-right-links,
+  body.admin-page .nav-left-links{
+    display: none !important;
+  }
+
+  /* מרכזים את הלוגו */
+  body.admin-page .nav.nav-centered{
+    justify-content: center !important;
+    padding: 12px 0 !important;
+    min-height: 72px;
+    position: relative;
+  }
+
+  body.admin-page .nav-center{
+    position: relative;
+    z-index: 5;
+  }
+
+  /* כפתור המבורגר */
+  body.admin-page .nav-toggle{
+    display: inline-flex !important;
+    position: absolute;
+    left: 14px;              /* לוגו באמצע, המבורגר בצד שמאל (כמו בתמונה שלך) */
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(148,163,184,0.28);
+    background: rgba(2,6,23,0.55);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 14px 40px rgba(0,0,0,0.35);
+    cursor: pointer;
+    z-index: 9999;
+  }
+
+  body.admin-page .nav-toggle span{
+    display:block;
+    width: 22px;
+    height: 2px;
+    background: #e5e7eb;
+    border-radius: 2px;
+  }
+  body.admin-page .nav-toggle span + span{ margin-top: 5px; }
+
+  /* תפריט נפתח */
+  body.admin-page #nav-mobile.nav-mobile{
+    display: none;
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 12px;
+    width: min(260px, calc(100% - 24px));
+    padding: 10px;
+    border-radius: 18px;
+    background: rgba(2,6,23,0.92);
+    border: 1px solid rgba(148,163,184,0.25);
+    box-shadow: 0 20px 55px rgba(0,0,0,0.45);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    z-index: 9999;
+  }
+
+  body.admin-page #nav-mobile.nav-mobile.open{
+    display: block;
+  }
+
+  body.admin-page #nav-mobile.nav-mobile a{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 12px;
+    margin: 8px 0;
+    border-radius: 14px;
+    font-weight: 800;
+    text-decoration: none;
+    color: #e5e7eb;
+    background: rgba(15,23,42,0.55);
+    border: 1px solid rgba(148,163,184,0.22);
+    transition: transform .15s ease, background .15s ease;
+  }
+
+  body.admin-page #nav-mobile.nav-mobile a:hover{
+    transform: translateY(-1px);
+    background: rgba(15,23,42,0.75);
+  }
+
+  /* active */
+  body.admin-page #nav-mobile.nav-mobile a.admin-active,
+  body.admin-page #nav-mobile.nav-mobile a.is-active{
+    background: linear-gradient(135deg,#2563eb,#38bdf8) !important;
+    border-color: rgba(56,189,248,.55) !important;
+    color: #fff !important;
+  }
+}
+/* =========================
+   ADMIN – MOBILE NAV FIX
+   put at VERY END
+   ========================= */
+
+body.admin-page .header-main{
+  padding-inline: 12px;
+}
+
+/* בסיס */
+body.admin-page .nav.nav-centered{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  position:relative;
+  padding: 10px 0;
+  gap: 12px;
+}
+
+/* צדדים */
+body.admin-page .nav-side{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+/* הלוגו תמיד במרכז */
+body.admin-page .nav-center{
+  flex: 0 0 auto;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* דסקטופ – רגיל */
+@media (min-width: 901px){
+  body.admin-page .nav-toggle{ display:none !important; }
+  body.admin-page #nav-mobile{ display:none !important; }
+}
+
+/* מובייל – המבורגר + לוגו באמצע, מסתיר לינקים גדולים */
+@media (max-width: 900px){
+  body.admin-page .nav-right-links,
+  body.admin-page .nav-left-links{
+    display:none !important;
+  }
+
+  body.admin-page .nav.nav-centered{
+    justify-content:center;
+    min-height: 72px;
+  }
+
+  /* המבורגר בצד */
+  body.admin-page .nav-toggle{
+    display:flex !important;
+    position:absolute;
+    left: 12px;
+    top:50%;
+    transform: translateY(-50%);
+    flex-direction:column;
+    gap:5px;
+    background: none;
+    border: 0;
+    cursor:pointer;
+    z-index: 10000;
+  }
+  body.admin-page .nav-toggle span{
+    width: 24px;
+    height: 2px;
+    border-radius: 2px;
+    background: #e5e7eb;
+    opacity: .95;
+  }
+
+  /* תפריט נפתח מתחת לטופבר */
+  body.admin-page #nav-mobile.nav-mobile{
+    display:none;
+    position:absolute;
+    top: calc(100% + 10px);
+    left: 12px;
+    width: min(260px, calc(100vw - 24px));
+    padding: 10px;
+    border-radius: 18px;
+    background: rgba(2,6,23,.92);
+    border: 1px solid rgba(148,163,184,.28);
+    box-shadow: 0 22px 60px rgba(0,0,0,.40);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    z-index: 10000;
+  }
+  body.admin-page #nav-mobile.nav-mobile.open{ display:block; }
+
+  body.admin-page #nav-mobile.nav-mobile a{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 12px 12px;
+    margin: 8px 0;
+    border-radius: 14px;
+    text-decoration:none;
+    font-weight: 800;
+    color: #e5e7eb;
+    background: rgba(15,23,42,.55);
+    border: 1px solid rgba(148,163,184,.25);
+  }
+  body.admin-page #nav-mobile.nav-mobile a:hover{
+    background: rgba(30,64,175,.55);
+    border-color: rgba(96,165,250,.55);
+  }
+
+  /* active */
+  body.admin-page #nav-mobile.nav-mobile a.admin-active{
+    background: linear-gradient(135deg,#2563eb,#38bdf8) !important;
+    color:#fff !important;
+    border-color: rgba(56,189,248,.55) !important;
+  }
+}
+/* =========================
+   ADMIN – MOBILE LAYOUT FIX
+   ========================= */
+
+body.admin-page .container{
+  width: min(1200px, calc(100% - 24px)) !important;
+  margin-inline: auto !important;
+}
+
+/* למנוע overflow שחותך עמודים */
+body.admin-page,
+body.admin-page .container,
+body.admin-page .card{
+  overflow-x: hidden;
+}
+
+@media (max-width: 900px){
+  /* כרטיסים נורמליים */
+  body.admin-page .card{
+    padding: 14px !important;
+    border-radius: 18px !important;
+  }
+
+  /* כל הגרידים לטור אחד */
+  body.admin-page .admin-columns{
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  /* שלא יהיה מצב ששדה “בורח” */
+  body.admin-page input,
+  body.admin-page select,
+  body.admin-page textarea,
+  body.admin-page button{
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* כפתורי העלאת קובץ שלא ידחפו דברים */
+  body.admin-page .admin-images-row,
+  body.admin-page .admin-item,
+  body.admin-page .admin-form{
+    min-width: 0 !important;
+  }
+}
+/* =========================
+   ADMIN MOBILE MENU – CLEAN
+   put at VERY END
+   ========================= */
+
+@media (max-width: 900px){
+
+  /* המבורגר תמיד שמאל */
+  body.admin-page .nav-toggle{
+    left: 12px !important;
+    right: auto !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 20000 !important;
+  }
+
+  /* תפריט נפתח בשמאל מתחת לטופבר */
+  body.admin-page #nav-mobile.nav-mobile{
+    left: 12px !important;
+    right: auto !important;
+    top: calc(100% + 10px) !important;
+
+    width: min(250px, calc(100vw - 24px)) !important;
+    padding: 10px !important;
+
+    border-radius: 18px !important;
+    background: rgba(2,6,23,.92) !important;
+    border: 1px solid rgba(148,163,184,.28) !important;
+    box-shadow: 0 22px 60px rgba(0,0,0,.45) !important;
+
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  /* רשימה – לא “כפתורים ענקיים” */
+  body.admin-page #nav-mobile.nav-mobile a{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:flex-start !important;   /* יישור יפה (RTL עדיין עובד) */
+    gap: 10px !important;
+
+    padding: 10px 12px !important;
+    margin: 8px 0 !important;
+
+    border-radius: 14px !important;
+    font-weight: 800 !important;
+    font-size: 0.95rem !important;
+
+    color: #e5e7eb !important;
+    background: rgba(15,23,42,.55) !important;
+    border: 1px solid rgba(148,163,184,.25) !important;
+
+    box-shadow: none !important;
+    transform: none !important;
+    text-decoration: none !important;
+  }
+
+  body.admin-page #nav-mobile.nav-mobile a:hover{
+    background: rgba(30,64,175,.55) !important;
+    border-color: rgba(96,165,250,.55) !important;
+  }
+
+  /* active */
+  body.admin-page #nav-mobile.nav-mobile a.admin-active{
+    background: linear-gradient(135deg,#2563eb,#38bdf8) !important;
+    color:#fff !important;
+    border-color: rgba(56,189,248,.55) !important;
+  }
+
+  /* לסגור שהטופבר לא ידחוף דברים מוזר */
+  body.admin-page .nav.nav-centered{
+    position: relative !important;
+  }
+}
+/* =========================
+   MOBILE NAV: style ONLY the NAV links
+   ========================= */
+@media (max-width: 900px){
+  /* רק לינקים שבתוך nav-mobile שהם ניווט */
+  body.admin-page #nav-mobile a.nav-link{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:flex-start !important;
+    padding: 10px 12px !important;
+    margin: 8px 0 !important;
+    border-radius: 14px !important;
+    font-weight: 800 !important;
+    font-size: 0.95rem !important;
+    color: #e5e7eb !important;
+    background: rgba(15,23,42,.55) !important;
+    border: 1px solid rgba(148,163,184,.25) !important;
+    text-decoration: none !important;
+  }
+
+  body.admin-page #nav-mobile a.nav-link:hover{
+    background: rgba(30,64,175,.55) !important;
+    border-color: rgba(96,165,250,.55) !important;
+  }
+
+  body.admin-page #nav-mobile a.nav-link.admin-active{
+    background: linear-gradient(135deg,#2563eb,#38bdf8) !important;
+    color:#fff !important;
+    border-color: rgba(56,189,248,.55) !important;
+  }
+}
+/* =========================
+   GRADE FILTER – MOBILE ROW
+   ========================= */
+@media (max-width: 900px){
+  .grade-filters{
+    display:flex !important;
+    gap: 8px !important;
+    overflow-x: auto !important;
+    padding: 8px 12px !important;
+    margin: 10px 0 6px !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .grade-filter-btn{
+    flex: 0 0 auto !important;
+    padding: 8px 12px !important;
+    border-radius: 999px !important;
+    font-size: .9rem !important;
+    font-weight: 800 !important;
+    background: rgba(15,23,42,.55) !important;
+    color:#e5e7eb !important;
+    border: 1px solid rgba(148,163,184,.25) !important;
+  }
+
+  .grade-filter-btn.active{
+    background: linear-gradient(135deg,#22c55e,#38bdf8) !important;
+    color:#041015 !important;
+    border-color: rgba(56,189,248,.55) !important;
+  }
+}
+/* =========================
+   ADMIN MOBILE MENU (ONLY .admin-btn)
+   ========================= */
+@media (max-width: 900px){
+
+  /* הכפתור (המבורגר) – בצד שמאל */
+  body.admin-page .nav-toggle{
+    left: 12px !important;
+    right: auto !important;
+  }
+
+  /* הקופסה של התפריט שנפתח */
+  body.admin-page #nav-mobile.nav-mobile{
+    width: min(260px, calc(100% - 24px)) !important;
+    left: 12px !important;
+    right: auto !important;
+    padding: 10px !important;
+    border-radius: 18px !important;
+    background: rgba(2,6,23,.92) !important;
+    border: 1px solid rgba(148,163,184,.25) !important;
+    box-shadow: 0 18px 55px rgba(0,0,0,.45) !important;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  /* לא לעצב כל a בעולם — רק כפתורים של התפריט */
+  body.admin-page #nav-mobile.nav-mobile a{
+    all: unset;
+    box-sizing: border-box;
+  }
+
+  body.admin-page #nav-mobile.nav-mobile a.admin-btn{
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    width: 100% !important;
+
+    padding: 12px 12px !important;
+    margin: 8px 0 !important;
+    border-radius: 14px !important;
+
+    font-weight: 800 !important;
+    font-size: 1rem !important;
+    color: #e5e7eb !important;
+
+    background: rgba(15,23,42,.55) !important;
+    border: 1px solid rgba(148,163,184,.22) !important;
+    text-decoration: none !important;
+    box-shadow: 0 10px 26px rgba(0,0,0,.28) !important;
+
+    transform: none !important;
+  }
+
+  body.admin-page #nav-mobile.nav-mobile a.admin-btn:hover{
+    background: rgba(30,64,175,.55) !important;
+    border-color: rgba(96,165,250,.55) !important;
+  }
+
+  body.admin-page #nav-mobile.nav-mobile a.admin-btn.active{
+    background: linear-gradient(135deg,#2563eb,#38bdf8) !important;
+    color: #fff !important;
+    border-color: rgba(56,189,248,.55) !important;
+    box-shadow: 0 14px 35px rgba(37,99,235,.45) !important;
+  }
+}
+/* =========================
+   ADMIN MOBILE TOPBAR LAYOUT
+   right: grades | center: logo | left: hamburger
+   ========================= */
+@media (max-width: 900px){
+
+  /* הטופבר עצמו */
+  body.admin-page .nav.nav-centered{
+    position: relative;
+    min-height: 72px;
+    padding: 10px 0;
+    justify-content: center !important;
+  }
+
+  /* הסמל באמצע */
+  body.admin-page .nav-center{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0 !important;
+  }
+
+  /* המבורגר בצד שמאל */
+  body.admin-page .nav-toggle{
+    position: absolute !important;
+    left: 12px !important;
+    right: auto !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 10001;
+  }
+
+  /* “השכבות” בצד ימין (קטן) */
+  body.admin-page .admin-grade-filters{
+    position: absolute !important;
+    right: 12px !important;
+    left: auto !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+
+    display: flex !important;
+    gap: 8px !important;
+    align-items: center !important;
+
+    max-width: 44vw;           /* שלא יתפוצץ */
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    z-index: 10001;
+  }
+  body.admin-page .admin-grade-filters::-webkit-scrollbar{ display:none; }
+
+  /* כפתורי שכבות קטנים יותר */
+  body.admin-page .admin-grade-filters .grade-filter-btn{
+    padding: 7px 10px !important;
+    font-size: .85rem !important;
+    border-radius: 999px !important;
+    white-space: nowrap;
+  }
+
+  /* אם יש לך גם "כל השכבות" — להקטין עוד טיפה */
+  body.admin-page .admin-grade-filters .grade-filter-btn[data-grade="all"]{
+    padding: 7px 12px !important;
+    font-weight: 900;
+  }
+
+  /* התפריט שנפתח מהמבורגר – ייפתח משמאל */
+  body.admin-page #nav-mobile.nav-mobile{
+    left: 12px !important;
+    right: auto !important;
+  }
+}
+/* =========================================================
+   FINAL MOBILE LOCK (put LAST): left hamburger | center logo | right grades
+   Works with your CURRENT HTML (admin-mobile-toggle + admin-mobile-menu + admin-grade-switcher)
+   ========================================================= */
+@media (max-width: 900px){
+
+  /* 1) נועלים שה-header הוא ה"אבא" של הכל */
+  body.admin-page .header-main{ position: sticky; top:0; z-index: 20000; }
+  body.admin-page .admin-nav{ position: relative; min-height: 72px; padding: 10px 0; }
+
+  /* 2) מציגים לוגו במרכז (מה שיש לך: .admin-nav-left עם הלוגו) */
+  body.admin-page .admin-nav-left{
+    display:flex !important;
+    position:absolute !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: 20002 !important;
+  }
+
+  /* 3) המבורגר בשמאל (מה שיש לך: .admin-mobile-toggle) */
+  body.admin-page .admin-mobile-toggle{
+    display:flex !important;
+    position:absolute !important;
+    left: 12px !important;
+    right: auto !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 20003 !important;
+
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 14px !important;
+    border: 1px solid rgba(148,163,184,.25) !important;
+    background: rgba(2,6,23,.55) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:4px !important;
+  }
+  body.admin-page .admin-mobile-toggle span{
+    display:block !important;
+    width: 20px !important;
+    height: 2px !important;
+    background: rgba(226,232,240,.92) !important;
+    border-radius: 3px !important;
+  }
+
+  /* 4) מסתירים את התפריט דסקטופ (שלא ישבור) */
+  body.admin-page .admin-nav-right{ display:none !important; }
+
+  /* 5) התפריט שנפתח (admin-mobile-menu) ייפתח משמאל ולא באמצע */
+  body.admin-page .admin-mobile-menu{
+    position: fixed !important;
+    top: 76px !important;
+    left: 12px !important;
+    right: auto !important;
+
+    width: min(280px, calc(100vw - 24px)) !important;
+    max-height: min(60vh, 520px) !important;
+    overflow: auto !important;
+
+    padding: 12px !important;
+    border-radius: 18px !important;
+    background: rgba(2,6,23,.92) !important;
+    border: 1px solid rgba(148,163,184,.18) !important;
+    box-shadow: 0 22px 55px rgba(0,0,0,.55) !important;
+    backdrop-filter: blur(14px) !important;
+    -webkit-backdrop-filter: blur(14px) !important;
+
+    display:none !important;
+    z-index: 20010 !important;
+  }
+  body.admin-page .admin-mobile-menu.open{ display:block !important; }
+
+  /* כפתורים בתוך התפריט */
+  body.admin-page .admin-mobile-menu a.admin-btn{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:flex-start !important;
+    width:100% !important;
+
+    padding: 12px 12px !important;
+    margin: 8px 0 !important;
+
+    border-radius: 14px !important;
+    font-weight: 900 !important;
+    font-size: 1rem !important;
+    color:#e5e7eb !important;
+    text-decoration:none !important;
+
+    background: rgba(15,23,42,.55) !important;
+    border: 1px solid rgba(148,163,184,.16) !important;
+    box-shadow: none !important;
+  }
+  body.admin-page .admin-mobile-menu a.admin-btn.active{
+    background: linear-gradient(135deg,#2563eb,#38bdf8) !important;
+    border-color: rgba(56,189,248,.45) !important;
+    color:#fff !important;
+  }
+
+  /* 6) השכבות — ימין למעלה קטן (מה שיש לך: .admin-grade-switcher) */
+  body.admin-page .admin-grade-switcher{
+    position: absolute !important;
+    right: 12px !important;
+    left: auto !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 20003 !important;
+
+    display:flex !important;
+    align-items:center !important;
+    gap: 8px !important;
+
+    max-width: 46vw !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+  body.admin-page .admin-grade-switcher::-webkit-scrollbar{ display:none; }
+
+  body.admin-page .admin-grade-switcher .grade-filter-btn{
+    all: unset;
+    box-sizing: border-box;
+
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+
+    padding: 7px 10px !important;
+    border-radius: 999px !important;
+    font-size: .82rem !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    cursor: pointer !important;
+
+    background: rgba(15,23,42,.55) !important;
+    color: #e5e7eb !important;
+    border: 1px solid rgba(148,163,184,.22) !important;
+  }
+  body.admin-page .admin-grade-switcher .grade-filter-btn.active{
+    background: linear-gradient(135deg,#22c55e,#38bdf8) !important;
+    color: #06121f !important;
+    border-color: rgba(56,189,248,.45) !important;
+  }
+
+  /* 7) מבטלים כל "גרייד פילטר" אחר שיש לך כדי שלא יריב */
+  body.admin-page .grade-filters,
+  body.admin-page .admin-grade-filters{
+    display:none !important;
+  }
+}
+@media (max-width: 600px){
+  body.admin-page .admin-grade-switcher{
+    top: 18px !important;      /* במקום 50% */
+    transform: none !important; /* שלא ימשוך לאמצע */
+  }
+}
+/* כשמציגים שכבה אחת בלבד – שתרחיב לרוחב מלא */
+.admin-columns.one-visible{
+  grid-template-columns: 1fr !important;
+}
+.admin-columns.one-visible > .admin-grade-section{
+  grid-column: 1 / -1 !important;
+}
 
   </style>
 </head>
@@ -450,14 +1300,13 @@ body.admin-page .admin-nav-right{
 </button>
 
 <div class="admin-mobile-menu" id="adminMobileMenu">
-  <!-- שים פה את אותם לינקים שיש לך בתפריט (copy/paste) -->
-  <a href="admin-panel.html" class="admin-btn">Admin</a>
-  <a href="all-grades.html" class="admin-btn">כל עריכה</a>
-  <a href="create-request.html" class="admin-btn">יצירת קשר</a>
-  <a href="news.html" class="admin-btn">חדשות</a>
-  <a href="exams.html" class="admin-btn">השכבות</a>
-  <a href="board.html" class="admin-btn">מבחנים</a>
-  <a href="announcements.html" class="admin-btn">מודעות</a>
+      <a href="admin.html" class="admin-btn active">Admin</a>
+        <a href="#news" class="admin-btn">חדשות</a>
+        <a href="#grades" class="admin-btn">השכבות</a>
+        <a href="#exams" class="admin-btn">מבחנים</a>
+        <a href="#board" class="admin-btn">מודעות</a>
+        <a href="adminapps.html" class="admin-btn">כלי עריכה</a>
+        <a href="#contact" class="admin-btn">יצירת קשר</a>
 </div>
 
       <div class="admin-nav-right">
@@ -945,6 +1794,83 @@ body.admin-page .admin-nav-right{
 
   <!-- ✅ THEME + MOBILE NAV (ADMIN ONLY) -->
   <script>
+document.addEventListener("DOMContentLoaded", () => {
+  const gradeButtons = document.querySelectorAll(".grade-filter-btn");
+  const gradeSections = document.querySelectorAll(".admin-grade-section[data-grade]");
+  const columns = document.querySelector(".admin-columns");
+
+  if (!gradeButtons.length || !gradeSections.length) {
+    console.warn("Grade filter: elements not found");
+    return;
+  }
+
+  function updateOneVisibleClass() {
+    if (!columns) return;
+    const visibleCount = Array.from(gradeSections).filter(
+      (sec) => sec.style.display !== "none"
+    ).length;
+    columns.classList.toggle("one-visible", visibleCount === 1);
+  }
+
+  gradeButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const selected = btn.dataset.grade || "all";
+
+      gradeButtons.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      gradeSections.forEach((sec) => {
+        const g = sec.dataset.grade;
+        sec.style.display = selected === "all" || g === selected ? "" : "none";
+      });
+
+      // ✅ חשוב: לעדכן אחרי הסינון
+      updateOneVisibleClass();
+    });
+  });
+
+  // ✅ חשוב: עדכון ראשון כשהעמוד נטען
+  updateOneVisibleClass();
+});
+
+
+// ===== MOBILE MENU TOGGLE (admin) =====
+document.addEventListener("DOMContentLoaded", () => {
+  const toggle = document.getElementById("adminMobileToggle");
+  const menu = document.getElementById("adminMobileMenu");
+  if (!toggle || !menu) return;
+
+  const closeMenu = () => {
+    menu.classList.remove("open");
+    toggle.setAttribute("aria-expanded", "false");
+  };
+
+  toggle.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    menu.classList.toggle("open");
+    toggle.setAttribute(
+      "aria-expanded",
+      menu.classList.contains("open") ? "true" : "false"
+    );
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!menu.classList.contains("open")) return;
+    if (menu.contains(e.target) || toggle.contains(e.target)) return;
+    closeMenu();
+  });
+
+  menu.querySelectorAll("a").forEach((a) => {
+    a.addEventListener("click", () => closeMenu());
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeMenu();
+  });
+});
+
+
     (function () {
       const key = "admin_theme";
       const themeBtn = document.getElementById("admin-theme-toggle");
