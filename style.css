@@ -3992,3 +3992,37 @@ body.admin-page.register-page{
     overflow: hidden;
   }
 }
+/* ✅ URGENT BANNER – readable on mobile (2–4 lines) */
+@media (max-width: 600px){
+
+  /* הקופסה של ההודעה */
+  .urgent-banner, .urgent-message, .urgent-pill, .urgent-alert{
+    font-size: 0.92rem !important;
+    line-height: 1.35 !important;
+    padding: 10px 12px !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  /* אם זה בנוי כ-flex (כמו בתמונה: אייקון + טקסט) */
+  .urgent-banner, .urgent-message, .urgent-pill, .urgent-alert{
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+  }
+
+  /* הטקסט עצמו חייב לקבל מקום ולהישבר שורה */
+  .urgent-text, .urgent-banner .text, .urgent-message .text, .urgent-alert .text{
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    word-break: break-word !important;
+  }
+
+  /* אם יש כפתור/אייקון בצד – שלא ימעך את הטקסט */
+  .urgent-icon, .urgent-btn, .urgent-pill button{
+    flex: 0 0 auto !important;
+  }
+}
