@@ -1178,4 +1178,3 @@ document.addEventListener("DOMContentLoaded", async () => {
   setupMobileNav();
   setupScrollToTop();
 });
-
