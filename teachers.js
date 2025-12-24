@@ -138,7 +138,7 @@ showTab("duties"); // ברירת מחדל
    1) teacherAllow/{emailLower} OR teacherAllow/{uid} active:true
    2) adminUsers/{uid} role in allowedRolesForTeacherPortal
    ========================= */
-const allowedRolesForTeacherPortal = ["teacher", "gradelead", "counselor", "principal", "dev"];
+const allowedRolesForTeacherPortal = ["teacher","teacherpanel","gradelead","counselor","principal","dev"];
 
 async function hasTeacherAllowDoc(user) {
   const e = emailLower(user);

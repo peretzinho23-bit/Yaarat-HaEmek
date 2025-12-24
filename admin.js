@@ -354,39 +354,50 @@ function setupForgotPassword() {
     await signOut(auth);
   });
 
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      try {
-        currentPerms = await loadAdminPermissions(user);
-        applyPermissionsToUI();
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    try {
+      currentPerms = await loadAdminPermissions(user);
 
-        // realtime guard
-        startPermissionWatcher(user);
+      // ✅ רק אלה נכנסים לאדמין
+      const ADMIN_ROLES = ["dev", "principal", "admin"];
+      const role = String(currentPerms?.role || "").trim().toLowerCase();
 
-        // 👇👇👇 כאן בדיוק
-        const devBtn = document.getElementById("dev-btn");
-        if (devBtn) {
-          const role = String(currentPerms?.role || "").toLowerCase();
-          const canSeeDev = ["dev", "principal", "gradelead"].includes(role);
-          devBtn.style.display = canSeeDev ? "inline-block" : "none";
-        }
-
-        statusEl.textContent = "מחובר כ: " + (user.email || "");
-        loginSection.style.display = "none";
-        adminSection.style.display = "block";
-        await loadAllData();
-      } catch (err) {
+      if (!ADMIN_ROLES.includes(role)) {
         alert("אין לך הרשאה להיכנס לפאנל הניהול.");
         await signOut(auth);
+        return;
       }
-    } else {
-      // לא מחובר
-      statusEl.textContent = "לא מחובר";
-      loginSection.style.display = "block";
-      adminSection.style.display = "none";
+
+      applyPermissionsToUI();
+
+      // realtime guard
+      startPermissionWatcher(user);
+
+      // כפתור DEV – רק למי שמותר לראות אותו
+      const devBtn = document.getElementById("dev-btn");
+      if (devBtn) {
+        const canSeeDev = ["dev", "principal"].includes(role); // ❗ gradelead הוצאתי כי זה לא אדמין
+        devBtn.style.display = canSeeDev ? "inline-block" : "none";
+      }
+
+      statusEl.textContent = "מחובר כ: " + (user.email || "");
+      loginSection.style.display = "none";
+      adminSection.style.display = "block";
+      await loadAllData();
+
+    } catch (err) {
+      alert("אין לך הרשאה להיכנס לפאנל הניהול.");
+      await signOut(auth);
     }
-  });
-}
+  } else {
+    // לא מחובר
+    statusEl.textContent = "לא מחובר";
+    loginSection.style.display = "block";
+    adminSection.style.display = "none";
+  }
+});
+
 
 /* ------------ load everything ------------ */
 
@@ -1317,6 +1328,18 @@ document.addEventListener("DOMContentLoaded", () => {
     a.addEventListener("click", closeMenu);
   });
 });
+const ADMIN_ROLES = ["dev","principal","admin"];
+
+async function canAccessAdmin(user){
+  const uid = user?.uid;
+  if (!uid) return false;
+
+  const snap = await getDoc(doc(db, "adminUsers", uid));
+  if (!snap.exists()) return false;
+
+  const role = String(snap.data()?.role || "").trim().toLowerCase();
+  return ADMIN_ROLES.includes(role);
+}
 
 /* ------------ MAIN INIT ------------ */
 
@@ -1331,4 +1354,4 @@ document.addEventListener("DOMContentLoaded", () => {
   setupSiteContentForm();
   setupGradeFilter();
 });
-
+}
