@@ -1155,3 +1155,124 @@ body[data-page="admin"] .admin-columns > section{
   /* שלא ידחוף תוכן למטה */
   body{ padding-top: 0 !important; }
 }
+/* =========================
+   ADMIN LOGIN – CLEAN CENTERED CARD (PUT AT VERY END)
+   ========================= */
+
+body.admin-page #login-section{
+  width: min(520px, calc(100% - 32px)) !important;
+  margin: 56px auto 24px !important;
+  padding: 26px 26px 22px !important;
+  border-radius: 22px !important;
+
+  background: rgba(2,6,23,.78) !important;
+  border: 1px solid rgba(148,163,184,.26) !important;
+  box-shadow: 0 22px 70px rgba(0,0,0,.55) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+body.admin-page #login-section .section-title{
+  margin: 0 0 6px !important;
+  text-align: center !important;
+  font-size: 1.65rem !important;
+  font-weight: 950 !important;
+  letter-spacing: .2px !important;
+}
+
+body.admin-page #login-section .section-title + p,
+body.admin-page #login-section .admin-subtitle,
+body.admin-page #login-section .subtitle{
+  text-align: center !important;
+  margin: 0 0 18px !important;
+  opacity: .82 !important;
+  line-height: 1.35 !important;
+}
+
+/* inputs */
+body.admin-page #login-section input{
+  height: 44px !important;
+  border-radius: 14px !important;
+  padding: 10px 12px !important;
+  background: rgba(15,23,42,.65) !important;
+  border: 1px solid rgba(148,163,184,.28) !important;
+  color: #e5e7eb !important;
+  outline: none !important;
+  transition: border-color .15s ease, box-shadow .15s ease, transform .08s ease;
+}
+body.admin-page #login-section input:focus{
+  border-color: rgba(56,189,248,.75) !important;
+  box-shadow: 0 0 0 4px rgba(56,189,248,.14) !important;
+}
+
+/* button */
+body.admin-page #login-section button[type="submit"],
+body.admin-page #login-section .login-btn,
+body.admin-page #login-section .admin-login-btn{
+  width: 100% !important;
+  height: 46px !important;
+  border-radius: 16px !important;
+  border: 0 !important;
+  font-weight: 950 !important;
+  cursor: pointer !important;
+
+  background: linear-gradient(135deg, #60a5fa, #a78bfa) !important;
+  color: #07111f !important;
+  box-shadow: 0 16px 40px rgba(59,130,246,.25) !important;
+  transition: transform .1s ease, box-shadow .2s ease, filter .2s ease;
+}
+body.admin-page #login-section button[type="submit"]:hover{
+  transform: translateY(-1px) !important;
+  box-shadow: 0 20px 55px rgba(59,130,246,.34) !important;
+  filter: brightness(1.03);
+}
+body.admin-page #login-section button[type="submit"]:active{
+  transform: translateY(0) !important;
+}
+
+/* links row under button */
+body.admin-page #login-section .admin-links,
+body.admin-page #login-section .login-links,
+body.admin-page #login-section .register-footer{
+  margin-top: 14px !important;
+  display: flex !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  flex-wrap: wrap !important;
+}
+body.admin-page #login-section .admin-links a,
+body.admin-page #login-section .login-links a,
+body.admin-page #login-section .register-footer a{
+  padding: 8px 12px !important;
+  border-radius: 999px !important;
+  text-decoration: none !important;
+  font-weight: 850 !important;
+  border: 1px solid rgba(148,163,184,.22) !important;
+  background: rgba(15,23,42,.40) !important;
+  color: #7dd3fc !important;
+}
+body.admin-page #login-section .admin-links a:hover,
+body.admin-page #login-section .login-links a:hover,
+body.admin-page #login-section .register-footer a:hover{
+  transform: translateY(-1px);
+}
+
+/* status text */
+body.admin-page #auth-status,
+body.admin-page #login-status,
+body.admin-page #loginMsg{
+  text-align: center !important;
+  margin-top: 10px !important;
+  opacity: .9 !important;
+}
+
+/* mobile spacing */
+@media (max-width: 520px){
+  body.admin-page #login-section{
+    margin-top: 28px !important;
+    padding: 20px 16px 18px !important;
+  }
+  body.admin-page #login-section .section-title{
+    font-size: 1.35rem !important;
+  }
+}

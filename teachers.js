@@ -308,10 +308,9 @@ teacherLoginForm?.addEventListener("submit", async (e) => {
    Request access (teacherRequests)
    ========================= */
 tOpenRequest?.addEventListener("click", () => {
-  teacherLoginForm.style.display = "none";
-  tRequestForm.style.display = "block";
-  msg(tReqMsg, "", "");
+  window.location.href = "register.html";
 });
+
 
 tBackToLogin?.addEventListener("click", () => {
   tRequestForm.style.display = "none";

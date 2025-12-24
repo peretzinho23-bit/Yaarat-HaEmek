@@ -7,6 +7,8 @@
 
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="admin.css" />
+  <link rel="stylesheet" href="register-pretty.css" />
+
 </head>
 
 <body class="admin-page register-page">
@@ -34,7 +36,7 @@
 
   <main class="container register-shell">
     <section class="register-hero">
-      <h1 class="register-title">בקשת הרשמה לאדמין</h1>
+<h1 class="register-title">בקשת הרשמה לפורטל מורים / אדמין</h1>
       <p class="register-subtitle">
         הטופס מיועד לצוות בית הספר שמעוניינים לקבל גישה ללוח הניהול.
         לאחר שליחה, הבקשה תישמר ותיבדק ידנית.
@@ -63,6 +65,7 @@
             />
           </div>
 
+
           <div class="field">
             <label for="email">אימייל</label>
             <input
@@ -88,16 +91,17 @@
             <small class="hint">מינימום 6 תווים. מומלץ: 10+ עם מספרים.</small>
           </div>
 
-          <div class="field">
-            <label for="role">תפקיד בבית הספר</label>
-            <input
-              id="role"
-              name="role"
-              type="text"
-              placeholder="לדוגמה: מחנכת ז2 / מורה למתמטיקה"
-              required
-            />
-          </div>
+  <div class="field">
+  <label for="role">תפקיד בבית הספר</label>
+  <select id="role" name="role" required>
+    <option value="" disabled selected>בחר תפקיד</option>
+    <option value="teacher">מורה</option>
+    <option value="counselor">יועץ/ת</option>
+    <option value="gradelead">רכז/ת שכבה</option>
+    <option value="principal">הנהלה</option>
+  </select>
+</div>
+
 
           <div class="field full">
             <label for="reason">למה צריך גישה ללוח הניהול?</label>
@@ -130,9 +134,11 @@
           <p id="register-status" class="register-status" aria-live="polite"></p>
         </div>
 
-        <div class="register-footer">
-          <a href="admin.html" class="link-soft">חזרה למסך התחברות</a>
-        </div>
+   <div class="register-footer" style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+  <a href="teachers.html" class="link-soft">חזרה לפורטל מורים</a>
+  <a href="admin.html" class="link-soft">חזרה לאדמין</a>
+</div>
+
       </form>
     </section>
   </main>
