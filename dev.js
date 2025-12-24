@@ -38,7 +38,7 @@ function norm(email) {
 }
 
 function normalizeRole(role) {
-  const r = String(role || "").trim().toLowerCase();
+const r = String(data?.role || "").toLowerCase();
   // תומך גם בגרסאות ישנות
   if (r === "gradelead" || r === "grade_lead" || r === "אחראי שכבה") return "gradelead";
   if (r === "principal" || r === "מנהל" || r === "מנהלת") return "principal";

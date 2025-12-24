@@ -1,9 +1,9 @@
 // analytics.js – לוגים + דשבורד אנליטיקות ליערת העמק (Firestore)
-// ✅ מצב מומלץ: analytics_pageViews = אגרגציה נקייה (מסמך אחד ליום+דף)
-// ❌ לא “לוג לכל כניסה” = לא מיליוני מסמכים
-// אופציונלי: analytics_events = לוג גולמי לכל כניסה (אם תרצה פירוט אמיתי לפי כיתה/שעה/דפים)
+// ✅ analytics_pageViews = אגרגציה נקייה (מסמך אחד ליום+דף)
+// אופציונלי: analytics_events = לוג גולמי (כבוי)
 
-import { db } from "./firebase-config.js";
+import { db, auth } from "./firebase-config.js";
+
 import {
   collection,
   addDoc,
@@ -15,7 +15,13 @@ import {
   doc,
   setDoc,
   increment,
+  getDoc
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+import {
+  onAuthStateChanged,
+  signInAnonymously
+} from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
 /* =============================
    CONFIG
@@ -57,16 +63,8 @@ function dateKeyLocal(d) {
 function parseGradeClassFromURL() {
   const usp = new URLSearchParams(location.search);
 
-  const classIdRaw =
-    usp.get("class") ||
-    usp.get("classId") ||
-    usp.get("cid") ||
-    null;
-
-  const gradeRaw =
-    usp.get("grade") ||
-    usp.get("g") ||
-    null;
+  const classIdRaw = usp.get("class") || usp.get("classId") || usp.get("cid") || null;
+  const gradeRaw = usp.get("grade") || usp.get("g") || null;
 
   const classId = safeLower(classIdRaw);
   let grade = safeLower(gradeRaw);
@@ -89,8 +87,6 @@ function parseGradeClassFromURL() {
 
 /**
  * מיפוי קבוע של הדפים שלך
- * ✅ מתאים לרשימה: about, admin, adminapps, article, class, exams, index, news, polls, redirect-edu, register
- * (ואם יש עוד – fallback לשם קובץ)
  */
 function getPageKeyFromPath(pathname) {
   const p = (pathname || "/").toLowerCase();
@@ -108,7 +104,7 @@ function getPageKeyFromPath(pathname) {
   if (p.endsWith("/redirect-edu.html")) return "redirect-edu";
   if (p.endsWith("/register.html")) return "register";
 
-  // דשבורד (אם קיים)
+  // דשבורד
   if (p.endsWith("/analytics.html")) return "analytics-dashboard";
 
   // fallback: שם הקובץ בלי .html
@@ -134,9 +130,6 @@ function shouldSkipLogging(page) {
 
 function dedupeKey() {
   const meta = getPageMeta();
-
-  // ✅ דדופ לפי pageId + query
-  // כדי שלא יהיו 2 כתיבות בגלל טעינה כפולה
   return JSON.stringify({
     page: meta.page,
     path: getPathWithQuery(),
@@ -152,14 +145,34 @@ function canLogNow() {
     localStorage.setItem(key, String(now));
     return true;
   } catch {
-    // אם localStorage חסום – עדיין נלוג
     return true;
+  }
+}
+
+function isPermissionDenied(err) {
+  const code = String(err?.code || "");
+  const msg = String(err?.message || "");
+  return code.includes("permission-denied") || msg.toLowerCase().includes("permission");
+}
+
+/* =============================
+   AUTH: Try anonymous sign-in (helps if rules require auth)
+============================= */
+async function ensureAuthForAnalytics() {
+  try {
+    if (auth?.currentUser) return true;
+    // יצליח רק אם Anonymous Auth מופעל בפרויקט
+    await signInAnonymously(auth);
+    return true;
+  } catch (e) {
+    // לא שוברים כלום אם זה לא פעיל
+    console.warn("analytics: anonymous auth not available:", e?.code || e?.message || e);
+    return false;
   }
 }
 
 /* =============================
    1) LOG PAGE VIEW (AGGREGATED)
-   ✅ מסמך אחד ליום+pageId => אין הצפה
 ============================= */
 
 async function logPageView() {
@@ -168,23 +181,23 @@ async function logPageView() {
     if (shouldSkipLogging(page)) return;
     if (!canLogNow()) return;
 
+    // ננסה ליצור user אנונימי כדי לעבור rules שדורשות auth
+    await ensureAuthForAnalytics();
+
     const now = new Date();
     const dateKey = dateKeyLocal(now);
     const hour = pad2(now.getHours());
     const path = getPathWithQuery();
 
-    // ✅ פה הקסם: מסמך אחד בלבד לכל יום+דף
-    // זה מונע אלפי מסמכים לכל כניסה / לכל classId
     const docId = `${dateKey}__${page}`;
 
     await setDoc(
       doc(db, PAGEVIEWS_COLLECTION, docId),
       {
         dateKey,
-        pageId: page,              // תואם למה שה-analytics.html שלך מצפה (pageId)
+        pageId: page,
         views: increment(1),
 
-        // “last seen” מידע שימושי (לא לספירה!)
         lastPath: path,
         lastHour: hour,
         lastGrade: grade || null,
@@ -195,7 +208,6 @@ async function logPageView() {
       { merge: true }
     );
 
-    // ✅ RAW EVENTS רק אם באמת צריך פירוט אמיתי לפי כיתה/שעה וכו'
     if (ENABLE_RAW_EVENTS) {
       await addDoc(eventsRef, {
         path,
@@ -217,19 +229,41 @@ async function logPageView() {
       });
     }
   } catch (err) {
+    if (isPermissionDenied(err)) {
+      // שקט – לא מפילים אתר בגלל אנליטיקס
+      console.warn("analytics: permission denied (log skipped)");
+      return;
+    }
     console.error("שגיאה בשמירת אנליטיקות:", err);
   }
 }
 
 /* =============================
    2) DASHBOARD (reads AGGREGATION)
-   ✅ מיועד ל-analytics.html שלך שקורא analytics_pageViews
 ============================= */
 
 function setText(id, value) {
   const el = document.getElementById(id);
   if (!el) return;
   el.textContent = String(value);
+}
+
+async function canReadAnalyticsDashboard(user) {
+  // אם אין לך rules שמגינות על זה, תחזיר true.
+  // אם יש, נבדוק adminUsers role.
+  try {
+    const uid = user?.uid;
+    if (!uid) return false;
+
+    const snap = await getDoc(doc(db, "adminUsers", uid));
+    if (!snap.exists()) return false;
+
+    const role = String(snap.data()?.role || "").trim().toLowerCase();
+    return ["dev", "principal", "admin"].includes(role);
+  } catch (e) {
+    console.warn("analytics dashboard role check failed:", e?.code || e?.message || e);
+    return false;
+  }
 }
 
 async function loadAnalyticsDashboard() {
@@ -239,7 +273,6 @@ async function loadAnalyticsDashboard() {
   try {
     const today = dateKeyLocal(new Date());
 
-    // שים לב: orderBy("dateKey") עובד כי תמיד יש dateKey
     const qViews = query(pageviewsRef, orderBy("dateKey", "desc"), limit(6000));
     const snap = await getDocs(qViews);
     const rows = snap.docs.map((d) => d.data());
@@ -256,10 +289,7 @@ async function loadAnalyticsDashboard() {
     let totalViews = 0;
     let todayViews = 0;
 
-    const byPage = new Map(); // pageId -> views
-    // ⚠️ אגרגציה לפי דף לא יודעת “כיתות מובילות” בלי RAW EVENTS
-    // לכן unique-classes פה יהיה 0 או "לא נתמך" אם תרצה (נשאיר 0 נקי)
-    // אם תדליק RAW EVENTS, תעשה בדשבורד קריאה ל-analytics_events ותחשב.
+    const byPage = new Map();
     for (const r of rows) {
       const v = Number(r.views || 0);
       totalViews += v;
@@ -277,9 +307,13 @@ async function loadAnalyticsDashboard() {
     if (statusEl) statusEl.textContent = `נטענו ${rows.length} מסמכי סיכום.`;
   } catch (err) {
     console.error("שגיאה בטעינת האנליטיקות:", err);
-    if (statusEl)
-      statusEl.textContent =
-        "אירעה שגיאה בטעינת נתוני האנליטיקות. בדוק את ה-console.";
+    if (isPermissionDenied(err)) {
+      const statusEl = document.getElementById("analytics-status");
+      if (statusEl) statusEl.textContent = "אין הרשאה לקרוא אנליטיקות. התחבר עם משתמש אדמין.";
+      return;
+    }
+    const statusEl = document.getElementById("analytics-status");
+    if (statusEl) statusEl.textContent = "אירעה שגיאה בטעינת נתוני האנליטיקות. בדוק Console.";
   }
 }
 
@@ -293,8 +327,25 @@ document.addEventListener("DOMContentLoaded", () => {
   const finalPage = pageType || computed;
 
   if (finalPage === "analytics-dashboard") {
-    loadAnalyticsDashboard();
+    // דשבורד: נטען רק אחרי auth, כדי לא לקבל permission denied “סתם”
+    onAuthStateChanged(auth, async (user) => {
+      const statusEl = document.getElementById("analytics-status");
+
+      if (!user) {
+        if (statusEl) statusEl.textContent = "כדי לראות אנליטיקות צריך להתחבר (אדמין).";
+        return;
+      }
+
+      const ok = await canReadAnalyticsDashboard(user);
+      if (!ok) {
+        if (statusEl) statusEl.textContent = "מחובר ✅ אבל אין הרשאה לדשבורד אנליטיקות.";
+        return;
+      }
+
+      await loadAnalyticsDashboard();
+    });
   } else {
+    // כל שאר הדפים: לוג צפייה
     logPageView();
   }
 });
