@@ -37,6 +37,10 @@ const tLogoutBtn = $("tLogoutBtn");
 const tAuthCard = $("tAuthCard");
 const tPortal = $("tPortal");
 
+// ✅ status + logout ליד "מחובר/ת"
+const teacherStatusEl = document.getElementById("teacher-auth-status");
+const teacherLogoutBtn = document.getElementById("teacher-logout-btn");
+
 const teacherLoginForm = $("teacherLoginForm");
 const tLoginMsg = $("tLoginMsg");
 
@@ -88,6 +92,31 @@ function isPermissionDenied(err) {
   return code.includes("permission-denied") || msgg.toLowerCase().includes("permission");
 }
 
+// ✅ עדכון שורת סטטוס + כפתור התנתקות (בלי לשבור כלום)
+function setTeacherAuthBar(user) {
+  if (!teacherStatusEl && !teacherLogoutBtn) return;
+
+  if (user) {
+    if (teacherStatusEl) teacherStatusEl.textContent = "מחובר/ת: " + (user.email || "");
+    if (teacherLogoutBtn) teacherLogoutBtn.style.display = "inline-block";
+  } else {
+    if (teacherStatusEl) teacherStatusEl.textContent = "לא מחובר";
+    if (teacherLogoutBtn) teacherLogoutBtn.style.display = "none";
+  }
+}
+
+/* =========================
+   Logout buttons
+   ========================= */
+teacherLogoutBtn?.addEventListener("click", async () => {
+  await signOut(auth);
+});
+
+tLogoutBtn?.addEventListener("click", async () => {
+  await signOut(auth);
+  closeMenu();
+});
+
 /* =========================
    Mobile menu
    ========================= */
@@ -114,6 +143,8 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") closeMenu();
 });
 tMenu?.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => closeMenu()));
+
+
 
 /* =========================
    Tabs (safe)
@@ -311,7 +342,6 @@ tOpenRequest?.addEventListener("click", () => {
   window.location.href = "register.html";
 });
 
-
 tBackToLogin?.addEventListener("click", () => {
   tRequestForm.style.display = "none";
   teacherLoginForm.style.display = "block";
@@ -356,18 +386,13 @@ tRequestForm?.addEventListener("submit", async (e) => {
 });
 
 /* =========================
-   Logout
-   ========================= */
-tLogoutBtn?.addEventListener("click", async () => {
-  await signOut(auth);
-  closeMenu();
-});
-
-/* =========================
-   Auth watcher
+   Auth watcher (single!)
    ========================= */
 onAuthStateChanged(auth, async (user) => {
   try {
+    // ✅ תמיד מעדכנים שורת סטטוס + כפתור התנתקות
+    setTeacherAuthBar(user);
+
     // אם לא מחובר -> מכבים realtime ומחזירים למסך התחברות
     if (!user) {
       try { if (dutiesUnsub) dutiesUnsub(); } catch {}
@@ -390,7 +415,7 @@ onAuthStateChanged(auth, async (user) => {
 
     // אם מותר -> מפעילים realtime
     if (allowed) {
-      startDutiesRealtime();          // ✅ מאזין לעדכונים בלי F5
+      startDutiesRealtime();           // ✅ מאזין לעדכונים בלי F5
       renderDutiesForDay(selectedDay); // ✅ מציג ישר את היום שנבחר
     } else {
       // אם לא מותר -> לא מאזינים
@@ -405,6 +430,9 @@ onAuthStateChanged(auth, async (user) => {
     try { if (dutiesUnsub) dutiesUnsub(); } catch {}
     dutiesUnsub = null;
 
+    // נעדכן UI + סטטוס
+    setTeacherAuthBar(auth.currentUser || null);
+
     await setUIState({ signedIn: true, allowed: false });
     showBanner("מחובר, אבל לא הצלחתי לבדוק הרשאה (בדוק Rules/Console).");
   }
@@ -415,9 +443,9 @@ function startDutiesRealtime() {
   try { if (dutiesUnsub) dutiesUnsub(); } catch {}
   dutiesUnsub = null;
 
-  const ref = doc(db, "teacherDuties", "main");
+  const refDoc = doc(db, "teacherDuties", "main");
 
-  dutiesUnsub = onSnapshot(ref, (snap) => {
+  dutiesUnsub = onSnapshot(refDoc, (snap) => {
     dutiesData = snap.exists() ? (snap.data() || {}) : {};
     renderDutiesForDay(selectedDay); // ✅ מתעדכן מיד בלי רענון
   }, (err) => {
@@ -425,14 +453,13 @@ function startDutiesRealtime() {
   });
 }
 
-
-function renderDutiesForDay(day){
+function renderDutiesForDay(day) {
   if (!tDutiesWrap) return;
 
   tDutiesWrap.innerHTML = "";
   if (tDutiesEmpty) tDutiesEmpty.style.display = "none";
 
-  const slots = Array.isArray(dutiesData?.slots) ? dutiesData.slots : ["בוקר","הפסקה 1","הפסקה 2","הפסקה 3"];
+  const slots = Array.isArray(dutiesData?.slots) ? dutiesData.slots : ["בוקר", "הפסקה 1", "הפסקה 2", "הפסקה 3"];
   const table = dutiesData?.table && typeof dutiesData.table === "object" ? dutiesData.table : {};
 
   let any = false;
@@ -444,7 +471,7 @@ function renderDutiesForDay(day){
     const clean = duties
       .map(d => ({
         location: String(d?.location || "").trim(),
-        teacher:  String(d?.teacher  || "").trim(),
+        teacher: String(d?.teacher || "").trim(),
       }))
       .filter(d => d.location || d.teacher);
 
@@ -482,6 +509,7 @@ function renderDutiesForDay(day){
 
   if (!any && tDutiesEmpty) tDutiesEmpty.style.display = "";
 }
+
 tDayBar?.addEventListener("click", (e) => {
   const btn = e.target.closest(".t-daybtn");
   if (!btn) return;

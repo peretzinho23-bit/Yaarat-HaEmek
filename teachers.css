@@ -431,3 +431,25 @@ body.teachers-page{
   color:rgba(234,240,255,.92);
   word-break:break-word;
 }
+.teacher-user-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: flex-end;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.teacher-logout-btn {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.35);
+  color: inherit;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.teacher-logout-btn:hover {
+  background: rgba(255,255,255,0.15);
+}
