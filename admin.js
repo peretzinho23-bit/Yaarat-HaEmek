@@ -22,7 +22,6 @@ import {
   sendPasswordResetEmail
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
-
 import {
   ref,
   uploadBytes,
@@ -57,7 +56,6 @@ function kickToLogin(msg = "אין לך יותר גישה") {
 // realtime guard — אם מוחקים/משנים role בזמן אמת => מעיפים
 function startPermissionWatcher(user) {
   stopPermissionWatcher();
-
   if (!user) return;
 
   const refDoc = doc(db, "adminUsers", user.uid);
@@ -70,9 +68,8 @@ function startPermissionWatcher(user) {
     const role = String(data.role || "").toLowerCase();
 
     // roles שמותר להיכנס ל-admin
-    const allowedRolesForAdmin = ["teacher", "gradelead", "counselor", "principal", "dev"];
+    const allowedRolesForAdmin = ["teacher", "gradelead", "counselor", "principal", "dev", "admin"];
     if (!allowedRolesForAdmin.includes(role)) return kickToLogin("אין לך הרשאות");
-
   }, (err) => {
     console.error("perm snapshot error:", err);
     kickToLogin("שגיאת הרשאות (בדוק חוקים/קונסול)");
@@ -130,6 +127,17 @@ function buildPermsFromRole(role, allowedGrades = []) {
     base.can.polls = true;
     base.can.logs = true;
     base.can.dev = true;
+    return base;
+  }
+
+  // admin (אם אתה משתמש בזה אצלך)
+  if (r === "admin") {
+    base.role = "admin";
+    base.allowedGrades = ["z", "h", "t"];
+    base.can.board = true;
+    base.can.siteContent = true;
+    base.can.polls = true;
+    base.can.logs = true;
     return base;
   }
 
@@ -293,19 +301,6 @@ async function getDocSafe(pathArr, def) {
   return snap.data() || def;
 }
 
-/* ------------ auth ------------ */
-
-function initAuth() {
-  const loginForm = document.getElementById("login-form");
-  const logoutBtn = document.getElementById("logout-btn");
-  const loginSection = document.getElementById("login-section");
-  const adminSection = document.getElementById("admin-section");
-  const statusEl = document.getElementById("auth-status");
-
-  if (!loginForm || !logoutBtn || !loginSection || !adminSection || !statusEl) {
-    console.error("auth elements missing in admin.html");
-    return;
-  }
 /* ------------ FORGOT PASSWORD (reset email) ------------ */
 function setupForgotPassword() {
   const link = document.getElementById("forgotPasswordLink");
@@ -334,6 +329,20 @@ function setupForgotPassword() {
   });
 }
 
+/* ------------ auth ------------ */
+function initAuth() {
+  const loginForm = document.getElementById("login-form");
+  const logoutBtn = document.getElementById("logout-btn");
+  const loginSection = document.getElementById("login-section");
+  const adminSection = document.getElementById("admin-section");
+  const statusEl = document.getElementById("auth-status");
+
+  if (!loginForm || !logoutBtn || !loginSection || !adminSection || !statusEl) {
+    console.error("auth elements missing in admin.html");
+    return;
+  }
+
+  // חשוב: למנוע submit רגיל
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const email = loginForm.email.value.trim();
@@ -354,53 +363,51 @@ function setupForgotPassword() {
     await signOut(auth);
   });
 
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    try {
-      currentPerms = await loadAdminPermissions(user);
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      try {
+        currentPerms = await loadAdminPermissions(user);
 
-      // ✅ רק אלה נכנסים לאדמין
-      const ADMIN_ROLES = ["dev", "principal", "admin"];
-      const role = String(currentPerms?.role || "").trim().toLowerCase();
+        // ✅ רק אלה נכנסים לאדמין
+        const ADMIN_ROLES = ["dev", "principal", "admin"];
+        const role = String(currentPerms?.role || "").trim().toLowerCase();
 
-      if (!ADMIN_ROLES.includes(role)) {
+        if (!ADMIN_ROLES.includes(role)) {
+          alert("אין לך הרשאה להיכנס לפאנל הניהול.");
+          await signOut(auth);
+          return;
+        }
+
+        applyPermissionsToUI();
+
+        // realtime guard
+        startPermissionWatcher(user);
+
+        // כפתור DEV – רק למי שמותר לראות אותו
+        const devBtn = document.getElementById("dev-btn");
+        if (devBtn) {
+          const canSeeDev = ["dev", "principal"].includes(role); // ❗ gradelead הוצאתי כי זה לא אדמין
+          devBtn.style.display = canSeeDev ? "inline-block" : "none";
+        }
+
+        statusEl.textContent = "מחובר כ: " + (user.email || "");
+        loginSection.style.display = "none";
+        adminSection.style.display = "block";
+        await loadAllData();
+      } catch (err) {
         alert("אין לך הרשאה להיכנס לפאנל הניהול.");
         await signOut(auth);
-        return;
       }
-
-      applyPermissionsToUI();
-
-      // realtime guard
-      startPermissionWatcher(user);
-
-      // כפתור DEV – רק למי שמותר לראות אותו
-      const devBtn = document.getElementById("dev-btn");
-      if (devBtn) {
-        const canSeeDev = ["dev", "principal"].includes(role); // ❗ gradelead הוצאתי כי זה לא אדמין
-        devBtn.style.display = canSeeDev ? "inline-block" : "none";
-      }
-
-      statusEl.textContent = "מחובר כ: " + (user.email || "");
-      loginSection.style.display = "none";
-      adminSection.style.display = "block";
-      await loadAllData();
-
-    } catch (err) {
-      alert("אין לך הרשאה להיכנס לפאנל הניהול.");
-      await signOut(auth);
+    } else {
+      // לא מחובר
+      statusEl.textContent = "לא מחובר";
+      loginSection.style.display = "block";
+      adminSection.style.display = "none";
     }
-  } else {
-    // לא מחובר
-    statusEl.textContent = "לא מחובר";
-    loginSection.style.display = "block";
-    adminSection.style.display = "none";
-  }
-});
-
+  });
+}
 
 /* ------------ load everything ------------ */
-
 async function loadAllData() {
   // NEWS
   for (const g of GRADES) {
@@ -635,7 +642,6 @@ function setupNewsForms() {
     });
   }
 }
-
 
 /* ------------ EXAMS ------------ */
 
@@ -1230,68 +1236,13 @@ function setupGradeFilter() {
 
   setActiveGrade("all");
 }
-document.addEventListener("DOMContentLoaded", () => {
-  const btn = document.getElementById("adminMobileToggle");
-  const menu = document.getElementById("adminMobileMenu");
-  if (!btn || !menu) return;
 
-  btn.addEventListener("click", () => {
-    menu.classList.toggle("open");
-  });
+/* =============================
+   NAV / MOBILE TOGGLES (מסודר, בלי כפילויות)
+============================= */
 
-  // סגירה בלחיצה מחוץ לתפריט
-  document.addEventListener("click", (e) => {
-    if (!menu.classList.contains("open")) return;
-    if (menu.contains(e.target) || btn.contains(e.target)) return;
-    menu.classList.remove("open");
-  });
-});
-  // ===== Mobile nav toggle (hamburger) =====
-  const navToggle = document.querySelector(".nav-toggle");
-  const navMobile = document.getElementById("nav-mobile");
-
-  function closeMobileNav() {
-    if (navMobile) navMobile.classList.remove("open");
-  }
-
-  if (navToggle && navMobile) {
-    navToggle.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      navMobile.classList.toggle("open");
-    });
-
-    // סוגר בלחיצה מחוץ לתפריט
-    document.addEventListener("click", (e) => {
-      if (!navMobile.classList.contains("open")) return;
-      const clickedInside = navMobile.contains(e.target) || navToggle.contains(e.target);
-      if (!clickedInside) closeMobileNav();
-    });
-
-    // סוגר אחרי לחיצה על לינק
-    navMobile.querySelectorAll("a").forEach((a) => {
-      a.addEventListener("click", () => closeMobileNav());
-    });
-  }
-// mobile nav toggle (safe)
-document.addEventListener("DOMContentLoaded", () => {
-  const btn = document.querySelector(".nav-toggle");
-  const menu = document.getElementById("nav-mobile");
-  if (!btn || !menu) return;
-
-  btn.addEventListener("click", () => {
-    menu.classList.toggle("open");
-  });
-
-  // close on outside click
-  document.addEventListener("click", (e) => {
-    if (!menu.classList.contains("open")) return;
-    if (menu.contains(e.target) || btn.contains(e.target)) return;
-    menu.classList.remove("open");
-  });
-});
-// ===== Admin mobile menu toggle (hamburger) =====
-document.addEventListener("DOMContentLoaded", () => {
+// Admin mobile menu toggle
+function setupAdminMobileMenu() {
   const toggle = document.getElementById("adminMobileToggle");
   const menu = document.getElementById("adminMobileMenu");
   if (!toggle || !menu) return;
@@ -1311,41 +1262,49 @@ document.addEventListener("DOMContentLoaded", () => {
     toggleMenu();
   });
 
-  // סגירה בלחיצה מחוץ לתפריט
   document.addEventListener("click", (e) => {
     if (!menu.classList.contains("open")) return;
     if (menu.contains(e.target) || toggle.contains(e.target)) return;
     closeMenu();
   });
 
-  // סגירה ב-Escape
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") closeMenu();
   });
 
-  // סגירה כשלוחצים על לינק בתפריט
   menu.querySelectorAll("a").forEach((a) => {
     a.addEventListener("click", closeMenu);
   });
-});
-const ADMIN_ROLES = ["dev","principal","admin"];
+}
 
-async function canAccessAdmin(user){
-  const uid = user?.uid;
-  if (!uid) return false;
+// Site mobile nav toggle (אם יש לך גם באתר)
+function setupSiteMobileNav() {
+  const btn = document.querySelector(".nav-toggle");
+  const menu = document.getElementById("nav-mobile");
+  if (!btn || !menu) return;
 
-  const snap = await getDoc(doc(db, "adminUsers", uid));
-  if (!snap.exists()) return false;
+  btn.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    menu.classList.toggle("open");
+  });
 
-  const role = String(snap.data()?.role || "").trim().toLowerCase();
-  return ADMIN_ROLES.includes(role);
+  document.addEventListener("click", (e) => {
+    if (!menu.classList.contains("open")) return;
+    if (menu.contains(e.target) || btn.contains(e.target)) return;
+    menu.classList.remove("open");
+  });
+
+  menu.querySelectorAll("a").forEach((a) => {
+    a.addEventListener("click", () => menu.classList.remove("open"));
+  });
 }
 
 /* ------------ MAIN INIT ------------ */
-
 document.addEventListener("DOMContentLoaded", () => {
   initAuth();
-  setupForgotPassword(); // ✅ חדש
+  setupForgotPassword();
+
   setupNewsForms();
   setupExamForms();
   setupBoardForm();
@@ -1353,5 +1312,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupDeleteHandler();
   setupSiteContentForm();
   setupGradeFilter();
+
+  setupAdminMobileMenu();
+  setupSiteMobileNav();
 });
-}
