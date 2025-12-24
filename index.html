@@ -653,6 +653,48 @@ html.theme-changing .hero-home-cards .grade-card{
 html[data-theme="dark"].theme-changing .hero-home-cards .grade-card{
   background-color: #0f172a !important;
 }
+.teacher-portal-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding:12px 14px;
+  border-radius:14px;
+  font-weight:900;
+  font-size:14px;
+  letter-spacing:.2px;
+  text-decoration:none;
+
+  color:#eafff4;
+  background:linear-gradient(135deg, rgba(57,217,138,.95), rgba(34,197,94,.70));
+  border:1px solid rgba(57,217,138,.35);
+
+  box-shadow:
+    0 10px 26px rgba(34,197,94,.22),
+    inset 0 1px 0 rgba(255,255,255,.12);
+
+  transition:transform .15s ease, box-shadow .15s ease, filter .15s ease;
+}
+
+.teacher-portal-btn:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.05);
+  box-shadow:
+    0 14px 34px rgba(34,197,94,.28),
+    inset 0 1px 0 rgba(255,255,255,.14);
+}
+
+.teacher-portal-btn:active{
+  transform:translateY(0);
+  filter:brightness(.98);
+}
+
+.teacher-portal-btn:focus-visible{
+  outline:none;
+  box-shadow:
+    0 0 0 3px rgba(57,217,138,.25),
+    0 14px 34px rgba(34,197,94,.28);
+}
 
   </style>
 </head>
@@ -704,6 +746,10 @@ html[data-theme="dark"].theme-changing .hero-home-cards .grade-card{
   <a href="index.html#contact">יצירת קשר</a>
   <a href="redirect-edu.html" class="personal-btn">למרחב האישי</a>
   <a href="admin.html" class="btn-outline">Admin</a>
+  <a href="teachers.html" class="teacher-portal-btn">
+   פורטל מורים
+</a>
+
 </div>
 
 
@@ -730,7 +776,10 @@ html[data-theme="dark"].theme-changing .hero-home-cards .grade-card{
         <a href="about.html">אודות</a>
         <a href="index.html#contact">יצירת קשר</a>
         <a href="redirect-edu.html" class="personal-btn">למרחב האישי</a>
+          <a href="teachers.html" class="teacher-portal-btn">
+  👩‍🏫 פורטל מורים
         <a href="admin.html" class="btn-outline">Admin</a>
+        
       </div>
 
     </nav>

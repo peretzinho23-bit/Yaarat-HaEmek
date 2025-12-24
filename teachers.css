@@ -1,0 +1,433 @@
+/* teachers.css — Mobile-first portal (dark, clean, punchy) */
+
+:root{
+  --bg:#070a13;
+  --bg2:#0b1020;
+  --card: rgba(255,255,255,.06);
+  --card2: rgba(255,255,255,.08);
+  --stroke: rgba(255,255,255,.12);
+  --text:#eaf0ff;
+  --muted: rgba(234,240,255,.72);
+  --muted2: rgba(234,240,255,.55);
+  --good:#22c55e;
+  --bad:#ef4444;
+  --brand:#60a5fa;
+  --brand2:#a78bfa;
+  --shadow: 0 18px 60px rgba(0,0,0,.45);
+  --r: 18px;
+}
+
+body.teachers-page{
+  margin:0;
+  background:
+    radial-gradient(900px 500px at 20% -10%, rgba(96,165,250,.18), transparent 55%),
+    radial-gradient(700px 400px at 90% 20%, rgba(167,139,250,.14), transparent 55%),
+    linear-gradient(180deg, var(--bg), var(--bg2));
+  color:var(--text);
+  font-family: system-ui, -apple-system, Segoe UI, Arial;
+}
+
+.t-container{ width:min(980px, 92vw); margin:0 auto; }
+.t-main{ padding: 18px 0 34px; }
+
+.t-header{
+  position: sticky;
+  top:0;
+  z-index:50;
+  backdrop-filter: blur(14px);
+  background: rgba(7,10,19,.55);
+  border-bottom: 1px solid var(--stroke);
+}
+
+.t-topbar{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding: 14px 0;
+}
+
+.t-logo{
+  width:46px; height:46px;
+  display:flex; align-items:center; justify-content:center;
+  border-radius: 999px;
+  background: rgba(255,255,255,.06);
+  border:1px solid var(--stroke);
+  overflow:hidden;
+  box-shadow: 0 10px 26px rgba(0,0,0,.22);
+}
+.t-logo img{ width:100%; height:100%; object-fit:cover; }
+
+.t-topbar-center{ flex:1; text-align:center; }
+.t-title{ font-weight:800; letter-spacing:.2px; font-size: 16px; }
+.t-subtitle{ font-size:12.5px; color:var(--muted); margin-top:2px; }
+
+.t-menu-btn{
+  width:44px; height:44px;
+  border-radius: 14px;
+  border:1px solid var(--stroke);
+  background: rgba(255,255,255,.06);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:5px;
+}
+.t-menu-btn span{
+  width:18px; height:2px;
+  background: rgba(234,240,255,.9);
+  border-radius: 99px;
+}
+
+.t-menu{
+  display:none;
+  padding: 10px 0 14px;
+}
+.t-menu.open{ display:block; }
+.t-menu-link{
+  display:block;
+  margin: 8px 0;
+  padding: 12px 14px;
+  border-radius: 14px;
+  color:var(--text);
+  text-decoration:none;
+  background: rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.10);
+}
+.t-menu-link:hover{ background: rgba(255,255,255,.08); }
+.t-menu-btnlink{ width:100%; text-align:right; cursor:pointer; }
+
+.t-card{
+  background: var(--card);
+  border:1px solid var(--stroke);
+  border-radius: var(--r);
+  box-shadow: var(--shadow);
+  overflow:hidden;
+}
+
+.t-authcard{ padding: 14px; }
+.t-card-head{ padding: 16px 16px 8px; }
+.t-h1{ margin:0; font-size: 20px; font-weight: 900; }
+.t-h2{ margin:0; font-size: 17px; font-weight: 900; }
+.t-muted{ margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+
+.t-label{
+  display:block;
+  margin: 12px 2px 6px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.t-input, .t-textarea{
+  width:100%;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(0,0,0,.20);
+  color: var(--text);
+  padding: 12px 12px;
+  outline:none;
+  font-size: 14px;
+}
+.t-input:focus, .t-textarea:focus{
+  border-color: rgba(96,165,250,.55);
+  box-shadow: 0 0 0 4px rgba(96,165,250,.14);
+}
+
+.t-passwrap{ position:relative; }
+.t-iconbtn{
+  position:absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 42px; height: 42px;
+  border-radius: 14px;
+  border:1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.06);
+  color: var(--text);
+}
+
+.t-btn{
+  width:100%;
+  margin-top: 14px;
+  border-radius: 16px;
+  padding: 12px 14px;
+  font-size: 15px;
+  font-weight: 900;
+  border:1px solid rgba(255,255,255,.14);
+  cursor:pointer;
+}
+.t-btn:disabled{ opacity:.6; cursor:not-allowed; }
+
+.t-btn-primary{
+  background: linear-gradient(135deg, rgba(96,165,250,.95), rgba(167,139,250,.9));
+  color:#071019;
+  border-color: transparent;
+}
+.t-btn-ghost{
+  background: rgba(255,255,255,.06);
+  color: var(--text);
+}
+
+.t-links{
+  margin-top: 12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  flex-wrap: wrap;
+}
+.t-linkbtn{
+  background: transparent;
+  border:none;
+  color: rgba(96,165,250,.95);
+  font-weight: 800;
+  cursor:pointer;
+  padding: 6px 8px;
+}
+.t-link{
+  color: rgba(167,139,250,.95);
+  text-decoration:none;
+  font-weight: 800;
+  padding: 6px 8px;
+}
+.t-dot{ color: var(--muted2); }
+
+.t-row{
+  display:flex;
+  gap:10px;
+}
+.t-row .t-btn{ width:50%; }
+
+.t-msg{
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--muted);
+  min-height: 18px;
+}
+.t-msg.ok{ color: rgba(34,197,94,.95); }
+.t-msg.err{ color: rgba(239,68,68,.95); }
+
+.t-banner{
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.14);
+  margin: 14px 0;
+  background: rgba(255,255,255,.05);
+}
+.t-banner-info{ color: var(--text); }
+
+.t-tabs{
+  display:flex;
+  gap:10px;
+  margin: 14px 0 12px;
+}
+.t-tab{
+  flex:1;
+  padding: 12px 10px;
+  border-radius: 16px;
+  border:1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.05);
+  color: var(--text);
+  font-weight: 900;
+}
+.t-tab.active{
+  background: rgba(96,165,250,.18);
+  border-color: rgba(96,165,250,.35);
+}
+
+.t-whoami{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin: 14px 0 10px;
+}
+.t-badge{
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(34,197,94,.14);
+  border: 1px solid rgba(34,197,94,.28);
+  font-weight: 900;
+  font-size: 12px;
+}
+.t-whoemail{ color: var(--muted); font-size: 13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+.t-list{ padding: 12px 14px 16px; display:flex; flex-direction:column; gap:10px; }
+.t-item{
+  background: rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius: 16px;
+  padding: 12px 12px;
+}
+.t-item-title{ font-weight: 950; }
+.t-item-meta{ color: var(--muted); font-size: 12px; margin-top: 3px; }
+.t-item-body{ color: var(--text); opacity:.92; margin: 10px 0 0; line-height:1.45; }
+
+.t-linksgrid{
+  padding: 12px 14px 16px;
+  display:grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+.t-linkcard{
+  display:block;
+  text-decoration:none;
+  color: var(--text);
+  background: rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius: 16px;
+  padding: 12px 12px;
+}
+.t-linkcard-title{ font-weight: 950; }
+.t-linkcard-sub{ color: var(--muted); font-size: 12px; margin-top: 4px; }
+
+.t-placeholder{
+  margin: 10px 14px 16px;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px dashed rgba(255,255,255,.18);
+  background: rgba(255,255,255,.04);
+}
+.t-ph-title{ font-weight: 950; }
+.t-ph-sub{ margin-top: 6px; color: var(--muted); font-size: 13px; line-height:1.4; }
+
+.t-mini-note{
+  padding: 0 14px 16px;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+/* Schedule UI */
+.t-schedule{ padding: 12px 0 0; }
+.t-schedule-head{ padding: 0 14px 10px; }
+.t-schedule-title{ font-weight: 950; }
+.t-schedule-sub{ color: var(--muted); font-size: 12.5px; margin-top: 4px; }
+
+/* Horizontal scroll like a timetable */
+.t-schedule-grid{
+  overflow:auto;
+  -webkit-overflow-scrolling: touch;
+  border-top: 1px solid rgba(255,255,255,.10);
+  border-bottom: 1px solid rgba(255,255,255,.10);
+  background: rgba(0,0,0,.14);
+}
+.t-sg-row{
+  display:grid;
+  grid-template-columns: 90px repeat(6, 120px);
+  min-width: calc(90px + 6 * 120px);
+}
+.t-sg-header{
+  position: sticky;
+  top: 0;
+  background: rgba(11,16,32,.88);
+  backdrop-filter: blur(10px);
+  z-index: 3;
+}
+.t-sg-cell{
+  padding: 10px 10px;
+  border-left: 1px solid rgba(255,255,255,.08);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  font-size: 13px;
+  white-space: nowrap;
+}
+.t-sg-time{
+  position: sticky;
+  right: 0;
+  z-index: 2;
+  background: rgba(11,16,32,.82);
+  font-weight: 950;
+}
+.t-sg-slot{
+  color: rgba(234,240,255,.9);
+}
+
+/* Bigger screens */
+@media (min-width: 720px){
+  .t-linksgrid{ grid-template-columns: repeat(2, 1fr); }
+  .t-title{ font-size: 18px; }
+}
+/* ===== Duties (day picker + cards) ===== */
+.t-daybar{
+  display:flex;
+  gap:8px;
+  overflow:auto;
+  -webkit-overflow-scrolling:touch;
+  padding:6px 2px 12px;
+  margin-top:6px;
+}
+.t-daybar::-webkit-scrollbar{ height:6px; }
+.t-daybar::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.12); border-radius:999px; }
+
+.t-daybtn{
+  flex:0 0 auto;
+  padding:10px 14px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.04);
+  color:rgba(234,240,255,.88);
+  font-weight:900;
+  font-size:13px;
+}
+.t-daybtn.active{
+  background:rgba(57,217,138,.14);
+  border-color:rgba(57,217,138,.35);
+  color:#c9ffe7;
+}
+
+.t-duties-wrap{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  margin-top:10px;
+}
+
+.t-duty-card{
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:16px;
+  background:rgba(255,255,255,.04);
+  padding:12px;
+}
+.t-duty-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:10px;
+}
+.t-duty-slot{
+  font-weight:1000;
+  font-size:14px;
+}
+.t-duty-chip{
+  font-size:12px;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.03);
+  color:rgba(234,240,255,.78);
+}
+
+.t-duty-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.t-duty-item{
+  border-radius:14px;
+  padding:10px;
+  background:rgba(0,0,0,.22);
+  border:1px solid rgba(255,255,255,.08);
+}
+.t-duty-item .t-duty-row{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:flex-start;
+}
+.t-duty-label{
+  font-size:11px;
+  color:rgba(234,240,255,.60);
+  margin-bottom:4px;
+}
+.t-duty-val{
+  font-size:13px;
+  font-weight:800;
+  color:rgba(234,240,255,.92);
+  word-break:break-word;
+}

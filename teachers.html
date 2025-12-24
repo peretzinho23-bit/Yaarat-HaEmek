@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover" />
+  <title>פורטל מורים · יערת העמק</title>
+
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="teachers.css" />
+
+  <meta name="theme-color" content="#0b1020" />
+</head>
+
+<body class="teachers-page">
+
+  <header class="t-header">
+    <div class="t-container t-topbar">
+      <a class="t-logo" href="index.html" aria-label="דף הבית">
+        <img src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png" alt="סמל יערת העמק">
+      </a>
+
+      <div class="t-topbar-center">
+        <div class="t-title">פורטל מורים</div>
+        <div class="t-subtitle">תורנויות · הודעות צוות · קישורים</div>
+      </div>
+
+      <button id="tMenuBtn" class="t-menu-btn" aria-label="תפריט" aria-expanded="false" type="button">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <div id="tMenu" class="t-menu">
+      <a href="#duties" class="t-menu-link">תורנויות</a>
+      <a href="#staff" class="t-menu-link">הודעות צוות</a>
+      <a href="#links" class="t-menu-link">קישורים פנימיים</a>
+      <button id="tLogoutBtn" class="t-menu-link t-menu-btnlink" type="button">התנתקות</button>
+    </div>
+  </header>
+
+  <main class="t-container t-main">
+
+    <!-- STATUS -->
+    <div id="tGlobalStatus" class="t-banner t-banner-info" style="display:none;"></div>
+
+    <!-- LOGIN / REQUEST -->
+    <section id="tAuthCard" class="t-card t-authcard">
+      <div class="t-card-head">
+        <h1 class="t-h1">כניסת מורים</h1>
+        <p class="t-muted">כניסה מיועדת לצוות בית הספר בלבד.</p>
+      </div>
+
+      <form id="teacherLoginForm" action="javascript:void(0)" novalidate>
+        <label class="t-label" for="tEmail">אימייל</label>
+        <input class="t-input" id="tEmail" name="email" type="email" autocomplete="email"
+               placeholder="name@school.org.il" required />
+
+        <label class="t-label" for="tPass">סיסמה</label>
+        <div class="t-passwrap">
+          <input class="t-input" id="tPass" name="password" type="password" autocomplete="current-password"
+                 placeholder="••••••••" required />
+          <button id="tTogglePass" class="t-iconbtn" type="button" aria-label="הצג סיסמה">👁</button>
+        </div>
+
+        <button id="tLoginBtn" class="t-btn t-btn-primary" type="submit">כניסה</button>
+
+        <div class="t-links">
+          <button id="tOpenRequest" class="t-linkbtn" type="button">אין לי גישה? בקשת הרשאה</button>
+          <span class="t-dot">•</span>
+          <a class="t-link" href="reset-password.html">שכחתי סיסמה</a>
+        </div>
+
+        <div id="tLoginMsg" class="t-msg" aria-live="polite"></div>
+      </form>
+
+      <form id="tRequestForm" class="t-form" style="display:none;" action="javascript:void(0)" novalidate>
+        <div class="t-request-head">
+          <h2 class="t-h2">בקשת הרשאה לפורטל מורים</h2>
+          <p class="t-muted">הבקשה תישלח לבדיקה. ייתכן שהמייל יגיע לספאם.</p>
+        </div>
+
+        <label class="t-label" for="rFullName">שם מלא</label>
+        <input class="t-input" id="rFullName" name="fullName" type="text" placeholder="לדוגמה: ישראל ישראלי" required />
+
+        <label class="t-label" for="rEmail">אימייל</label>
+        <input class="t-input" id="rEmail" name="email" type="email" placeholder="name@school.org.il" required />
+
+        <label class="t-label" for="rRole">תפקיד</label>
+        <input class="t-input" id="rRole" name="role" type="text" placeholder="לדוגמה: מחנכת ז2 / רכזת מקצוע" required />
+
+        <label class="t-label" for="rNote">הערה (אופציונלי)</label>
+        <textarea class="t-textarea" id="rNote" name="note" rows="3" placeholder="כל מידע נוסף שיכול לעזור לאישור..."></textarea>
+
+        <div class="t-row">
+          <button id="tReqBtn" class="t-btn t-btn-primary" type="submit">שליחת בקשה</button>
+          <button id="tBackToLogin" class="t-btn t-btn-ghost" type="button">חזרה</button>
+        </div>
+
+        <div id="tReqMsg" class="t-msg" aria-live="polite"></div>
+      </form>
+    </section>
+
+    <!-- PORTAL (after allowed) -->
+    <section id="tPortal" style="display:none;">
+
+      <div class="t-whoami">
+        <div class="t-badge">מחובר/ת</div>
+        <div id="tWhoEmail" class="t-whoemail"></div>
+      </div>
+
+      <div class="t-tabs">
+        <button class="t-tab active" data-tab="duties" type="button">תורנויות</button>
+        <button class="t-tab" data-tab="staff" type="button">הודעות צוות</button>
+        <button class="t-tab" data-tab="links" type="button">קישורים</button>
+      </div>
+
+  <section id="duties" class="t-card t-tabpane">
+  <div class="t-card-head">
+    <h2 class="t-h2">תורנויות</h2>
+    <p class="t-muted">בחר יום כדי לראות תורנויות לפי בוקר/הפסקות.</p>
+  </div>
+
+  <!-- Day picker -->
+  <div class="t-daybar" id="tDayBar">
+    <button class="t-daybtn active" type="button" data-day="א">א׳</button>
+    <button class="t-daybtn" type="button" data-day="ב">ב׳</button>
+    <button class="t-daybtn" type="button" data-day="ג">ג׳</button>
+    <button class="t-daybtn" type="button" data-day="ד">ד׳</button>
+    <button class="t-daybtn" type="button" data-day="ה">ה׳</button>
+    <button class="t-daybtn" type="button" data-day="ו">ו׳</button>
+  </div>
+
+  <div id="tDutiesWrap" class="t-duties-wrap"></div>
+
+  <div id="tDutiesEmpty" class="t-placeholder" style="display:none;">
+    <div class="t-ph-title">אין תורנויות ליום הזה</div>
+    <div class="t-ph-sub">DEV/מנהל עדיין לא מילאו מערכת או שאין נתונים.</div>
+  </div>
+</section>
+
+
+      <section id="staff" class="t-card t-tabpane" style="display:none;">
+        <div class="t-card-head">
+          <h2 class="t-h2">הודעות צוות</h2>
+          <p class="t-muted">נשלף מתוך Firestore (teacherPortal/main).</p>
+        </div>
+
+        <div id="tStaffList" class="t-list"></div>
+        <div id="tStaffEmpty" class="t-placeholder" style="display:none;">
+          <div class="t-ph-title">אין הודעות כרגע</div>
+          <div class="t-ph-sub">כשתוסיף הודעות ב־DEV, הן יופיעו כאן.</div>
+        </div>
+      </section>
+
+      <section id="links" class="t-card t-tabpane" style="display:none;">
+        <div class="t-card-head">
+          <h2 class="t-h2">קישורים פנימיים</h2>
+          <p class="t-muted">קישורים שימושיים לצוות – נשלף מתוך Firestore.</p>
+        </div>
+
+        <div id="tLinksList" class="t-linksgrid"></div>
+        <div id="tLinksEmpty" class="t-placeholder" style="display:none;">
+          <div class="t-ph-title">אין קישורים עדיין</div>
+          <div class="t-ph-sub">כשתוסיף קישורים ב־DEV, הם יופיעו כאן.</div>
+        </div>
+      </section>
+
+    </section>
+  </main>
+
+<script type="module" src="teachers.js?v=4"></script>
+</body>
+</html>

@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover" />
+  <title>עריכת פורטל מורים · יערת העמק</title>
+
+  <style>
+    :root{
+      --bg:#070a12;
+      --card:#0c1222;
+      --card2:#0b1020;
+      --border:rgba(255,255,255,.10);
+      --text:#eaf0ff;
+      --muted:rgba(234,240,255,.72);
+      --muted2:rgba(234,240,255,.52);
+      --shadow:0 16px 60px rgba(0,0,0,.55);
+      --radius:18px;
+      --radius2:24px;
+      --p:14px;
+      --p2:18px;
+      --accent:#7c5cff;
+      --accent2:#62b0ff;
+      --good:#39d98a;
+      --bad:#ff4d4d;
+      --warn:#ffcc66;
+      --focus:0 0 0 4px rgba(124,92,255,.22);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background:
+        radial-gradient(900px 380px at 70% -80px, rgba(124,92,255,.35), transparent 60%),
+        radial-gradient(900px 380px at 20% -80px, rgba(98,176,255,.28), transparent 60%),
+        radial-gradient(1200px 700px at 50% 0px, rgba(255,255,255,.05), transparent 55%),
+        var(--bg);
+      color:var(--text);
+      min-height:100vh;
+    }
+    a{color:inherit}
+    .wrap{max-width:1100px;margin:0 auto;padding:14px}
+    .topbar{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter: blur(12px);
+      background: linear-gradient(to bottom, rgba(7,10,18,.92), rgba(7,10,18,.60));
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .topbar-in{
+      display:flex; align-items:center; gap:10px;
+      padding:10px 14px;
+    }
+    .logo{
+      width:40px;height:40px;border-radius:999px;
+      display:grid;place-items:center;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      overflow:hidden;
+      flex:0 0 auto;
+    }
+    .logo img{width:100%;height:100%;object-fit:cover}
+    .titles{min-width:0;flex:1}
+    .h1{font-weight:900;font-size:14.5px;letter-spacing:.2px}
+    .sub{font-size:12px;color:var(--muted);margin-top:2px}
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.06);
+      padding:8px 10px;border-radius:999px;
+      font-size:12px;color:var(--muted);
+      white-space:nowrap;
+    }
+    .btn{
+      border:none; cursor:pointer;
+      border-radius:14px;
+      padding:11px 12px;
+      font-weight:800;
+      color:var(--text);
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.10);
+      transition:.15s transform ease, .15s background ease, .15s border ease;
+    }
+    .btn:active{transform:scale(.98)}
+    .btn:focus{outline:none; box-shadow:var(--focus)}
+    .btn-primary{
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      border: none;
+    }
+    .btn-ghost{
+      background: transparent;
+      border:1px solid rgba(255,255,255,.12);
+    }
+    .btn-danger{
+      background: rgba(255,77,77,.12);
+      border:1px solid rgba(255,77,77,.25);
+      color:#ffd3d3;
+    }
+    .grid{
+      display:grid;
+      gap:14px;
+      padding:14px 0 40px;
+    }
+    @media(min-width:920px){
+      .grid{grid-template-columns: 1.1fr .9fr;}
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius2);
+      overflow:hidden;
+    }
+    .card-h{
+      padding:16px 16px 10px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      display:flex;align-items:flex-start;justify-content:space-between;gap:10px;
+    }
+    .card-h .t{font-size:14px;font-weight:900;margin:0}
+    .card-h .m{font-size:12px;color:var(--muted);margin-top:4px}
+    .card-b{padding:16px}
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .msg{
+      margin-top:10px;
+      font-size:12.5px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color:var(--muted);
+    }
+    .msg.ok{border-color:rgba(57,217,138,.25); background:rgba(57,217,138,.10); color:#c9ffe7}
+    .msg.err{border-color:rgba(255,77,77,.25); background:rgba(255,77,77,.10); color:#ffd3d3}
+    .msg.warn{border-color:rgba(255,204,102,.25); background:rgba(255,204,102,.10); color:#ffe8b7}
+    .field{display:grid; gap:8px; margin:10px 0}
+    label{font-size:12.5px;color:var(--muted);font-weight:800}
+    input, textarea, select{
+      width:100%;
+      padding:12px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.22);
+      color:var(--text);
+      outline:none;
+    }
+    input:focus, textarea:focus, select:focus{box-shadow:var(--focus);border-color:rgba(124,92,255,.35)}
+    textarea{min-height:92px;resize:vertical}
+    .split{display:grid; gap:10px}
+    @media(min-width:520px){.split{grid-template-columns:1fr 1fr}}
+    .mini{font-size:12px;color:var(--muted2)}
+    .list{
+      display:grid; gap:10px;
+    }
+    .item{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+      border-radius: 16px;
+      padding:12px;
+    }
+    .item-top{display:flex;gap:10px;align-items:flex-start;justify-content:space-between}
+    .item-title{font-weight:900;font-size:13px}
+    .item-meta{font-size:12px;color:var(--muted);margin-top:3px}
+    .item-body{margin-top:8px;color:var(--text);font-size:12.8px;line-height:1.45}
+    .hr{height:1px;background:rgba(255,255,255,.08);margin:14px 0}
+    .hide{display:none !important;}
+
+    /* duties board */
+    .duties-wrap{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.16);
+      border-radius: 18px;
+      overflow:hidden;
+    }
+    .duties-head{
+      display:flex;gap:10px;align-items:center;justify-content:space-between;
+      padding:12px 12px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .duties-title{font-weight:900;font-size:13px}
+    .duties-note{font-size:12px;color:var(--muted)}
+    .table-wrap{overflow:auto}
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      min-width: 720px;
+    }
+    th, td{
+      padding:10px 10px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      border-left:1px solid rgba(255,255,255,.06);
+      text-align:right;
+      vertical-align:top;
+      font-size:12.5px;
+    }
+    th{
+      position:sticky; top:0;
+      background: rgba(10,14,26,.92);
+      backdrop-filter: blur(10px);
+      font-weight:900;
+      z-index:2;
+    }
+    tr:last-child td{border-bottom:none}
+    th:first-child, td:first-child{
+      position:sticky; right:0;
+      background: rgba(10,14,26,.92);
+      z-index:3;
+      border-left:1px solid rgba(255,255,255,.08);
+      min-width: 170px;
+    }
+    td input{
+      padding:10px 10px;
+      border-radius: 12px;
+      font-size:12.5px;
+      background: rgba(0,0,0,.22);
+      border:1px solid rgba(255,255,255,.12);
+    }
+    .tinybtn{
+      padding:8px 10px;border-radius:12px;
+      font-size:12px;font-weight:900;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="topbar">
+    <div class="topbar-in wrap">
+      <div class="logo" title="יערַת העמק">
+        <img src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png" alt="סמל">
+      </div>
+      <div class="titles">
+        <div class="h1">עריכת פורטל מורים</div>
+        <div class="sub">רק DEV ומנהל/ת יכולים לערוך · שמירה ל-Firestore</div>
+      </div>
+
+      <span id="whoPill" class="pill">לא מחובר</span>
+      <button id="logoutBtn" class="btn btn-danger hide" type="button">התנתקות</button>
+    </div>
+  </div>
+
+  <div class="wrap grid">
+    <!-- LOGIN -->
+    <section id="loginCard" class="card">
+      <div class="card-h">
+        <div>
+          <p class="t">כניסה לעריכה</p>
+          <div class="m">מותר רק ל-DEV ומנהל/ת (principal). אם אין לך הרשאה — לא תוכל לשמור.</div>
+        </div>
+      </div>
+      <div class="card-b">
+        <form id="loginForm" autocomplete="on" novalidate>
+          <div class="field">
+            <label for="email">אימייל</label>
+            <input id="email" name="email" type="email" placeholder="name@school.org.il" required />
+          </div>
+          <div class="field">
+            <label for="pass">סיסמה</label>
+            <input id="pass" name="pass" type="password" placeholder="••••••••" required />
+          </div>
+          <div class="row">
+            <button class="btn btn-primary" type="submit">כניסה</button>
+            <button id="goTeachers" class="btn btn-ghost" type="button">חזרה לפורטל מורים</button>
+          </div>
+          <div id="loginMsg" class="msg hide"></div>
+        </form>
+      </div>
+    </section>
+
+    <!-- EDITOR -->
+    <section id="editorCard" class="card hide">
+      <div class="card-h">
+        <div>
+          <p class="t">עריכת תוכן הפורטל</p>
+          <div class="m">כאן אתה עורך הודעות צוות, קישורים ותורנויות. בסוף לוחצים “שמור הכל”.</div>
+        </div>
+        <div class="row">
+          <button id="reloadBtn" class="btn tinybtn" type="button">רענן נתונים</button>
+          <button id="saveAllBtn" class="btn btn-primary tinybtn" type="button">שמור הכל</button>
+        </div>
+      </div>
+
+      <div class="card-b">
+        <div class="msg warn">
+          ⚠️ טיפ: אל תתפזר. תעדכן → שמור → תבדוק בפורטל מורים.
+        </div>
+
+        <div class="hr"></div>
+
+        <!-- STAFF MESSAGES -->
+        <h3 style="margin:0 0 8px;font-size:13.5px;font-weight:900;">הודעות צוות</h3>
+        <div class="mini">נשמר בתוך <b>teacherPortal/main</b> תחת <b>staffMessages</b></div>
+
+        <div class="split">
+          <div class="field">
+            <label>כותרת</label>
+            <input id="smTitle" placeholder="לדוגמה: ישיבת צוות ביום שלישי" />
+          </div>
+          <div class="field">
+            <label>מטא (אופציונלי)</label>
+            <input id="smMeta" placeholder="לדוגמה: 09:30 · חדר מורים" />
+          </div>
+        </div>
+        <div class="field">
+          <label>תוכן</label>
+          <textarea id="smBody" placeholder="כתוב הודעה קצרה וברורה..."></textarea>
+        </div>
+        <div class="row">
+          <button id="addStaffBtn" class="btn tinybtn" type="button">הוסף הודעה</button>
+          <span class="mini">מומלץ עד 20 הודעות</span>
+        </div>
+
+        <div id="staffList" class="list" style="margin-top:12px;"></div>
+
+        <div class="hr"></div>
+
+        <!-- LINKS -->
+        <h3 style="margin:0 0 8px;font-size:13.5px;font-weight:900;">קישורים פנימיים</h3>
+        <div class="mini">נשמר בתוך <b>teacherPortal/main</b> תחת <b>links</b></div>
+
+        <div class="split">
+          <div class="field">
+            <label>כותרת</label>
+            <input id="lnTitle" placeholder="לדוגמה: טפסי משרד החינוך" />
+          </div>
+          <div class="field">
+            <label>כתובת (URL)</label>
+            <input id="lnUrl" placeholder="https://..." />
+          </div>
+        </div>
+        <div class="field">
+          <label>תת-כותרת (אופציונלי)</label>
+          <input id="lnSub" placeholder="לדוגמה: קישורים מהירים לצוות" />
+        </div>
+        <div class="row">
+          <button id="addLinkBtn" class="btn tinybtn" type="button">הוסף קישור</button>
+          <span class="mini">מומלץ עד 30 קישורים</span>
+        </div>
+
+        <div id="linksList" class="list" style="margin-top:12px;"></div>
+
+        <div class="hr"></div>
+
+        <!-- DUTIES -->
+        <h3 style="margin:0 0 8px;font-size:13.5px;font-weight:900;">תורנויות (מערכת)</h3>
+        <div class="mini">נשמר בתוך <b>teacherDuties/main</b>. הטבלה ניתנת לגלילה אופקית במובייל.</div>
+
+        <div class="duties-wrap" style="margin-top:10px;">
+          <div class="duties-head">
+            <div>
+              <div class="duties-title">טבלת תורנויות</div>
+<div class="duties-note">שורות = בוקר/הפסקות · עמודות = ימים · בכל תא: מיקום + מורה</div>
+            </div>
+            <div class="row">
+              <button id="addRowBtn" class="btn tinybtn" type="button">+ שורה</button>
+              <button id="removeRowBtn" class="btn tinybtn btn-ghost" type="button">- שורה אחרונה</button>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+<thead>
+  <tr>
+    <th>זמן</th>
+    <th>א׳</th>
+    <th>ב׳</th>
+    <th>ג׳</th>
+    <th>ד׳</th>
+    <th>ה׳</th>
+    <th>ו׳</th>
+  </tr>
+</thead>
+<tbody id="dutiesBody"></tbody>
+
+            </table>
+          </div>
+        </div>
+
+        <div id="saveMsg" class="msg hide"></div>
+      </div>
+    </section>
+  </div>
+
+ <script type="module">
+  import { db, auth } from "./firebase-config.js";
+
+  import {
+    signInWithEmailAndPassword,
+    onAuthStateChanged,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+
+  import {
+    doc,
+    getDoc,
+    setDoc,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+  // ====== DOM ======
+  const $ = (id) => document.getElementById(id);
+
+  const whoPill = $("whoPill");
+  const logoutBtn = $("logoutBtn");
+
+  const loginCard = $("loginCard");
+  const editorCard = $("editorCard");
+
+  const loginForm = $("loginForm");
+  const loginMsg = $("loginMsg");
+  const goTeachers = $("goTeachers");
+
+  const reloadBtn = $("reloadBtn");
+  const saveAllBtn = $("saveAllBtn");
+  const saveMsg = $("saveMsg");
+
+  const smTitle = $("smTitle");
+  const smMeta  = $("smMeta");
+  const smBody  = $("smBody");
+  const addStaffBtn = $("addStaffBtn");
+  const staffList = $("staffList");
+
+  const lnTitle = $("lnTitle");
+  const lnUrl   = $("lnUrl");
+  const lnSub   = $("lnSub");
+  const addLinkBtn = $("addLinkBtn");
+  const linksList = $("linksList");
+
+  const dutiesBody = $("dutiesBody");
+  const addRowBtn = $("addRowBtn");
+  const removeRowBtn = $("removeRowBtn");
+
+  // ====== helpers ======
+  const DEV_EMAILS = ["nadavp1119@gmail.com","peretzinho23@gmail.com"].map(x => x.toLowerCase());
+  const allowedRoles = ["principal","dev"]; // DEV + מנהל/ת בלבד
+
+  const escapeHtml = (s) => String(s ?? "")
+    .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+
+  function showMsg(el, text, type="") {
+    el.classList.remove("hide","ok","err","warn");
+    if (type) el.classList.add(type);
+    el.textContent = text;
+  }
+  function hideMsg(el){ el.classList.add("hide"); el.textContent=""; el.classList.remove("ok","err","warn"); }
+
+  function normalizeEmail(e){ return String(e||"").trim().toLowerCase(); }
+
+  async function canEditPortal(user){
+    const email = normalizeEmail(user?.email);
+    if (DEV_EMAILS.includes(email)) return true;
+
+    // principal לפי adminUsers/{uid}
+    const uid = user?.uid;
+    if (!uid) return false;
+
+    const snap = await getDoc(doc(db, "adminUsers", uid));
+    if (!snap.exists()) return false;
+
+    const role = String(snap.data()?.role || "").trim().toLowerCase();
+    return allowedRoles.includes(role);
+  }
+
+  // ====== state ======
+  let currentUser = null;
+  let canEdit = false;
+
+  let portalData = { staffMessages: [], links: [] };
+
+  const DEFAULT_DAYS  = ["א","ב","ג","ד","ה","ו"];
+  const DEFAULT_SLOTS = ["בוקר","הפסקה 1","הפסקה 2","הפסקה 3"];
+
+  let dutiesData = { days: DEFAULT_DAYS, slots: DEFAULT_SLOTS, table: {} };
+
+  function setWho(email, ok){
+    whoPill.textContent = ok ? ("מחובר: " + email) : "לא מחובר";
+    whoPill.style.borderColor = ok ? "rgba(57,217,138,.35)" : "rgba(255,255,255,.10)";
+    whoPill.style.background = ok ? "rgba(57,217,138,.10)" : "rgba(255,255,255,.06)";
+    whoPill.style.color = ok ? "#c9ffe7" : "rgba(234,240,255,.72)";
+  }
+
+  function renderStaff(){
+    staffList.innerHTML = "";
+    const arr = Array.isArray(portalData.staffMessages) ? portalData.staffMessages : [];
+    if (!arr.length){
+      staffList.innerHTML = '<div class="msg">אין הודעות עדיין.</div>';
+      return;
+    }
+
+    arr.slice(0,60).forEach((it, idx) => {
+      const div = document.createElement("div");
+      div.className = "item";
+      div.innerHTML = `
+        <div class="item-top">
+          <div>
+            <div class="item-title">${escapeHtml(it.title || "הודעה")}</div>
+            ${it.meta ? `<div class="item-meta">${escapeHtml(it.meta)}</div>` : `<div class="item-meta">—</div>`}
+          </div>
+          <button class="btn btn-danger tinybtn" data-del-staff="${idx}" type="button">מחק</button>
+        </div>
+        ${it.body ? `<div class="item-body">${escapeHtml(it.body)}</div>` : ""}
+      `;
+      staffList.appendChild(div);
+    });
+
+    staffList.querySelectorAll("[data-del-staff]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const i = Number(btn.dataset.delStaff);
+        if (!Number.isFinite(i)) return;
+        portalData.staffMessages.splice(i,1);
+        renderStaff();
+      });
+    });
+  }
+
+  function renderLinks(){
+    linksList.innerHTML = "";
+    const arr = Array.isArray(portalData.links) ? portalData.links : [];
+    if (!arr.length){
+      linksList.innerHTML = '<div class="msg">אין קישורים עדיין.</div>';
+      return;
+    }
+
+    arr.slice(0,80).forEach((it, idx) => {
+      const div = document.createElement("div");
+      div.className = "item";
+      div.innerHTML = `
+        <div class="item-top">
+          <div>
+            <div class="item-title">${escapeHtml(it.title || "קישור")}</div>
+            <div class="item-meta">${escapeHtml(it.subtitle || it.url || "")}</div>
+          </div>
+          <button class="btn btn-danger tinybtn" data-del-link="${idx}" type="button">מחק</button>
+        </div>
+        ${it.url ? `<div class="item-body"><a href="${escapeHtml(it.url)}" target="_blank" rel="noopener">${escapeHtml(it.url)}</a></div>` : ""}
+      `;
+      linksList.appendChild(div);
+    });
+
+    linksList.querySelectorAll("[data-del-link]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const i = Number(btn.dataset.delLink);
+        if (!Number.isFinite(i)) return;
+        portalData.links.splice(i,1);
+        renderLinks();
+      });
+    });
+  }
+
+  // ====== DUTIES (matrix) ======
+function ensureDutiesShape() {
+  if (!Array.isArray(dutiesData.days) || !dutiesData.days.length) dutiesData.days = DEFAULT_DAYS.slice();
+  if (!Array.isArray(dutiesData.slots) || !dutiesData.slots.length) dutiesData.slots = DEFAULT_SLOTS.slice();
+  if (!dutiesData.table || typeof dutiesData.table !== "object") dutiesData.table = {};
+
+  for (const slot of dutiesData.slots) {
+    if (!dutiesData.table[slot] || typeof dutiesData.table[slot] !== "object") dutiesData.table[slot] = {};
+    for (const day of dutiesData.days) {
+      const cell = dutiesData.table[slot][day];
+
+      // ✅ cell = { duties: [ {location, teacher}, ... ] }
+      if (!cell || typeof cell !== "object") {
+        dutiesData.table[slot][day] = { duties: [ { location:"", teacher:"" } ] };
+      } else {
+        if (!Array.isArray(cell.duties) || !cell.duties.length) cell.duties = [ { location:"", teacher:"" } ];
+        cell.duties = cell.duties.map(x => ({
+          location: String(x?.location || ""),
+          teacher:  String(x?.teacher  || "")
+        }));
+      }
+    }
+  }
+}
+
+function renderDuties() {
+  dutiesBody.innerHTML = "";
+  ensureDutiesShape();
+
+  dutiesData.slots.forEach((slot) => {
+    const tr = document.createElement("tr");
+
+    // עמודת זמן
+    const tdSlot = document.createElement("td");
+    tdSlot.innerHTML = `<b>${escapeHtml(slot)}</b><div style="font-size:11px;color:rgba(234,240,255,.6);margin-top:4px;">מקום + מורה</div>`;
+    tr.appendChild(tdSlot);
+
+    // ימים
+    dutiesData.days.forEach((day) => {
+      const cell = dutiesData.table?.[slot]?.[day] || { duties: [ { location:"", teacher:"" } ] };
+      const duties = Array.isArray(cell.duties) ? cell.duties : [ { location:"", teacher:"" } ];
+
+      const td = document.createElement("td");
+
+      // כל duty כרטיס קטן עם שני אינפוטים + כפתור מחיקה
+      td.innerHTML = duties.map((d, idx) => `
+        <div class="duty-mini" style="border:1px solid rgba(255,255,255,.10);border-radius:12px;padding:10px;margin-bottom:10px;background:rgba(255,255,255,.04);">
+          <input
+            data-slot="${escapeHtml(slot)}" data-day="${escapeHtml(day)}" data-i="${idx}" data-k="location"
+            placeholder="מיקום" value="${escapeHtml(d.location || "")}"
+            style="margin-bottom:8px;"
+          >
+          <input
+            data-slot="${escapeHtml(slot)}" data-day="${escapeHtml(day)}" data-i="${idx}" data-k="teacher"
+            placeholder="מורה" value="${escapeHtml(d.teacher || "")}"
+            style="margin-bottom:8px;"
+          >
+          <button
+            class="btn tinybtn btn-ghost"
+            type="button"
+            data-del-duty="1"
+            data-slot="${escapeHtml(slot)}"
+            data-day="${escapeHtml(day)}"
+            data-i="${idx}"
+            style="width:100%;"
+          >מחק תורנות</button>
+        </div>
+      `).join("");
+
+      // כפתור “הוסף תורנות” לתא
+      td.innerHTML += `
+        <button class="btn tinybtn" type="button"
+          data-add-duty="1"
+          data-slot="${escapeHtml(slot)}"
+          data-day="${escapeHtml(day)}"
+          style="width:100%;"
+        >+ הוסף מורה/מקום</button>
+      `;
+
+      tr.appendChild(td);
+    });
+
+    dutiesBody.appendChild(tr);
+  });
+
+  // עדכון ערכים
+  dutiesBody.querySelectorAll("input[data-slot]").forEach((inp) => {
+    inp.addEventListener("input", () => {
+      const slot = inp.dataset.slot;
+      const day  = inp.dataset.day;
+      const i    = Number(inp.dataset.i);
+      const k    = inp.dataset.k; // location / teacher
+      const cell = dutiesData.table?.[slot]?.[day];
+      if (!cell?.duties?.[i]) return;
+      cell.duties[i][k] = inp.value;
+    });
+  });
+
+  // הוספת תורנות לתא
+  dutiesBody.querySelectorAll("button[data-add-duty]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const slot = btn.dataset.slot;
+      const day  = btn.dataset.day;
+      const cell = dutiesData.table?.[slot]?.[day];
+      if (!cell) return;
+      cell.duties.push({ location:"", teacher:"" });
+      renderDuties();
+    });
+  });
+
+  // מחיקת תורנות מתא
+  dutiesBody.querySelectorAll("button[data-del-duty]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const slot = btn.dataset.slot;
+      const day  = btn.dataset.day;
+      const i    = Number(btn.dataset.i);
+      const cell = dutiesData.table?.[slot]?.[day];
+      if (!cell?.duties) return;
+      cell.duties.splice(i, 1);
+      if (!cell.duties.length) cell.duties = [ { location:"", teacher:"" } ]; // לא משאיר ריק
+      renderDuties();
+    });
+  });
+}
+
+  // ====== load/save ======
+  async function loadAll(){
+    hideMsg(saveMsg);
+
+    // teacherPortal/main
+    const pSnap = await getDoc(doc(db, "teacherPortal", "main"));
+    portalData = pSnap.exists() ? (pSnap.data() || {}) : {};
+    if (!Array.isArray(portalData.staffMessages)) portalData.staffMessages = [];
+    if (!Array.isArray(portalData.links)) portalData.links = [];
+    renderStaff();
+    renderLinks();
+
+    // teacherDuties/main
+    const dSnap = await getDoc(doc(db, "teacherDuties", "main"));
+    dutiesData = dSnap.exists() ? (dSnap.data() || {}) : {};
+    ensureDutiesShape();
+    renderDuties();
+  }
+
+  async function saveAll(){
+    hideMsg(saveMsg);
+
+    if (!currentUser || !canEdit){
+      showMsg(saveMsg, "אין לך הרשאה לשמור.", "err");
+      return;
+    }
+
+    const email = normalizeEmail(currentUser.email);
+
+    const staff = (portalData.staffMessages || []).slice(0,60).map(x => ({
+      title: String(x.title||"").trim(),
+      meta:  String(x.meta||"").trim(),
+      body:  String(x.body||"").trim(),
+    })).filter(x => x.title || x.body);
+
+    const links = (portalData.links || []).slice(0,80).map(x => ({
+      title: String(x.title||"").trim(),
+      subtitle: String(x.subtitle||"").trim(),
+      url: String(x.url||"").trim(),
+    })).filter(x => x.title && x.url);
+
+    // duties trim
+    ensureDutiesShape();
+    for (const slot of dutiesData.slots) {
+      for (const day of dutiesData.days) {
+        const c = dutiesData.table?.[slot]?.[day];
+        if (!c) continue;
+        c.location = String(c.location || "").trim();
+        c.teacher  = String(c.teacher  || "").trim();
+      }
+    }
+
+    try{
+      saveAllBtn.disabled = true;
+      saveAllBtn.textContent = "שומר...";
+
+      await setDoc(doc(db,"teacherPortal","main"), {
+        staffMessages: staff,
+        links: links,
+        updatedAt: serverTimestamp(),
+        updatedBy: email
+      }, { merge:true });
+
+ensureDutiesShape();
+
+// trim
+for (const slot of dutiesData.slots) {
+  for (const day of dutiesData.days) {
+    const cell = dutiesData.table?.[slot]?.[day];
+    if (!cell || !Array.isArray(cell.duties)) continue;
+
+    cell.duties = cell.duties
+      .map(d => ({
+        location: String(d?.location || "").trim(),
+        teacher:  String(d?.teacher  || "").trim(),
+      }))
+      .filter(d => d.location || d.teacher);
+
+    if (!cell.duties.length) cell.duties = [ { location:"", teacher:"" } ];
+  }
+}
+
+await setDoc(doc(db,"teacherDuties","main"), {
+  days: dutiesData.days,
+  slots: dutiesData.slots,
+  table: dutiesData.table,
+  updatedAt: serverTimestamp(),
+  updatedBy: email
+}, { merge:true });
+
+
+      showMsg(saveMsg, "נשמר ✅ עכשיו תבדוק בפורטל מורים.", "ok");
+    }catch(err){
+      console.error("SAVE ERROR:", err);
+      showMsg(saveMsg, "שגיאה בשמירה: " + (err?.message || err?.code || "unknown"), "err");
+    }finally{
+      saveAllBtn.disabled = false;
+      saveAllBtn.textContent = "שמור הכל";
+    }
+  }
+
+  // ====== events ======
+  goTeachers.addEventListener("click", () => (window.location.href = "teachers.html"));
+
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    hideMsg(loginMsg);
+
+    const email = $("email").value.trim();
+    const pass = $("pass").value;
+
+    if (!email || !pass){
+      showMsg(loginMsg, "תמלא אימייל וסיסמה.", "err");
+      return;
+    }
+
+    try{
+      showMsg(loginMsg, "מתחבר...", "");
+      await signInWithEmailAndPassword(auth, email, pass);
+    }catch(err){
+      console.error("LOGIN ERROR:", err);
+      showMsg(loginMsg, "כניסה נכשלה: " + (err?.message || err?.code || "unknown"), "err");
+    }
+  });
+
+  logoutBtn.addEventListener("click", async () => {
+    await signOut(auth);
+  });
+
+  reloadBtn.addEventListener("click", async () => {
+    if (!currentUser || !canEdit) return;
+    showMsg(saveMsg, "טוען מחדש...", "");
+    await loadAll();
+    showMsg(saveMsg, "נטען ✅", "ok");
+    setTimeout(() => hideMsg(saveMsg), 1200);
+  });
+
+  saveAllBtn.addEventListener("click", saveAll);
+
+  addStaffBtn.addEventListener("click", () => {
+    const t = smTitle.value.trim();
+    const m = smMeta.value.trim();
+    const b = smBody.value.trim();
+    if (!t && !b) return;
+
+    portalData.staffMessages.unshift({ title:t, meta:m, body:b });
+    smTitle.value=""; smMeta.value=""; smBody.value="";
+    renderStaff();
+  });
+
+  addLinkBtn.addEventListener("click", () => {
+    const t = lnTitle.value.trim();
+    const u = lnUrl.value.trim();
+    const s = lnSub.value.trim();
+    if (!t || !u) return;
+
+    portalData.links.unshift({ title:t, url:u, subtitle:s });
+    lnTitle.value=""; lnUrl.value=""; lnSub.value="";
+    renderLinks();
+  });
+
+  // + שורה = מוסיף “הפסקה X”
+  addRowBtn.addEventListener("click", () => {
+    ensureDutiesShape();
+    const nextNum = dutiesData.slots.length + 1;
+    const newSlot = "הפסקה " + nextNum;
+    dutiesData.slots.push(newSlot);
+    dutiesData.table[newSlot] = {};
+    dutiesData.days.forEach((d) => dutiesData.table[newSlot][d] = { location:"", teacher:"" });
+    renderDuties();
+  });
+
+  // - שורה = מוחק את השורה האחרונה (לא נוגע בבוקר אם תרצה לנעול תגיד)
+  removeRowBtn.addEventListener("click", () => {
+    ensureDutiesShape();
+    if (!dutiesData.slots.length) return;
+    const last = dutiesData.slots.pop();
+    try { delete dutiesData.table[last]; } catch {}
+    renderDuties();
+  });
+
+  // ====== auth watcher ======
+  onAuthStateChanged(auth, async (user) => {
+    currentUser = user || null;
+    hideMsg(loginMsg);
+    hideMsg(saveMsg);
+
+    if (!user){
+      setWho("", false);
+      logoutBtn.classList.add("hide");
+      loginCard.classList.remove("hide");
+      editorCard.classList.add("hide");
+      return;
+    }
+
+    setWho(user.email || "", true);
+    logoutBtn.classList.remove("hide");
+
+    try{
+      canEdit = await canEditPortal(user);
+
+      if (!canEdit){
+        loginCard.classList.remove("hide");
+        editorCard.classList.add("hide");
+        showMsg(loginMsg, "מחובר אבל אין הרשאת עריכה. מותר רק DEV ומנהל/ת.", "warn");
+        return;
+      }
+
+      loginCard.classList.add("hide");
+      editorCard.classList.remove("hide");
+      await loadAll();
+      showMsg(saveMsg, "נטען ✅ אפשר לערוך ולשמור.", "ok");
+      setTimeout(() => hideMsg(saveMsg), 1200);
+
+    }catch(err){
+      console.error("EDITOR AUTH ERROR:", err);
+      loginCard.classList.remove("hide");
+      editorCard.classList.add("hide");
+      showMsg(loginMsg, "מחובר אבל אין גישה/Rules חוסמים: " + (err?.message || err?.code || "unknown"), "err");
+    }
+  });
+</script>
+
+</body>
+</html>
