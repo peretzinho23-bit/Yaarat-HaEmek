@@ -38,13 +38,16 @@ function norm(email) {
 }
 
 function normalizeRole(role) {
-const r = String(data?.role || "").toLowerCase();
-  // תומך גם בגרסאות ישנות
+  const r = String(role || "").trim().toLowerCase();
+
+  // תומך גם בגרסאות ישנות / עברית
+  if (r === "teacherpanel" || r === "teacher_panel" || r === "פאנל מורים") return "teacherpanel";
   if (r === "gradelead" || r === "grade_lead" || r === "אחראי שכבה") return "gradelead";
   if (r === "principal" || r === "מנהל" || r === "מנהלת") return "principal";
   if (r === "counselor" || r === "יועץ" || r === "יועצת") return "counselor";
   if (r === "teacher" || r === "מורה") return "teacher";
   if (r === "dev") return "dev";
+
   return r || "teacher";
 }
 
@@ -133,10 +136,16 @@ function getSecondaryAuth() {
 }
 
 /* =============================
-   🔥 REALTIME PERMISSION GUARD (ה“מיידי”)
-   אם מורידים הרשאה/מוחקים מסמך -> מעיף מיד
+   🔥 REALTIME PERMISSION GUARD
 ============================= */
 let unsubPerm = null;
+
+function stopRealtime() {
+  try { if (unsubReq) unsubReq(); } catch {}
+  try { if (unsubUsers) unsubUsers(); } catch {}
+  unsubReq = null;
+  unsubUsers = null;
+}
 
 function kick(msg = "אין לך יותר גישה") {
   alert(msg);
@@ -146,7 +155,6 @@ function kick(msg = "אין לך יותר גישה") {
   stopRealtime();
 
   signOut(auth).finally(() => {
-    // חזרה לדף התחברות DEV (תשנה אם אצלך זה שם אחר)
     window.location.href = "dev.html";
   });
 }
@@ -160,16 +168,14 @@ function startPermWatcher(user) {
   stopPermWatcher();
   if (!user) return;
 
-  const ref = doc(db, "adminUsers", user.uid);
+  const refDoc = doc(db, "adminUsers", user.uid);
 
-  unsubPerm = onSnapshot(ref, (snap) => {
-    // אם מחקת לו את המסמך -> אין גישה
+  unsubPerm = onSnapshot(refDoc, (snap) => {
     if (!snap.exists()) return kick("הגישה שלך בוטלה");
 
     const data = snap.data() || {};
     const role = normalizeRole(data.role);
 
-    // דף DEV בלבד: רק מנהל/אחראי שכבה/DEV
     if (!ALLOWED_ROLES_FOR_DEV_PANEL.includes(role)) {
       return kick("אין לך גישה לדף DEV (מותר רק מנהל / אחראי שכבה / DEV)");
     }
@@ -211,11 +217,11 @@ if (elLogout) {
 ============================= */
 async function ensureDevAdminUserDoc(user) {
   try {
-    const ref = doc(db, "adminUsers", user.uid);
-    const snap = await getDoc(ref);
+    const refDoc = doc(db, "adminUsers", user.uid);
+    const snap = await getDoc(refDoc);
     if (snap.exists()) return;
 
-    await setDoc(ref, {
+    await setDoc(refDoc, {
       email: user.email,
       fullName: "DEV",
       role: "dev",
@@ -247,12 +253,10 @@ onAuthStateChanged(auth, async (user) => {
   const email = norm(user.email);
   const isDevByEmail = DEV_EMAILS.includes(email);
 
-  // אם DEV לפי אימייל - ניצור מסמך אם חסר
   if (isDevByEmail) {
     await ensureDevAdminUserDoc(user);
   }
 
-  // קוראים role פעם אחת כדי להציג סטטוס + בדיקת כניסה ראשונית
   let role = null;
   try {
     const snap = await getDoc(doc(db, "adminUsers", user.uid));
@@ -261,7 +265,6 @@ onAuthStateChanged(auth, async (user) => {
     console.error("Failed reading adminUsers role:", e);
   }
 
-  // אם אין מסמך והוא לא DEV לפי אימייל -> אין גישה
   if (!role && !isDevByEmail) {
     if (elStatus) elStatus.textContent = "אין לך גישה";
     alert("אין לך גישה לדף DEV (חסר מסמך הרשאות)");
@@ -269,7 +272,6 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  // בדיקת כניסה: DEV לפי אימייל תמיד מותר, אחרת לפי role
   if (!isDevByEmail && !ALLOWED_ROLES_FOR_DEV_PANEL.includes(role)) {
     if (elStatus) elStatus.textContent = "אין לך גישה (מותר רק מנהל/אחראי שכבה/DEV)";
     alert("אין לך גישה לדף DEV (מותר רק מנהל / אחראי שכבה / DEV)");
@@ -277,14 +279,15 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  // 🔥 פה מתחיל המיידי: מאזין להרשאות של המשתמש
   startPermWatcher(user);
 
-  if (elStatus) elStatus.textContent = `מחובר: ${user.email} · תפקיד: ${roleLabel(role || (isDevByEmail ? "dev" : ""))}`;
+  if (elStatus) {
+    elStatus.textContent =
+      `מחובר: ${user.email} · תפקיד: ${roleLabel(role || (isDevByEmail ? "dev" : ""))}`;
+  }
   if (elLogin) elLogin.style.display = "none";
   if (elContent) elContent.style.display = "block";
 
-  // realtime של הטבלאות
   startRealtime();
 });
 
@@ -293,13 +296,6 @@ onAuthStateChanged(auth, async (user) => {
 ============================= */
 let unsubReq = null;
 let unsubUsers = null;
-
-function stopRealtime() {
-  try { if (unsubReq) unsubReq(); } catch {}
-  try { if (unsubUsers) unsubUsers(); } catch {}
-  unsubReq = null;
-  unsubUsers = null;
-}
 
 function startRealtime() {
   stopRealtime();
@@ -419,15 +415,13 @@ function renderRequestRow(r) {
 
   const roleSel = document.createElement("select");
   roleSel.className = "select";
-  // ✅ תפקידים אחידים (lowercase)
   roleSel.innerHTML = `
-  <option value="teacherpanel">פאנל מורים</option>
-  <option value="teacher">מורה</option>
-  <option value="gradelead">אחראי שכבה</option>
-  <option value="counselor">יועץ</option>
-  <option value="principal">מנהל</option>
-`;
-
+    <option value="teacherpanel">פאנל מורים</option>
+    <option value="teacher">מורה</option>
+    <option value="gradelead">אחראי שכבה</option>
+    <option value="counselor">יועץ</option>
+    <option value="principal">מנהל</option>
+  `;
 
   const chkWrap = document.createElement("div");
   chkWrap.className = "chkline";
@@ -463,20 +457,35 @@ function renderRequestRow(r) {
   msg.className = "small";
   msg.style.marginTop = "8px";
 
-  btnApprove.addEventListener("click", async () => {
-const role = normalizeRole(roleSel.value);
+  function syncReqGradesUI() {
+    const rrole = normalizeRole(roleSel.value);
+    const isTeacherPanel = (rrole === "teacherpanel");
 
-let grades = [];
-if (role !== "teacherpanel") {
-  grades = Array.from(chkWrap.querySelectorAll("input[type=checkbox]:checked")).map(c => c.value);
+    chkWrap.style.display = isTeacherPanel ? "none" : "";
 
-  if (grades.length === 0 && role !== "principal") {
-    alert("בחר לפחות שכבה אחת");
-    return;
+    if (isTeacherPanel) {
+      chkWrap.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false);
+    } else {
+      const anyChecked = !!chkWrap.querySelector('input[type="checkbox"]:checked');
+      if (!anyChecked) {
+        chkWrap.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = true);
+      }
+    }
   }
-}
+  roleSel.addEventListener("change", syncReqGradesUI);
+  syncReqGradesUI();
 
+  btnApprove.addEventListener("click", async () => {
+    const role = normalizeRole(roleSel.value);
 
+    let grades = [];
+    if (role !== "teacherpanel") {
+      grades = Array.from(chkWrap.querySelectorAll("input[type=checkbox]:checked")).map(c => c.value);
+      if (grades.length === 0 && role !== "principal") {
+        alert("בחר לפחות שכבה אחת");
+        return;
+      }
+    }
 
     msg.textContent = "יוצר משתמש...";
     try {
@@ -516,26 +525,6 @@ if (role !== "teacherpanel") {
       msg.textContent = "שגיאה: " + (e?.message || e);
     }
   });
-function syncReqGradesUI(){
-  const rrole = normalizeRole(roleSel.value);
-  const isTeacherPanel = (rrole === "teacherpanel");
-
-  // מסתיר שכבות אם זה "פאנל מורים"
-  chkWrap.style.display = isTeacherPanel ? "none" : "";
-
-  // אם זה פאנל מורים — מנקה בחירה כדי שלא ישמור שכבות בטעות
-  if (isTeacherPanel) {
-    chkWrap.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false);
-  } else {
-    // ברירת מחדל נחמדה: אם אף שכבה לא מסומנת — סמן הכל
-    const anyChecked = !!chkWrap.querySelector('input[type="checkbox"]:checked');
-    if (!anyChecked) {
-      chkWrap.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = true);
-    }
-  }
-}
-roleSel.addEventListener("change", syncReqGradesUI);
-syncReqGradesUI();
 
   act.appendChild(btnApprove);
   act.appendChild(btnReject);
@@ -551,7 +540,6 @@ syncReqGradesUI();
 }
 
 async function approveRequest(r, role, grades) {
-  // ✅ הגנה: רק מנהל/אחראי שכבה/DEV יכולים לאשר בקשות
   const meUid = auth.currentUser?.uid;
   const meEmail = norm(auth.currentUser?.email);
   const isDev = DEV_EMAILS.includes(meEmail);
@@ -583,36 +571,33 @@ async function approveRequest(r, role, grades) {
   }
 
   const uid = cred.user.uid;
+  const finalRole = normalizeRole(role);
 
-const finalRole = normalizeRole(role);
+  await setDoc(doc(db, "adminUsers", uid), {
+    email,
+    fullName: r.fullName || "",
+    role: finalRole,
+    allowedGrades:
+      (finalRole === "principal" || finalRole === "dev") ? ALL_GRADES :
+      (finalRole === "teacherpanel") ? [] :
+      grades,
+    createdAt: serverTimestamp(),
+    createdBy: auth.currentUser?.email || ""
+  });
 
-await setDoc(doc(db, "adminUsers", uid), {
-  email,
-  fullName: r.fullName || "",
-  role: finalRole,
-  allowedGrades:
-    (finalRole === "principal" || finalRole === "dev") ? ALL_GRADES :
-    (finalRole === "teacherpanel") ? [] :
-    grades,
-  createdAt: serverTimestamp(),
-  createdBy: auth.currentUser?.email || ""
-});
-
-
-await updateDoc(doc(db, "adminRequests", r.id), {
-  handled: true,
-  status: "approved",
-  approvedRole: finalRole,
-  approvedGrades:
-    (finalRole === "principal" || finalRole === "dev") ? ALL_GRADES :
-    (finalRole === "teacherpanel") ? [] :
-    grades,
-  handledAt: serverTimestamp(),
-  handledBy: auth.currentUser?.email || "",
-  approvedUid: uid
-});
-} // ✅ סוגר את approveRequest
-
+  await updateDoc(doc(db, "adminRequests", r.id), {
+    handled: true,
+    status: "approved",
+    approvedRole: finalRole,
+    approvedGrades:
+      (finalRole === "principal" || finalRole === "dev") ? ALL_GRADES :
+      (finalRole === "teacherpanel") ? [] :
+      grades,
+    handledAt: serverTimestamp(),
+    handledBy: auth.currentUser?.email || "",
+    approvedUid: uid
+  });
+}
 
 /* =============================
    Users (adminUsers)
@@ -664,7 +649,7 @@ function createRoleSelect(currentRole) {
   const canSeeDev = DEV_EMAILS.includes(norm(auth.currentUser?.email));
 
   sel.innerHTML = `
-  <option value="teacherpanel">פאנל מורים</option>
+    <option value="teacherpanel">פאנל מורים</option>
     <option value="teacher">מורה</option>
     <option value="gradelead">אחראי שכבה</option>
     <option value="counselor">יועץ</option>
@@ -674,7 +659,6 @@ function createRoleSelect(currentRole) {
 
   const normalized = normalizeRole(currentRole || "teacher");
   sel.value = (!canSeeDev && normalized === "dev") ? "principal" : normalized;
-if (r === "teacherpanel" || r === "teacher_panel" || r === "פאנל מורים") return "teacherpanel";
 
   return sel;
 }
@@ -800,27 +784,25 @@ function renderUserCard(u) {
   editor.appendChild(actionRow);
   wrap.appendChild(editor);
 
-function setGradesLockUI(role) {
-  const r = normalizeRole(role);
-  const lockAll = (r === "principal" || r === "dev");
-  const hideAll = (r === "teacherpanel");
+  function setGradesLockUI(role) {
+    const r = normalizeRole(role);
+    const lockAll = (r === "principal" || r === "dev");
+    const hideAll = (r === "teacherpanel");
 
-  gradesRow.style.display = hideAll ? "none" : "";
+    gradesRow.style.display = hideAll ? "none" : "";
 
-  chkWrap.querySelectorAll('input[type="checkbox"]').forEach((c) => {
-    if (hideAll) {
-      c.disabled = true;
-      c.checked = false;
-      return;
-    }
-    c.disabled = lockAll;
-    c.checked = lockAll ? true : c.checked;
-  });
-}
-
+    chkWrap.querySelectorAll('input[type="checkbox"]').forEach((c) => {
+      if (hideAll) {
+        c.disabled = true;
+        c.checked = false;
+        return;
+      }
+      c.disabled = lockAll;
+      c.checked = lockAll ? true : c.checked;
+    });
+  }
 
   setGradesLockUI(roleSel.value);
-
   roleSel.addEventListener("change", () => setGradesLockUI(roleSel.value));
 
   btnEdit.addEventListener("click", () => {
@@ -846,19 +828,18 @@ function setGradesLockUI(role) {
   btnSave.addEventListener("click", async () => {
     const newRole = normalizeRole(roleSel.value);
 
-let newGrades = [];
-if (newRole === "principal" || newRole === "dev") {
-  newGrades = ALL_GRADES;
-} else if (newRole === "teacherpanel") {
-  newGrades = [];
-} else {
-  newGrades = Array.from(chkWrap.querySelectorAll('input[type="checkbox"]:checked')).map((c) => c.value);
-  if (newGrades.length === 0) {
-    alert("בחר לפחות שכבה אחת");
-    return;
-  }
-}
-
+    let newGrades = [];
+    if (newRole === "principal" || newRole === "dev") {
+      newGrades = ALL_GRADES;
+    } else if (newRole === "teacherpanel") {
+      newGrades = [];
+    } else {
+      newGrades = Array.from(chkWrap.querySelectorAll('input[type="checkbox"]:checked')).map((c) => c.value);
+      if (newGrades.length === 0) {
+        alert("בחר לפחות שכבה אחת");
+        return;
+      }
+    }
 
     msg.textContent = "שומר...";
     try {
