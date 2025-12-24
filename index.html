@@ -695,6 +695,51 @@ html[data-theme="dark"].theme-changing .hero-home-cards .grade-card{
     0 0 0 3px rgba(57,217,138,.25),
     0 14px 34px rgba(34,197,94,.28);
 }
+.nav-spacer{
+  pointer-events: none;
+  opacity: 0;
+}
+#hero-main-title {
+  color: #0a0101;
+  text-shadow:
+    0 0 6px rgba(96,165,250,0.9),
+    0 0 16px rgba(96,165,250,0.7),
+    0 0 32px rgba(96,165,250,0.5);
+}
+
+#hero-main-body {
+  color: #00143a;
+  text-shadow:
+    0 0 4px rgba(82, 62, 62, 0.6);
+}
+#hero-main-title {
+  letter-spacing: 0.02em;
+}
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(146, 126, 126, 0.45),
+    rgba(211, 186, 186, 0.6)
+  );
+  z-index: 1;
+}
+[data-theme="dark"] .hero-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.65),
+    rgba(0,0,0,0.75)
+  );
+}
+[data-theme="dark"] #hero-main-body {
+  color: #ffffff;
+  text-shadow:
+    0 2px 4px rgba(3, 2, 2, 0.9),
+    0 0 14px rgba(15, 15, 24, 0.6),
+    0 0 28px rgba(36, 20, 20, 0.4);
+}
+
 
   </style>
 </head>
@@ -743,7 +788,6 @@ html[data-theme="dark"].theme-changing .hero-home-cards .grade-card{
       </div>
 
 <div class="nav-side nav-left-links">
-  <a href="index.html#contact">יצירת קשר</a>
   <a href="redirect-edu.html" class="personal-btn">למרחב האישי</a>
   <a href="admin.html" class="btn-outline">Admin</a>
   <a href="teachers.html" class="teacher-portal-btn">
