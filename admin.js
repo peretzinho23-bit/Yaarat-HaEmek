@@ -369,7 +369,7 @@ function initAuth() {
         currentPerms = await loadAdminPermissions(user);
 
         // ✅ רק אלה נכנסים לאדמין
-        const ADMIN_ROLES = ["dev", "principal", "admin"];
+const ADMIN_ROLES = ["teacher", "gradelead", "counselor", "principal", "dev", "admin"];
         const role = String(currentPerms?.role || "").trim().toLowerCase();
 
         if (!ADMIN_ROLES.includes(role)) {
