@@ -367,6 +367,12 @@ function initAuth() {
     if (user) {
       try {
         currentPerms = await loadAdminPermissions(user);
+// ❌ חסימה מוחלטת לפאנל מורים
+if (role === "teacherspanel" || role === "teacher_panel" || role === "פאנל מורים") {
+  alert("אין לך גישה לפאנל הניהול");
+  await signOut(auth);
+  return;
+}
 
         // ✅ רק אלה נכנסים לאדמין
 const ADMIN_ROLES = ["teacher", "gradelead", "counselor", "principal", "dev", "admin"];
