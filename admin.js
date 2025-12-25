@@ -194,11 +194,6 @@ async function loadAdminPermissions(user) {
   // DEV לפי אימייל - תמיד מאפשר
   if (DEV_EMAILS.includes(email)) {
     currentPerms = buildPermsFromRole("dev", ["z", "h", "t"]);
-const role = String(data.role || "").toLowerCase();
-if (role === "teacherspanel" || role === "פאנל מורים") {
-  currentPerms = null;
-  throw new Error("אין לך גישה לפאנל הניהול");
-}
 
     // ניצור doc אם אין עדיין (כדי שזה יהיה עקבי)
     try {
@@ -387,12 +382,7 @@ const ADMIN_ROLES = ["teacher", "gradelead", "counselor", "principal", "dev", "a
 
         // realtime guard
         startPermissionWatcher(user);
-const allowedRolesForAdmin = String(data.role || "").toLowerCase();
 
-// ❌ פאנל מורים לא נכנס לאדמין בכלל
-if (role === "teacherspanel" || role === "פאנל מורים") {
-  return kickToLogin("אין לך גישה לפאנל הניהול");
-}
 
         // כפתור DEV – רק למי שמותר לראות אותו
         const devBtn = document.getElementById("dev-btn");
