@@ -68,7 +68,7 @@ function startPermissionWatcher(user) {
     const role = String(data.role || "").toLowerCase();
 
     // roles שמותר להיכנס ל-admin
-    const allowedRolesForAdmin = ["teacher", "gradelead", "counselor", "principal", "dev", "admin"];
+const ADMIN_ROLES = ["teacher", "gradelead", "counselor", "principal", "dev", "admin"];
     if (!allowedRolesForAdmin.includes(role)) return kickToLogin("אין לך הרשאות");
   }, (err) => {
     console.error("perm snapshot error:", err);
