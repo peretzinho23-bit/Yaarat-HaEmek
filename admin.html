@@ -722,19 +722,21 @@ body.admin-page .card{
           </section>
 
           <!-- NEWS H -->
-          <section class="admin-grade-section" data-grade="h">
-            <div class="card">
-              <h3>שכבת ח'</h3>
-              <div id="admin-news-h" class="admin-list"></div>
+<label>כיתה</label>
+<select name="classId" required>
+  <option value="">בחר כיתה</option>
+  <option value="h1">ח1/7</option>
+  <option value="h4">ח4/8</option>
+  <option value="h5">ח5/9</option>
+  <option value="h6">ח6/10</option>
+</select>
 
-              <form id="news-form-h">
-                <label>כיתה</label>
-                <select name="classId" required>
-                  <option value="">בחר כיתה</option>
-                  <option value="h1">ח1/7</option>
-                  <option value="h4">ח4/8</option>
-                  <option value="h5">ח5/9</option>
-                  <option value="h6">ח6/10</option>
+<label style="display:flex;gap:8px;align-items:center;margin:8px 0;">
+  <input type="checkbox" name="sendAMT" />
+  שלח גם לעמ״ט (ח1+ח4+ח5)
+</label>
+
+
                 </select>
 
                 <label>כותרת</label>
@@ -1119,6 +1121,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   updateOneVisibleClass();
 });
+const themeBtn = document.getElementById("admin-theme-toggle");
+const navToggle = document.getElementById("navToggle");
 
 // ===== MOBILE MENU TOGGLE (admin) =====
 document.addEventListener("DOMContentLoaded", () => {
