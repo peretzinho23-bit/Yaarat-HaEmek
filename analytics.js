@@ -1,26 +1,22 @@
 // analytics.js – לוגים + דשבורד אנליטיקות ליערת העמק (Firestore)
-// ✅ analytics_pageViews = אגרגציה נקייה (מסמך אחד ליום+דף)
-// אופציונלי: analytics_events = לוג גולמי (כבוי)
+// ✅ FIX: תואם לחוקי Firestore שלך: analytics_pageViews מאפשר רק {dateKey,pageId,views}
+// ✅ ולכן אנחנו עושים CREATE קטן (addDoc) במקום setDoc+merge+increment (שדורש UPDATE ונחסם)
 
 import { db, auth } from "./firebase-config.js";
 
 import {
   collection,
   addDoc,
-  serverTimestamp,
   getDocs,
   query,
   orderBy,
   limit,
   doc,
-  setDoc,
-  increment,
   getDoc
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
 import {
-  onAuthStateChanged,
-  signInAnonymously
+  onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
 /* =============================
@@ -29,7 +25,7 @@ import {
 
 const PAGEVIEWS_COLLECTION = "analytics_pageViews";
 
-// RAW EVENTS (מומלץ להשאיר כבוי כדי לא ליצור מלא מסמכים)
+// RAW EVENTS (אם תרצה בעתיד)
 const EVENTS_COLLECTION = "analytics_events";
 const ENABLE_RAW_EVENTS = false;
 
@@ -69,12 +65,10 @@ function parseGradeClassFromURL() {
   const classId = safeLower(classIdRaw);
   let grade = safeLower(gradeRaw);
 
-  // אם אין grade אבל יש classId כמו z3 -> נחלץ ממנו
   if (!grade && classId && /^[zht]\d+$/i.test(classId)) {
     grade = classId[0];
   }
 
-  // data-* על ה-body תמיד מנצח
   const body = document.body;
   const bodyGrade = safeLower(body?.dataset?.grade || null);
   const bodyClassId = safeLower(body?.dataset?.classId || null);
@@ -104,10 +98,8 @@ function getPageKeyFromPath(pathname) {
   if (p.endsWith("/redirect-edu.html")) return "redirect-edu";
   if (p.endsWith("/register.html")) return "register";
 
-  // דשבורד
   if (p.endsWith("/analytics.html")) return "analytics-dashboard";
 
-  // fallback: שם הקובץ בלי .html
   const file = (p.split("/").pop() || "").trim();
   if (file.endsWith(".html")) return file.replace(".html", "");
   return "page";
@@ -124,7 +116,6 @@ function getPageMeta() {
 }
 
 function shouldSkipLogging(page) {
-  // לא רושמים צפיות לדשבורד אנליטיקס עצמו
   return page === "analytics-dashboard";
 }
 
@@ -156,81 +147,38 @@ function isPermissionDenied(err) {
 }
 
 /* =============================
-   AUTH: Try anonymous sign-in (helps if rules require auth)
-============================= */
-async function ensureAuthForAnalytics() {
-  try {
-    if (auth?.currentUser) return true;
-    // יצליח רק אם Anonymous Auth מופעל בפרויקט
-    await signInAnonymously(auth);
-    return true;
-  } catch (e) {
-    // לא שוברים כלום אם זה לא פעיל
-    console.warn("analytics: anonymous auth not available:", e?.code || e?.message || e);
-    return false;
-  }
-}
-
-/* =============================
-   1) LOG PAGE VIEW (AGGREGATED)
+   1) LOG PAGE VIEW (NOW: CREATE ONLY, RULES-SAFE)
+   ✅ writes ONLY: { dateKey, pageId, views }
 ============================= */
 
 async function logPageView() {
   try {
-    const { page, grade, classId } = getPageMeta();
+    const { page } = getPageMeta();
     if (shouldSkipLogging(page)) return;
     if (!canLogNow()) return;
 
-    // ננסה ליצור user אנונימי כדי לעבור rules שדורשות auth
-    await ensureAuthForAnalytics();
-
     const now = new Date();
     const dateKey = dateKeyLocal(now);
-    const hour = pad2(now.getHours());
-    const path = getPathWithQuery();
 
-    const docId = `${dateKey}__${page}`;
+    // ✅ תואם לחוקים שלך: רק 3 שדות!
+    await addDoc(pageviewsRef, {
+      dateKey,
+      pageId: page,
+      views: 1
+    });
 
-    await setDoc(
-      doc(db, PAGEVIEWS_COLLECTION, docId),
-      {
-        dateKey,
-        pageId: page,
-        views: increment(1),
-
-        lastPath: path,
-        lastHour: hour,
-        lastGrade: grade || null,
-        lastClassId: classId || null,
-
-        updatedAt: serverTimestamp(),
-      },
-      { merge: true }
-    );
-
+    // RAW EVENTS נשאר כבוי כברירת מחדל
     if (ENABLE_RAW_EVENTS) {
+      const { grade, classId } = getPageMeta();
       await addDoc(eventsRef, {
-        path,
-        pageId: page,
-        grade: grade || null,
-        classId: classId || null,
-        referrer: document.referrer || null,
-        userAgent: navigator.userAgent || null,
-        language: navigator.language || null,
-        screen: {
-          w: window.screen?.width || null,
-          h: window.screen?.height || null,
-        },
-        tzOffsetMin: new Date().getTimezoneOffset(),
         dateKey,
-        hour,
-        createdAt: serverTimestamp(),
-        createdAtClient: new Date().toISOString(),
+        pageId: page,
+        views: 1,
+        // אם תרצה RAW מלא – תצטרך להתאים חוקים ל-events (כרגע זה כבוי)
       });
     }
   } catch (err) {
     if (isPermissionDenied(err)) {
-      // שקט – לא מפילים אתר בגלל אנליטיקס
       console.warn("analytics: permission denied (log skipped)");
       return;
     }
@@ -239,7 +187,7 @@ async function logPageView() {
 }
 
 /* =============================
-   2) DASHBOARD (reads AGGREGATION)
+   2) DASHBOARD (reads pageViews)
 ============================= */
 
 function setText(id, value) {
@@ -249,8 +197,6 @@ function setText(id, value) {
 }
 
 async function canReadAnalyticsDashboard(user) {
-  // אם אין לך rules שמגינות על זה, תחזיר true.
-  // אם יש, נבדוק adminUsers role.
   try {
     const uid = user?.uid;
     if (!uid) return false;
@@ -273,6 +219,8 @@ async function loadAnalyticsDashboard() {
   try {
     const today = dateKeyLocal(new Date());
 
+    // הערה: בגלל שאנחנו יוצרים הרבה מסמכים, לא נטען "6000" אם זה גדל מאוד.
+    // אבל כרגע זה מספיק. אם תרצה, נעשה paging/פילטר לתאריך.
     const qViews = query(pageviewsRef, orderBy("dateKey", "desc"), limit(6000));
     const snap = await getDocs(qViews);
     const rows = snap.docs.map((d) => d.data());
@@ -302,9 +250,11 @@ async function loadAnalyticsDashboard() {
     setText("analytics-total-visits", totalViews);
     setText("analytics-today-visits", todayViews);
     setText("analytics-unique-pages", byPage.size);
+
+    // כרגע אין classId במסמכים האלה (בכוונה כדי להתאים לחוקים)
     setText("analytics-unique-classes", 0);
 
-    if (statusEl) statusEl.textContent = `נטענו ${rows.length} מסמכי סיכום.`;
+    if (statusEl) statusEl.textContent = `נטענו ${rows.length} אירועי צפייה.`;
   } catch (err) {
     console.error("שגיאה בטעינת האנליטיקות:", err);
     if (isPermissionDenied(err)) {
@@ -327,7 +277,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const finalPage = pageType || computed;
 
   if (finalPage === "analytics-dashboard") {
-    // דשבורד: נטען רק אחרי auth, כדי לא לקבל permission denied “סתם”
     onAuthStateChanged(auth, async (user) => {
       const statusEl = document.getElementById("analytics-status");
 
@@ -345,7 +294,6 @@ document.addEventListener("DOMContentLoaded", () => {
       await loadAnalyticsDashboard();
     });
   } else {
-    // כל שאר הדפים: לוג צפייה
     logPageView();
   }
 });
