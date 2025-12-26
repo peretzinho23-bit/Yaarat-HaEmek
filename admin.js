@@ -36,6 +36,12 @@ console.log("🔥 ADMIN.JS LOADED");
 
 // DEV שמותר לו הכל + גישה לדף dev.html
 const DEV_EMAILS = ["nadavp1119@gmail.com", "peretzinho23@gmail.com"].map((e) => e.toLowerCase());
+// מי רשאי להיכנס ל-admin.html (דף הניהול)
+const ADMIN_ROLES = ["teacher", "gradelead", "counselor", "principal", "dev", "admin"];
+
+// תפקידים שחסומים מכניסה לפאנל ניהול (אם אצלך יש "פאנל מורים" כתפקיד נפרד)
+const BLOCKED_ROLES = ["teacherspanel", "teacher_panel", "פאנל מורים"]
+  .map((r) => String(r).trim().toLowerCase());
 
 let currentPerms = null; // נטען אחרי התחברות
 let unsubPerm = null;    // realtime watcher להרשאות
@@ -60,21 +66,25 @@ function startPermissionWatcher(user) {
 
   const refDoc = doc(db, "adminUsers", user.uid);
 
-  unsubPerm = onSnapshot(refDoc, (snap) => {
-    // אם מחקת לו את המסמך -> אין גישה
-    if (!snap.exists()) return kickToLogin("הגישה שלך בוטלה");
+  unsubPerm = onSnapshot(
+    refDoc,
+    (snap) => {
+      // אם מחקת לו את המסמך -> אין גישה
+      if (!snap.exists()) return kickToLogin("הגישה שלך בוטלה");
 
-    const data = snap.data() || {};
-    const role = String(data.role || "").toLowerCase();
+      const data = snap.data() || {};
+      const role = String(data.role || "").trim().toLowerCase();
 
-    // roles שמותר להיכנס ל-admin
-const ADMIN_ROLES = ["teacher", "gradelead", "counselor", "principal", "dev", "admin"];
-    if (!allowedRolesForAdmin.includes(role)) return kickToLogin("אין לך הרשאות");
-  }, (err) => {
-    console.error("perm snapshot error:", err);
-    kickToLogin("שגיאת הרשאות (בדוק חוקים/קונסול)");
-  });
+      // roles שמותר להיכנס ל-admin
+      if (!ADMIN_ROLES.includes(role)) return kickToLogin("אין לך הרשאות");
+    },
+    (err) => {
+      console.error("perm snapshot error:", err);
+      kickToLogin("שגיאת הרשאות (בדוק חוקים/קונסול)");
+    }
+  );
 }
+
 
 function stopPermissionWatcher() {
   try { if (unsubPerm) unsubPerm(); } catch {}
@@ -329,7 +339,6 @@ function setupForgotPassword() {
   });
 }
 
-/* ------------ auth ------------ */
 function initAuth() {
   const loginForm = document.getElementById("login-form");
   const logoutBtn = document.getElementById("logout-btn");
@@ -342,7 +351,6 @@ function initAuth() {
     return;
   }
 
-  // חשוב: למנוע submit רגיל
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const email = loginForm.email.value.trim();
@@ -367,16 +375,15 @@ function initAuth() {
     if (user) {
       try {
         currentPerms = await loadAdminPermissions(user);
-// ❌ חסימה מוחלטת לפאנל מורים
-if (role === "teacherspanel" || role === "teacher_panel" || role === "פאנל מורים") {
-  alert("אין לך גישה לפאנל הניהול");
-  await signOut(auth);
-  return;
-}
 
-        // ✅ רק אלה נכנסים לאדמין
-const ADMIN_ROLES = ["teacher", "gradelead", "counselor", "principal", "dev", "admin"];
         const role = String(currentPerms?.role || "").trim().toLowerCase();
+        console.log("ROLE:", role, "EMAIL:", user.email);
+
+        if (BLOCKED_ROLES.includes(role)) {
+          alert("אין לך גישה לפאנל הניהול");
+          await signOut(auth);
+          return;
+        }
 
         if (!ADMIN_ROLES.includes(role)) {
           alert("אין לך הרשאה להיכנס לפאנל הניהול.");
@@ -385,34 +392,32 @@ const ADMIN_ROLES = ["teacher", "gradelead", "counselor", "principal", "dev", "a
         }
 
         applyPermissionsToUI();
-
-        // realtime guard
         startPermissionWatcher(user);
 
-
-        // כפתור DEV – רק למי שמותר לראות אותו
         const devBtn = document.getElementById("dev-btn");
         if (devBtn) {
-          const canSeeDev = ["dev", "principal"].includes(role); // ❗ gradelead הוצאתי כי זה לא אדמין
+          const canSeeDev = ["dev", "principal"].includes(role);
           devBtn.style.display = canSeeDev ? "inline-block" : "none";
         }
 
         statusEl.textContent = "מחובר כ: " + (user.email || "");
         loginSection.style.display = "none";
         adminSection.style.display = "block";
+
         await loadAllData();
       } catch (err) {
+        console.error("authState error:", err);
         alert("אין לך הרשאה להיכנס לפאנל הניהול.");
         await signOut(auth);
       }
     } else {
-      // לא מחובר
       statusEl.textContent = "לא מחובר";
       loginSection.style.display = "block";
       adminSection.style.display = "none";
     }
   });
-}
+} // ✅ סוף initAuth
+
 
 /* ------------ load everything ------------ */
 async function loadAllData() {
