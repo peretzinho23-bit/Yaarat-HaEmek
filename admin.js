@@ -251,7 +251,6 @@ const CLASS_IDS_BY_GRADE = {
   h: ["h1", "h4", "h5", "h6"],
   t: ["t1", "t2", "t3", "t4", "t5"]
 };
-const AMT_CLASS_IDS = ["h1", "h4", "h5"]; // עמ״ט (כיתה ח׳): שליחה ל-3 כיתות ביחד
 
 let newsData = { z: [], h: [], t: [] };
 let examsData = { z: [], h: [], t: [] };
@@ -584,7 +583,6 @@ function setupNewsForms() {
       const file1 = form.imageFile?.files?.[0] || null;
       const file2 = form.imageFile2?.files?.[0] || null;
 
-      // ✅ בדיקות בסיס
       if (!classId) {
         alert("חובה לבחור כיתה.");
         return;
@@ -620,50 +618,31 @@ function setupNewsForms() {
         // ייחודיות + מקסימום 2
         const finalImages = [...new Set(imageUrls.map(x => String(x).trim()).filter(Boolean))].slice(0, 2);
 
-        // ✅ AMT – רק אחרי שיש לנו finalImages+color (ובלי כפילויות)
-        const sendAMT = !!form.sendAMT?.checked;
-        let targetClassIds = [classId];
-
-        // אם זה שכבה ח׳ וסימנו “שלח לעמ״ט” → מוסיפים את שלושת הכיתות
-        if (g === "h" && sendAMT) {
-          targetClassIds = [...new Set([classId, ...AMT_CLASS_IDS])];
-        }
-
-        // ולידציה לכל הכיתות שנשלחות
-        for (const cid of targetClassIds) {
-          if (!CLASS_IDS_BY_GRADE[g].includes(cid)) {
-            alert("כיתה לא חוקית לשכבה הזאת: " + cid);
-            return;
-          }
-        }
+        const newItem = {
+          classId,            // ✅ הכי חשוב: חדשות לכיתה
+          title,
+          meta,
+          body,
+          color,
+          imageUrls: finalImages,
+          createdAt: new Date().toISOString()
+        };
 
         if (!newsData[g]) newsData[g] = [];
-
-        // ✅ יוצרים ידיעה לכל כיתה ב-target
-        for (const cid of targetClassIds) {
-          newsData[g].push({
-            classId: cid,
-            title,
-            meta,
-            body,
-            color,
-            imageUrls: finalImages,
-            createdAt: new Date().toISOString()
-          });
-        }
+        newsData[g].push(newItem);
 
         form.reset();
+        // נחזיר את הצבע לברירת מחדל כדי שלא “ייעלם”
         if (form.color) form.color.value = "#ffffff";
 
         renderNewsAdmin();
         await saveNewsGrade(g);
 
-        // לוג (נשאר אותו דבר בגדול, רק classId יכול להיות "מרובה")
         await logSystemChange("create", "news", {
           grade: g,
-          classId: (g === "h" && sendAMT) ? targetClassIds.join(",") : classId,
-          subject: title,
-          topic: body,
+          classId,
+          subject: newItem.title,
+          topic: newItem.body,
           itemsCount: newsData[g].length
         });
 
@@ -675,7 +654,6 @@ function setupNewsForms() {
     });
   }
 }
-
 
 /* ------------ EXAMS ------------ */
 
@@ -822,10 +800,8 @@ function setupExamForms() {
       const time = form.time ? form.time.value.trim() : "";
       const subject = form.subject.value.trim();
       const topic = form.topic.value.trim();
-
       const classIdRaw = form.classId ? form.classId.value.trim() : "";
       const classId = classIdRaw.toLowerCase();
-
       const imageUrl =
         (form.imageUrl && form.imageUrl.value && form.imageUrl.value.trim()) || "";
 
@@ -839,27 +815,10 @@ function setupExamForms() {
         return;
       }
 
-      // ✅ AMT – רק אחרי שיש imageUrl
-      const sendAMT = !!form.sendAMT?.checked;
-      let targetClassIds = [classId];
-
-      if (g === "h" && sendAMT) {
-        targetClassIds = [...new Set([classId, ...AMT_CLASS_IDS])];
-      }
-
-      for (const cid of targetClassIds) {
-        if (!CLASS_IDS_BY_GRADE[g].includes(cid)) {
-          alert("כיתה לא חוקית עבור השכבה הזאת: " + cid);
-          return;
-        }
-      }
+      const newExam = { date, time, subject, topic, classId, imageUrl };
 
       if (!examsData[g]) examsData[g] = [];
-
-      // ✅ מוסיפים מבחן לכל כיתה ב-target (וזהו—בלי push נוסף)
-      for (const cid of targetClassIds) {
-        examsData[g].push({ date, time, subject, topic, classId: cid, imageUrl });
-      }
+      examsData[g].push(newExam);
 
       try {
         form.reset();
@@ -868,11 +827,11 @@ function setupExamForms() {
 
         await logSystemChange("create", "exam", {
           grade: g,
-          classId: (g === "h" && sendAMT) ? targetClassIds.join(",") : classId,
-          subject,
-          date,
-          time,
-          topic,
+          classId: newExam.classId,
+          subject: newExam.subject,
+          date: newExam.date,
+          time: newExam.time,
+          topic: newExam.topic,
           itemsCount: examsData[g].length
         });
 
@@ -884,7 +843,6 @@ function setupExamForms() {
     });
   }
 }
-
 
 /* ------------ POLLS ------------ */
 
