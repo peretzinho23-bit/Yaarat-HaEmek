@@ -3992,3 +3992,41 @@ body.admin-page.register-page{
     overflow: hidden;
   }
 }
+#footer-text {
+  font-size: 1.15rem;   /* כמו Peretzinho */
+  font-weight: 800;
+  color: #000;
+  text-align: center;
+}
+
+.footer-devlink {
+  font-size: inherit;   /* בדיוק אותו גודל */
+  font-weight: 900;     /* טיפה יותר חזק */
+  color: #000;
+  text-decoration: none;
+  margin: 0 6px;
+}
+
+.footer-devlink:hover {
+  opacity: 0.75;
+}
+#footer-text {
+  font-size: 1.3rem;        /* גדול */
+  font-weight: 900;         /* הכי בולט */
+  color: #000;              /* שחור חזק */
+  letter-spacing: 0.4px;    /* פרימיום */
+  text-align: center;
+}
+
+.footer-devlink {
+  font-size: inherit;
+  font-weight: 900;
+  color: #000;
+  text-decoration: none;
+  margin: 0 8px;
+  text-transform: uppercase; /* נותן כוח */
+}
+
+.footer-devlink:hover {
+  opacity: 0.8;
+}

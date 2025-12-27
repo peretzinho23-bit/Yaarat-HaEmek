@@ -8,6 +8,7 @@ const CLASS_IDS_BY_GRADE = {
   z: ["z1", "z2", "z3", "z4", "z5"],
   h: ["h1", "h4", "h5", "h6"],
   t: ["t1", "t2", "t3", "t4", "t5"]
+  
 };
 
 const DAYS = [
