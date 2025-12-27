@@ -410,7 +410,7 @@ onAuthStateChanged(auth, async (user) => {
       allowed,
       reason: allowed
         ? ""
-        : "מחובר ✅ אבל אין הרשאה לפורטל. צריך: (adminUsers.role = teacher/gradelead/counselor/principal/dev) או teacherAllow active:true."
+        : "מחובר ✅ אבל אין לך יותר גישה לדף האדמין/המורים"
     });
 
     // אם מותר -> מפעילים realtime
