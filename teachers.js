@@ -437,6 +437,121 @@ onAuthStateChanged(auth, async (user) => {
     showBanner("מחובר, אבל לא הצלחתי לבדוק הרשאה (בדוק Rules/Console).");
   }
 });
+/* =========================
+   DUTY COUNTDOWN (HH:MM:SS)
+========================= */
+/* =========================
+   DUTIES COUNTDOWN (weekly + days)
+   ========================= */
+
+const DUTY_SLOTS = {
+  "בוקר":    { start: "07:40", end: "08:10" },
+  "הפסקה 1": { start: "09:40", end: "10:00" },
+  "הפסקה1":  { start: "09:40", end: "10:00" },
+  "הפסקה 2": { start: "11:45", end: "12:00" },
+  "הפסקה2":  { start: "11:45", end: "12:00" },
+  "הפסקה 3": { start: "13:30", end: "13:45" },
+  "הפסקה3":  { start: "13:30", end: "13:45" },
+};
+
+const HEB_DAY_TO_JS = { "א": 0, "ב": 1, "ג": 2, "ד": 3, "ה": 4, "ו": 5 }; // א=Sunday
+
+let dutyTimer = null;
+
+function parseHM(hm) {
+  const [h, m] = String(hm).split(":").map(n => parseInt(n, 10));
+  return { h: h || 0, m: m || 0 };
+}
+
+function setToWeekdayAndTime(baseNow, targetJsDow, hm) {
+  const { h, m } = parseHM(hm);
+  const d = new Date(baseNow);
+  d.setSeconds(0, 0);
+
+  const nowDow = d.getDay(); // 0=Sun
+  let addDays = targetJsDow - nowDow;
+  if (addDays < 0) addDays += 7;
+
+  d.setDate(d.getDate() + addDays);
+  d.setHours(h, m, 0, 0);
+
+  return d;
+}
+
+function nextWindowForSlot(dayHeb, slotName, now = new Date()) {
+  const jsDow = HEB_DAY_TO_JS[dayHeb];
+  const cfg = DUTY_SLOTS[slotName];
+  if (jsDow == null || !cfg) return null;
+
+  let start = setToWeekdayAndTime(now, jsDow, cfg.start);
+  let end   = setToWeekdayAndTime(now, jsDow, cfg.end);
+
+  // אם עברנו את הסוף השבועי הנוכחי -> קופצים לשבוע הבא
+  if (now > end) {
+    start = new Date(start.getTime() + 7 * 24 * 60 * 60 * 1000);
+    end   = new Date(end.getTime() + 7 * 24 * 60 * 60 * 1000);
+  }
+
+  // אם היום נכון אבל עדיין לפני ההתחלה -> נשאר באותו שבוע
+  return { start, end };
+}
+
+function formatDiff(ms) {
+  const totalSec = Math.max(0, Math.floor(ms / 1000));
+  const days = Math.floor(totalSec / 86400);
+  const rem = totalSec % 86400;
+
+  const hh = String(Math.floor(rem / 3600)).padStart(2, "0");
+  const mm = String(Math.floor((rem % 3600) / 60)).padStart(2, "0");
+  const ss = String(rem % 60).padStart(2, "0");
+
+  // מציג ימים רק אם יש
+  return days > 0 ? `${days}d ${hh}:${mm}:${ss}` : `${hh}:${mm}:${ss}`;
+}
+
+function startDutyCountdownsIn(container) {
+  if (!container) return;
+
+const items = container.querySelectorAll(".t-duty-card[data-duty-day][data-duty-slot]");
+
+// תמיד מנקים טיימר קודם
+if (dutyTimer) clearInterval(dutyTimer);
+dutyTimer = null;
+
+if (!items.length) return;
+
+  const tick = () => {
+    const now = new Date();
+
+    items.forEach(card => {
+      const dayHeb = card.dataset.dutyDay;
+      const slot = card.dataset.dutySlot;
+
+      const box = card.querySelector(".duty-countdown");
+      if (!box) return;
+
+      const w = nextWindowForSlot(dayHeb, slot, now);
+      if (!w) { box.textContent = ""; return; }
+
+      if (now < w.start) {
+        box.textContent = `מתחיל בעוד ${formatDiff(w.start - now)}`;
+      } else if (now >= w.start && now <= w.end) {
+        box.textContent = `עכשיו בתורנות · נגמר בעוד ${formatDiff(w.end - now)}`;
+      } else {
+        // אמור כמעט לא לקרות כי nextWindow כבר דוחף לשבוע הבא, אבל נשאיר
+        box.textContent = `הסתיים`;
+      }
+    });
+  };
+
+  tick();
+  dutyTimer = setInterval(tick, 1000);
+}
+
+console.log(
+  "COUNTDOWN READY:",
+  document.querySelectorAll(".t-duty-card").length
+);
 
 function startDutiesRealtime() {
   // אם כבר מאזין – סוגרים
@@ -459,7 +574,10 @@ function renderDutiesForDay(day) {
   tDutiesWrap.innerHTML = "";
   if (tDutiesEmpty) tDutiesEmpty.style.display = "none";
 
-  const slots = Array.isArray(dutiesData?.slots) ? dutiesData.slots : ["בוקר", "הפסקה 1", "הפסקה 2", "הפסקה 3"];
+  const slots = Array.isArray(dutiesData?.slots)
+    ? dutiesData.slots
+    : ["בוקר", "הפסקה 1", "הפסקה 2", "הפסקה 3"];
+
   const table = dutiesData?.table && typeof dutiesData.table === "object" ? dutiesData.table : {};
 
   let any = false;
@@ -481,11 +599,21 @@ function renderDutiesForDay(day) {
 
     const card = document.createElement("div");
     card.className = "t-duty-card";
+    // ✅ פה הקסם: data-duty-day + data-duty-slot
+    card.dataset.dutyDay = day;
+    card.dataset.dutySlot = slot;
+
     card.innerHTML = `
       <div class="t-duty-head">
         <div class="t-duty-slot">${escapeHtml(slot)}</div>
         <div class="t-duty-chip">יום ${escapeHtml(day)}׳</div>
       </div>
+
+      <!-- ✅ טיימר -->
+<div class="duty-countdown"
+     style="font-weight:900; margin:8px 0 6px; font-size:15px; color:#fff; opacity:0.95;">
+</div>
+
       <div class="t-duty-list">
         ${clean.map(d => `
           <div class="t-duty-item">
@@ -508,7 +636,11 @@ function renderDutiesForDay(day) {
   });
 
   if (!any && tDutiesEmpty) tDutiesEmpty.style.display = "";
+  
+  // ✅ מפעיל/מעדכן את הטיימרים אחרי הרינדור
+  startDutyCountdownsIn(tDutiesWrap);
 }
+
 
 tDayBar?.addEventListener("click", (e) => {
   const btn = e.target.closest(".t-daybtn");
