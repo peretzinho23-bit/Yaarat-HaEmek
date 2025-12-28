@@ -6,6 +6,7 @@
   <title>עריכת פורטל מורים · יערת העמק</title>
 
   <style>
+
     :root{
       --bg:#070a12;
       --card:#0c1222;
@@ -218,8 +219,97 @@
       padding:8px 10px;border-radius:12px;
       font-size:12px;font-weight:900;
     }
+/* =========================
+   DESKTOP: DUTIES = FULL WIDTH (REAL)
+   ========================= */
+
+/* במובייל/ברירת מחדל - הכל נשאר בתוך wrap */
+.editor-duties-full{
+  width: 100%;
+}
+
+/* רק בדסקטופ: מוציאים את התורנויות מה-wrap בלי לשבור layout */
+@media (min-width: 920px){
+
+  /* חשוב: להחזיר wrap להיות “כמעט full” כדי שלא יהיה פס */
+  .wrap{
+    max-width: 1400px; /* תרגיש חופשי להעלות ל-1600 */
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  /* ועכשיו התורנויות באמת תופסת שורה מלאה */
+  .editor-duties-full{
+    grid-column: 1 / -1;
+  }
+
+  /* הטבלה עצמה */
+  .editor-duties-full .table-wrap{
+    overflow: auto;
+  }
+
+  .editor-duties-full table{
+    min-width: 1200px; /* נותן רוחב יפה */
+  }
+}
+
+/* אם אתה רוצה FULL SCREEN אמיתי (100% מסך) בדסקטופ – בלי 100vw hacks */
+@media (min-width: 1200px){
+  .wrap{
+    max-width: 100%;
+  }
+}
+/* =========================
+   DUTIES FULL-WIDTH FIX (FINAL)
+   ========================= */
+
+/* בדסקטופ – שהגריד והעטיפה יהיו 100% מסך בלי שוליים מציקים */
+@media (min-width: 920px){
+  .wrap{
+    max-width: 100%;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .wrap.grid{
+    width: 100%;
+    margin: 0;
+  }
+
+  /* בלוק התורנויות על כל הרוחב */
+  .editor-duties-full{
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .editor-duties-full .duties-wrap{
+    width: 100%;
+  }
+
+  /* הטבלה תתפוס רוחב מסך במקום להישאר "קטנה" */
+  .editor-duties-full table{
+    width: 100%;
+    min-width: 0;        /* זה ה-KEY */
+  }
+
+  /* אם יש פחות עמודות וזה נראה "ריק" – מחלק רוחב יפה */
+  .editor-duties-full th,
+  .editor-duties-full td{
+    width: calc(100% / 7);
+  }
+}
+
+/* במובייל – נשאיר גלילה אופקית (כמו אצלך) */
+@media (max-width: 919px){
+  .table-wrap{ overflow-x: auto; }
+  table{ min-width: 720px; }
+}
+
+
+
   </style>
 </head>
+
 
 <body>
   <div class="topbar">
@@ -266,7 +356,7 @@
     </section>
 
     <!-- EDITOR -->
-    <section id="editorCard" class="card hide">
+<section id="editorCard" class="card hide editor-card">
       <div class="card-h">
         <div>
           <p class="t">עריכת תוכן הפורטל</p>
@@ -343,7 +433,7 @@
         <h3 style="margin:0 0 8px;font-size:13.5px;font-weight:900;">תורנויות (מערכת)</h3>
         <div class="mini">נשמר בתוך <b>teacherDuties/main</b>. הטבלה ניתנת לגלילה אופקית במובייל.</div>
 
-        <div class="duties-wrap" style="margin-top:10px;">
+<div class="duties-wrap duties-full editor-duties-full" style="margin-top:10px;">
           <div class="duties-head">
             <div>
               <div class="duties-title">טבלת תורנויות</div>
