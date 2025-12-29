@@ -12,15 +12,12 @@
       color: white;
       font-family: system-ui, sans-serif;
       padding: 20px;
-      margin: 0;
     }
 
     h1 {
       text-align: center;
-      margin: 10px 0 20px;
+      margin-bottom: 20px;
       color: #38bdf8;
-      font-weight: 900;
-      letter-spacing: .2px;
     }
 
     .status {
@@ -35,27 +32,64 @@
       color: #f97373;
     }
 
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: #1e293b;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #334155;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    th {
+      background: #020617;
+      color: #38bdf8;
+    }
+
+    tr:hover {
+      background: #334155;
+    }
+
+    .action-create {
+      color: #4ade80;
+      font-weight: 600;
+    }
+    .action-update{
+      color:#fbbf24;
+      font-weight: 600;
+    }
+    .action-delete {
+      color: #f87171;
+      font-weight: 600;
+    }
+
     .filters {
-      margin: 14px auto 18px;
+      margin-bottom: 20px;
       display: flex;
-      gap: 12px;
+      gap: 15px;
       justify-content: center;
       flex-wrap: wrap;
-      max-width: 1100px;
     }
 
     select {
-      padding: 8px 10px;
-      border-radius: 10px;
+      padding: 8px;
+      border-radius: 6px;
       background: #1e293b;
       color: white;
       border: 1px solid #475569;
-      min-width: 140px;
-      outline: none;
+      min-width: 130px;
     }
-    select:focus{ border-color:#38bdf8; box-shadow:0 0 0 3px rgba(56,189,248,.18); }
 
-    .hidden { display: none; }
+    .hidden {
+      display: none;
+    }
 
     .btn-link {
       display: inline-block;
@@ -67,59 +101,6 @@
       text-decoration: none;
       font-size: 0.9rem;
     }
-
-    /* responsive table wrapper */
-    .table-wrap{
-      max-width: 1200px;
-      margin: 0 auto;
-      overflow: auto;
-      border-radius: 12px;
-      border: 1px solid #334155;
-      background: #1e293b;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 980px;
-      table-layout: fixed;
-    }
-
-    th, td {
-      padding: 12px;
-      border-bottom: 1px solid #334155;
-      text-align: center;
-      font-size: 0.9rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    th {
-      background: #020617;
-      color: #38bdf8;
-      position: sticky;
-      top: 0;
-      z-index: 1;
-      font-weight: 800;
-    }
-
-    tr:hover { background: #334155; }
-
-    .action-create { color: #4ade80; font-weight: 800; }
-    .action-update { color: #fbbf24; font-weight: 800; }
-    .action-delete { color: #f87171; font-weight: 800; }
-
-    /* nicer width per column */
-    th:nth-child(1), td:nth-child(1){ width: 90px; }   /* סוג */
-    th:nth-child(2), td:nth-child(2){ width: 90px; }   /* פעולה */
-    th:nth-child(3), td:nth-child(3){ width: 70px; }   /* שכבה */
-    th:nth-child(4), td:nth-child(4){ width: 80px; }   /* כיתה */
-    th:nth-child(5), td:nth-child(5){ width: 190px; }  /* כותרת */
-    th:nth-child(6), td:nth-child(6){ width: 210px; }  /* מידע */
-    th:nth-child(7), td:nth-child(7){ width: 190px; }  /* מנהל */
-    th:nth-child(8), td:nth-child(8){ width: 170px; }  /* זמן */
-
   </style>
 </head>
 
@@ -153,24 +134,23 @@
     </select>
   </div>
 
-  <div id="tableWrap" class="table-wrap hidden">
-    <table id="logs-table">
-      <thead>
-        <tr>
-          <th>סוג</th>
-          <th>פעולה</th>
-          <th>שכבה</th>
-          <th>כיתה</th>
-          <th>כותרת / מקצוע</th>
-          <th>תאריך המבחן / מידע</th>
-          <th>מנהל שביצע</th>
-          <th>זמן פעולה</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
+  <table id="logs-table" class="hidden">
+    <thead>
+      <tr>
+        <th>סוג</th>
+        <th>פעולה</th>
+        <th>שכבה</th>
+        <th>כיתה</th>
+        <th>כותרת / מקצוע</th>
+        <th>תאריך המבחן / מידע</th>
+        <th>מנהל שביצע</th>
+        <th>זמן פעולה</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
+  <!-- Firebase -->
   <script type="module">
     import { db, auth } from "./firebase-config.js";
     import {
@@ -183,7 +163,9 @@
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
     // 🔒 רק אתה יכול לראות את הלוגים
-    const OWNER_EMAILS = ["nadavp1119@gmail.com"].map(x => x.toLowerCase());
+    const OWNER_EMAILS = [
+      "nadavp1119@gmail.com"
+    ].map(x => String(x).toLowerCase());
 
     const tableBody = document.querySelector("#logs-table tbody");
     const filterAction = document.getElementById("filter-action");
@@ -191,10 +173,10 @@
     const filterEntity = document.getElementById("filter-entity");
     const statusEl = document.getElementById("status");
     const filtersEl = document.getElementById("filters");
-    const tableWrap = document.getElementById("tableWrap");
+    const tableEl = document.getElementById("logs-table");
 
     let allLogs = [];
-    let unsub = null;
+    let unsubLogs = null;
 
     function formatTimestamp(ts) {
       try{
@@ -211,9 +193,9 @@
       switch (entity) {
         case "exam": return "מבחן";
         case "news": return "חדשות";
-        case "board": return "לוח";
-        case "siteContent": return "תוכן";
-        case "adminRequest": return "בקשה";
+        case "board": return "לוח מודעות";
+        case "siteContent": return "תוכן אתר";
+        case "adminRequest": return "בקשת אדמין";
         default: return entity || "-";
       }
     }
@@ -223,12 +205,6 @@
       if (action === "update") return "עדכון";
       if (action === "delete") return "מחיקה";
       return action || "-";
-    }
-
-    function esc(s){
-      return String(s ?? "")
-        .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;").replaceAll("'","&#039;");
     }
 
     function renderLogs(logs) {
@@ -248,25 +224,26 @@
         const actionText = humanAction(log.action);
 
         const mainLabel = log.subject || "-";
-
         const extraInfo =
           log.entity === "exam"
             ? (log.date || "-")
-            : (log.entity === "news" || log.entity === "board" || log.entity === "adminRequest")
-              ? (log.topic ? String(log.topic).slice(0, 60) + (String(log.topic).length > 60 ? "..." : "") : "-")
+            : log.entity === "news" || log.entity === "board"
+              ? (log.topic ? String(log.topic).slice(0, 40) + (String(log.topic).length > 40 ? "..." : "") : "-")
               : log.entity === "siteContent"
                 ? "עדכון תוכן האתר"
-                : (log.date || "-");
+                : log.entity === "adminRequest"
+                  ? (log.topic ? String(log.topic).slice(0, 40) + (String(log.topic).length > 40 ? "..." : "") : "-")
+                  : (log.date || "-");
 
         tr.innerHTML = `
-          <td title="${esc(log.entity || "")}">${esc(entityText)}</td>
-          <td class="action-${esc(log.action || "")}" title="${esc(log.action || "")}">${esc(actionText)}</td>
-          <td>${esc(log.grade || "-")}</td>
-          <td>${esc(log.classId || "-")}</td>
-          <td title="${esc(mainLabel)}">${esc(mainLabel)}</td>
-          <td title="${esc(extraInfo)}">${esc(extraInfo)}</td>
-          <td title="${esc(log.adminEmail || "-")}">${esc(log.adminEmail || "-")}</td>
-          <td>${esc(formatTimestamp(log.createdAt))}</td>
+          <td>${entityText}</td>
+          <td class="action-${log.action || ""}">${actionText}</td>
+          <td>${log.grade || "-"}</td>
+          <td>${log.classId || "-"}</td>
+          <td>${mainLabel}</td>
+          <td>${extraInfo}</td>
+          <td>${log.adminEmail || "-"}</td>
+          <td>${formatTimestamp(log.createdAt)}</td>
         `;
 
         tableBody.appendChild(tr);
@@ -284,33 +261,35 @@
     }
 
     function initLogsListener() {
-      // 🔥 זה שם הקולקשן שלך לפי התמונה:
-      const COL = "exams_logs";
+      // מונע מאזין כפול
+      if (unsubLogs) { try { unsubLogs(); } catch {} unsubLogs = null; }
+
+      statusEl.classList.remove("error");
+      statusEl.textContent = "טוען לוגים...";
 
       const qLogs = query(
-        collection(db, COL),
+        collection(db, "exams_logs"),
         orderBy("createdAt", "desc"),
         limit(300)
       );
 
-      statusEl.textContent = "טוען לוגים...";
-      if (unsub) unsub();
-
-      unsub = onSnapshot(qLogs, (snapshot) => {
-        allLogs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      unsubLogs = onSnapshot(qLogs, (snapshot) => {
+        allLogs = snapshot.docs.map((d) => d.data());
         statusEl.textContent = `נטענו ${snapshot.size} לוגים ✅`;
         applyFilters();
       }, (err) => {
-        console.error("LOGS ERROR:", err);
+        console.error("LOGS SNAPSHOT ERROR:", err);
         statusEl.classList.add("error");
-        statusEl.textContent = "שגיאה בטעינת לוגים: " + (err?.message || err);
-        tableWrap.classList.add("hidden");
+        statusEl.textContent = "שגיאה בטעינת לוגים: " + (err?.message || err?.code || "unknown");
+        // משאיר את הטבלה קיימת אבל מוסתרת כדי שלא יראה "ריק" בלי הסבר
+        tableEl.classList.add("hidden");
         filtersEl.classList.add("hidden");
       });
     }
 
     onAuthStateChanged(auth, (user) => {
-      statusEl.classList.remove("error");
+      // נקה מאזין אם יצאת
+      if (!user && unsubLogs) { try { unsubLogs(); } catch {} unsubLogs = null; }
 
       if (!user) {
         statusEl.classList.add("error");
@@ -321,8 +300,7 @@
           <a class="btn-link" href="admin.html">לעמוד ההתחברות</a>
         `;
         filtersEl.classList.add("hidden");
-        tableWrap.classList.add("hidden");
-        if (unsub) unsub();
+        tableEl.classList.add("hidden");
         return;
       }
 
@@ -336,15 +314,15 @@
           רק בעל המערכת יכול לראות אותם.
         `;
         filtersEl.classList.add("hidden");
-        tableWrap.classList.add("hidden");
-        if (unsub) unsub();
+        tableEl.classList.add("hidden");
         return;
       }
 
-      // מחובר ומורשה
+      statusEl.classList.remove("error");
       statusEl.textContent = "מחובר כ: " + email;
       filtersEl.classList.remove("hidden");
-      tableWrap.classList.remove("hidden");
+      tableEl.classList.remove("hidden");
+
       initLogsListener();
     });
 
@@ -354,5 +332,6 @@
   </script>
 
   <script type="module" src="/analytics.js"></script>
+
 </body>
 </html>
