@@ -1,8 +1,6 @@
+// reset-password.js
 import { auth } from "./firebase-config.js";
-import {
-  sendPasswordResetEmail,
-  fetchSignInMethodsForEmail
-} from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+import { sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
 console.log("✅ reset-password.js loaded");
 
@@ -10,47 +8,89 @@ const form = document.getElementById("reset-form");
 const emailInput = document.getElementById("reset-email");
 const statusEl = document.getElementById("reset-status");
 
+const LOG_ENDPOINT =
+  "https://europe-west1-yaarat-haemek.cloudfunctions.net/logResetRequest";
+
+let submitting = false;
+
 function setStatus(text, type = "") {
+  if (!statusEl) return;
   statusEl.textContent = text || "";
   statusEl.classList.remove("loading", "success", "error");
   if (type) statusEl.classList.add(type);
 }
 
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
+function normalizeEmail(v) {
+  return String(v || "").trim().toLowerCase();
+}
 
-  const email = (emailInput.value || "").trim().toLowerCase();
-  if (!email) return setStatus("תכניס אימייל.", "error");
-
+async function postLog(email) {
+  // לוג לא אמור להפיל את התהליך לעולם
   try {
-    setStatus("בודק את האימייל...", "loading");
+    const payload = {
+      email: normalizeEmail(email),
+      // לא חובה, אבל סבבה שיהיה גם בצד שלך
+      when: Date.now(),
+      path: location.pathname,
+      userAgent: navigator.userAgent,
+    };
 
-    // ✅ בדיקה שהמייל קיים במערכת (אתה ביקשת)
-    const methods = await fetchSignInMethodsForEmail(auth, email);
-    if (!methods || methods.length === 0) {
-      setStatus("האימייל הזה לא נמצא במערכת.", "error");
+    // Keepalive = גם אם המשתמש עובר עמוד מהר, הבקשה תנסה לצאת
+    await fetch(LOG_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      keepalive: true,
+    });
+  } catch (e) {
+    console.warn("logResetRequest failed:", e);
+  }
+}
+
+// אם חסרים אלמנטים, אל תפיל את כל האתר
+if (!form || !emailInput || !statusEl) {
+  console.error("❌ reset-password.js missing elements:", { form, emailInput, statusEl });
+} else {
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (submitting) return;
+
+    const email = normalizeEmail(emailInput.value);
+    if (!email) {
+      setStatus("תכניס אימייל.", "error");
       return;
     }
 
-    setStatus("שולח קישור איפוס...", "loading");
+    submitting = true;
+    const btn = form.querySelector('button[type="submit"]');
+    if (btn) btn.disabled = true;
 
-    // ✅ שולח קישור לדף שלך (B)
-    const actionCodeSettings = {
-      url: `${location.origin}/reset-confirm.html`,
-      handleCodeInApp: true,
-    };
+    try {
+      setStatus("שולח קישור איפוס...", "loading");
 
-    await sendPasswordResetEmail(auth, email, actionCodeSettings);
+      // שולח מייל איפוס (אם לא קיים -> יזרוק user-not-found אצלך)
+      await sendPasswordResetEmail(auth, email);
 
-    setStatus("✅ נשלח קישור איפוס למייל. בדוק ספאם.", "success");
-  } catch (err) {
-    console.error("❌ reset error:", err);
-    const code = err?.code || "";
-    let msg = "שגיאה בשליחה. נסה שוב.";
-    if (code === "auth/invalid-email") msg = "האימייל לא תקין.";
-    if (code === "auth/too-many-requests") msg = "יותר מדי ניסיונות. חכה קצת.";
-    if (code === "auth/network-request-failed") msg = "בעיה ברשת. נסה שוב.";
-    if (code === "auth/operation-not-allowed") msg = "איפוס סיסמה לא מופעל בפיירבייס.";
-    setStatus(msg, "error");
-  }
-});
+      // רק אחרי הצלחה – לוג עם IP מהשרת
+      postLog(email); // לא await בכוונה: שלא יעכב UI
+
+      setStatus("✅ נשלח קישור איפוס למייל", "success");
+    } catch (err) {
+      console.error("❌ reset error:", err);
+
+      let msg = "שגיאה בשליחה. בדוק את האימייל ונסה שוב.";
+      const code = err?.code || "";
+
+      if (code === "auth/invalid-email") msg = "האימייל לא תקין.";
+      else if (code === "auth/missing-email") msg = "חסר אימייל.";
+      else if (code === "auth/user-not-found") msg = "האימייל הזה לא נמצא במערכת.";
+      else if (code === "auth/too-many-requests") msg = "יותר מדי ניסיונות. חכה קצת ונסה שוב.";
+      else if (code === "auth/network-request-failed") msg = "בעיה ברשת. נסה שוב.";
+
+      setStatus(msg, "error");
+    } finally {
+      submitting = false;
+      if (btn) btn.disabled = false;
+    }
+  });
+}

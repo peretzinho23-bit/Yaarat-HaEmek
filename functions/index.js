@@ -2,6 +2,7 @@ const admin = require("firebase-admin");
 admin.initializeApp();
 
 const { onDocumentCreated } = require("firebase-functions/v2/firestore");
+const { onCall, onRequest } = require("firebase-functions/v2/https");
 const logger = require("firebase-functions/logger");
 
 // ❗ שים פה WEBHOOK חדש (אחרי שהחלפת בדיסקורד)
@@ -35,6 +36,9 @@ function humanAction(action) {
   return action || "-";
 }
 
+// =========================
+// 1) Discord notify על exams_logs (כמו שהיה)
+// =========================
 exports.notifyOnNewLog = onDocumentCreated(
   {
     region: "europe-west1",
@@ -90,6 +94,46 @@ exports.notifyOnNewLog = onDocumentCreated(
       }
     } catch (e) {
       logger.error("Discord webhook error:", e);
+    }
+  }
+);
+
+// =========================
+// 2) ✅ הדבר שאתה רוצה: לוג על "שלח איפוס סיסמה"
+// =========================
+exports.logResetRequest = onRequest(
+  { region: "europe-west1" },
+  async (req, res) => {
+    // CORS בסיסי
+    res.set("Access-Control-Allow-Origin", "*");
+    res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+    res.set("Access-Control-Allow-Headers", "Content-Type");
+    if (req.method === "OPTIONS") return res.status(204).send("");
+
+    if (req.method !== "POST") return res.status(405).json({ ok: false });
+
+    try {
+      const email = String(req.body?.email || "").trim().toLowerCase();
+      if (!email || !email.includes("@")) return res.status(400).json({ ok: false });
+
+      // IP אמיתי
+      const xff = req.headers["x-forwarded-for"];
+      const ip = Array.isArray(xff)
+        ? xff[0]
+        : String(xff || "").split(",")[0].trim() || req.ip || "";
+
+      await admin.firestore().collection("password_reset_requests").add({
+        email,
+        ip,
+        path: String(req.body?.path || ""),
+        userAgent: String(req.body?.userAgent || ""),
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+      return res.json({ ok: true });
+    } catch (e) {
+      logger.error("logResetRequest error:", e);
+      return res.status(500).json({ ok: false });
     }
   }
 );
