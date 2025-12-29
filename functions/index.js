@@ -1,11 +1,12 @@
-const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-
 admin.initializeApp();
 
-// ❗הכנס כאן את ה-Webhook שלך (עדיף בהמשך לשים כ-secrets, אבל עכשיו שיהיה פשוט)
+const { onDocumentCreated } = require("firebase-functions/v2/firestore");
+const logger = require("firebase-functions/logger");
+
+// ❗ שים פה WEBHOOK חדש (אחרי שהחלפת בדיסקורד)
 const DISCORD_WEBHOOK =
-  "https://discord.com/api/webhooks/1455214180289478889/bgpwyd738OErSZL9x9A3wxW2RbMA-GJe5OsZrLVAJ_PrXJCsC1LzHCgx8TUr0bn7wro0";
+  "https://discord.com/api/webhooks/XXXX/XXXX";
 
 function toILTime(ts) {
   try {
@@ -34,11 +35,15 @@ function humanAction(action) {
   return action || "-";
 }
 
-exports.notifyOnNewLog = functions
-  .region("europe-west1") // ישראל לרוב טוב עם europe-west1. אם הפרויקט שלך על אזור אחר תגיד לי.
-  .firestore
-  .document("exams_logs/{logId}")
-  .onCreate(async (snap, context) => {
+exports.notifyOnNewLog = onDocumentCreated(
+  {
+    region: "europe-west1",
+    document: "exams_logs/{logId}",
+  },
+  async (event) => {
+    const snap = event.data;
+    if (!snap) return;
+
     const log = snap.data() || {};
     const when = toILTime(log.createdAt);
 
@@ -50,7 +55,6 @@ exports.notifyOnNewLog = functions
     const subject = log.subject || "-";
     const adminEmail = log.adminEmail || "-";
 
-    // info נוסף כמו אצלך
     const extraInfo =
       log.entity === "exam"
         ? (log.date || "-")
@@ -69,7 +73,7 @@ exports.notifyOnNewLog = functions
 **מידע:** ${extraInfo}
 **בוצע ע"י:** ${adminEmail}
 **זמן:** ${when || "-"}
-**Doc:** ${context.params.logId}`;
+**Doc:** ${event.params.logId}`;
 
     try {
       const res = await fetch(DISCORD_WEBHOOK, {
@@ -80,9 +84,12 @@ exports.notifyOnNewLog = functions
 
       if (!res.ok) {
         const txt = await res.text().catch(() => "");
-        console.error("Discord webhook failed:", res.status, txt);
+        logger.error("Discord webhook failed:", res.status, txt);
+      } else {
+        logger.info("Discord webhook sent ✅");
       }
     } catch (e) {
-      console.error("Discord webhook error:", e);
+      logger.error("Discord webhook error:", e);
     }
-  });
+  }
+);
