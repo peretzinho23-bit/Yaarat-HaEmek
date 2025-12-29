@@ -6,7 +6,7 @@ const logger = require("firebase-functions/logger");
 
 // ❗ שים פה WEBHOOK חדש (אחרי שהחלפת בדיסקורד)
 const DISCORD_WEBHOOK =
-  "https://discord.com/api/webhooks/XXXX/XXXX";
+  "https://discord.com/api/webhooks/1455214180289478889/bgpwyd738OErSZL9x9A3wxW2RbMA-GJe5OsZrLVAJ_PrXJCsC1LzHCgx8TUr0bn7wro0";
 
 function toILTime(ts) {
   try {
