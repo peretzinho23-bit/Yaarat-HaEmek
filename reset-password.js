@@ -9,7 +9,7 @@ const emailInput = document.getElementById("reset-email");
 const statusEl = document.getElementById("reset-status");
 
 const LOG_ENDPOINT =
-  "https://europe-west1-yaarat-haemek.cloudfunctions.net/logResetRequest";
+"https://europe-west1-yaarat-haemek.cloudfunctions.net/logResetRequest";
 
 let submitting = false;
 

@@ -122,6 +122,7 @@ exports.logResetRequest = onRequest(
         ? xff[0]
         : String(xff || "").split(",")[0].trim() || req.ip || "";
 
+      // שמירה ב-Firestore
       await admin.firestore().collection("password_reset_requests").add({
         email,
         ip,
@@ -130,6 +131,29 @@ exports.logResetRequest = onRequest(
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
       });
 
+      // ✅ שליחה לדיסקורד (אחרי ששמרנו)
+      const content =
+`🔐 **בקשת איפוס סיסמה**
+📧 אימייל: ${email}
+🌐 IP: ${ip}
+🕒 זמן: ${new Date().toLocaleString("he-IL", { timeZone: "Asia/Jerusalem" })}
+📄 דף: ${req.body?.path || "-"}`;
+
+      try {
+        const discordRes = await fetch(DISCORD_WEBHOOK, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ content }),
+        });
+
+        if (!discordRes.ok) {
+          const txt = await discordRes.text().catch(() => "");
+          logger.error("Discord webhook failed:", discordRes.status, txt);
+        }
+      } catch (e) {
+        logger.error("Discord webhook error:", e);
+      }
+
       return res.json({ ok: true });
     } catch (e) {
       logger.error("logResetRequest error:", e);
@@ -137,3 +161,4 @@ exports.logResetRequest = onRequest(
     }
   }
 );
+
