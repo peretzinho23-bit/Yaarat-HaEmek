@@ -74,7 +74,7 @@ if (!form || !emailInput || !statusEl) {
       // רק אחרי הצלחה – לוג עם IP מהשרת
       postLog(email); // לא await בכוונה: שלא יעכב UI
 
-      setStatus("✅ נשלח קישור איפוס למייל", "success");
+  setStatus("✅ אם האימייל קיים במערכת – נשלח קישור איפוס (בדוק ספאם)", "success");
     } catch (err) {
       console.error("❌ reset error:", err);
 

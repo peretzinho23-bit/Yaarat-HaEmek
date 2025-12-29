@@ -36,6 +36,36 @@ function humanAction(action) {
   return action || "-";
 }
 
+// ✅ צנזור IP לדיסקורד בלבד
+function maskIp(raw) {
+  let ip = String(raw || "").trim();
+
+  // לפעמים מגיע "ip1, ip2" -> ניקח ראשון
+  if (ip.includes(",")) ip = ip.split(",")[0].trim();
+
+  // לפעמים מגיע IPv4 עם פורט: "1.2.3.4:12345"
+  if (/^\d{1,3}(\.\d{1,3}){3}:\d+$/.test(ip)) ip = ip.split(":")[0];
+
+  // לפעמים מגיע IPv6-mapped IPv4: "::ffff:1.2.3.4"
+  if (ip.startsWith("::ffff:")) ip = ip.replace("::ffff:", "");
+
+  // IPv4 רגיל
+  if (/^\d{1,3}(\.\d{1,3}){3}$/.test(ip)) {
+    const p = ip.split(".");
+    return `${p[0]}.${p[1]}.*.*`;
+  }
+
+  // IPv6
+  if (ip.includes(":")) {
+    const parts = ip.split(":").filter(Boolean);
+    const head = parts.slice(0, 2).join(":");
+    return head ? `${head}:****:****:****:****:****:****` : "****";
+  }
+
+  return "****";
+}
+
+
 // =========================
 // 1) Discord notify על exams_logs (כמו שהיה)
 // =========================
@@ -122,7 +152,7 @@ exports.logResetRequest = onRequest(
         ? xff[0]
         : String(xff || "").split(",")[0].trim() || req.ip || "";
 
-      // שמירה ב-Firestore
+      // שמירה ב-Firestore (IP מלא נשמר כאן)
       await admin.firestore().collection("password_reset_requests").add({
         email,
         ip,
@@ -131,11 +161,11 @@ exports.logResetRequest = onRequest(
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
       });
 
-      // ✅ שליחה לדיסקורד (אחרי ששמרנו)
+      // ✅ שליחה לדיסקורד (IP מצונזר בלבד)
       const content =
 `🔐 **בקשת איפוס סיסמה**
 📧 אימייל: ${email}
-🌐 IP: ${ip}
+🌐 IP: ${maskIp(ip)}
 🕒 זמן: ${new Date().toLocaleString("he-IL", { timeZone: "Asia/Jerusalem" })}
 📄 דף: ${req.body?.path || "-"}`;
 
@@ -161,4 +191,3 @@ exports.logResetRequest = onRequest(
     }
   }
 );
-
