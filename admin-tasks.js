@@ -50,9 +50,7 @@ function renderAdminTasksList(grade, items){
 
     const fileLink = fileUrl
       ? `<div style="margin-top:6px;">
-           📎 <a href="${esc(fileUrl)}" target="_blank" rel="noopener">
-             ${esc(fileName)}
-           </a>
+           📎 <a href="${esc(fileUrl)}" target="_blank" rel="noopener">${esc(fileName)}</a>
          </div>`
       : "";
 
@@ -95,7 +93,6 @@ async function uploadTaskFile({ grade, classId, file }){
   const cleanName = String(file.name || `file.${ext || "bin"}`)
     .replace(/[^\w.\-\s()]/g, "_");
 
-  // ✅ קודם מגדירים path ואז לוג
   const path = `tasks/${safeGrade}/${safeClass}/${id}_${cleanName}`;
   console.log("Uploading:", path, file.name, file.size, file.type);
 
@@ -110,10 +107,8 @@ async function uploadTaskFile({ grade, classId, file }){
     }
   });
 
-  console.log("Uploaded OK, getting URL...");
-
   const url = await getDownloadURL(fileRef);
-  console.log("File URL:", url);
+  console.log("Uploaded OK:", url);
 
   return {
     fileUrl: url,
@@ -135,8 +130,8 @@ async function addTask({ grade, classId, subject, title, text, dueAt, fileMeta }
     classId: String(classId).toLowerCase(),
     subject: subject || "",
     title: title || "משימה",
-    text: text || "",
-    dueAt: dueAt || null,
+    text: text || "",              // ✅ זה מה שהדף tasks קורא
+    dueAt: dueAt || null,          // ✅ זה מה שהדף tasks מציג
     createdAt: new Date().toISOString(),
 
     fileUrl: fileMeta?.fileUrl || "",
@@ -172,7 +167,12 @@ function hookForm(grade){
       return;
     }
 
-    const iso = new Date(dueAtLocal).toISOString();
+    const dueDate = new Date(dueAtLocal);
+    if (Number.isNaN(dueDate.getTime())){
+      alert("דדליין לא תקין");
+      return;
+    }
+    const iso = dueDate.toISOString();
 
     try{
       if (submitBtn){

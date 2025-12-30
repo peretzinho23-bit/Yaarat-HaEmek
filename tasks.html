@@ -55,11 +55,9 @@
         linear-gradient(180deg,var(--bgA),var(--bgB));
     }
 
-    /* ===== Layout ===== */
     .container{max-width:var(--w); margin:0 auto; padding:0 18px}
     .page-wrap{max-width:var(--w); margin:0 auto; padding:18px 18px 70px}
 
-    /* ===== Header like class.html ===== */
     .header-main{position:sticky; top:0; z-index:999; padding:10px 0}
     .nav{
       display:flex; align-items:center; justify-content:space-between;
@@ -185,7 +183,6 @@
       }
     }
 
-    /* ===== Cards ===== */
     .card{
       border:1px solid var(--line);
       background: var(--card);
@@ -232,7 +229,6 @@
     .btn.ghost{background: var(--chipbg)}
     .btn.danger{border-color: rgba(239,68,68,.35); background: rgba(239,68,68,.12)}
 
-    /* ===== Filters ===== */
     .grid{display:grid; gap:12px; margin-top:12px}
     .filters{
       display:grid;
@@ -256,7 +252,6 @@
     input::placeholder{color: rgba(148,163,184,.75)}
     html[data-theme="light"] input::placeholder{color: rgba(15,23,42,.45)}
 
-    /* ===== Stats ===== */
     .stats{
       display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;
     }
@@ -281,7 +276,6 @@
       box-shadow: 0 0 0 6px rgba(22,163,74,.16);
     }
 
-    /* ===== List ===== */
     .list-head{
       display:flex; justify-content:space-between; align-items:center; gap:10px;
       padding:12px 14px;
@@ -366,7 +360,6 @@
 </head>
 
 <body>
-  <!-- HEADER -->
   <header class="header-main">
     <div class="container">
       <nav class="nav" aria-label="ניווט ראשי">
@@ -411,8 +404,6 @@
   </header>
 
   <main class="page-wrap">
-
-    <!-- HERO -->
     <section class="card" id="filtersCard">
       <div class="hero">
         <div>
@@ -473,13 +464,12 @@
 
           <div class="live">
             <span class="dot"></span>
-            <span id="liveClock">עודכן: —</span>
+            <span id="liveClock">שעה: —</span>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- LIST -->
     <section class="card" id="listCard" style="margin-top:12px; padding:0;">
       <div class="list-head">
         <div class="list-title">📌 משימות</div>
@@ -490,11 +480,9 @@
         <div class="loader">טוען מ־Firestore…</div>
       </div>
     </section>
-
   </main>
 
   <script>
-    // Theme toggle (same idea like class.html)
     (function () {
       const btn = document.getElementById("theme-toggle");
       if (!btn) return;
@@ -515,7 +503,6 @@
       });
     })();
 
-    // mobile menu
     (function () {
       const btn = document.getElementById("nav-toggle");
       const menu = document.getElementById("nav-mobile");
@@ -581,10 +568,27 @@
         .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
     }
     function normalize(x){ return String(x||"").toLowerCase().trim(); }
+
+    // ✅ חשוב: לחפש גם ב-text + subject + dueAt
     function blob(t){
       return [
-        t.title, t.body, t.classId, classIdToLabel(t.classId), t.grade
+        t.title,
+        t.text,          // ✅
+        t.body,          // תאימות אם יש לך ישנים
+        t.subject,
+        t.classId,
+        classIdToLabel(t.classId),
+        t.grade,
+        t.dueAt
       ].map(v=>String(v||"")).join(" ").toLowerCase();
+    }
+
+    // ✅ פורמט אחיד לדדליין
+    function fmtDueAt(iso){
+      if(!iso) return "";
+      const d = new Date(iso);
+      if(Number.isNaN(d.getTime())) return "";
+      return d.toLocaleString("he-IL");
     }
 
     const itemsEl = document.getElementById("items");
@@ -611,11 +615,6 @@
     let ALL = [];
     let lastFetchedAt = null;
 
-    function getParam(name){
-      try{ return new URLSearchParams(location.search).get(name); }
-      catch{ return null; }
-    }
-
     function refreshClassDropdown(){
       const g = gradeEl.value;
       const cur = classEl.value;
@@ -632,11 +631,8 @@
       classEl.value = opts.some(o=>o.v===cur) ? cur : "all";
     }
 
-    // Context: url -> referrer -> localStorage
     function pickInitialContext(){
       const params = new URLSearchParams(location.search);
-
-      // תומך בשני שמות (כי ב-class.js אתה משתמש class=)
       let classId = normalize(params.get("class") || params.get("classId"));
       let grade = normalize(params.get("grade"));
 
@@ -654,7 +650,6 @@
 
       if(classId && !grade) grade = gradeFromClassId(classId);
 
-      // וולידציה — רק אם זה נראה כמו z1/h4/t2
       if(classId && !/^[zht]\d{1,2}$/.test(classId)){
         classId = "";
         grade = "";
@@ -707,19 +702,10 @@
 
     function tickLiveClock(){
       const now = new Date();
-      const hh = String(now.getHours()).padStart(2,"0");
-      const mm = String(now.getMinutes()).padStart(2,"0");
-      const ss = String(now.getSeconds()).padStart(2,"0");
-      liveClockEl.textContent = `עודכן עכשיו: ${hh}:${mm}:${ss}`;
+      liveClockEl.textContent = `שעה: ${now.toLocaleTimeString("he-IL")}`;
 
       if(lastFetchedAt){
-        const d = String(lastFetchedAt.getDate()).padStart(2,"0");
-        const m = String(lastFetchedAt.getMonth()+1).padStart(2,"0");
-        const y = lastFetchedAt.getFullYear();
-        const h2 = String(lastFetchedAt.getHours()).padStart(2,"0");
-        const m2 = String(lastFetchedAt.getMinutes()).padStart(2,"0");
-        const s2 = String(lastFetchedAt.getSeconds()).padStart(2,"0");
-        lastFetchEl.textContent = `טעינה אחרונה: ${d}.${m}.${y} · ${h2}:${m2}:${s2}`;
+        lastFetchEl.textContent = `טעינה אחרונה: ${lastFetchedAt.toLocaleString("he-IL")}`;
       }else{
         lastFetchEl.textContent = "טעינה אחרונה: —";
       }
@@ -762,14 +748,25 @@
         const g = normalize(t.grade);
         const cls = normalize(t.classId);
 
-        const link = (t.fileUrl || t.linkUrl || "").trim();
-        const linkHtml = link
-          ? `<a class="task-link" href="${escapeHtml(link)}" target="_blank" rel="noopener">📎 פתח קובץ/קישור</a>`
+        // ✅ תאימות: אם יש ישנים עם body
+        const text = (t.text ?? t.body ?? "").toString().trim();
+
+        const dueTxt = fmtDueAt(t.dueAt);
+        const created = t.createdAt ? new Date(t.createdAt) : null;
+        const createdTxt = created && !Number.isNaN(created.getTime())
+          ? created.toLocaleDateString("he-IL")
           : "";
 
-        const created = t.createdAt ? new Date(t.createdAt) : null;
-        const createdTxt = created
-          ? `${String(created.getDate()).padStart(2,"0")}.${String(created.getMonth()+1).padStart(2,"0")}.${created.getFullYear()}`
+        // ✅ קובץ מהאדמין
+        const fileUrl = String(t.fileUrl || "").trim();
+        const fileName = String(t.fileName || "פתח קובץ").trim();
+
+        // תאימות: אם יש גם linkUrl
+        const linkUrl = String(t.linkUrl || "").trim();
+        const finalLink = fileUrl || linkUrl;
+
+        const linkHtml = finalLink
+          ? `<a class="task-link" href="${escapeHtml(finalLink)}" target="_blank" rel="noopener">📎 ${escapeHtml(fileUrl ? fileName : "פתח קובץ/קישור")}</a>`
           : "";
 
         return `
@@ -783,10 +780,10 @@
               <span class="tag blue">שכבה: ${escapeHtml(gradeLabel(g))}</span>
               <span class="tag">כיתה: ${escapeHtml(classIdToLabel(cls))}</span>
               ${t.subject ? `<span class="tag good">📘 ${escapeHtml(t.subject)}</span>` : ""}
-              ${t.kind || t.type ? `<span class="tag warn">✅ ${escapeHtml(t.kind || t.type)}</span>` : ""}
+              ${dueTxt ? `<span class="tag warn">⏰ דדליין: ${escapeHtml(dueTxt)}</span>` : ""}
             </div>
 
-            ${t.body ? `<div class="task-body">${escapeHtml(t.body)}</div>` : ""}
+            ${text ? `<div class="task-body">${escapeHtml(text)}</div>` : ""}
             ${linkHtml}
           </article>
         `;
@@ -820,6 +817,7 @@
       lastFetchedAt = new Date();
       countAllEl.textContent = String(ALL.length);
       applyAndRender();
+      tickLiveClock();
     }
 
     function clearFilters(){
@@ -829,7 +827,6 @@
       classEl.value = "all";
       sortEl.value = "newFirst";
 
-      // מוחק קונטקסט גם מה-URL (כדי שלא יחזור)
       try{
         const url = new URL(location.href);
         url.searchParams.delete("class");
@@ -842,16 +839,13 @@
       applyAndRender();
     }
 
-    // events
     [qEl, gradeEl, classEl, sortEl].forEach(el => el.addEventListener("input", applyAndRender));
     refreshBtn.addEventListener("click", loadAll);
     clearBtn.addEventListener("click", clearFilters);
 
-    // boot
     applyInitialContext();
     await loadAll();
 
-    // LIVE CLOCK every second
     tickLiveClock();
     setInterval(tickLiveClock, 1000);
   </script>
