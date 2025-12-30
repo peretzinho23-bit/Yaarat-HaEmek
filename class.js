@@ -355,11 +355,11 @@ function getNextExamCountdownParts() {
 }
 
 function taskDueToDate(t) {
-  const v = t?.dueAt ?? t?.due ?? t?.deadline;
+  const v = t?.dueAt ?? t?.due ?? t?.deadline ?? t?.dueDate ?? t?.date;
 
   if (!v) return null;
 
-  // ISO string (מה־admin)
+  // ISO string
   if (typeof v === "string") {
     const d = new Date(v);
     return isNaN(d.getTime()) ? null : d;
@@ -384,28 +384,6 @@ function taskDueToDate(t) {
   }
 
   return null;
-}
-
-
-  // ✅ number (ms)
-  if (typeof dueAt === "number") {
-    const dt = new Date(dueAt);
-    return Number.isNaN(dt.getTime()) ? null : dt;
-  }
-
-  // fallback: dueDate + dueTime
-  const dd = t?.dueDate || t?.date;
-  const tm = t?.dueTime || t?.time;
-  const d = parseDate(dd);
-  if (!d) return null;
-
-  if (typeof tm === "string" && /^\d{1,2}:\d{2}$/.test(tm.trim())) {
-    const [hh, mm] = tm.trim().split(":").map(Number);
-    d.setHours(hh, mm, 0, 0);
-  } else {
-    d.setHours(23, 59, 0, 0);
-  }
-  return d;
 }
 
 
@@ -1045,7 +1023,6 @@ function renderTasks(classId, arr) {
   ensureLocalStyles();
   if (!tasks || !tasksStatus) return;
 
-  // arr already filtered & sorted
   lastTasksArr = Array.isArray(arr) ? arr : [];
   updateBoomCounts();
 
@@ -1054,6 +1031,12 @@ function renderTasks(classId, arr) {
     tasks.innerHTML = "";
     return;
   }
+
+  console.log("TASK DT:", taskDueToDate(lastTasksArr[0]), lastTasksArr[0]);
+
+  // ...המשך הקוד שלך
+}
+
 
   tasksStatus.textContent = "";
 
@@ -1122,7 +1105,6 @@ if (tasksAllBtn) {
       </div>
     `;
   }).join("");
-}
 function toDateSafe(v){
   if(!v) return null;
 
