@@ -8,7 +8,8 @@
     :root{
       --bg:#0b1020; --line:rgba(255,255,255,.12);
       --card:rgba(255,255,255,.06); --text:#eaf0ff; --muted:rgba(234,240,255,.72);
-      --accent:#4f8cff; --good:#16a34a; --r:18px; --r2:14px; --w:1100px;
+      --accent:#4f8cff; --good:#16a34a; --warn:#f59e0b;
+      --r:18px; --r2:14px; --w:1100px;
     }
     *{box-sizing:border-box}
     body{
@@ -65,9 +66,31 @@
     .meta{display:flex; flex-wrap:wrap; gap:8px; font-size:12px; color:var(--muted); align-items:center}
     .tag{padding:6px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.12); background:rgba(0,0,0,.22)}
     .tag.blue{border-color:rgba(79,140,255,.45)}
+    .tag.good{border-color:rgba(22,163,74,.45)}
+    .tag.warn{border-color:rgba(245,158,11,.45)}
     .loader{padding:14px 16px; border-radius:var(--r); border:1px dashed rgba(255,255,255,.25); color:var(--muted); background:rgba(0,0,0,.18)}
     .empty{padding:22px 16px; text-align:center; color:var(--muted)}
-    .link{color:#b9d1ff; text-decoration:underline; word-break:break-all}
+    .body{margin-top:2px; color:rgba(234,240,255,.88); line-height:1.55; white-space:pre-wrap}
+    .link{color:#b9d1ff; text-decoration:underline; word-break:break-all; font-weight:900}
+    .fileRow{margin-top:10px; display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .fileBtn{
+      display:inline-flex; gap:8px; align-items:center;
+      padding:9px 12px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      text-decoration:none;
+      font-weight:900;
+    }
+    .preview{
+      margin-top:10px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      overflow:hidden;
+      max-width:360px;
+      background: rgba(0,0,0,.18);
+    }
+    .preview img{width:100%; height:auto; display:block}
   </style>
 </head>
 <body>
@@ -122,7 +145,8 @@
         h1:"ח1/7", h4:"ח4/8", h5:"ח5/9", h6:"ח6/10",
         t1:"ט1", t2:"ט2", t3:"ט3", t4:"ט4", t5:"ט5"
       };
-      return map[String(classId||"").toLowerCase()] || String(classId||"");
+      const c = String(classId||"").toLowerCase().trim();
+      return map[c] || c.toUpperCase();
     }
     function gradeLabel(g){ return g==="z" ? "ז׳" : g==="h" ? "ח׳" : g==="t" ? "ט׳" : g; }
     function escapeHtml(str){
@@ -132,6 +156,40 @@
     }
     function normalize(x){ return String(x||"").toLowerCase().trim(); }
 
+    // ✅ דדליין מכל פורמט אפשרי
+    function taskDueToDate(t){
+      const v = t?.dueAt ?? t?.due ?? t?.deadline ?? t?.dueDate ?? t?.date;
+      if(!v) return null;
+
+      if (typeof v === "string") {
+        const d = new Date(v);
+        return Number.isNaN(d.getTime()) ? null : d;
+      }
+      if (typeof v?.toDate === "function") {
+        const d = v.toDate();
+        return Number.isNaN(d.getTime()) ? null : d;
+      }
+      if (typeof v?.seconds === "number") {
+        const d = new Date(v.seconds * 1000);
+        return Number.isNaN(d.getTime()) ? null : d;
+      }
+      if (typeof v === "number") {
+        const d = new Date(v);
+        return Number.isNaN(d.getTime()) ? null : d;
+      }
+
+      return null;
+    }
+    function fmtIL(d){
+      return d ? d.toLocaleString("he-IL") : "";
+    }
+    function looksLikeImage(url, fileType){
+      const u = String(url||"").toLowerCase();
+      const ft = String(fileType||"").toLowerCase();
+      if (ft.startsWith("image/")) return true;
+      return /\.(png|jpe?g|webp|gif)$/i.test(u.split("?")[0] || "");
+    }
+
     const itemsEl = document.getElementById("items");
     const refreshBtn = document.getElementById("refreshBtn");
     const countEl = document.getElementById("count");
@@ -140,20 +198,27 @@
     const subtitleEl = document.getElementById("subtitle");
     const classBadgeEl = document.getElementById("classBadge");
 
-    // --- take classId from URL ---
+    // ✅ מקבל גם class וגם classId (כדי שהלינק מ-class.html יעבוד)
     const params = new URLSearchParams(location.search);
-    const classId = normalize(params.get("classId"));
+    const classId = normalize(params.get("class") || params.get("classId"));
     const grade = classId ? classId[0] : "";
 
+    function isKnownClass(c){
+      if(!/^[zht]\d{1,2}$/.test(c)) return false;
+      const g = c[0];
+      if((CLASS_IDS_BY_GRADE[g]||[]).includes(c)) return true;
+      // אם לא ברשימה שלך (כמו h2/h3) עדיין נאפשר
+      return true;
+    }
+
     function validate(){
-      if(!classId || !/^[zht]\d$/.test(classId)){
-        itemsEl.innerHTML = `<div class="empty">חסר classId בכתובת. דוגמה: <b>tasks-class.html?classId=h1</b></div>`;
-        subtitleEl.textContent = "חסר classId";
+      if(!classId || !/^[zht]\d{1,2}$/.test(classId)){
+        itemsEl.innerHTML = `<div class="empty">חסר class בכתובת. דוגמה: <b>tasks-class.html?class=h1</b></div>`;
+        subtitleEl.textContent = "חסר class";
         return false;
       }
-      const ok = (CLASS_IDS_BY_GRADE[grade]||[]).includes(classId);
-      if(!ok){
-        itemsEl.innerHTML = `<div class="empty">classId לא מוכר: <b>${escapeHtml(classId)}</b></div>`;
+      if(!isKnownClass(classId)){
+        itemsEl.innerHTML = `<div class="empty">class לא מוכר: <b>${escapeHtml(classId)}</b></div>`;
         subtitleEl.textContent = "כיתה לא מוכרת";
         return false;
       }
@@ -172,7 +237,9 @@
         const snap = await getDoc(doc(db, "tasks", grade));
         const data = snap.exists() ? (snap.data()||{}) : {};
         const items = Array.isArray(data.items) ? data.items : [];
-        const list = items.filter(t => normalize(t.classId) === classId);
+        const list = items
+          .filter(t => normalize(t.classId) === classId)
+          .map(t => ({ ...t, _dt: taskDueToDate(t) }));
 
         countEl.textContent = String(list.length);
         lastUpdatedEl.textContent = "עודכן: " + new Date().toLocaleString("he-IL");
@@ -194,25 +261,61 @@
         return;
       }
 
+      // מיון חכם: קודם לפי דדליין (אם יש), אחרת לפי createdAt
       list = list.slice().sort((a,b)=>{
+        const ad = a._dt ? a._dt.getTime() : Infinity;
+        const bd = b._dt ? b._dt.getTime() : Infinity;
+        if (ad !== bd) return ad - bd;
+
         const at = new Date(a.createdAt || 0).getTime();
         const bt = new Date(b.createdAt || 0).getTime();
         return bt - at;
       });
 
       itemsEl.innerHTML = list.map(t=>{
-        const link = (t.fileUrl || t.linkUrl || "").trim();
-        const linkHtml = link ? `<div style="margin-top:10px">📎 <a class="link" href="${escapeHtml(link)}" target="_blank" rel="noopener">פתח קובץ/קישור</a></div>` : "";
+        const text = String((t.text ?? t.body ?? t.content ?? "") || "").trim();
+        const subject = String(t.subject || "").trim();
+        const kind = String(t.kind || t.type || "").trim();
+
+        const dt = t._dt || null;
+        const dueTxt = dt ? fmtIL(dt) : "";
+
+        const fileUrl = String(t.fileUrl || "").trim();
+        const fileName = String(t.fileName || "").trim();
+        const linkUrl = String(t.linkUrl || "").trim();
+        const finalLink = fileUrl || linkUrl;
+
+        const linkHtml = finalLink
+          ? `
+            <div class="fileRow">
+              <a class="fileBtn" href="${escapeHtml(finalLink)}" target="_blank" rel="noopener">
+                📎 ${escapeHtml(fileUrl ? (fileName || "פתח קובץ") : "פתח קישור")}
+              </a>
+            </div>
+          `
+          : "";
+
+        const previewHtml = (fileUrl && looksLikeImage(fileUrl, t.fileType))
+          ? `<div class="preview"><img src="${escapeHtml(fileUrl)}" alt="תמונה למשימה"></div>`
+          : "";
+
         return `
           <div class="item">
             <div>
               <h3>${escapeHtml(t.title || "משימה")}</h3>
+
               <div class="meta">
                 <span class="tag blue"><b>שכבה:</b> ${escapeHtml(gradeLabel(grade))}</span>
                 <span class="tag"><b>כיתה:</b> ${escapeHtml(classIdToLabel(classId))}</span>
+                ${kind ? `<span class="tag good">✅ ${escapeHtml(kind)}</span>` : ""}
+                ${subject ? `<span class="tag"><b>מקצוע:</b> ${escapeHtml(subject)}</span>` : ""}
+                ${dueTxt ? `<span class="tag warn">⏰ דדליין: ${escapeHtml(dueTxt)}</span>` : ""}
               </div>
-              ${t.body ? `<div style="margin-top:10px; color:rgba(234,240,255,.86); line-height:1.5;">${escapeHtml(t.body)}</div>` : ""}
+
+              ${text ? `<div class="body">${escapeHtml(text)}</div>` : ""}
+
               ${linkHtml}
+              ${previewHtml}
             </div>
           </div>
         `;
