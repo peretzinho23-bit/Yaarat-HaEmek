@@ -283,37 +283,57 @@ function getDueDate(t){
   return toDateAny(t.dueAt) || toDateAny(t.dueDate) || toDateAny(t.deadline) || null;
 }
 
+function isImageUrl(url){
+  const u = String(url||"").toLowerCase();
+  return /\.(png|jpe?g|gif|webp|bmp|svg)(\?.*)?$/.test(u);
+}
+function fmtDueAt(iso){
+  if(!iso) return "";
+  const d = new Date(iso);
+  if(Number.isNaN(d.getTime())) return "";
+  return d.toLocaleString("he-IL");
+}
+
 function render(list){
   if(!list.length){
     itemsEl.innerHTML = `<div class="empty">אין משימות לכיתה הזו.</div>`;
     return;
   }
 
-  // מיון: דדליין קרוב קודם, ואז חדש קודם
   list = list.slice().sort((a,b)=>{
-    const ad = getDueDate(a)?.getTime() ?? Infinity;
-    const bd = getDueDate(b)?.getTime() ?? Infinity;
-    if(ad !== bd) return ad - bd;
-
-    const at = toDateAny(a.createdAt)?.getTime() ?? 0;
-    const bt = toDateAny(b.createdAt)?.getTime() ?? 0;
+    // עדיף למיין לפי דדליין אם יש, אחרת לפי createdAt
+    const ad = new Date(a.dueAt || 0).getTime();
+    const bd = new Date(b.dueAt || 0).getTime();
+    if(ad && bd) return ad - bd;
+    const at = new Date(a.createdAt || 0).getTime();
+    const bt = new Date(b.createdAt || 0).getTime();
     return bt - at;
   });
 
   itemsEl.innerHTML = list.map(t=>{
-    const text = (t.text ?? t.body ?? "").toString().trim();
+    const text = String(t.text ?? t.body ?? "").trim();
+    const dueTxt = fmtDueAt(t.dueAt);
 
-    const due = getDueDate(t);
-    const dueTxt = fmtIL(due);
+    const fileUrl = String(t.fileUrl || "").trim();
+    const fileName = String(t.fileName || "").trim();
+    const linkUrl = String(t.linkUrl || "").trim();
+    const finalLink = fileUrl || linkUrl;
 
-    const fileUrl = String(t.fileUrl || t.linkUrl || "").trim();
-    const fileName = String(t.fileName || "פתח קובץ/קישור").trim();
-
-    const linkHtml = fileUrl
-      ? `<div style="margin-top:10px">📎 <a class="link" href="${escapeHtml(fileUrl)}" target="_blank" rel="noopener">${escapeHtml(fileName)}</a></div>`
+    const linkHtml = finalLink
+      ? `<div style="margin-top:10px">
+          📎 <a class="link" href="${escapeHtml(finalLink)}" target="_blank" rel="noopener">
+            ${escapeHtml(fileUrl ? (fileName || "פתח קובץ") : "פתח קישור")}
+          </a>
+        </div>`
       : "";
 
-    const subject = String(t.subject || "").trim();
+    // תצוגה כתמונה אם העלית תמונה כקובץ
+    const imgHtml = (fileUrl && (String(t.fileType||"").startsWith("image/") || isImageUrl(fileUrl)))
+      ? `<div style="margin-top:10px">
+           <img src="${escapeHtml(fileUrl)}" alt="תמונה למשימה"
+                style="max-width:100%;border-radius:14px;border:1px solid rgba(148,163,184,.25);display:block;">
+         </div>`
+      : "";
 
     return `
       <div class="item">
@@ -323,22 +343,19 @@ function render(list){
           <div class="meta">
             <span class="tag blue"><b>שכבה:</b> ${escapeHtml(gradeLabel(grade))}</span>
             <span class="tag"><b>כיתה:</b> ${escapeHtml(classIdToLabel(classId))}</span>
-            ${subject ? `<span class="tag"><b>מקצוע:</b> ${escapeHtml(subject)}</span>` : ""}
-            ${
-              dueTxt
-                ? `<span class="tag" style="border-color:rgba(245,158,11,.45)"><b>דדליין:</b> ${escapeHtml(dueTxt)}</span>`
-                : `<span class="tag" style="opacity:.75;border-color:rgba(245,158,11,.35)"><b>דדליין:</b> בלי דדליין</span>`
-            }
+            ${t.subject ? `<span class="tag"><b>מקצוע:</b> ${escapeHtml(t.subject)}</span>` : ""}
+            ${dueTxt ? `<span class="tag" style="border-color:rgba(245,158,11,.35)"><b>דדליין:</b> ${escapeHtml(dueTxt)}</span>` : ""}
           </div>
 
           ${text ? `<div style="margin-top:10px; color:rgba(234,240,255,.86); line-height:1.6; white-space:pre-wrap;">${escapeHtml(text)}</div>` : ""}
-
           ${linkHtml}
+          ${imgHtml}
         </div>
       </div>
     `;
   }).join("");
 }
+
 
 
     refreshBtn.addEventListener("click", load);

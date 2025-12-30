@@ -514,12 +514,14 @@ async function loadAllData() {
   boardData = b.items || [];
   renderBoardAdmin(); // ✅ (לא חובה, אבל מסודר)
 
-  // TASKS
-  for (const g of GRADES) {
-    const res = await getDocSafe(["tasks", g], { items: [] });
-    tasksData[g] = res.items || [];
-  }
-  renderTasksAdmin();
+for (const g of GRADES) {
+  onSnapshot(doc(db, "tasks", g), (snap) => {
+    const data = snap.exists() ? snap.data() : { items: [] };
+    tasksData[g] = data.items || [];
+    renderTasksAdmin();
+  });
+}
+
 
   // POLLS
   await loadPolls();
@@ -1540,7 +1542,6 @@ document.addEventListener("DOMContentLoaded", () => {
   setupDeleteHandler();
   setupSiteContentForm();
   setupGradeFilter();
-  setupTaskForms();
   setupAdminMobileMenu();
   setupSiteMobileNav();
 });

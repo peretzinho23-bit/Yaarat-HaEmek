@@ -909,6 +909,11 @@ function getDueDate(t){
             ${imgs.map((url)=>`<img src="${escapeHtml(url)}" alt="תמונה למשימה">`).join("")}
           </div>
         ` : "";
+// אם העלו תמונה כקובץ למשימה (Storage)
+const fu = String(t.fileUrl || "").trim();
+if (fu && (String(t.fileType||"").startsWith("image/") || /\.(png|jpe?g|gif|webp|bmp|svg)(\?.*)?$/.test(fu.toLowerCase()))) {
+  out.push(fu);
+}
 
         return `
           <article class="task">
