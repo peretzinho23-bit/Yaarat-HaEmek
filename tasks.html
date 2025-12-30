@@ -655,33 +655,44 @@
     }
 
     // ✅ דדליין: תופס dueAt / due / deadline + fallback dueDate+dueTime
-    function getDueDate(t){
-      const raw = t?.dueAt ?? t?.due ?? t?.deadline;
-      const d = toDateAny(raw);
-      if (d) return d;
+function getDueDate(t){
+  const raw = t?.dueAt ?? t?.due ?? t?.deadline ?? t?.dueDate ?? t?.date;
+  let d = toDateAny(raw);
+  if (d) return d;
 
-      // fallback: dueDate + dueTime
-      const dd = t?.dueDate || t?.date;
-      const tm = t?.dueTime || t?.time;
-      if(!dd) return null;
-
-      // dd can be "DD/MM/YYYY"
-      const m = String(dd).trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/);
-      if(!m) return toDateAny(dd);
-
+  // ✅ תומך גם: 30/12/2025 או 30.12.2025 או 30-12-2025
+  if (typeof raw === "string") {
+    const s = raw.trim();
+    const m = s.match(/^(\d{1,2})[\/\.\-](\d{1,2})[\/\.\-](\d{2}|\d{4})$/);
+    if (m) {
       let day = Number(m[1]), mo = Number(m[2]), y = Number(m[3]);
       if (y < 100) y = 2000 + y;
-      const dt = new Date(y, mo - 1, day);
-
-      if (typeof tm === "string" && /^\d{1,2}:\d{2}$/.test(tm.trim())) {
-        const [hh, mm] = tm.trim().split(":").map(Number);
-        dt.setHours(hh, mm, 0, 0);
-      } else {
-        dt.setHours(23, 59, 0, 0);
-      }
-
+      const dt = new Date(y, mo - 1, day, 23, 59, 0, 0);
       return Number.isNaN(dt.getTime()) ? null : dt;
     }
+  }
+
+  // fallback: dueDate + dueTime
+  const dd = t?.dueDate || t?.date;
+  const tm = t?.dueTime || t?.time;
+  if(!dd) return null;
+
+  const mm = String(dd).trim().match(/^(\d{1,2})[\/\.\-](\d{1,2})[\/\.\-](\d{2}|\d{4})$/);
+  if(!mm) return toDateAny(dd);
+
+  let day = Number(mm[1]), mo = Number(mm[2]), y = Number(mm[3]);
+  if (y < 100) y = 2000 + y;
+  const dt = new Date(y, mo - 1, day);
+
+  if (typeof tm === "string" && /^\d{1,2}:\d{2}$/.test(tm.trim())) {
+    const [hh, min] = tm.trim().split(":").map(Number);
+    dt.setHours(hh, min, 0, 0);
+  } else {
+    dt.setHours(23, 59, 0, 0);
+  }
+
+  return Number.isNaN(dt.getTime()) ? null : dt;
+}
 
     function fmtIL(d){
       return d ? d.toLocaleString("he-IL") : "";
