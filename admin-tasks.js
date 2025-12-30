@@ -1,10 +1,11 @@
 // admin-tasks.js
 import { db } from "./firebase-config.js";
+
 import {
   doc,
   onSnapshot,
   setDoc,
-  arrayUnion,
+  arrayUnion
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
 import {
@@ -30,7 +31,7 @@ function classIdToLabel(classId){
     t1:"ט1", t2:"ט2", t3:"ט3", t4:"ט4", t5:"ט5"
   };
   const k = String(classId||"").toLowerCase();
-  return map[k] || classId || "";
+  return map[k] || (classId || "");
 }
 
 function renderAdminTasksList(grade, items){
@@ -44,10 +45,13 @@ function renderAdminTasksList(grade, items){
   }
 
   box.innerHTML = arr.map(t => {
-    const fileLink = (t.fileUrl || "").trim()
+    const fileUrl = String(t.fileUrl || "").trim();
+    const fileName = String(t.fileName || "פתח קובץ").trim();
+
+    const fileLink = fileUrl
       ? `<div style="margin-top:6px;">
-           📎 <a href="${esc(t.fileUrl)}" target="_blank" rel="noopener">
-             ${esc(t.fileName || "פתח קובץ")}
+           📎 <a href="${esc(fileUrl)}" target="_blank" rel="noopener">
+             ${esc(fileName)}
            </a>
          </div>`
       : "";
@@ -79,7 +83,6 @@ function extFromName(name){
 }
 
 async function uploadTaskFile({ grade, classId, file }){
-  // אפשר לשים מגבלות גודל (מומלץ)
   const maxMB = 20;
   if (file.size > maxMB * 1024 * 1024){
     throw new Error(`קובץ גדול מדי (מקסימום ${maxMB}MB)`);
@@ -89,10 +92,13 @@ async function uploadTaskFile({ grade, classId, file }){
   const safeClass = String(classId).toLowerCase();
   const id = crypto.randomUUID();
   const ext = extFromName(file.name);
-  const cleanName = file.name.replace(/[^\w.\-\s()]/g, "_");
+  const cleanName = String(file.name || `file.${ext || "bin"}`)
+    .replace(/[^\w.\-\s()]/g, "_");
 
-  // נתיב אחסון מסודר
+  // ✅ קודם מגדירים path ואז לוג
   const path = `tasks/${safeGrade}/${safeClass}/${id}_${cleanName}`;
+  console.log("Uploading:", path, file.name, file.size, file.type);
+
   const fileRef = sRef(storage, path);
 
   await uploadBytes(fileRef, file, {
@@ -104,8 +110,18 @@ async function uploadTaskFile({ grade, classId, file }){
     }
   });
 
+  console.log("Uploaded OK, getting URL...");
+
   const url = await getDownloadURL(fileRef);
-  return { fileUrl: url, fileName: cleanName, storagePath: path, fileType: file.type || "", fileSize: file.size };
+  console.log("File URL:", url);
+
+  return {
+    fileUrl: url,
+    fileName: cleanName,
+    storagePath: path,
+    fileType: file.type || "",
+    fileSize: file.size
+  };
 }
 
 async function addTask({ grade, classId, subject, title, text, dueAt, fileMeta }) {
@@ -123,7 +139,6 @@ async function addTask({ grade, classId, subject, title, text, dueAt, fileMeta }
     dueAt: dueAt || null,
     createdAt: new Date().toISOString(),
 
-    // קובץ (אופציונלי)
     fileUrl: fileMeta?.fileUrl || "",
     fileName: fileMeta?.fileName || "",
     storagePath: fileMeta?.storagePath || "",
@@ -157,22 +172,19 @@ function hookForm(grade){
       return;
     }
 
-    // datetime-local → ISO
     const iso = new Date(dueAtLocal).toISOString();
 
     try{
       if (submitBtn){
         submitBtn.disabled = true;
-        submitBtn.textContent = "מעלה...";
+        submitBtn.textContent = file ? "מעלה קובץ..." : "שומר...";
       }
 
       let fileMeta = null;
       if (file){
-        // 1) העלאה ל-Storage
         fileMeta = await uploadTaskFile({ grade, classId, file });
       }
 
-      // 2) שמירה ל-Firestore עם קישור
       await addTask({ grade, classId, subject, title, text, dueAt: iso, fileMeta });
 
       form.reset();
