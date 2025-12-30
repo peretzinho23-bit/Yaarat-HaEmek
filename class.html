@@ -733,6 +733,11 @@ html[data-theme="light"] .boom-chip{background:rgba(255,255,255,.92);border-colo
 </main>
 
 <script>
+  (function(){
+    const p = new URLSearchParams(location.search);
+    const classId = (p.get("classId") || "").toLowerCase().trim();
+    if(classId) localStorage.setItem("lastClassId", classId);
+  })();
   // Theme toggle
   (function () {
     const btn = document.getElementById("theme-toggle");

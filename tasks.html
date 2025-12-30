@@ -4,153 +4,546 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>כל המשימות · יערת העמק</title>
+
   <style>
     :root{
-      --bg:#0b1020; --line:rgba(255,255,255,.12);
-      --card:rgba(255,255,255,.06); --text:#eaf0ff; --muted:rgba(234,240,255,.72);
-      --accent:#4f8cff; --good:#16a34a; --bad:#ef4444; --r:18px; --r2:14px; --w:1100px;
+      --bgA:#070a12;
+      --bgB:#0b1020;
+      --card: rgba(255,255,255,.06);
+      --card2: rgba(255,255,255,.04);
+      --line: rgba(148,163,184,.35);
+      --text:#eaf0ff;
+      --muted: rgba(234,240,255,.72);
+      --shadow: 0 18px 45px rgba(15,23,42,0.18);
+      --r: 18px;
+      --r2: 14px;
+      --w: 1100px;
+
+      --accent: #3b82f6;
+      --accent2:#38bdf8;
+      --good:#16a34a;
+      --warn:#f59e0b;
+      --bad:#ef4444;
+
+      --chipbg: rgba(255,255,255,.08);
+      --inputbg: rgba(0,0,0,.20);
     }
+
+    html[data-theme="light"]{
+      --bgA:#eef2ff;
+      --bgB:#f8fafc;
+      --card: rgba(255,255,255,.85);
+      --card2: rgba(255,255,255,.70);
+      --line: rgba(15,23,42,.12);
+      --text:#0f172a;
+      --muted: rgba(15,23,42,.65);
+      --shadow: 0 18px 45px rgba(15,23,42,0.12);
+
+      --chipbg: rgba(15,23,42,.05);
+      --inputbg: rgba(255,255,255,.88);
+    }
+
     *{box-sizing:border-box}
     body{
-      margin:0; color:var(--text);
+      margin:0;
+      color:var(--text);
       font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
-      background:
-        radial-gradient(1200px 600px at 85% -10%, rgba(79,140,255,.35), transparent 55%),
-        radial-gradient(900px 500px at 15% 0%, rgba(22,163,74,.22), transparent 55%),
-        linear-gradient(180deg,#070a12,#0b1020 60%,#060813);
       min-height:100svh;
+      background:
+        radial-gradient(1200px 600px at 85% -10%, rgba(59,130,246,.22), transparent 55%),
+        radial-gradient(900px 500px at 15% 0%, rgba(22,163,74,.14), transparent 55%),
+        linear-gradient(180deg,var(--bgA),var(--bgB));
     }
-    .wrap{max-width:var(--w); margin:0 auto; padding:18px 14px 60px}
-    .top{
-      display:flex; gap:12px; align-items:center; justify-content:space-between;
-      padding:14px 14px; border:1px solid var(--line);
-      background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.03));
-      border-radius:var(--r); position:sticky; top:12px; z-index:10;
+
+    /* ===== Layout ===== */
+    .container{max-width:var(--w); margin:0 auto; padding:0 18px}
+    .page-wrap{max-width:var(--w); margin:0 auto; padding:18px 18px 70px}
+
+    /* ===== Header like class.html ===== */
+    .header-main{position:sticky; top:0; z-index:999; padding:10px 0}
+    .nav{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px; padding: 12px 14px;
+      border-radius: 22px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
       backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+      position:relative;
     }
-    .brand{display:flex; gap:12px; align-items:center}
-    .logo{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,rgba(79,140,255,.95),rgba(22,163,74,.85))}
-    h1{margin:0;font-size:16px;font-weight:900}
-    .sub{margin:0;font-size:12px;color:var(--muted)}
-    .actions{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end}
-    .pill{
-      border:1px solid var(--line); background:rgba(255,255,255,.05);
-      padding:10px 12px; border-radius:999px; color:var(--text);
-      cursor:pointer; user-select:none; font-weight:800; font-size:13px;
+
+    .nav-side{display:flex; gap:10px; align-items:center; flex:1}
+    .nav-right-links{justify-content:flex-start}
+    .nav-left-links{justify-content:flex-end}
+
+    .nav-side a{
+      padding:8px 14px;border-radius:999px;
+      background: rgba(255,255,255,0.92);
+      border:1px solid rgba(148,163,184,0.55);
+      color:#0f172a;
+      transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
+      box-shadow:0 8px 20px rgba(15,23,42,0.08);
+      font-size:.92rem;text-decoration:none;white-space:nowrap;
+    }
+    html[data-theme="dark"] .nav-side a{
+      background: rgba(15,23,42,0.55);
+      color: #e5e7eb;
+      border-color: rgba(148,163,184,0.25);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.28);
+    }
+    .nav-side a:hover{transform:translateY(-1px); background:#eff6ff}
+    html[data-theme="dark"] .nav-side a:hover{background: rgba(2,6,23,0.55)}
+
+    .logo-circle{
+      width:62px;height:62px;border-radius:999px;overflow:hidden;
+      border:2px solid rgba(59,130,246,0.35);
+      background: rgba(255,255,255,.9);
+      box-shadow:0 10px 25px rgba(15,23,42,0.12);
+      display:flex;align-items:center;justify-content:center;
+    }
+    html[data-theme="dark"] .logo-circle{
+      background: rgba(15,23,42,0.55);
+      border-color: rgba(56,189,248,0.35);
+    }
+    .logo-img{width:100%;height:100%;object-fit:cover;display:block}
+
+    .theme-toggle-btn{
+      all:unset;box-sizing:border-box;
+      width:44px;height:44px;border-radius:50%;
+      display:inline-flex;align-items:center;justify-content:center;
+      cursor:pointer;
+      border:1px solid rgba(148,163,184,0.6);
+      background: rgba(255,255,255,0.92);
+      box-shadow:0 8px 20px rgba(15,23,42,0.08);
+      font-size:1.35rem;
+      position:absolute;
+      right:12px;
+      top:50%;
+      transform:translateY(-50%);
+      z-index:50;
+    }
+    html[data-theme="dark"] .theme-toggle-btn{
+      background: rgba(15,23,42,0.9);
+      color:#f9fafb;
+      border-color: rgba(148,163,184,0.25);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.28);
+    }
+
+    .nav-toggle{display:none}
+    .nav-mobile{display:none}
+
+    @media (max-width: 900px){
+      .nav-right-links,.nav-left-links{display:none !important}
+      .nav{justify-content:center !important; min-height:74px}
+
+      .nav-toggle{
+        display:flex !important;
+        position:absolute !important;
+        left:12px !important;
+        top:50% !important;
+        transform:translateY(-50%) !important;
+        flex-direction:column;gap:4px;
+        background:none;border:none;cursor:pointer;z-index:9999;
+      }
+      .nav-toggle span{width:22px;height:2px;background:#0f172a}
+      html[data-theme="dark"] .nav-toggle span{background:#e5e7eb}
+
+      #nav-mobile{
+        display:none;
+        position:absolute;
+        top:calc(100% + 10px);
+        left:12px;
+        width:min(260px, calc(100% - 24px));
+        background: rgba(255,255,255,0.98);
+        border:1px solid rgba(148,163,184,0.45);
+        border-radius:18px;
+        padding:10px;
+        box-shadow: var(--shadow);
+        z-index:9999;
+      }
+      html[data-theme="dark"] #nav-mobile{
+        background: rgba(15,23,42,0.95);
+        border-color: rgba(148,163,184,0.25);
+      }
+      #nav-mobile.open{display:block !important}
+
+      #nav-mobile a{
+        display:block;
+        padding:10px 12px;
+        border-radius:12px;
+        margin:6px 0;
+        background: rgba(255,255,255,0.9);
+        border:1px solid rgba(148,163,184,0.45);
+        color:#0f172a;
+        text-decoration:none;
+        font-weight:800;
+      }
+      html[data-theme="dark"] #nav-mobile a{
+        background: rgba(2,6,23,0.55);
+        border-color: rgba(148,163,184,0.20);
+        color:#e5e7eb;
+      }
+    }
+
+    /* ===== Cards ===== */
+    .card{
+      border:1px solid var(--line);
+      background: var(--card);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      padding:14px;
+    }
+
+    .hero{
+      display:flex; gap:14px; align-items:flex-start; justify-content:space-between;
+      flex-wrap:wrap;
+    }
+    .hero h1{margin:0; font-size:1.25rem; font-weight:1000; letter-spacing:.2px}
+    .hero p{margin:6px 0 0; color:var(--muted); font-weight:700}
+    .hero-right{display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end}
+
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background: var(--chipbg);
+      font-weight:900;
+      color: var(--text);
+      white-space:nowrap;
+    }
+    .chip.good{border-color: rgba(22,163,74,.35)}
+    .chip.blue{border-color: rgba(59,130,246,.35)}
+
+    .btn{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 14px; border-radius:999px;
+      border:1px solid var(--line);
+      background: var(--chipbg);
+      color: var(--text);
+      cursor:pointer;
+      font-weight:1000;
       text-decoration:none;
+      transition: transform .12s ease, background .12s ease, border-color .12s ease;
     }
-    .pill.primary{border-color:rgba(79,140,255,.5); background:rgba(79,140,255,.18)}
-    .pill.good{border-color:rgba(22,163,74,.5); background:rgba(22,163,74,.16)}
-    .grid{margin-top:14px; display:grid; gap:12px}
+    .btn:hover{transform:translateY(-1px)}
+    .btn.primary{border-color: rgba(59,130,246,.40); background: rgba(59,130,246,.14)}
+    .btn.good{border-color: rgba(22,163,74,.40); background: rgba(22,163,74,.14)}
+    .btn.ghost{background: var(--chipbg)}
+    .btn.danger{border-color: rgba(239,68,68,.35); background: rgba(239,68,68,.12)}
+
+    /* ===== Filters ===== */
+    .grid{display:grid; gap:12px; margin-top:12px}
     .filters{
-      padding:14px; border:1px solid var(--line); border-radius:var(--r);
-      background:rgba(255,255,255,.035);
-      display:grid; grid-template-columns: 1.2fr .6fr .7fr .7fr;
+      display:grid;
+      grid-template-columns: 1.3fr .6fr .7fr .7fr;
       gap:10px;
     }
-    @media(max-width:920px){.filters{grid-template-columns:1fr 1fr}}
-    @media(max-width:520px){.filters{grid-template-columns:1fr}.top{position:relative;top:0}}
-    label{display:block; font-size:12px; color:var(--muted); margin-bottom:6px}
+    @media (max-width: 940px){ .filters{grid-template-columns: 1fr 1fr} }
+    @media (max-width: 540px){ .filters{grid-template-columns: 1fr} }
+
+    label{display:block; font-size:.85rem; color:var(--muted); margin:0 2px 6px; font-weight:900}
     input,select{
-      width:100%; padding:11px 12px; border-radius:12px;
-      border:1px solid var(--line); background:rgba(0,0,0,.22);
-      color:var(--text); outline:none;
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background: var(--inputbg);
+      color: var(--text);
+      outline:none;
+      font-weight:800;
     }
+    input::placeholder{color: rgba(148,163,184,.75)}
+    html[data-theme="light"] input::placeholder{color: rgba(15,23,42,.45)}
+
+    /* ===== Stats ===== */
     .stats{
-      display:flex; flex-wrap:wrap; gap:10px; align-items:center;
-      padding:12px 14px; border:1px solid var(--line); border-radius:var(--r);
-      background:rgba(255,255,255,.03);
+      display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;
     }
-    .stat{padding:10px 12px; border-radius:14px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.10); font-size:13px; color:var(--muted)}
-    .stat b{color:var(--text)}
-    .list{border:1px solid var(--line); border-radius:var(--r); background:rgba(255,255,255,.03); overflow:hidden}
-    .head{display:flex; justify-content:space-between; gap:10px; align-items:center; padding:12px 14px; border-bottom:1px solid var(--line); background:rgba(255,255,255,.04)}
-    .head .t{font-weight:900; font-size:14px}
-    .small{font-size:12px;color:var(--muted)}
-    .items{padding:10px}
-    .item{
-      border:1px solid rgba(255,255,255,.10); background:rgba(255,255,255,.045);
-      border-radius:var(--r2); padding:12px; margin:10px 0;
-      display:grid; grid-template-columns: 1fr; gap:10px;
+    .stats-left{display:flex; flex-wrap:wrap; gap:10px; align-items:center}
+    .stat{
+      padding:10px 12px;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background: var(--card2);
+      font-weight:900;
+      color: var(--muted);
     }
-    .item h3{margin:0 0 6px; font-size:15px; font-weight:900}
-    .meta{display:flex; flex-wrap:wrap; gap:8px; font-size:12px; color:var(--muted); align-items:center}
-    .tag{padding:6px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.12); background:rgba(0,0,0,.22)}
-    .tag.blue{border-color:rgba(79,140,255,.45)}
-    .tag.good{border-color:rgba(22,163,74,.45)}
-    .loader{padding:14px 16px; border-radius:var(--r); border:1px dashed rgba(255,255,255,.25); color:var(--muted); background:rgba(0,0,0,.18)}
-    .empty{padding:22px 16px; text-align:center; color:var(--muted)}
-    .link{color:#b9d1ff; text-decoration:underline; word-break:break-all}
+    .stat b{color: var(--text)}
+    .live{
+      font-weight:1000;
+      color: var(--muted);
+      display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    }
+    .dot{
+      width:10px;height:10px;border-radius:999px;
+      background: rgba(22,163,74,.95);
+      box-shadow: 0 0 0 6px rgba(22,163,74,.16);
+    }
+
+    /* ===== List ===== */
+    .list-head{
+      display:flex; justify-content:space-between; align-items:center; gap:10px;
+      padding:12px 14px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      border-radius: calc(var(--r) - 2px) calc(var(--r) - 2px) 0 0;
+    }
+    .list-title{font-weight:1000}
+    .items{padding:12px}
+
+    .loader{
+      padding:14px 16px;
+      border-radius: 16px;
+      border:1px dashed rgba(148,163,184,.45);
+      background: rgba(0,0,0,.12);
+      color: var(--muted);
+      font-weight:900;
+    }
+    html[data-theme="light"] .loader{background: rgba(15,23,42,.04)}
+
+    .empty{
+      padding:20px 14px;
+      text-align:center;
+      color: var(--muted);
+      font-weight:900;
+    }
+
+    .task{
+      border:1px solid var(--line);
+      background: var(--card2);
+      border-radius: 18px;
+      padding:12px;
+      margin:10px 0;
+      transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+    }
+    .task:hover{
+      transform: translateY(-1px);
+      border-color: rgba(59,130,246,.25);
+      box-shadow: 0 16px 40px rgba(0,0,0,.18);
+    }
+
+    .task-top{display:flex; justify-content:space-between; gap:12px; align-items:flex-start; flex-wrap:wrap}
+    .task-title{font-weight:1000; font-size:1.02rem; margin:0}
+    .task-meta{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px}
+
+    .tag{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:7px 10px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background: var(--chipbg);
+      font-weight:1000;
+      color: var(--text);
+      font-size:.9rem;
+      white-space:nowrap;
+    }
+    .tag.blue{border-color: rgba(59,130,246,.35)}
+    .tag.good{border-color: rgba(22,163,74,.35)}
+    .tag.warn{border-color: rgba(245,158,11,.35)}
+
+    .task-body{
+      margin-top:10px;
+      color: rgba(234,240,255,.92);
+      line-height:1.6;
+      white-space:pre-wrap;
+      font-weight:700;
+    }
+    html[data-theme="light"] .task-body{color:#0f172a}
+
+    .task-link{
+      margin-top:10px;
+      display:inline-flex; gap:8px; align-items:center;
+      color: #b9d1ff;
+      font-weight:1000;
+      text-decoration: underline;
+      word-break: break-all;
+    }
+    html[data-theme="light"] .task-link{color:#1d4ed8}
+
+    .mini-muted{color:var(--muted); font-weight:900; font-size:.92rem}
   </style>
 </head>
 
 <body>
-  <div class="wrap">
-    <header class="top">
-      <div class="brand">
-        <div class="logo"></div>
+  <!-- HEADER -->
+  <header class="header-main">
+    <div class="container">
+      <nav class="nav" aria-label="ניווט ראשי">
+
+        <div class="nav-side nav-right-links">
+          <a href="index.html">← דף הבית</a>
+          <a id="backToClassTop" href="class.html">דף כיתה</a>
+          <a href="#listCard">משימות</a>
+        </div>
+
+        <div class="nav-center">
+          <a href="index.html" class="logo-circle" aria-label="דף הבית">
+            <img
+              src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png"
+              alt="סמל יערת העמק"
+              class="logo-img"
+            />
+          </a>
+        </div>
+
+        <div class="nav-side nav-left-links">
+          <a href="#filtersCard">סינון</a>
+          <a href="#listCard">רשימה</a>
+          <a id="ctxChipLink" href="#filtersCard">כיתה</a>
+        </div>
+
+        <button id="theme-toggle" class="theme-toggle-btn" type="button" aria-label="מצב כהה/בהיר">🌙</button>
+
+        <button class="nav-toggle" id="nav-toggle" type="button" aria-label="פתח תפריט" aria-expanded="false" aria-controls="nav-mobile">
+          <span></span><span></span><span></span>
+        </button>
+
+        <div class="nav-mobile" id="nav-mobile" aria-hidden="true">
+          <a href="index.html">← דף הבית</a>
+          <a id="backToClassMobile" href="class.html">דף כיתה</a>
+          <a href="#filtersCard">סינון</a>
+          <a href="#listCard">משימות</a>
+        </div>
+
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-wrap">
+
+    <!-- HERO -->
+    <section class="card" id="filtersCard">
+      <div class="hero">
         <div>
-          <h1>כל המשימות</h1>
-          <p class="sub">נשלף מ־Firestore: tasks/z,h,t (לא exams)</p>
+          <h1 id="heroTitle">כל המשימות</h1>
+          <p id="heroSub">מרוכז מכל השכבות · כולל סינון חכם לפי כיתה</p>
+        </div>
+
+        <div class="hero-right">
+          <span class="chip blue" id="ctxChip" style="display:none;">🔎 כיתה: —</span>
+          <span class="chip good" id="fromClassChip" style="display:none;">↩️ הגעת מדף כיתה</span>
+
+          <a class="btn primary" href="index.html">🏠 אתר</a>
+          <a class="btn ghost" id="backToClassBtn" href="class.html" style="display:none;">↩️ חזרה לכיתה</a>
+          <button class="btn ghost" id="clearBtn" type="button">🧼 נקה</button>
+          <button class="btn good" id="refreshBtn" type="button">🔄 רענן</button>
         </div>
       </div>
 
-      <div class="actions">
-        <a class="pill primary" href="index.html">🏠 חזרה לאתר</a>
-        <button class="pill good" id="refreshBtn">🔄 רענן</button>
-      </div>
-    </header>
+      <div class="grid" style="margin-top:14px;">
+        <div class="filters">
+          <div>
+            <label for="q">חיפוש</label>
+            <input id="q" placeholder="חפש לפי כותרת / תוכן / כיתה…" />
+          </div>
 
-    <section class="grid">
-      <div class="filters">
-        <div>
-          <label for="q">חיפוש</label>
-          <input id="q" placeholder="חפש לפי כותרת/תיאור/כיתה..." />
+          <div>
+            <label for="grade">שכבה</label>
+            <select id="grade">
+              <option value="all">הכל</option>
+              <option value="z">ז׳</option>
+              <option value="h">ח׳</option>
+              <option value="t">ט׳</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="classId">כיתה</label>
+            <select id="classId">
+              <option value="all">הכל</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="sort">מיון</label>
+            <select id="sort">
+              <option value="newFirst">חדש קודם</option>
+              <option value="oldFirst">ישן קודם</option>
+              <option value="titleAsc">כותרת א-ת</option>
+            </select>
+          </div>
         </div>
 
-        <div>
-          <label for="grade">שכבה</label>
-          <select id="grade">
-            <option value="all">הכל</option>
-            <option value="z">ז׳</option>
-            <option value="h">ח׳</option>
-            <option value="t">ט׳</option>
-          </select>
-        </div>
+        <div class="stats">
+          <div class="stats-left">
+            <div class="stat"><b id="countAll">0</b> משימות</div>
+            <div class="stat"><b id="countFiltered">0</b> אחרי סינון</div>
+          </div>
 
-        <div>
-          <label for="classId">כיתה</label>
-          <select id="classId">
-            <option value="all">הכל</option>
-          </select>
-        </div>
-
-        <div>
-          <label for="sort">מיון</label>
-          <select id="sort">
-            <option value="newFirst">חדש קודם</option>
-            <option value="oldFirst">ישן קודם</option>
-            <option value="titleAsc">כותרת א-ת</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="stats">
-        <div class="stat"><b id="countAll">0</b> משימות</div>
-        <div class="stat"><b id="countFiltered">0</b> אחרי סינון</div>
-      </div>
-
-      <div class="list">
-        <div class="head">
-          <div class="t">📌 משימות</div>
-          <div class="small" id="lastUpdated">לא נטען עדיין</div>
-        </div>
-        <div class="items" id="items">
-          <div class="loader">טוען מ־Firestore…</div>
+          <div class="live">
+            <span class="dot"></span>
+            <span id="liveClock">עודכן: —</span>
+          </div>
         </div>
       </div>
     </section>
-  </div>
+
+    <!-- LIST -->
+    <section class="card" id="listCard" style="margin-top:12px; padding:0;">
+      <div class="list-head">
+        <div class="list-title">📌 משימות</div>
+        <div class="mini-muted" id="lastFetch">טעינה אחרונה: —</div>
+      </div>
+
+      <div class="items" id="items">
+        <div class="loader">טוען מ־Firestore…</div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // Theme toggle (same idea like class.html)
+    (function () {
+      const btn = document.getElementById("theme-toggle");
+      if (!btn) return;
+
+      function applyTheme(theme) {
+        document.documentElement.setAttribute("data-theme", theme);
+        btn.textContent = theme === "dark" ? "🌙" : "☀️";
+        try { localStorage.setItem("theme", theme); } catch {}
+      }
+
+      let saved = "dark";
+      try { saved = localStorage.getItem("theme") || "dark"; } catch {}
+      applyTheme(saved);
+
+      btn.addEventListener("click", () => {
+        const cur = document.documentElement.getAttribute("data-theme") || "dark";
+        applyTheme(cur === "dark" ? "light" : "dark");
+      });
+    })();
+
+    // mobile menu
+    (function () {
+      const btn = document.getElementById("nav-toggle");
+      const menu = document.getElementById("nav-mobile");
+      if (!btn || !menu) return;
+
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const isOpen = menu.classList.toggle("open");
+        btn.setAttribute("aria-expanded", String(isOpen));
+        menu.setAttribute("aria-hidden", String(!isOpen));
+      });
+
+      menu.querySelectorAll("a").forEach((a) => {
+        a.addEventListener("click", () => {
+          menu.classList.remove("open");
+          btn.setAttribute("aria-expanded", "false");
+          menu.setAttribute("aria-hidden", "true");
+        });
+      });
+
+      document.addEventListener("click", (e) => {
+        if (menu.contains(e.target) || btn.contains(e.target)) return;
+        menu.classList.remove("open");
+        btn.setAttribute("aria-expanded", "false");
+        menu.setAttribute("aria-hidden", "true");
+      });
+    })();
+  </script>
 
   <script type="module">
     import { db } from "./firebase-config.js";
@@ -171,15 +564,27 @@
       };
       return map[String(classId||"").toLowerCase()] || String(classId||"");
     }
-
+    function gradeFromClassId(classId){
+      const c = String(classId||"").toLowerCase().trim();
+      if(!c) return "";
+      if(c.startsWith("z")) return "z";
+      if(c.startsWith("h")) return "h";
+      if(c.startsWith("t")) return "t";
+      return "";
+    }
     function gradeLabel(g){
       return g==="z" ? "ז׳" : g==="h" ? "ח׳" : g==="t" ? "ט׳" : g;
     }
-
     function escapeHtml(str){
       return String(str||"")
         .replace(/&/g,"&amp;").replace(/</g,"&lt;")
         .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    }
+    function normalize(x){ return String(x||"").toLowerCase().trim(); }
+    function blob(t){
+      return [
+        t.title, t.body, t.classId, classIdToLabel(t.classId), t.grade
+      ].map(v=>String(v||"")).join(" ").toLowerCase();
     }
 
     const itemsEl = document.getElementById("items");
@@ -188,11 +593,28 @@
     const classEl = document.getElementById("classId");
     const sortEl = document.getElementById("sort");
     const refreshBtn = document.getElementById("refreshBtn");
+    const clearBtn = document.getElementById("clearBtn");
+
     const countAllEl = document.getElementById("countAll");
     const countFilteredEl = document.getElementById("countFiltered");
-    const lastUpdatedEl = document.getElementById("lastUpdated");
+    const lastFetchEl = document.getElementById("lastFetch");
+    const liveClockEl = document.getElementById("liveClock");
+
+    const ctxChip = document.getElementById("ctxChip");
+    const fromClassChip = document.getElementById("fromClassChip");
+    const backToClassBtn = document.getElementById("backToClassBtn");
+    const backToClassTop = document.getElementById("backToClassTop");
+    const backToClassMobile = document.getElementById("backToClassMobile");
+    const heroTitle = document.getElementById("heroTitle");
+    const heroSub = document.getElementById("heroSub");
 
     let ALL = [];
+    let lastFetchedAt = null;
+
+    function getParam(name){
+      try{ return new URLSearchParams(location.search).get(name); }
+      catch{ return null; }
+    }
 
     function refreshClassDropdown(){
       const g = gradeEl.value;
@@ -210,41 +632,97 @@
       classEl.value = opts.some(o=>o.v===cur) ? cur : "all";
     }
 
-    function normalize(x){ return String(x||"").toLowerCase().trim(); }
+    // Context: url -> referrer -> localStorage
+    function pickInitialContext(){
+      const params = new URLSearchParams(location.search);
 
-    function blob(t){
-      return [
-        t.title, t.body, t.classId, classIdToLabel(t.classId), t.grade
-      ].map(v=>String(v||"")).join(" ").toLowerCase();
-    }
+      // תומך בשני שמות (כי ב-class.js אתה משתמש class=)
+      let classId = normalize(params.get("class") || params.get("classId"));
+      let grade = normalize(params.get("grade"));
 
-    async function loadAll(){
-      itemsEl.innerHTML = `<div class="loader">טוען מ־tasks/z,h,t…</div>`;
-      ALL = [];
+      const ref = normalize(document.referrer || "");
+      const hasRef = !!ref;
 
-      for(const g of GRADES){
-        try{
-          const snap = await getDoc(doc(db, "tasks", g));
-          const data = snap.exists() ? (snap.data()||{}) : {};
-          const items = Array.isArray(data.items) ? data.items : [];
-          for(const t of items){
-            ALL.push({ ...t, grade: g });
-          }
-        }catch(err){
-          console.error("load tasks failed:", g, err);
-          itemsEl.innerHTML = `
-            <div class="empty">
-              שגיאה בטעינה (בדוק Console/Rules).<br>
-              אם כתוב <b>permission-denied</b> — החוקים חוסמים קריאה ל- <b>tasks/${g}</b>.
-            </div>
-          `;
-          return;
-        }
+      if(!classId && ref){
+        const m = ref.match(/(?:\?|&)class=([zht]\d{1,2})\b/i) || ref.match(/\b([zht]\d{1,2})\b/i);
+        if(m) classId = normalize(m[1]);
       }
 
-      lastUpdatedEl.textContent = "עודכן: " + new Date().toLocaleString("he-IL");
-      countAllEl.textContent = String(ALL.length);
-      applyAndRender();
+      if(!classId){
+        try{ classId = normalize(localStorage.getItem("lastClassId")); }catch{}
+      }
+
+      if(classId && !grade) grade = gradeFromClassId(classId);
+
+      // וולידציה — רק אם זה נראה כמו z1/h4/t2
+      if(classId && !/^[zht]\d{1,2}$/.test(classId)){
+        classId = "";
+        grade = "";
+      }
+
+      return { classId, grade, hasRef };
+    }
+
+    function applyContextUI(ctx){
+      if(ctx.classId){
+        ctxChip.style.display = "inline-flex";
+        ctxChip.textContent = `🔎 ${gradeLabel(ctx.grade)} · ${classIdToLabel(ctx.classId)}`;
+
+        heroTitle.textContent = `משימות לכיתה ${classIdToLabel(ctx.classId)}`;
+        heroSub.textContent = "הדף סינן אוטומטית לפי הכיתה שלך.";
+
+        fromClassChip.style.display = ctx.hasRef ? "inline-flex" : "none";
+
+        backToClassBtn.style.display = "inline-flex";
+        backToClassBtn.href = `class.html?class=${encodeURIComponent(ctx.classId)}`;
+
+        backToClassTop.href = `class.html?class=${encodeURIComponent(ctx.classId)}`;
+        backToClassMobile.href = `class.html?class=${encodeURIComponent(ctx.classId)}`;
+      }else{
+        ctxChip.style.display = "none";
+        fromClassChip.style.display = "none";
+        backToClassBtn.style.display = "none";
+
+        heroTitle.textContent = "כל המשימות";
+        heroSub.textContent = "מרוכז מכל השכבות · כולל סינון חכם לפי כיתה";
+
+        backToClassTop.href = "class.html";
+        backToClassMobile.href = "class.html";
+      }
+    }
+
+    function applyInitialContext(){
+      const ctx = pickInitialContext();
+
+      if(ctx.grade) gradeEl.value = ctx.grade;
+      refreshClassDropdown();
+      if(ctx.classId) classEl.value = ctx.classId;
+
+      applyContextUI(ctx);
+
+      if(ctx.classId){
+        try{ localStorage.setItem("lastClassId", ctx.classId); }catch{}
+      }
+    }
+
+    function tickLiveClock(){
+      const now = new Date();
+      const hh = String(now.getHours()).padStart(2,"0");
+      const mm = String(now.getMinutes()).padStart(2,"0");
+      const ss = String(now.getSeconds()).padStart(2,"0");
+      liveClockEl.textContent = `עודכן עכשיו: ${hh}:${mm}:${ss}`;
+
+      if(lastFetchedAt){
+        const d = String(lastFetchedAt.getDate()).padStart(2,"0");
+        const m = String(lastFetchedAt.getMonth()+1).padStart(2,"0");
+        const y = lastFetchedAt.getFullYear();
+        const h2 = String(lastFetchedAt.getHours()).padStart(2,"0");
+        const m2 = String(lastFetchedAt.getMinutes()).padStart(2,"0");
+        const s2 = String(lastFetchedAt.getSeconds()).padStart(2,"0");
+        lastFetchEl.textContent = `טעינה אחרונה: ${d}.${m}.${y} · ${h2}:${m2}:${s2}`;
+      }else{
+        lastFetchEl.textContent = "טעינה אחרונה: —";
+      }
     }
 
     function applyAndRender(){
@@ -260,7 +738,6 @@
       if(c !== "all") arr = arr.filter(x => normalize(x.classId) === c);
       if(q) arr = arr.filter(x => blob(x).includes(q));
 
-      // מיון
       arr.sort((a,b)=>{
         const at = new Date(a.createdAt || 0).getTime();
         const bt = new Date(b.createdAt || 0).getTime();
@@ -286,29 +763,97 @@
         const cls = normalize(t.classId);
 
         const link = (t.fileUrl || t.linkUrl || "").trim();
-        const linkHtml = link ? `<div style="margin-top:10px">📎 <a class="link" href="${escapeHtml(link)}" target="_blank" rel="noopener">פתח קובץ/קישור</a></div>` : "";
+        const linkHtml = link
+          ? `<a class="task-link" href="${escapeHtml(link)}" target="_blank" rel="noopener">📎 פתח קובץ/קישור</a>`
+          : "";
+
+        const created = t.createdAt ? new Date(t.createdAt) : null;
+        const createdTxt = created
+          ? `${String(created.getDate()).padStart(2,"0")}.${String(created.getMonth()+1).padStart(2,"0")}.${created.getFullYear()}`
+          : "";
 
         return `
-          <div class="item">
-            <div>
-              <h3>${escapeHtml(t.title || "משימה")}</h3>
-              <div class="meta">
-                <span class="tag blue"><b>שכבה:</b> ${escapeHtml(gradeLabel(g))}</span>
-                <span class="tag"><b>כיתה:</b> ${escapeHtml(classIdToLabel(cls))}</span>
-              </div>
-              ${t.body ? `<div style="margin-top:10px; color:rgba(234,240,255,.86); line-height:1.5;">${escapeHtml(t.body)}</div>` : ""}
-              ${linkHtml}
+          <article class="task">
+            <div class="task-top">
+              <h3 class="task-title">${escapeHtml(t.title || "משימה")}</h3>
+              <div class="mini-muted">${createdTxt ? `נוסף: ${escapeHtml(createdTxt)}` : ""}</div>
             </div>
-          </div>
+
+            <div class="task-meta">
+              <span class="tag blue">שכבה: ${escapeHtml(gradeLabel(g))}</span>
+              <span class="tag">כיתה: ${escapeHtml(classIdToLabel(cls))}</span>
+              ${t.subject ? `<span class="tag good">📘 ${escapeHtml(t.subject)}</span>` : ""}
+              ${t.kind || t.type ? `<span class="tag warn">✅ ${escapeHtml(t.kind || t.type)}</span>` : ""}
+            </div>
+
+            ${t.body ? `<div class="task-body">${escapeHtml(t.body)}</div>` : ""}
+            ${linkHtml}
+          </article>
         `;
       }).join("");
     }
 
+    async function loadAll(){
+      itemsEl.innerHTML = `<div class="loader">טוען משימות…</div>`;
+      ALL = [];
+
+      for(const g of GRADES){
+        try{
+          const snap = await getDoc(doc(db, "tasks", g));
+          const data = snap.exists() ? (snap.data()||{}) : {};
+          const items = Array.isArray(data.items) ? data.items : [];
+          for(const t of items){
+            ALL.push({ ...t, grade: g });
+          }
+        }catch(err){
+          console.error("load tasks failed:", g, err);
+          itemsEl.innerHTML = `
+            <div class="empty">
+              שגיאה בטעינה. בדוק Console / Rules.<br>
+              אם כתוב <b>permission-denied</b> — החוקים חוסמים קריאה ל- <b>tasks/${g}</b>.
+            </div>
+          `;
+          return;
+        }
+      }
+
+      lastFetchedAt = new Date();
+      countAllEl.textContent = String(ALL.length);
+      applyAndRender();
+    }
+
+    function clearFilters(){
+      qEl.value = "";
+      gradeEl.value = "all";
+      refreshClassDropdown();
+      classEl.value = "all";
+      sortEl.value = "newFirst";
+
+      // מוחק קונטקסט גם מה-URL (כדי שלא יחזור)
+      try{
+        const url = new URL(location.href);
+        url.searchParams.delete("class");
+        url.searchParams.delete("classId");
+        url.searchParams.delete("grade");
+        history.replaceState({}, "", url.toString());
+      }catch{}
+
+      applyContextUI({classId:"", grade:"", hasRef:false});
+      applyAndRender();
+    }
+
+    // events
     [qEl, gradeEl, classEl, sortEl].forEach(el => el.addEventListener("input", applyAndRender));
     refreshBtn.addEventListener("click", loadAll);
+    clearBtn.addEventListener("click", clearFilters);
 
-    refreshClassDropdown();
-    loadAll();
+    // boot
+    applyInitialContext();
+    await loadAll();
+
+    // LIVE CLOCK every second
+    tickLiveClock();
+    setInterval(tickLiveClock, 1000);
   </script>
 </body>
 </html>

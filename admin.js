@@ -1303,8 +1303,6 @@ function setupSiteContentForm() {
   });
 }
 
-/* ------------ DELETE + TOGGLE HANDLER ------------ */
-
 function setupDeleteHandler() {
   document.addEventListener("click", async (e) => {
     const toggleBtn = e.target.closest(".admin-toggle-poll");
@@ -1347,7 +1345,6 @@ function setupDeleteHandler() {
       renderNewsAdmin();
       await saveNewsGrade(grade);
 
-      // ✅ FIX: לוג מחיקת NEWS במקום הנכון
       if (deletedNews) {
         await logSystemChange("delete", "news", {
           grade,
@@ -1375,8 +1372,6 @@ function setupDeleteHandler() {
           itemsCount: tasksData[grade].length
         });
       }
-
-      // ✅ FIX: מחקתי את deletedNews מפה (זה היה הבאג)
 
     } else if (type === "exam") {
       if (!examsData[grade]) return;
@@ -1434,6 +1429,7 @@ function setupDeleteHandler() {
     }
   });
 }
+
 
 /* ------------ GRADE FILTER ------------ */
 

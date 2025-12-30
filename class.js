@@ -1051,14 +1051,13 @@ function renderTasks(classId, arr) {
     : (nearest ? [nearest] : []);
 
   // header button
-  if (tasksAllBtn) {
-    tasksAllBtn.textContent = tasksViewAll ? "חזרה" : "לכל המשימות »";
-    tasksAllBtn.onclick = () => {
-      tasksViewAll = !tasksViewAll;
-      // rerender from cached data
-      renderTasks(classId, lastTasksArr);
-    };
-  }
+if (tasksAllBtn) {
+  // תמיד קישור אמיתי לדף tasks עם הכיתה הנוכחית
+  tasksAllBtn.textContent = "לכל המשימות »";
+  tasksAllBtn.href = `tasks.html?class=${encodeURIComponent(classId)}`;
+  tasksAllBtn.onclick = null; // מבטל את ה-toggle הישן
+}
+
 
   tasks.innerHTML = list.map((t) => {
     const dt = t._dt || taskDueToDate(t);
