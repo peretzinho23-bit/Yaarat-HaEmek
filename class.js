@@ -355,20 +355,42 @@ function getNextExamCountdownParts() {
 }
 
 function taskDueToDate(t) {
-  // Prefer dueAt (Timestamp/Date/ms)
-  const dueAt = t?.dueAt ?? t?.due ?? t?.deadline;
-  if (dueAt && typeof dueAt === "object") {
-    // Firestore Timestamp has toDate()
-    if (typeof dueAt.toDate === "function") {
-      const dt = dueAt.toDate();
-      return isNaN(dt.getTime()) ? null : dt;
-    }
-    // native Date
-    if (dueAt instanceof Date) return isNaN(dueAt.getTime()) ? null : dueAt;
+  const v = t?.dueAt ?? t?.due ?? t?.deadline;
+
+  if (!v) return null;
+
+  // ISO string (מה־admin)
+  if (typeof v === "string") {
+    const d = new Date(v);
+    return isNaN(d.getTime()) ? null : d;
   }
+
+  // Firestore Timestamp
+  if (typeof v?.toDate === "function") {
+    const d = v.toDate();
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  // seconds (Timestamp raw)
+  if (typeof v?.seconds === "number") {
+    const d = new Date(v.seconds * 1000);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  // number (ms)
+  if (typeof v === "number") {
+    const d = new Date(v);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  return null;
+}
+
+
+  // ✅ number (ms)
   if (typeof dueAt === "number") {
     const dt = new Date(dueAt);
-    return isNaN(dt.getTime()) ? null : dt;
+    return Number.isNaN(dt.getTime()) ? null : dt;
   }
 
   // fallback: dueDate + dueTime
@@ -385,6 +407,7 @@ function taskDueToDate(t) {
   }
   return d;
 }
+
 
 function getNextTaskCountdownParts() {
   if (!Array.isArray(lastTasksArr) || lastTasksArr.length === 0) return null;
@@ -1099,6 +1122,25 @@ if (tasksAllBtn) {
       </div>
     `;
   }).join("");
+}
+function toDateSafe(v){
+  if(!v) return null;
+
+  // אם שמרת ISO string
+  if (typeof v === "string") {
+    const d = new Date(v);
+    return Number.isNaN(d.getTime()) ? null : d;
+  }
+
+  // אם יצא Timestamp של Firestore
+  if (v?.seconds) return new Date(v.seconds * 1000);
+  if (typeof v?.toDate === "function") return v.toDate();
+
+  return null;
+}
+
+function fmtIL(d){
+  return d ? d.toLocaleString("he-IL") : "";
 }
 
 async function loadTasksOnce(classId) {
