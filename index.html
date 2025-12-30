@@ -740,6 +740,135 @@ html[data-theme="dark"].theme-changing .hero-home-cards .grade-card{
     0 0 28px rgba(36, 20, 20, 0.4);
 }
 
+/* =========================
+   HOME CLASS PICKER – NEW LOOK
+   (לא משנה IDs, לא שובר JS)
+========================= */
+.home-class-wrap{
+  width:100%;
+  max-width:900px;
+  margin:0 auto;
+}
+
+.home-class-panel{
+  border-radius:24px;
+  padding:18px 18px 16px;
+  border:1px solid rgba(148,163,184,0.55);
+  background: rgba(255,255,255,0.92);
+  box-shadow: 0 18px 45px rgba(15,23,42,0.10);
+  position:relative;
+  overflow:hidden;
+}
+
+.home-class-panel::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(900px 240px at 80% -20%, rgba(37,99,235,.18), transparent 60%),
+    radial-gradient(700px 220px at 10% 120%, rgba(56,189,248,.14), transparent 55%);
+  pointer-events:none;
+}
+
+.home-class-head{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:12px;
+  position:relative;
+  z-index:1;
+}
+
+.home-class-icon{
+  width:46px;
+  height:46px;
+  border-radius:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:1.35rem;
+  background: rgba(37,99,235,0.10);
+  border:1px solid rgba(37,99,235,0.22);
+}
+
+.home-class-title{
+  font-weight:900;
+  letter-spacing:.2px;
+}
+
+.home-class-subtitle{
+  font-size:.9rem;
+  color: rgba(15,23,42,0.70);
+}
+
+.home-class-form{
+  display:grid;
+  grid-template-columns: 110px 1fr 110px 1fr auto;
+  gap:10px;
+  align-items:center;
+  position:relative;
+  z-index:1;
+}
+
+.home-class-label{
+  font-size:.85rem;
+  font-weight:800;
+  color: rgba(15,23,42,0.78);
+}
+
+.home-class-select{
+  border-radius:14px;
+  padding:10px 12px;
+  border:1px solid rgba(148,163,184,0.55);
+  background: rgba(255,255,255,0.9);
+  box-shadow: 0 10px 22px rgba(15,23,42,0.06);
+}
+
+.home-class-go{
+  border-radius:16px;
+  padding:10px 16px;
+  font-weight:900;
+  box-shadow: 0 14px 34px rgba(37,99,235,0.20);
+}
+
+
+
+/* responsive */
+@media (max-width:900px){
+  .home-class-form{
+    grid-template-columns: 1fr 1fr;
+  }
+  .home-class-label{ display:none; }
+  .home-class-go{ grid-column: 1 / -1; }
+}
+
+/* dark mode */
+html[data-theme="dark"] .home-class-panel{
+  background: rgba(15,23,42,0.88);
+  border-color: rgba(148,163,184,0.22);
+  box-shadow: 0 18px 55px rgba(0,0,0,0.45);
+}
+html[data-theme="dark"] .home-class-icon{
+  background: rgba(56,189,248,0.10);
+  border-color: rgba(56,189,248,0.22);
+}
+html[data-theme="dark"] .home-class-subtitle{
+  color: rgba(255,255,255,0.72);
+}
+html[data-theme="dark"] .home-class-label{
+  color: rgba(255,255,255,0.78);
+}
+html[data-theme="dark"] .home-class-select{
+  background: rgba(2,6,23,0.55);
+  border-color: rgba(148,163,184,0.25);
+  box-shadow: 0 10px 22px rgba(0,0,0,0.28);
+  color:#e5e7eb;
+}
+html[data-theme="dark"] .home-class-hints .pill{
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(148,163,184,0.22);
+  color: rgba(255,255,255,0.72);
+}
 
   </style>
 </head>
@@ -815,7 +944,7 @@ html[data-theme="dark"].theme-changing .hero-home-cards .grade-card{
       <div class="nav-mobile" id="nav-mobile" aria-hidden="true">
         <a href="index.html#home-news">חדשות</a>
         <a href="index.html#home-exams">מבחנים</a>
-        <a href="index.html#grades">השכבות</a>
+<a href="index.html#home-class-picker">השכבות</a>
         <a href="polls.html">סקרים</a>
         <a href="about.html">אודות</a>
         <a href="index.html#contact">יצירת קשר</a>
@@ -972,31 +1101,45 @@ html[data-theme="dark"].theme-changing .hero-home-cards .grade-card{
   </section>
 <section id="home-class-picker" class="section-light reveal-on-scroll">
   <div class="container">
-    <div class="card home-class-card">
-      <h3 style="margin:0 0 8px;">בחירת כיתה</h3>
-      <p class="section-subtitle" style="margin-top:0;">
-        בחר שכבה ואז כיתה, ונעביר אותך לדף הכיתה.
-      </p>
 
-      <div class="home-class-row">
-        <select id="home-grade" class="select">
-          <option value="">בחר שכבה</option>
-          <option value="z">ז׳</option>
-          <option value="h">ח׳</option>
-          <option value="t">ט׳</option>
-        </select>
+    <div class="home-class-wrap">
+      <div class="home-class-panel">
+        <div class="home-class-head">
+          <div class="home-class-icon" aria-hidden="true">🏫</div>
+          <div class="home-class-titles">
+            <h3 class="home-class-title" style="margin:0;">בחירת כיתה</h3>
+            <p class="home-class-subtitle" style="margin:6px 0 0;">
+              בחר שכבה ואז כיתה — ונעביר אותך לדף הכיתה.
+            </p>
+          </div>
+        </div>
 
-        <select id="home-class" class="select" disabled>
-          <option value="">בחר כיתה</option>
-        </select>
+        <div class="home-class-form">
+          <label class="home-class-label" for="home-grade">שכבה</label>
+          <select id="home-grade" class="select home-class-select">
+            <option value="">בחר שכבה</option>
+            <option value="z">ז׳</option>
+            <option value="h">ח׳</option>
+            <option value="t">ט׳</option>
+          </select>
 
-        <button id="home-open-class" class="btn" type="button" disabled>
-          פתח דף כיתה
-        </button>
+          <label class="home-class-label" for="home-class">כיתה</label>
+          <select id="home-class" class="select home-class-select" disabled>
+            <option value="">בחר כיתה</option>
+          </select>
+
+          <button id="home-open-class" class="btn home-class-go" type="button" disabled>
+            פתח דף כיתה
+          </button>
+        </div>
+
+ 
       </div>
     </div>
+
   </div>
 </section>
+
 
 </div>
 
@@ -1006,57 +1149,7 @@ html[data-theme="dark"].theme-changing .hero-home-cards .grade-card{
 <script src="home-class-picker.js" defer></script>
 
 
-  <section id="home-exams" class="section-light reveal-on-scroll">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title" id="home-exams-title">מבחנים קרובים</h2>
-        <p class="section-subtitle" id="home-exams-subtitle">
-          בחרו את הכיתה שלכם כדי לראות את לוח המבחנים המלא – ובכרטיס למטה יופיעו גם המבחנים הבאים בשכבה.
-        </p>
-      </div>
-
-      <div class="home-grid">
-        <div class="grade-card">
-          <h3>מבחנים · שכבת ז'</h3>
-          <p style="font-size:0.85rem; margin-top:4px;">בחרו את כיתתכם כדי לראות את כל המבחנים הקרובים:</p>
-          <div class="grades-buttons" style="margin:10px 0 14px;">
-            <a href="exams.html?grade=z&class=z1" class="grade-btn">ז1</a>
-            <a href="exams.html?grade=z&class=z2" class="grade-btn">ז2</a>
-            <a href="exams.html?grade=z&class=z3" class="grade-btn">ז3</a>
-            <a href="exams.html?grade=z&class=z4" class="grade-btn">ז4</a>
-            <a href="exams.html?grade=z&class=z5" class="grade-btn">ז5/7</a>
-          </div>
-          <div id="home-exams-z" class="home-exams-list"></div>
-        </div>
-
-        <div class="grade-card">
-          <h3>מבחנים · שכבת ח'</h3>
-          <p style="font-size:0.85rem; margin-top:4px;">בחרו את כיתתכם כדי לראות את כל המבחנים הקרובים:</p>
-          <div class="grades-buttons" style="margin:10px 0 14px;">
-            <a href="exams.html?grade=h&class=h1" class="grade-btn">ח1/7</a>
-            <a href="exams.html?grade=h&class=h4" class="grade-btn">ח4/8</a>
-            <a href="exams.html?grade=h&class=h5" class="grade-btn">ח5/9</a>
-            <a href="exams.html?grade=h&class=h6" class="grade-btn">ח6/10</a>
-          </div>
-          <div id="home-exams-h" class="home-exams-list"></div>
-        </div>
-
-        <div class="grade-card">
-          <h3>מבחנים · שכבת ט'</h3>
-          <p style="font-size:0.85rem; margin-top:4px;">בחרו את כיתתכם כדי לראות את כל המבחנים הקרובים:</p>
-          <div class="grades-buttons" style="margin:10px 0 14px;">
-            <a href="exams.html?grade=t&class=t1" class="grade-btn">ט1</a>
-            <a href="exams.html?grade=t&class=t2" class="grade-btn">ט2</a>
-            <a href="exams.html?grade=t&class=t3" class="grade-btn">ט3</a>
-            <a href="exams.html?grade=t&class=t4" class="grade-btn">ט4</a>
-            <a href="exams.html?grade=t&class=t5" class="grade-btn">ט5</a>
-          </div>
-          <div id="home-exams-t" class="home-exams-list"></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
+  
   <!-- GRADES -->
   <section id="grades" class="section-dark-strong reveal-on-scroll">
     <div class="container">

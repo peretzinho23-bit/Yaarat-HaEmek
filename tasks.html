@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>כל המשימות · יערת העמק</title>
+  <style>
+    :root{
+      --bg:#0b1020; --line:rgba(255,255,255,.12);
+      --card:rgba(255,255,255,.06); --text:#eaf0ff; --muted:rgba(234,240,255,.72);
+      --accent:#4f8cff; --good:#16a34a; --bad:#ef4444; --r:18px; --r2:14px; --w:1100px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; color:var(--text);
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+      background:
+        radial-gradient(1200px 600px at 85% -10%, rgba(79,140,255,.35), transparent 55%),
+        radial-gradient(900px 500px at 15% 0%, rgba(22,163,74,.22), transparent 55%),
+        linear-gradient(180deg,#070a12,#0b1020 60%,#060813);
+      min-height:100svh;
+    }
+    .wrap{max-width:var(--w); margin:0 auto; padding:18px 14px 60px}
+    .top{
+      display:flex; gap:12px; align-items:center; justify-content:space-between;
+      padding:14px 14px; border:1px solid var(--line);
+      background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.03));
+      border-radius:var(--r); position:sticky; top:12px; z-index:10;
+      backdrop-filter: blur(10px);
+    }
+    .brand{display:flex; gap:12px; align-items:center}
+    .logo{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,rgba(79,140,255,.95),rgba(22,163,74,.85))}
+    h1{margin:0;font-size:16px;font-weight:900}
+    .sub{margin:0;font-size:12px;color:var(--muted)}
+    .actions{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end}
+    .pill{
+      border:1px solid var(--line); background:rgba(255,255,255,.05);
+      padding:10px 12px; border-radius:999px; color:var(--text);
+      cursor:pointer; user-select:none; font-weight:800; font-size:13px;
+      text-decoration:none;
+    }
+    .pill.primary{border-color:rgba(79,140,255,.5); background:rgba(79,140,255,.18)}
+    .pill.good{border-color:rgba(22,163,74,.5); background:rgba(22,163,74,.16)}
+    .grid{margin-top:14px; display:grid; gap:12px}
+    .filters{
+      padding:14px; border:1px solid var(--line); border-radius:var(--r);
+      background:rgba(255,255,255,.035);
+      display:grid; grid-template-columns: 1.2fr .6fr .7fr .7fr;
+      gap:10px;
+    }
+    @media(max-width:920px){.filters{grid-template-columns:1fr 1fr}}
+    @media(max-width:520px){.filters{grid-template-columns:1fr}.top{position:relative;top:0}}
+    label{display:block; font-size:12px; color:var(--muted); margin-bottom:6px}
+    input,select{
+      width:100%; padding:11px 12px; border-radius:12px;
+      border:1px solid var(--line); background:rgba(0,0,0,.22);
+      color:var(--text); outline:none;
+    }
+    .stats{
+      display:flex; flex-wrap:wrap; gap:10px; align-items:center;
+      padding:12px 14px; border:1px solid var(--line); border-radius:var(--r);
+      background:rgba(255,255,255,.03);
+    }
+    .stat{padding:10px 12px; border-radius:14px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.10); font-size:13px; color:var(--muted)}
+    .stat b{color:var(--text)}
+    .list{border:1px solid var(--line); border-radius:var(--r); background:rgba(255,255,255,.03); overflow:hidden}
+    .head{display:flex; justify-content:space-between; gap:10px; align-items:center; padding:12px 14px; border-bottom:1px solid var(--line); background:rgba(255,255,255,.04)}
+    .head .t{font-weight:900; font-size:14px}
+    .small{font-size:12px;color:var(--muted)}
+    .items{padding:10px}
+    .item{
+      border:1px solid rgba(255,255,255,.10); background:rgba(255,255,255,.045);
+      border-radius:var(--r2); padding:12px; margin:10px 0;
+      display:grid; grid-template-columns: 1fr; gap:10px;
+    }
+    .item h3{margin:0 0 6px; font-size:15px; font-weight:900}
+    .meta{display:flex; flex-wrap:wrap; gap:8px; font-size:12px; color:var(--muted); align-items:center}
+    .tag{padding:6px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.12); background:rgba(0,0,0,.22)}
+    .tag.blue{border-color:rgba(79,140,255,.45)}
+    .tag.good{border-color:rgba(22,163,74,.45)}
+    .loader{padding:14px 16px; border-radius:var(--r); border:1px dashed rgba(255,255,255,.25); color:var(--muted); background:rgba(0,0,0,.18)}
+    .empty{padding:22px 16px; text-align:center; color:var(--muted)}
+    .link{color:#b9d1ff; text-decoration:underline; word-break:break-all}
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="brand">
+        <div class="logo"></div>
+        <div>
+          <h1>כל המשימות</h1>
+          <p class="sub">נשלף מ־Firestore: tasks/z,h,t (לא exams)</p>
+        </div>
+      </div>
+
+      <div class="actions">
+        <a class="pill primary" href="index.html">🏠 חזרה לאתר</a>
+        <button class="pill good" id="refreshBtn">🔄 רענן</button>
+      </div>
+    </header>
+
+    <section class="grid">
+      <div class="filters">
+        <div>
+          <label for="q">חיפוש</label>
+          <input id="q" placeholder="חפש לפי כותרת/תיאור/כיתה..." />
+        </div>
+
+        <div>
+          <label for="grade">שכבה</label>
+          <select id="grade">
+            <option value="all">הכל</option>
+            <option value="z">ז׳</option>
+            <option value="h">ח׳</option>
+            <option value="t">ט׳</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="classId">כיתה</label>
+          <select id="classId">
+            <option value="all">הכל</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="sort">מיון</label>
+          <select id="sort">
+            <option value="newFirst">חדש קודם</option>
+            <option value="oldFirst">ישן קודם</option>
+            <option value="titleAsc">כותרת א-ת</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><b id="countAll">0</b> משימות</div>
+        <div class="stat"><b id="countFiltered">0</b> אחרי סינון</div>
+      </div>
+
+      <div class="list">
+        <div class="head">
+          <div class="t">📌 משימות</div>
+          <div class="small" id="lastUpdated">לא נטען עדיין</div>
+        </div>
+        <div class="items" id="items">
+          <div class="loader">טוען מ־Firestore…</div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script type="module">
+    import { db } from "./firebase-config.js";
+    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+    const GRADES = ["z","h","t"];
+    const CLASS_IDS_BY_GRADE = {
+      z: ["z1","z2","z3","z4","z5"],
+      h: ["h1","h4","h5","h6"],
+      t: ["t1","t2","t3","t4","t5"]
+    };
+
+    function classIdToLabel(classId){
+      const map = {
+        z1:"ז1", z2:"ז2", z3:"ז3", z4:"ז4", z5:"ז5",
+        h1:"ח1/7", h4:"ח4/8", h5:"ח5/9", h6:"ח6/10",
+        t1:"ט1", t2:"ט2", t3:"ט3", t4:"ט4", t5:"ט5"
+      };
+      return map[String(classId||"").toLowerCase()] || String(classId||"");
+    }
+
+    function gradeLabel(g){
+      return g==="z" ? "ז׳" : g==="h" ? "ח׳" : g==="t" ? "ט׳" : g;
+    }
+
+    function escapeHtml(str){
+      return String(str||"")
+        .replace(/&/g,"&amp;").replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    }
+
+    const itemsEl = document.getElementById("items");
+    const qEl = document.getElementById("q");
+    const gradeEl = document.getElementById("grade");
+    const classEl = document.getElementById("classId");
+    const sortEl = document.getElementById("sort");
+    const refreshBtn = document.getElementById("refreshBtn");
+    const countAllEl = document.getElementById("countAll");
+    const countFilteredEl = document.getElementById("countFiltered");
+    const lastUpdatedEl = document.getElementById("lastUpdated");
+
+    let ALL = [];
+
+    function refreshClassDropdown(){
+      const g = gradeEl.value;
+      const cur = classEl.value;
+
+      const opts = [{v:"all", t:"הכל"}];
+      if(g === "all"){
+        const all = Object.values(CLASS_IDS_BY_GRADE).flat();
+        for(const id of all) opts.push({v:id, t: classIdToLabel(id)});
+      }else{
+        for(const id of (CLASS_IDS_BY_GRADE[g]||[])) opts.push({v:id, t: classIdToLabel(id)});
+      }
+
+      classEl.innerHTML = opts.map(o=>`<option value="${o.v}">${o.t}</option>`).join("");
+      classEl.value = opts.some(o=>o.v===cur) ? cur : "all";
+    }
+
+    function normalize(x){ return String(x||"").toLowerCase().trim(); }
+
+    function blob(t){
+      return [
+        t.title, t.body, t.classId, classIdToLabel(t.classId), t.grade
+      ].map(v=>String(v||"")).join(" ").toLowerCase();
+    }
+
+    async function loadAll(){
+      itemsEl.innerHTML = `<div class="loader">טוען מ־tasks/z,h,t…</div>`;
+      ALL = [];
+
+      for(const g of GRADES){
+        try{
+          const snap = await getDoc(doc(db, "tasks", g));
+          const data = snap.exists() ? (snap.data()||{}) : {};
+          const items = Array.isArray(data.items) ? data.items : [];
+          for(const t of items){
+            ALL.push({ ...t, grade: g });
+          }
+        }catch(err){
+          console.error("load tasks failed:", g, err);
+          itemsEl.innerHTML = `
+            <div class="empty">
+              שגיאה בטעינה (בדוק Console/Rules).<br>
+              אם כתוב <b>permission-denied</b> — החוקים חוסמים קריאה ל- <b>tasks/${g}</b>.
+            </div>
+          `;
+          return;
+        }
+      }
+
+      lastUpdatedEl.textContent = "עודכן: " + new Date().toLocaleString("he-IL");
+      countAllEl.textContent = String(ALL.length);
+      applyAndRender();
+    }
+
+    function applyAndRender(){
+      refreshClassDropdown();
+
+      const q = normalize(qEl.value);
+      const g = gradeEl.value;
+      const c = classEl.value;
+      const sort = sortEl.value;
+
+      let arr = ALL.slice();
+      if(g !== "all") arr = arr.filter(x => normalize(x.grade) === g);
+      if(c !== "all") arr = arr.filter(x => normalize(x.classId) === c);
+      if(q) arr = arr.filter(x => blob(x).includes(q));
+
+      // מיון
+      arr.sort((a,b)=>{
+        const at = new Date(a.createdAt || 0).getTime();
+        const bt = new Date(b.createdAt || 0).getTime();
+
+        if(sort === "newFirst") return bt - at;
+        if(sort === "oldFirst") return at - bt;
+        if(sort === "titleAsc") return String(a.title||"").localeCompare(String(b.title||""), "he");
+        return 0;
+      });
+
+      countFilteredEl.textContent = String(arr.length);
+      render(arr);
+    }
+
+    function render(list){
+      if(!list.length){
+        itemsEl.innerHTML = `<div class="empty">אין משימות תואמות לסינון.</div>`;
+        return;
+      }
+
+      itemsEl.innerHTML = list.map(t=>{
+        const g = normalize(t.grade);
+        const cls = normalize(t.classId);
+
+        const link = (t.fileUrl || t.linkUrl || "").trim();
+        const linkHtml = link ? `<div style="margin-top:10px">📎 <a class="link" href="${escapeHtml(link)}" target="_blank" rel="noopener">פתח קובץ/קישור</a></div>` : "";
+
+        return `
+          <div class="item">
+            <div>
+              <h3>${escapeHtml(t.title || "משימה")}</h3>
+              <div class="meta">
+                <span class="tag blue"><b>שכבה:</b> ${escapeHtml(gradeLabel(g))}</span>
+                <span class="tag"><b>כיתה:</b> ${escapeHtml(classIdToLabel(cls))}</span>
+              </div>
+              ${t.body ? `<div style="margin-top:10px; color:rgba(234,240,255,.86); line-height:1.5;">${escapeHtml(t.body)}</div>` : ""}
+              ${linkHtml}
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    [qEl, gradeEl, classEl, sortEl].forEach(el => el.addEventListener("input", applyAndRender));
+    refreshBtn.addEventListener("click", loadAll);
+
+    refreshClassDropdown();
+    loadAll();
+  </script>
+</body>
+</html>

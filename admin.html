@@ -902,7 +902,104 @@ body.admin-page .card{
           </section>
         </div>
 
-        <br><br>
+<br><br>
+
+<!-- TASKS -->
+<div id="tasks"></div>
+<h3 class="section-title" style="font-size:1.2rem;margin-bottom:10px;">משימות לפי כיתות</h3>
+<p class="section-subtitle">הוספת משימה תופיע בדף הכיתה אוטומטית (כמו חדשות/מבחנים).</p>
+
+<div class="admin-columns">
+  <!-- TASKS Z -->
+  <section class="admin-grade-section" data-grade="z">
+    <div class="card">
+      <h3>משימות · ז'</h3>
+      <div id="admin-tasks-z" class="admin-list"></div>
+
+      <form id="tasks-form-z" class="admin-form" data-grade="z">
+        <label>כיתה</label>
+        <select name="classId" required>
+          <option value="">בחר כיתה</option>
+          <option value="z1">ז1</option><option value="z2">ז2</option><option value="z3">ז3</option><option value="z4">ז4</option><option value="z5">ז5</option>
+        </select>
+
+        <label>מקצוע (אופציונלי)</label>
+        <input name="subject" placeholder="מתמטיקה / אנגלית..." />
+
+        <label>כותרת משימה</label>
+        <input name="title" placeholder="לדוגמה: שיעורי בית" required />
+
+        <label>תיאור המשימה</label>
+        <textarea name="text" placeholder="מה צריך לעשות?" required></textarea>
+
+        <label>דדליין (תאריך ושעה)</label>
+        <input name="dueAt" type="datetime-local" required />
+
+        <button type="submit">הוסף משימה לז'</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- TASKS H -->
+  <section class="admin-grade-section" data-grade="h">
+    <div class="card">
+      <h3>משימות · ח'</h3>
+      <div id="admin-tasks-h" class="admin-list"></div>
+
+      <form id="tasks-form-h" class="admin-form" data-grade="h">
+        <label>כיתה</label>
+        <select name="classId" required>
+          <option value="">בחר כיתה</option>
+          <option value="h1">ח1/7</option><option value="h4">ח4/8</option><option value="h5">ח5/9</option><option value="h6">ח6/10</option>
+        </select>
+
+        <label>מקצוע (אופציונלי)</label>
+        <input name="subject" placeholder="מתמטיקה / אנגלית..." />
+
+        <label>כותרת משימה</label>
+        <input name="title" placeholder="לדוגמה: להביא ציוד" required />
+
+        <label>תיאור המשימה</label>
+        <textarea name="text" placeholder="מה צריך לעשות?" required></textarea>
+
+        <label>דדליין (תאריך ושעה)</label>
+        <input name="dueAt" type="datetime-local" required />
+
+        <button type="submit">הוסף משימה לח'</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- TASKS T -->
+  <section class="admin-grade-section" data-grade="t">
+    <div class="card">
+      <h3>משימות · ט'</h3>
+      <div id="admin-tasks-t" class="admin-list"></div>
+
+      <form id="tasks-form-t" class="admin-form" data-grade="t">
+        <label>כיתה</label>
+        <select name="classId" required>
+          <option value="">בחר כיתה</option>
+          <option value="t1">ט1</option><option value="t2">ט2</option><option value="t3">ט3</option><option value="t4">ט4</option><option value="t5">ט5</option>
+        </select>
+
+        <label>מקצוע (אופציונלי)</label>
+        <input name="subject" placeholder="מתמטיקה / אנגלית..." />
+
+        <label>כותרת משימה</label>
+        <input name="title" placeholder="לדוגמה: עבודה להגשה" required />
+
+        <label>תיאור המשימה</label>
+        <textarea name="text" placeholder="מה צריך לעשות?" required></textarea>
+
+        <label>דדליין (תאריך ושעה)</label>
+        <input name="dueAt" type="datetime-local" required />
+
+        <button type="submit">הוסף משימה לט'</button>
+      </form>
+    </div>
+  </section>
+</div>
 
         <div class="card" style="margin-top:16px;">
           <h3 style="margin:0 0 10px;">הודעה דחופה</h3>
@@ -1198,6 +1295,7 @@ document.addEventListener("DOMContentLoaded", () => {
   </script>
 
   <script type="module" src="admin.js?v=7"></script>
+  <script type="module" src="admin-tasks.js?v=1"></script>
   <script type="module" src="./admin-urgent.js"></script>
   <script src="accessibility.js"></script>
 </body>
