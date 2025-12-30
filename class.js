@@ -234,6 +234,41 @@ function ensureLocalStyles() {
     .tt-meta{opacity:.86;font-size:.9rem;display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
     .tt-dot{opacity:.6}
     .tt-dash{opacity:.55;font-weight:700}
+/* TASKS */
+.tasks-item{
+  border:1px solid rgba(148,163,184,.25);
+  border-radius:16px;
+  padding:14px;
+  margin-bottom:12px;
+  background:rgba(255,255,255,.06);
+  box-shadow: 0 10px 30px rgba(0,0,0,.18);
+}
+html[data-theme="light"] .tasks-item{
+  background:rgba(255,255,255,.95);
+  box-shadow: 0 10px 30px rgba(15,23,42,.08);
+}
+.tasks-title{font-weight:1000;margin-bottom:4px;font-size:1.05rem}
+.tasks-meta{opacity:.82;font-size:.92rem;margin-bottom:10px;font-weight:800}
+.tasks-body{line-height:1.5;white-space:pre-wrap;margin-top:8px}
+
+.tasks-chip{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:7px 11px;border-radius:999px;
+  border:1px solid rgba(148,163,184,.28);
+  background:rgba(255,255,255,.07);
+  font-weight:900
+}
+html[data-theme="light"] .tasks-chip{background:rgba(15,23,42,.04)}
+
+.tasks-imgs{
+  display:flex; gap:10px; flex-wrap:wrap;
+  margin-top:12px
+}
+.tasks-imgs img{
+  max-width:220px; width:100%;
+  border-radius:14px;
+  border:1px solid rgba(148,163,184,.25);
+}
 
     .news-item{border:1px solid rgba(148,163,184,.25);border-radius:14px;padding:12px;margin-bottom:10px;background:rgba(255,255,255,.06)}
     html[data-theme="light"] .news-item{background:rgba(255,255,255,.92)}
@@ -355,36 +390,53 @@ function getNextExamCountdownParts() {
 }
 
 function taskDueToDate(t) {
-  const v = t?.dueAt ?? t?.due ?? t?.deadline ?? t?.dueDate ?? t?.date;
+  if (!t) return null;
 
-  if (!v) return null;
+  // קח כל שם אפשרי ששמרת לו באדמין
+  const v =
+    t.dueAt ?? t.due ?? t.deadline ?? t.deadlineAt ?? t.dueDateTime ?? t.dueISO ?? null;
 
-  // ISO string
-  if (typeof v === "string") {
-    const d = new Date(v);
-    return isNaN(d.getTime()) ? null : d;
-  }
-
-  // Firestore Timestamp
-  if (typeof v?.toDate === "function") {
+  // 1) Firestore Timestamp
+  if (v && typeof v?.toDate === "function") {
     const d = v.toDate();
     return isNaN(d.getTime()) ? null : d;
   }
 
-  // seconds (Timestamp raw)
-  if (typeof v?.seconds === "number") {
+  // 2) Raw timestamp object {seconds: ...}
+  if (v && typeof v?.seconds === "number") {
     const d = new Date(v.seconds * 1000);
     return isNaN(d.getTime()) ? null : d;
   }
 
-  // number (ms)
+  // 3) number (ms)
   if (typeof v === "number") {
     const d = new Date(v);
     return isNaN(d.getTime()) ? null : d;
   }
 
-  return null;
+  // 4) ISO string
+  if (typeof v === "string") {
+    const d = new Date(v);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  // 5) fallback: dueDate + dueTime (או date+time)
+  const dd = t.dueDate || t.deadlineDate || t.date || null;
+  const tm = t.dueTime || t.deadlineTime || t.time || null;
+
+  const d = parseDate(dd);
+  if (!d) return null;
+
+  if (typeof tm === "string" && /^\d{1,2}:\d{2}$/.test(tm.trim())) {
+    const [hh, mm] = tm.trim().split(":").map(Number);
+    d.setHours(hh, mm, 0, 0);
+  } else {
+    d.setHours(23, 59, 0, 0);
+  }
+
+  return isNaN(d.getTime()) ? null : d;
 }
+
 
 
 function getNextTaskCountdownParts() {
@@ -931,6 +983,18 @@ function extractNewsImages(n) {
   if (n.imageUrl2) imgs.push(n.imageUrl2);
   return [...new Set(imgs.map((x) => String(x).trim()).filter(Boolean))].slice(0, 2);
 }
+function extractTaskImages(t) {
+  const imgs = [];
+  if (Array.isArray(t.imageUrls)) imgs.push(...t.imageUrls.filter(Boolean));
+  if (t.imageUrl) imgs.push(t.imageUrl);
+  if (t.imageUrl2) imgs.push(t.imageUrl2);
+
+  // אם אצלך באדמין קראת לזה אחרת:
+  if (Array.isArray(t.images)) imgs.push(...t.images.filter(Boolean));
+  if (t.image) imgs.push(t.image);
+
+  return [...new Set(imgs.map((x) => String(x).trim()).filter(Boolean))].slice(0, 3);
+}
 
 function normalizeNewsColorForTheme(color) {
   const c = String(color || "").trim().toLowerCase();
@@ -1031,6 +1095,74 @@ function renderTasks(classId, arr) {
     tasks.innerHTML = "";
     return;
   }
+  tasksStatus.textContent = "";
+
+  const now = new Date();
+
+  // nearest task (future)
+  const nearest = lastTasksArr
+    .map((t) => ({ ...t, _dt: taskDueToDate(t) }))
+    .filter((t) => t._dt && t._dt.getTime() > now.getTime())
+    .sort((a, b) => a._dt - b._dt)[0] || null;
+
+  const list = tasksViewAll
+    ? lastTasksArr
+        .map((t) => ({ ...t, _dt: taskDueToDate(t) }))
+        .filter((t) => t._dt && t._dt.getTime() >= now.getTime() - 60 * 1000)
+        .sort((a, b) => a._dt - b._dt)
+    : (nearest ? [nearest] : []);
+
+  // כפתור "לכל המשימות"
+  if (tasksAllBtn) {
+    tasksAllBtn.textContent = "לכל המשימות »";
+    tasksAllBtn.href = `tasks.html?class=${encodeURIComponent(classId)}`;
+    tasksAllBtn.onclick = null;
+  }
+
+  tasks.innerHTML = list.map((t) => {
+    const dt = t._dt || taskDueToDate(t);
+
+    // ✅ תמונות
+    const imgs = extractTaskImages(t);
+    const imgsHtml = imgs.length ? `
+      <div class="tasks-imgs">
+        ${imgs.map((url) => `<img src="${escapeHtml(url)}" alt="תמונה למשימה">`).join("")}
+      </div>
+    ` : "";
+
+    // countdown
+    const cd = dt ? Math.max(0, Math.floor((dt.getTime() - now.getTime()) / 1000)) : null;
+    const h = cd != null ? Math.floor(cd / 3600) : null;
+    const m = cd != null ? Math.floor((cd % 3600) / 60) : null;
+    const s = cd != null ? (cd % 60) : null;
+
+    const title = String(t.title || "").trim() || "משימה";
+    const body = String(t.body || t.text || "").trim();
+    const subject = String(t.subject || "").trim();
+    const kind = String(t.kind || t.type || "").trim();
+
+    const chipText = cd != null ? `⏳ ${h}ש ${m}ד ${s}ש׳` : "⏳ —";
+
+    return `
+      <div class="tasks-item">
+        <div class="tasks-title">${escapeHtml(title)}</div>
+
+        <div class="tasks-meta">
+          ${kind ? `✅ ${escapeHtml(kind)}` : "✅ משימה"}
+          ${subject ? ` · ${escapeHtml(subject)}` : ""}
+        </div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:8px;">
+          <span class="tasks-chip">${escapeHtml(chipText)}</span>
+          ${dt ? `<span class="tasks-chip">📅 ${escapeHtml(formatDue(dt))}</span>` : `<span class="tasks-chip">📅 אין דדלין</span>`}
+        </div>
+
+        ${body ? `<div class="tasks-body">${linkify(body)}</div>` : ""}
+
+        ${imgsHtml}
+      </div>
+    `;
+  }).join("");
 
   console.log("TASK DT:", taskDueToDate(lastTasksArr[0]), lastTasksArr[0]);
 
