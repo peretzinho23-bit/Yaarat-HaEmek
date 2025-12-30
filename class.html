@@ -670,9 +670,8 @@ html[data-theme="light"] .boom-chip{background:rgba(255,255,255,.92);border-colo
     </div>
 
     <div class="boom-chip">
-  <div class="boom-k">✅ משימות</div>
-<div class="boom-v" id="boomTasks">—</div>
-
+      <div class="boom-k">📰 ידיעות לכיתה</div>
+      <div class="boom-v" id="boomNews">—</div>
     </div>
 
     <div class="boom-chip">
@@ -714,14 +713,6 @@ html[data-theme="light"] .boom-chip{background:rgba(255,255,255,.92);border-colo
         <div id="ex" class="list"></div>
       </div>
     </div>
-<div class="cardx" style="margin-top:12px;" id="tasks-section">
-  <div style="display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap;">
-    <h2 class="section-title2" style="margin:0;">✅ משימות לכיתה</h2>
-    <a id="tasksAllBtn" class="pill" style="cursor:pointer;" href="#">לכל המשימות »</a>
-  </div>
-  <div class="muted" id="tasksStatus">טוען…</div>
-  <div id="tasks" class="list"></div>
-</div>
 
     <div class="cardx" style="margin-top:12px;" id="news-section">
       <h2 class="section-title2">📰 חדשות לכיתה</h2>
@@ -733,11 +724,6 @@ html[data-theme="light"] .boom-chip{background:rgba(255,255,255,.92);border-colo
 </main>
 
 <script>
-  (function(){
-    const p = new URLSearchParams(location.search);
-    const classId = (p.get("classId") || "").toLowerCase().trim();
-    if(classId) localStorage.setItem("lastClassId", classId);
-  })();
   // Theme toggle
   (function () {
     const btn = document.getElementById("theme-toggle");

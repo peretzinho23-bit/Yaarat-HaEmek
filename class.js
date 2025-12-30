@@ -1,16 +1,14 @@
-// class.js (PASTE FULL FILE)
-// ============================================================
+// class.js
 import { db, auth } from "./firebase-config.js";
 import { doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
-// ============================================================
-// CONFIG
-// ============================================================
+// ====== config ======
 const CLASS_IDS_BY_GRADE = {
   z: ["z1", "z2", "z3", "z4", "z5"],
   h: ["h1", "h4", "h5", "h6"],
-  t: ["t1", "t2", "t3", "t4", "t5"],
+  t: ["t1", "t2", "t3", "t4", "t5"]
+  
 };
 
 const DAYS = [
@@ -19,15 +17,16 @@ const DAYS = [
   { key: "tue", label: "שלישי" },
   { key: "wed", label: "רביעי" },
   { key: "thu", label: "חמישי" },
-  { key: "fri", label: "שישי" },
+  { key: "fri", label: "שישי" }
 ];
 
-const PERIODS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+// שיעורים 1–9
+const PERIODS = [1,2,3,4,5,6,7,8,9];
 
 // שישי קצר (אפשר לשנות)
 const DAY_PERIOD_LIMITS = { fri: 6 };
 
-// שעות שיעורים
+// ✅ שעות שיעורים
 const PERIOD_TIMES = {
   1: "8:10-8:55",
   2: "8:55-9:40",
@@ -37,24 +36,22 @@ const PERIOD_TIMES = {
   6: "12:45-13:30",
   7: "13:45-14:30",
   8: "14:30-15:15",
-  9: "",
+  9: ""
 };
 
-// הפסקות/אירועים קבועים (לתצוגה בנייד)
+// ✅ הפסקות/אירועים קבועים (לתצוגה בנייד)
 const BETWEEN_BLOCKS = [
   { label: "הפסקה", time: "9:40-10:00" },
   { label: "פותחים בטוב", time: "10:00-10:15" },
   { label: "הפסקה", time: "11:45-12:00" },
-  { label: "הפסקה", time: "13:30-13:45" },
+  { label: "הפסקה", time: "13:30-13:45" }
 ];
 
-// ============================================================
-// TIME HELPERS
-// ============================================================
+// ====== time helpers ======
 function toMinutes(hhmm) {
   const m = String(hhmm || "").match(/^(\d{1,2}):(\d{2})$/);
   if (!m) return null;
-  return Number(m[1]) * 60 + Number(m[2]);
+  return (Number(m[1]) * 60) + Number(m[2]);
 }
 
 function parseRange(rangeStr) {
@@ -70,7 +67,7 @@ function parseRange(rangeStr) {
 function todayDayKey() {
   // JS: 0=Sun .. 6=Sat
   const d = new Date().getDay();
-  const map = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+  const map = ["sun","mon","tue","wed","thu","fri","sat"];
   return map[d] || "sun";
 }
 
@@ -86,16 +83,16 @@ function buildDayTimeline(dayKey) {
     if (p > limit) continue;
     const r = parseRange(PERIOD_TIMES[p]);
     if (!r) continue;
-    blocks.push({ type: "lesson", period: p, label: `שיעור ${p}`, start: r.start, end: r.end });
+    blocks.push({ type:"lesson", period:p, label:`שיעור ${p}`, start:r.start, end:r.end });
   }
 
   for (const b of BETWEEN_BLOCKS) {
     const r = parseRange(b.time);
     if (!r) continue;
-    blocks.push({ type: "break", period: null, label: b.label, start: r.start, end: r.end });
+    blocks.push({ type:"break", period:null, label:b.label, start:r.start, end:r.end });
   }
 
-  blocks.sort((a, b) => a.start - b.start);
+  blocks.sort((a,b) => a.start - b.start);
   return blocks;
 }
 
@@ -110,11 +107,11 @@ function getNowNextForDay(dayKey) {
   let nowBlock = null;
   let nextBlock = null;
 
-  for (let i = 0; i < blocks.length; i++) {
+  for (let i=0; i<blocks.length; i++) {
     const b = blocks[i];
     if (nowMin >= b.start && nowMin < b.end) {
       nowBlock = b;
-      nextBlock = blocks[i + 1] || null;
+      nextBlock = blocks[i+1] || null;
       break;
     }
     if (nowMin < b.start) {
@@ -123,19 +120,19 @@ function getNowNextForDay(dayKey) {
     }
   }
 
-  const nowId = nowBlock ? `${nowBlock.type}:${nowBlock.type === "lesson" ? nowBlock.period : nowBlock.start}` : null;
-  const nextId = nextBlock ? `${nextBlock.type}:${nextBlock.type === "lesson" ? nextBlock.period : nextBlock.start}` : null;
+  const nowId = nowBlock ? `${nowBlock.type}:${nowBlock.type==="lesson" ? nowBlock.period : nowBlock.start}` : null;
+  const nextId = nextBlock ? `${nextBlock.type}:${nextBlock.type==="lesson" ? nextBlock.period : nextBlock.start}` : null;
 
-  const fmt = (min) => `${String(Math.floor(min / 60)).padStart(2, "0")}:${String(min % 60).padStart(2, "0")}`;
+  const fmt = (min) => `${String(Math.floor(min/60)).padStart(2,"0")}:${String(min%60).padStart(2,"0")}`;
+
+  // שומר תאימות – אבל אנחנו לא נשתמש ב"סוגריים" בבום-בר
   const nowText = nowBlock ? `${nowBlock.label} ${fmt(nowBlock.start)}-${fmt(nowBlock.end)}` : "";
   const nextText = nextBlock ? `${nextBlock.label} ${fmt(nextBlock.start)}-${fmt(nextBlock.end)}` : "";
 
   return { nowId, nextId, nowText, nextText };
 }
 
-// ============================================================
-// GENERAL HELPERS
-// ============================================================
+// ====== helpers ======
 function classToGrade(classId) {
   const c = String(classId || "").toLowerCase();
   if (c.startsWith("z")) return "z";
@@ -144,25 +141,18 @@ function classToGrade(classId) {
   return null;
 }
 
-// ✅ מאפשר גם כיתות שלא הוגדרו לך במערך (לדוגמה h2/h3 וכו')
 function isKnownClass(classId) {
-  const c = String(classId || "").toLowerCase().trim();
-  const g = classToGrade(c);
+  const g = classToGrade(classId);
   if (!g) return false;
-
-  // אם קיימת ברשימה — מעולה
-  if ((CLASS_IDS_BY_GRADE[g] || []).includes(c)) return true;
-
-  // אחרת: תן לעבור אם זה נראה כמו "h2" / "z6" / "t4" וכו'
-  return /^[zht]\d{1,2}$/.test(c);
+  return (CLASS_IDS_BY_GRADE[g] || []).includes(classId);
 }
 
 function classLabel(classId) {
-  const c = String(classId || "").toLowerCase().trim();
+  const c = String(classId || "").toLowerCase();
   const map = {
-    z1: "ז1", z2: "ז2", z3: "ז3", z4: "ז4", z5: "ז5",
-    h1: "ח1/7", h4: "ח4/8", h5: "ח5/9", h6: "ח6/10",
-    t1: "ט1", t2: "ט2", t3: "ט3", t4: "ט4", t5: "ט5",
+    z1:"ז1", z2:"ז2", z3:"ז3", z4:"ז4", z5:"ז5",
+    h1:"ח1/7", h4:"ח4/8", h5:"ח5/9", h6:"ח6/10",
+    t1:"ט1", t2:"ט2", t3:"ט3", t4:"ט4", t5:"ט5"
   };
   return map[c] || c.toUpperCase();
 }
@@ -199,7 +189,7 @@ function parseDate(dateStr) {
 
 function todayMidnight() {
   const d = new Date();
-  d.setHours(0, 0, 0, 0);
+  d.setHours(0,0,0,0);
   return d.getTime();
 }
 
@@ -234,41 +224,6 @@ function ensureLocalStyles() {
     .tt-meta{opacity:.86;font-size:.9rem;display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
     .tt-dot{opacity:.6}
     .tt-dash{opacity:.55;font-weight:700}
-/* TASKS */
-.tasks-item{
-  border:1px solid rgba(148,163,184,.25);
-  border-radius:16px;
-  padding:14px;
-  margin-bottom:12px;
-  background:rgba(255,255,255,.06);
-  box-shadow: 0 10px 30px rgba(0,0,0,.18);
-}
-html[data-theme="light"] .tasks-item{
-  background:rgba(255,255,255,.95);
-  box-shadow: 0 10px 30px rgba(15,23,42,.08);
-}
-.tasks-title{font-weight:1000;margin-bottom:4px;font-size:1.05rem}
-.tasks-meta{opacity:.82;font-size:.92rem;margin-bottom:10px;font-weight:800}
-.tasks-body{line-height:1.5;white-space:pre-wrap;margin-top:8px}
-
-.tasks-chip{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:7px 11px;border-radius:999px;
-  border:1px solid rgba(148,163,184,.28);
-  background:rgba(255,255,255,.07);
-  font-weight:900
-}
-html[data-theme="light"] .tasks-chip{background:rgba(15,23,42,.04)}
-
-.tasks-imgs{
-  display:flex; gap:10px; flex-wrap:wrap;
-  margin-top:12px
-}
-.tasks-imgs img{
-  max-width:220px; width:100%;
-  border-radius:14px;
-  border:1px solid rgba(148,163,184,.25);
-}
 
     .news-item{border:1px solid rgba(148,163,184,.25);border-radius:14px;padding:12px;margin-bottom:10px;background:rgba(255,255,255,.06)}
     html[data-theme="light"] .news-item{background:rgba(255,255,255,.92)}
@@ -278,24 +233,11 @@ html[data-theme="light"] .tasks-chip{background:rgba(15,23,42,.04)}
     .news-body a{text-decoration:underline;font-weight:800}
     .news-imgs{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
     .news-imgs img{max-width:240px;width:100%;border-radius:12px;border:1px solid rgba(148,163,184,.25)}
-
-    /* TASKS */
-    .tasks-item{border:1px solid rgba(148,163,184,.25);border-radius:14px;padding:12px;margin-bottom:10px;background:rgba(255,255,255,.06)}
-    html[data-theme="light"] .tasks-item{background:rgba(255,255,255,.92)}
-    .tasks-title{font-weight:900;margin-bottom:2px}
-    .tasks-meta{opacity:.78;font-size:.9rem;margin-bottom:8px}
-    .tasks-body{line-height:1.45;white-space:pre-wrap}
-    .tasks-chip{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;border:1px solid rgba(148,163,184,.25);background:rgba(255,255,255,.07);font-weight:900}
-    html[data-theme="light"] .tasks-chip{background:rgba(15,23,42,.04)}
-    .tasks-view-all{margin-top:10px;display:flex;justify-content:flex-start}
-    .tasks-view-all button{cursor:pointer;padding:8px 12px;border-radius:999px;border:1px solid rgba(148,163,184,.35);background:rgba(255,255,255,.10);color:inherit;font-weight:900}
   `;
   document.head.appendChild(style);
 }
 
-// ============================================================
-// DOM
-// ============================================================
+// ====== DOM ======
 const elTitle = document.getElementById("page-title");
 const elSub = document.getElementById("page-sub");
 const elPill = document.getElementById("class-pill");
@@ -314,48 +256,32 @@ const exStatus = document.getElementById("exStatus");
 const news = document.getElementById("news");
 const newsStatus = document.getElementById("newsStatus");
 
-// tasks (אם לא קיימים ב-HTML זה לא יקרוס)
-const tasks = document.getElementById("tasks");
-const tasksStatus = document.getElementById("tasksStatus");
-const tasksAllBtn = document.getElementById("tasksAllBtn");
-
-// boom bar
 const announceBox = document.getElementById("announceBox");
 const boomSub = document.getElementById("boomSub");
 const boomExams = document.getElementById("boomExams");
 const boomNews = document.getElementById("boomNews");
 const boomNowNext = document.getElementById("boomNowNext");
-const boomTasks = document.getElementById("boomTasks");
 
 const devLink = document.getElementById("dev-link");
 
-// DEV link only when logged in
+// ====== DEV link only when logged in ======
 onAuthStateChanged(auth, (user) => {
   if (devLink) devLink.style.display = user ? "" : "none";
 });
 
-// ============================================================
-// STATE
-// ============================================================
-let activeClassId = null;
-
-let lastTimetableGrid = null;
+// ====== BOOM BAR state ======
 let lastExamsArr = [];
 let lastNewsArr = [];
-let lastTasksArr = [];
+let activeClassId = null;
 
-let tasksViewAll = false; // same page toggle
-
-// ============================================================
-// BOOM BAR
-// ============================================================
+// ✅ מחזיר את המבחן הבא + ספירה לאחור (שעות/דקות/שניות) + מקצוע + שעה (אם קיימת)
 function getNextExamCountdownParts() {
   if (!Array.isArray(lastExamsArr) || lastExamsArr.length === 0) return null;
 
   const now = new Date();
 
   const next = lastExamsArr
-    .map((e) => {
+    .map(e => {
       const d = parseDate(e.date);
       if (!d) return null;
 
@@ -370,7 +296,7 @@ function getNextExamCountdownParts() {
 
       return { ...e, _dt: d, _timeStr: timeStr };
     })
-    .filter((e) => e && e._dt.getTime() > now.getTime())
+    .filter(e => e && e._dt.getTime() > now.getTime())
     .sort((a, b) => a._dt - b._dt)[0];
 
   if (!next) return null;
@@ -389,108 +315,23 @@ function getNextExamCountdownParts() {
   return { subject, timeLabel, hours, minutes, seconds };
 }
 
-function taskDueToDate(t) {
-  if (!t) return null;
-
-  // קח כל שם אפשרי ששמרת לו באדמין
-  const v =
-    t.dueAt ?? t.due ?? t.deadline ?? t.deadlineAt ?? t.dueDateTime ?? t.dueISO ?? null;
-
-  // 1) Firestore Timestamp
-  if (v && typeof v?.toDate === "function") {
-    const d = v.toDate();
-    return isNaN(d.getTime()) ? null : d;
-  }
-
-  // 2) Raw timestamp object {seconds: ...}
-  if (v && typeof v?.seconds === "number") {
-    const d = new Date(v.seconds * 1000);
-    return isNaN(d.getTime()) ? null : d;
-  }
-
-  // 3) number (ms)
-  if (typeof v === "number") {
-    const d = new Date(v);
-    return isNaN(d.getTime()) ? null : d;
-  }
-
-  // 4) ISO string
-  if (typeof v === "string") {
-    const d = new Date(v);
-    return isNaN(d.getTime()) ? null : d;
-  }
-
-  // 5) fallback: dueDate + dueTime (או date+time)
-  const dd = t.dueDate || t.deadlineDate || t.date || null;
-  const tm = t.dueTime || t.deadlineTime || t.time || null;
-
-  const d = parseDate(dd);
-  if (!d) return null;
-
-  if (typeof tm === "string" && /^\d{1,2}:\d{2}$/.test(tm.trim())) {
-    const [hh, mm] = tm.trim().split(":").map(Number);
-    d.setHours(hh, mm, 0, 0);
-  } else {
-    d.setHours(23, 59, 0, 0);
-  }
-
-  return isNaN(d.getTime()) ? null : d;
-}
-
-
-
-function getNextTaskCountdownParts() {
-  if (!Array.isArray(lastTasksArr) || lastTasksArr.length === 0) return null;
-
-  const now = new Date();
-  const next = lastTasksArr
-    .map((t) => {
-      const dt = taskDueToDate(t);
-      if (!dt) return null;
-      return { ...t, _dt: dt };
-    })
-    .filter((t) => t && t._dt.getTime() > now.getTime())
-    .sort((a, b) => a._dt - b._dt)[0];
-
-  if (!next) return null;
-
-  let diff = Math.floor((next._dt.getTime() - now.getTime()) / 1000);
-  if (diff <= 0) return null;
-
-  const hours = Math.floor(diff / 3600);
-  diff %= 3600;
-  const minutes = Math.floor(diff / 60);
-  const seconds = diff % 60;
-
-  const title = String(next.title || "").trim() || "משימה";
-  const subject = String(next.subject || "").trim();
-  const kind = String(next.kind || next.type || "").trim();
-
-  return { title, subject, kind, hours, minutes, seconds, _dt: next._dt };
-}
-
 function updateBoomCounts() {
   if (boomExams) {
     const cd = getNextExamCountdownParts();
-    boomExams.textContent = cd ? `📘 ${cd.subject}${cd.timeLabel} בעוד ${cd.hours}ש ${cd.minutes}ד ${cd.seconds}ש׳` : "—";
+    boomExams.textContent = cd
+      ? `📘 ${cd.subject}${cd.timeLabel} בעוד ${cd.hours}ש ${cd.minutes}ד ${cd.seconds}ש׳`
+      : "—";
   }
 
   if (boomNews) {
     boomNews.textContent = lastNewsArr?.length ? `${lastNewsArr.length}` : "—";
   }
 
-  if (boomTasks) {
-    const td = getNextTaskCountdownParts();
-    boomTasks.textContent = td
-      ? `✅ ${td.subject ? td.subject + " · " : ""}${td.title} בעוד ${td.hours}ש ${td.minutes}ד ${td.seconds}ש׳`
-      : "—";
-  }
-
   if (boomSub) {
     const now = new Date();
-    const hh = String(now.getHours()).padStart(2, "0");
-    const mm = String(now.getMinutes()).padStart(2, "0");
-    const ss = String(now.getSeconds()).padStart(2, "0");
+    const hh = String(now.getHours()).padStart(2,"0");
+    const mm = String(now.getMinutes()).padStart(2,"0");
+    const ss = String(now.getSeconds()).padStart(2,"0");
     boomSub.textContent = `עודכן ב-${hh}:${mm}:${ss}`;
   }
 }
@@ -500,6 +341,7 @@ function getBoomDayKey() {
   return todayDayKey();
 }
 
+// ✅ helper: מחזיר עכשיו+הבא כולל הפסקות
 function getNowNextBlocks(dayKey) {
   const nowKey = todayDayKey();
   if (dayKey !== nowKey) return { nowBlock: null, nextBlock: null, nextInMin: null };
@@ -557,7 +399,7 @@ function updateBoomNowNext() {
     return subj ? `${nextBlock.label} · ${subj}` : nextBlock.label;
   })();
 
-  const nextTime = nextBlock && nextInMin != null ? ` בעוד ${nextInMin} דקות` : "";
+  const nextTime = (nextBlock && nextInMin != null) ? ` בעוד ${nextInMin} דקות` : "";
 
   boomNowNext.innerHTML = `
     <div style="font-weight:900;">🔥 עכשיו: ${escapeHtml(nowLabel)}</div>
@@ -567,13 +409,14 @@ function updateBoomNowNext() {
   `;
 }
 
-// ============================================================
-// MOBILE TIMETABLE
-// ============================================================
+// ===============================
+// ✅ MOBILE DAY SLIDER
+// ===============================
 const ttMobileWrap = document.getElementById("tt-mobile");
 const daySelect = document.getElementById("daySelect");
 const daySchedule = document.getElementById("daySchedule");
 
+let lastTimetableGrid = null;
 let selectedDayKey = "sun";
 
 function isMobileView() {
@@ -609,7 +452,7 @@ function renderMobileDayFromLastGrid() {
   }
 
   const dayKey = selectedDayKey || "sun";
-  const dayLabel = DAYS.find((d) => d.key === dayKey)?.label || "";
+  const dayLabel = (DAYS.find(d => d.key === dayKey)?.label) || "";
 
   const limit = maxPeriodsForDay(dayKey);
   const arr = Array.isArray(lastTimetableGrid?.[dayKey]) ? lastTimetableGrid[dayKey] : [];
@@ -617,7 +460,7 @@ function renderMobileDayFromLastGrid() {
   const { nowId, nextId } = getNowNextForDay(dayKey);
 
   const rows = PERIODS.map((p, idx) => {
-    const disabled = idx + 1 > limit;
+    const disabled = (idx + 1) > limit;
     if (disabled) return null;
 
     const cell = arr[idx] || {};
@@ -627,14 +470,12 @@ function renderMobileDayFromLastGrid() {
     const empty = !subject && !teacher && !room;
 
     const id = `lesson:${p}`;
-    const isNow = id === nowId;
-    const isNext = !isNow && id === nextId;
+    const isNow = (id === nowId);
+    const isNext = (!isNow && id === nextId);
 
     const badge = isNow
       ? `<span class="ttm-badge">🔥 עכשיו</span>`
-      : isNext
-      ? `<span class="ttm-badge">➡️ הבא</span>`
-      : "";
+      : (isNext ? `<span class="ttm-badge">➡️ הבא</span>` : "");
 
     return `
       <div class="ttm-row ${isNow ? "ttm-now" : ""} ${isNext ? "ttm-next" : ""}" style="
@@ -651,24 +492,19 @@ function renderMobileDayFromLastGrid() {
           </div>
           <div style="font-weight:800; opacity:.75;">${escapeHtml(PERIOD_TIMES[p] || "")}</div>
         </div>
-        ${
-          empty
-            ? `<div style="opacity:.65; font-weight:700;">—</div>`
-            : `
+        ${empty ? `<div style="opacity:.65; font-weight:700;">—</div>` : `
           <div style="font-weight:900; line-height:1.2;">${escapeHtml(subject)}</div>
           <div style="opacity:.85; margin-top:6px;">
             ${teacher ? `<span>${escapeHtml(teacher)}</span>` : ""}
             ${teacher && room ? `<span style="opacity:.6; margin:0 6px;">•</span>` : ""}
             ${room ? `<span>${escapeHtml(room)}</span>` : ""}
           </div>
-        `
-        }
+        `}
       </div>
     `;
   }).filter(Boolean);
 
-  const betweenHtml = BETWEEN_BLOCKS.map(
-    (b) => `
+  const betweenHtml = BETWEEN_BLOCKS.map(b => `
     <div class="ttm-row" style="
       border:1px dashed rgba(148,163,184,.35);
       border-radius:14px;
@@ -682,8 +518,7 @@ function renderMobileDayFromLastGrid() {
         <div style="font-weight:800; opacity:.75;">${escapeHtml(b.time)}</div>
       </div>
     </div>
-  `
-  ).join("");
+  `).join("");
 
   daySchedule.innerHTML = `
     <div style="font-weight:900; margin: 4px 0 10px; opacity:.9;">${escapeHtml(dayLabel)}</div>
@@ -707,13 +542,10 @@ window.addEventListener("resize", () => {
   syncTimetableMobileVisibility();
 });
 
-// ============================================================
-// CHOOSER
-// ============================================================
+// ====== chooser ======
 function fillClassesForGrade(g) {
   if (!classSel) return;
   classSel.innerHTML = `<option value="">בחר כיתה</option>`;
-
   const arr = CLASS_IDS_BY_GRADE[g] || [];
   for (const c of arr) {
     const opt = document.createElement("option");
@@ -721,7 +553,6 @@ function fillClassesForGrade(g) {
     opt.textContent = classLabel(c);
     classSel.appendChild(opt);
   }
-
   classSel.disabled = !arr.length;
 }
 
@@ -741,44 +572,33 @@ goBtn?.addEventListener("click", () => {
   openClass(c);
 });
 
-// ============================================================
-// VIEW HELPERS
-// ============================================================
+// ====== render helpers ======
 function showChooser() {
   chooserCard?.classList.remove("hide");
   content?.classList.add("hide");
-
   if (elTitle) elTitle.textContent = "דף כיתה";
   if (elSub) elSub.textContent = "בחר כיתה כדי לראות חדשות, מבחנים ומערכת שעות";
   if (elPill) elPill.textContent = "לא נבחרה כיתה";
 
   lastExamsArr = [];
   lastNewsArr = [];
-  lastTasksArr = [];
-  lastTimetableGrid = null;
-
-  tasksViewAll = false;
-
   updateBoomCounts();
   updateBoomNowNext();
-
   if (announceBox) announceBox.classList.add("hide");
 }
 
 function showContentFor(classId) {
   chooserCard?.classList.add("hide");
   content?.classList.remove("hide");
-
   if (elTitle) elTitle.textContent = `דף כיתה ${classLabel(classId)}`;
-  if (elSub) elSub.textContent = "חדשות לכיתה · מבחנים לכיתה · מערכת שעות · משימות";
+  if (elSub) elSub.textContent = "חדשות לכיתה · מבחנים לכיתה · מערכת שעות";
   if (elPill) elPill.textContent = `${classLabel(classId)}`;
 }
 
-// ============================================================
-// TIMETABLE RENDER
-// ============================================================
+// ====== Timetable (grid) ======
 function renderTimetableFromGrid(grid) {
   ensureLocalStyles();
+
   lastTimetableGrid = grid || null;
 
   const thead = `
@@ -788,7 +608,7 @@ function renderTimetableFromGrid(grid) {
           שיעור
           <div style="font-weight:700; opacity:.75; font-size:.82rem; margin-top:2px;">שעה</div>
         </th>
-        ${DAYS.map((d) => `<th>${escapeHtml(d.label)}</th>`).join("")}
+        ${DAYS.map(d => `<th>${escapeHtml(d.label)}</th>`).join("")}
       </tr>
     </thead>
   `;
@@ -796,30 +616,28 @@ function renderTimetableFromGrid(grid) {
   const tbodyRows = PERIODS.map((p, pIndex) => {
     const tds = DAYS.map((d) => {
       const limit = maxPeriodsForDay(d.key);
-      const disabled = pIndex + 1 > limit;
+      const disabled = (pIndex + 1) > limit;
 
       const cell = (Array.isArray(grid?.[d.key]) ? grid[d.key][pIndex] : null) || {};
-      const subject = String(cell.subject || "").trim();
-      const teacher = String(cell.teacher || "").trim();
-      const room = String(cell.room || "").trim();
+      const subject = (cell.subject || "").trim();
+      const teacher = (cell.teacher || "").trim();
+      const room = (cell.room || "").trim();
       const empty = !subject && !teacher && !room;
 
-      if (disabled) return `<td class="tt-td tt-disabled"><div class="tt-dash">—</div></td>`;
+      if (disabled) {
+        return `<td class="tt-td tt-disabled"><div class="tt-dash">—</div></td>`;
+      }
 
       return `
         <td class="tt-td ${empty ? "tt-empty" : ""}">
-          ${
-            empty
-              ? `<div class="tt-dash">—</div>`
-              : `
+          ${empty ? `<div class="tt-dash">—</div>` : `
             <div class="tt-subject">${escapeHtml(subject)}</div>
             <div class="tt-meta">
               ${teacher ? `<span>${escapeHtml(teacher)}</span>` : ""}
               ${teacher && room ? `<span class="tt-dot">•</span>` : ""}
               ${room ? `<span>${escapeHtml(room)}</span>` : ""}
             </div>
-          `
-          }
+          `}
         </td>
       `;
     }).join("");
@@ -854,9 +672,10 @@ function renderTimetableFromGrid(grid) {
   updateBoomCounts();
 }
 
+// schema ישן (days/rows) -> ממירים ל-grid ומציגים
 function renderTimetableFromDays(days) {
   const grid = {};
-  for (const d of DAYS) grid[d.key] = PERIODS.map(() => ({ subject: "", teacher: "", room: "" }));
+  for (const d of DAYS) grid[d.key] = PERIODS.map(() => ({ subject:"", teacher:"", room:"" }));
 
   (Array.isArray(days) ? days : []).forEach((dayObj) => {
     const name = String(dayObj?.day || "").trim();
@@ -881,9 +700,7 @@ function renderTimetableFromDays(days) {
   renderTimetableFromGrid(grid);
 }
 
-// ============================================================
-// LOADERS (ONCE)
-// ============================================================
+// ====== Data loaders (first load) ======
 async function loadTimetableOnce(classId) {
   if (tt) tt.innerHTML = "";
   if (ttStatus) ttStatus.textContent = "טוען…";
@@ -937,13 +754,13 @@ async function loadExamsOnce(classId) {
 
   try {
     const snap = await getDoc(doc(db, "exams", grade));
-    const items = snap.exists() ? snap.data()?.items || [] : [];
+    const items = snap.exists() ? (snap.data()?.items || []) : [];
 
     const arr = items
-      .filter((x) => String(x.classId || "").toLowerCase() === classId)
-      .map((x) => ({ ...x, _d: parseDate(x.date) }))
-      .filter((x) => !x._d || x._d.getTime() >= todayMidnight())
-      .sort((a, b) => {
+      .filter(x => String(x.classId || "").toLowerCase() === classId)
+      .map(x => ({ ...x, _d: parseDate(x.date) }))
+      .filter(x => !x._d || x._d.getTime() >= todayMidnight())
+      .sort((a,b) => {
         const da = a._d ? a._d.getTime() : Infinity;
         const dbt = b._d ? b._d.getTime() : Infinity;
         return da - dbt;
@@ -960,7 +777,7 @@ async function loadExamsOnce(classId) {
 
     if (exStatus) exStatus.textContent = "";
     if (ex) {
-      ex.innerHTML = arr.map((e) => `
+      ex.innerHTML = arr.map(e => `
         <div class="item">
           <div><b>${escapeHtml(e.subject || "")}</b></div>
           <div class="meta">${escapeHtml(e.date || "")}${e.time ? " · " + escapeHtml(e.time) : ""}</div>
@@ -981,32 +798,23 @@ function extractNewsImages(n) {
   if (Array.isArray(n.imageUrls)) imgs.push(...n.imageUrls.filter(Boolean));
   if (n.imageUrl) imgs.push(n.imageUrl);
   if (n.imageUrl2) imgs.push(n.imageUrl2);
-  return [...new Set(imgs.map((x) => String(x).trim()).filter(Boolean))].slice(0, 2);
-}
-function extractTaskImages(t) {
-  const imgs = [];
-  if (Array.isArray(t.imageUrls)) imgs.push(...t.imageUrls.filter(Boolean));
-  if (t.imageUrl) imgs.push(t.imageUrl);
-  if (t.imageUrl2) imgs.push(t.imageUrl2);
-
-  // אם אצלך באדמין קראת לזה אחרת:
-  if (Array.isArray(t.images)) imgs.push(...t.images.filter(Boolean));
-  if (t.image) imgs.push(t.image);
-
-  return [...new Set(imgs.map((x) => String(x).trim()).filter(Boolean))].slice(0, 3);
+  return [...new Set(imgs.map(x => String(x).trim()).filter(Boolean))].slice(0,2);
 }
 
 function normalizeNewsColorForTheme(color) {
   const c = String(color || "").trim().toLowerCase();
   if (!c) return "";
-  if (!isDarkMode() && (c === "#ffffff" || c === "white" || c === "rgb(255,255,255)")) return "#0f172a";
+  if (!isDarkMode() && (c === "#ffffff" || c === "white" || c === "rgb(255,255,255)")) {
+    return "#0f172a";
+  }
   return color;
 }
 
 function renderNewsList(classId, items) {
   ensureLocalStyles();
 
-  const classSpecific = (items || []).filter((n) => String(n.classId || "").toLowerCase() === classId);
+  const classSpecific = (items || []).filter(n => String(n.classId || "").toLowerCase() === classId);
+
   lastNewsArr = classSpecific.slice(-12);
   updateBoomCounts();
 
@@ -1021,17 +829,17 @@ function renderNewsList(classId, items) {
 
   if (!news) return;
 
-  news.innerHTML = ordered.map((n) => {
+  news.innerHTML = ordered.map(n => {
     const imgs = extractNewsImages(n);
     const finalColor = normalizeNewsColorForTheme(n.color);
     const baseText = isDarkMode() ? "rgba(255,255,255,.92)" : "#0f172a";
 
-    const titleColor = !isDarkMode() ? "#0f172a" : (finalColor || baseText);
+    const titleColor = (!isDarkMode()) ? "#0f172a" : (finalColor || baseText);
     const bodyColor = finalColor || baseText;
 
     const imgsHtml = imgs.length ? `
       <div class="news-imgs">
-        ${imgs.map((url) => `<img src="${escapeHtml(url)}" alt="תמונה לידיעה">`).join("")}
+        ${imgs.map(url => `<img src="${escapeHtml(url)}" alt="תמונה לידיעה">`).join("")}
       </div>
     ` : "";
 
@@ -1060,7 +868,7 @@ async function loadNewsOnce(classId) {
 
   try {
     const snap = await getDoc(doc(db, "news", grade));
-    const items = snap.exists() ? snap.data()?.items || [] : [];
+    const items = snap.exists() ? (snap.data()?.items || []) : [];
     renderNewsList(classId, items);
   } catch (e) {
     console.error("news error:", e);
@@ -1070,250 +878,16 @@ async function loadNewsOnce(classId) {
   }
 }
 
-// ============================================================
-// TASKS (NEW)
-// ============================================================
-function formatDue(dt) {
-  if (!dt) return "";
-  const d = String(dt.getDate()).padStart(2, "0");
-  const m = String(dt.getMonth() + 1).padStart(2, "0");
-  const y = dt.getFullYear();
-  const hh = String(dt.getHours()).padStart(2, "0");
-  const mm = String(dt.getMinutes()).padStart(2, "0");
-  return `${d}/${m}/${y} · ${hh}:${mm}`;
-}
-
-function renderTasks(classId, arr) {
-  ensureLocalStyles();
-  if (!tasks || !tasksStatus) return;
-
-  lastTasksArr = Array.isArray(arr) ? arr : [];
-  updateBoomCounts();
-
-  if (!lastTasksArr.length) {
-    tasksStatus.textContent = "אין משימות קרובות לכיתה הזאת.";
-    tasks.innerHTML = "";
-    return;
-  }
-  tasksStatus.textContent = "";
-
-  const now = new Date();
-
-  // nearest task (future)
-  const nearest = lastTasksArr
-    .map((t) => ({ ...t, _dt: taskDueToDate(t) }))
-    .filter((t) => t._dt && t._dt.getTime() > now.getTime())
-    .sort((a, b) => a._dt - b._dt)[0] || null;
-
-  const list = tasksViewAll
-    ? lastTasksArr
-        .map((t) => ({ ...t, _dt: taskDueToDate(t) }))
-        .filter((t) => t._dt && t._dt.getTime() >= now.getTime() - 60 * 1000)
-        .sort((a, b) => a._dt - b._dt)
-    : (nearest ? [nearest] : []);
-
-  // כפתור "לכל המשימות"
-  if (tasksAllBtn) {
-    tasksAllBtn.textContent = "לכל המשימות »";
-    tasksAllBtn.href = `tasks.html?class=${encodeURIComponent(classId)}`;
-    tasksAllBtn.onclick = null;
-  }
-
-  tasks.innerHTML = list.map((t) => {
-    const dt = t._dt || taskDueToDate(t);
-
-    // ✅ תמונות
-    const imgs = extractTaskImages(t);
-    const imgsHtml = imgs.length ? `
-      <div class="tasks-imgs">
-        ${imgs.map((url) => `<img src="${escapeHtml(url)}" alt="תמונה למשימה">`).join("")}
-      </div>
-    ` : "";
-
-    // countdown
-    const cd = dt ? Math.max(0, Math.floor((dt.getTime() - now.getTime()) / 1000)) : null;
-    const h = cd != null ? Math.floor(cd / 3600) : null;
-    const m = cd != null ? Math.floor((cd % 3600) / 60) : null;
-    const s = cd != null ? (cd % 60) : null;
-
-    const title = String(t.title || "").trim() || "משימה";
-    const body = String(t.body || t.text || "").trim();
-    const subject = String(t.subject || "").trim();
-    const kind = String(t.kind || t.type || "").trim();
-
-    const chipText = cd != null ? `⏳ ${h}ש ${m}ד ${s}ש׳` : "⏳ —";
-
-    return `
-      <div class="tasks-item">
-        <div class="tasks-title">${escapeHtml(title)}</div>
-
-        <div class="tasks-meta">
-          ${kind ? `✅ ${escapeHtml(kind)}` : "✅ משימה"}
-          ${subject ? ` · ${escapeHtml(subject)}` : ""}
-        </div>
-
-        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:8px;">
-          <span class="tasks-chip">${escapeHtml(chipText)}</span>
-          ${dt ? `<span class="tasks-chip">📅 ${escapeHtml(formatDue(dt))}</span>` : `<span class="tasks-chip">📅 אין דדלין</span>`}
-        </div>
-
-        ${body ? `<div class="tasks-body">${linkify(body)}</div>` : ""}
-
-        ${imgsHtml}
-      </div>
-    `;
-  }).join("");
-
-  console.log("TASK DT:", taskDueToDate(lastTasksArr[0]), lastTasksArr[0]);
-
-  // ...המשך הקוד שלך
-}
-
-
-  tasksStatus.textContent = "";
-
-  const now = new Date();
-
-  // nearest task (future)
-  const nearest = lastTasksArr
-    .map((t) => ({ ...t, _dt: taskDueToDate(t) }))
-    .filter((t) => t._dt && t._dt.getTime() > now.getTime())
-    .sort((a, b) => a._dt - b._dt)[0] || null;
-
-  // view: only nearest OR all
-  const list = tasksViewAll
-    ? lastTasksArr
-        .map((t) => ({ ...t, _dt: taskDueToDate(t) }))
-        .filter((t) => t._dt && t._dt.getTime() >= now.getTime() - 60 * 1000) // allow just-past 1 min
-        .sort((a, b) => a._dt - b._dt)
-    : (nearest ? [nearest] : []);
-
-  // header button
-if (tasksAllBtn) {
-  // תמיד קישור אמיתי לדף tasks עם הכיתה הנוכחית
-  tasksAllBtn.textContent = "לכל המשימות »";
-  tasksAllBtn.href = `tasks.html?class=${encodeURIComponent(classId)}`;
-  tasksAllBtn.onclick = null; // מבטל את ה-toggle הישן
-}
-
-
-  tasks.innerHTML = list.map((t) => {
-    const dt = t._dt || taskDueToDate(t);
-    const cd = dt ? Math.max(0, Math.floor((dt.getTime() - now.getTime()) / 1000)) : null;
-    const h = cd != null ? Math.floor(cd / 3600) : null;
-    const m = cd != null ? Math.floor((cd % 3600) / 60) : null;
-    const s = cd != null ? (cd % 60) : null;
-
-    const title = String(t.title || "").trim() || "משימה";
-    const body = String(t.body || t.text || "").trim();
-    const subject = String(t.subject || "").trim();
-    const kind = String(t.kind || t.type || "").trim(); // שיעורי בית / להביא ציוד / עבודה
-
-    // optional: day/period
-    const dayKey = String(t.dayKey || "").trim();
-    const period = Number(t.period || 0);
-    const dayLabel = DAYS.find((d) => d.key === dayKey)?.label || "";
-    const when = (dayLabel && period) ? `${dayLabel} · שיעור ${period}` : "";
-
-    const chipText = cd != null
-      ? `⏳ ${h}ש ${m}ד ${s}ש׳`
-      : "⏳ —";
-
-    return `
-      <div class="tasks-item">
-        <div class="tasks-title">${escapeHtml(title)}</div>
-        <div class="tasks-meta">
-          ${kind ? `✅ ${escapeHtml(kind)}` : "✅ משימה"}
-          ${subject ? ` · ${escapeHtml(subject)}` : ""}
-          ${when ? ` · ${escapeHtml(when)}` : ""}
-        </div>
-
-        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:8px;">
-          <span class="tasks-chip">${escapeHtml(chipText)}</span>
-          ${dt ? `<span class="tasks-chip">📅 ${escapeHtml(formatDue(dt))}</span>` : ""}
-        </div>
-
-        ${body ? `<div class="tasks-body">${linkify(body)}</div>` : ""}
-      </div>
-    `;
-  }).join("");
-function toDateSafe(v){
-  if(!v) return null;
-
-  // אם שמרת ISO string
-  if (typeof v === "string") {
-    const d = new Date(v);
-    return Number.isNaN(d.getTime()) ? null : d;
-  }
-
-  // אם יצא Timestamp של Firestore
-  if (v?.seconds) return new Date(v.seconds * 1000);
-  if (typeof v?.toDate === "function") return v.toDate();
-
-  return null;
-}
-
-function fmtIL(d){
-  return d ? d.toLocaleString("he-IL") : "";
-}
-
-async function loadTasksOnce(classId) {
-  if (!tasks || !tasksStatus) return;
-
-  tasks.innerHTML = "";
-  tasksStatus.textContent = "טוען…";
-
-  const grade = classToGrade(classId);
-  if (!grade) {
-    tasksStatus.textContent = "כיתה לא חוקית.";
-    lastTasksArr = [];
-    updateBoomCounts();
-    return;
-  }
-
-  try {
-    const snap = await getDoc(doc(db, "tasks", grade));
-    const items = snap.exists() ? snap.data()?.items || [] : [];
-
-    const now = new Date();
-
-    const arr = items
-      .filter((x) => String(x.classId || "").toLowerCase() === classId)
-      .map((x) => ({ ...x, _dt: taskDueToDate(x) }))
-      .filter((x) => !x._dt || x._dt.getTime() >= now.getTime() - 60 * 1000) // keep future (and tiny past)
-      .sort((a, b) => {
-        const da = a._dt ? a._dt.getTime() : Infinity;
-        const dbt = b._dt ? b._dt.getTime() : Infinity;
-        return da - dbt;
-      })
-      .slice(0, 50);
-
-    // store raw (without _dt) for rerenders
-    const cleaned = arr.map(({ _dt, ...rest }) => rest);
-
-    renderTasks(classId, cleaned);
-  } catch (e) {
-    console.error("tasks error:", e);
-    tasksStatus.textContent = "שגיאה בטעינת משימות.";
-    lastTasksArr = [];
-    updateBoomCounts();
-  }
-}
-
-// ============================================================
-// REALTIME
-// ============================================================
+// ====== REALTIME ======
 let unsubTT = null;
 let unsubNews = null;
 let unsubExams = null;
-let unsubTasks = null;
 
 function stopRealtime() {
   try { if (unsubTT) unsubTT(); } catch {}
   try { if (unsubNews) unsubNews(); } catch {}
   try { if (unsubExams) unsubExams(); } catch {}
-  try { if (unsubTasks) unsubTasks(); } catch {}
-  unsubTT = unsubNews = unsubExams = unsubTasks = null;
+  unsubTT = unsubNews = unsubExams = null;
 }
 
 function startRealtime(classId) {
@@ -1356,15 +930,15 @@ function startRealtime(classId) {
   });
 
   unsubExams = onSnapshot(doc(db, "exams", grade), (snap) => {
-    const items = snap.exists() ? snap.data()?.items || [] : [];
+    const items = snap.exists() ? (snap.data()?.items || []) : [];
     if (ex) ex.innerHTML = "";
     if (exStatus) exStatus.textContent = "טוען…";
 
     const arr = items
-      .filter((x) => String(x.classId || "").toLowerCase() === classId)
-      .map((x) => ({ ...x, _d: parseDate(x.date) }))
-      .filter((x) => !x._d || x._d.getTime() >= todayMidnight())
-      .sort((a, b) => {
+      .filter(x => String(x.classId || "").toLowerCase() === classId)
+      .map(x => ({ ...x, _d: parseDate(x.date) }))
+      .filter(x => !x._d || x._d.getTime() >= todayMidnight())
+      .sort((a,b) => {
         const da = a._d ? a._d.getTime() : Infinity;
         const dbt = b._d ? b._d.getTime() : Infinity;
         return da - dbt;
@@ -1381,7 +955,7 @@ function startRealtime(classId) {
 
     if (exStatus) exStatus.textContent = "";
     if (ex) {
-      ex.innerHTML = arr.map((e) => `
+      ex.innerHTML = arr.map(e => `
         <div class="item">
           <div><b>${escapeHtml(e.subject || "")}</b></div>
           <div class="meta">${escapeHtml(e.date || "")}${e.time ? " · " + escapeHtml(e.time) : ""}</div>
@@ -1397,7 +971,7 @@ function startRealtime(classId) {
   });
 
   unsubNews = onSnapshot(doc(db, "news", grade), (snap) => {
-    const items = snap.exists() ? snap.data()?.items || [] : [];
+    const items = snap.exists() ? (snap.data()?.items || []) : [];
     if (newsStatus) newsStatus.textContent = "טוען…";
     renderNewsList(classId, items);
   }, (err) => {
@@ -1406,38 +980,9 @@ function startRealtime(classId) {
     lastNewsArr = [];
     updateBoomCounts();
   });
-
-  // TASKS realtime
-  unsubTasks = onSnapshot(doc(db, "tasks", grade), (snap) => {
-    if (!tasks || !tasksStatus) return;
-
-    const items = snap.exists() ? snap.data()?.items || [] : [];
-    const now = new Date();
-
-    const arr = items
-      .filter((x) => String(x.classId || "").toLowerCase() === classId)
-      .map((x) => ({ ...x, _dt: taskDueToDate(x) }))
-      .filter((x) => !x._dt || x._dt.getTime() >= now.getTime() - 60 * 1000)
-      .sort((a, b) => {
-        const da = a._dt ? a._dt.getTime() : Infinity;
-        const dbt = b._dt ? b._dt.getTime() : Infinity;
-        return da - dbt;
-      })
-      .slice(0, 50);
-
-    const cleaned = arr.map(({ _dt, ...rest }) => rest);
-    renderTasks(classId, cleaned);
-  }, (err) => {
-    console.error("tasks snapshot error:", err);
-    if (tasksStatus) tasksStatus.textContent = "שגיאה בטעינת משימות.";
-    lastTasksArr = [];
-    updateBoomCounts();
-  });
 }
 
-// ============================================================
-// OPEN CLASS
-// ============================================================
+// ====== open class ======
 async function openClass(classId) {
   activeClassId = classId;
 
@@ -1445,17 +990,13 @@ async function openClass(classId) {
 
   lastExamsArr = [];
   lastNewsArr = [];
-  lastTasksArr = [];
-  lastTimetableGrid = null;
-
   updateBoomCounts();
   updateBoomNowNext();
 
   await Promise.all([
     loadTimetableOnce(classId),
     loadExamsOnce(classId),
-    loadNewsOnce(classId),
-    loadTasksOnce(classId),
+    loadNewsOnce(classId)
   ]);
 
   startRealtime(classId);
@@ -1464,22 +1005,17 @@ async function openClass(classId) {
   updateBoomNowNext();
 }
 
-// ============================================================
-// BOOT
-// ============================================================
+// ====== boot ======
 const qs = new URLSearchParams(location.search);
 const classId = (qs.get("class") || "").trim().toLowerCase();
 
-// refresh every 1s (countdowns + now/next + tasks countdown)
+// ✅ refresh every 1s (בשביל ספירה לאחור + עכשיו/הבא)
 setInterval(() => {
   updateBoomCounts();
   updateBoomNowNext();
 
-  if (isMobileView()) renderMobileDayFromLastGrid();
-
-  // rerender tasks countdown without refetch (keeps UI alive)
-  if (activeClassId && tasks && lastTasksArr?.length) {
-    renderTasks(activeClassId, lastTasksArr);
+  if (isMobileView()) {
+    renderMobileDayFromLastGrid();
   }
 }, 1000);
 

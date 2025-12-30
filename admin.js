@@ -123,47 +123,64 @@ function startPermissionWatcher(user) {
     refDoc,
     { includeMetadataChanges: true },
     (snap) => {
+      // כל snapshot "טוב" מבטל טיימר בעיטה
+      // (אלא אם באמת נחליט לתזמן בעיטה שוב)
       clearPermKickTimer();
 
       const fromCache = !!snap?.metadata?.fromCache;
 
+      // אם המסמך לא קיים:
       if (!snap.exists()) {
+        // ✅ אם זה מהקאש – יכול להיות שהשרת עוד לא חזר/התחברות עוד מתייצבת
         if (fromCache) {
+          // לא בועטים, פשוט מחכים לשרת
+          // נשאיר גם טיימר עדין רק אם כבר התחמשנו בעבר
           if (permWatcherArmed) {
             scheduleKick("הגישה שלך בוטלה");
           }
           return;
         }
 
+        // אם זה לא מהקאש (שרת אמר שאין) – זו באמת בעיה
+        // אבל עדיין ניתן grace קצר כדי להימנע מ"גליץ'" ברשת/החלפת משתמש
         scheduleKick("הגישה שלך בוטלה");
         return;
       }
 
+      // כאן המסמך קיים => אפשר להתחמש
       permWatcherArmed = true;
 
       const data = snap.data() || {};
       const role = String(data.role || "").trim().toLowerCase();
 
+      // ✅ אם אין role לרגע (דאטה לא שלם) – לא בעיטה ישר, נחכה
       if (!role) {
         scheduleKick("אין לך הרשאות");
         return;
       }
 
+      // roles שמותר להיכנס ל-admin
       if (!ADMIN_ROLES.includes(role)) {
         scheduleKick("אין לך הרשאות");
         return;
       }
 
+      // אם הכול תקין – לא לעשות כלום
+      // (וגם לוודא שאין kick timer)
       clearPermKickTimer();
     },
     (err) => {
       console.error("perm snapshot error:", err);
 
+      // ✅ לא בועטים על שגיאות זמניות (unavailable/network וכו')
       if (shouldKickForSnapshotError(err)) {
         kickToLogin("שגיאת הרשאות (בדוק חוקים/קונסול)");
         return;
       }
 
+      // שגיאה זמנית: ניתן הודעה עדינה בקונסול בלבד + ננסה להמשיך בלי בעיטה
+      // (ה-onSnapshot בדרך כלל ינסה להתחבר מחדש לבד)
+      // אם כבר התחמשנו בעבר, נשאיר grace kick רק אם זה חוזר ונשנה:
       if (permWatcherArmed) {
         scheduleKick("בעיה זמנית בחיבור/הרשאות. נסה שוב.");
       }
@@ -189,7 +206,6 @@ function buildPermsFromRole(role, allowedGrades = []) {
     can: {
       news: true,
       exams: true,
-      tasks: true,
       board: false,
       siteContent: false,
       polls: false,
@@ -230,6 +246,7 @@ function buildPermsFromRole(role, allowedGrades = []) {
     return base;
   }
 
+  // admin (אם אתה משתמש בזה אצלך)
   if (r === "admin") {
     base.role = "admin";
     base.allowedGrades = ["z", "h", "t"];
@@ -240,6 +257,7 @@ function buildPermsFromRole(role, allowedGrades = []) {
     return base;
   }
 
+  // teacher (ברירת מחדל)
   base.role = "teacher";
   return base;
 }
@@ -252,30 +270,36 @@ function gradeAllowed(grade) {
 function applyPermissionsToUI() {
   if (!currentPerms) return;
 
+  // hide grade sections not allowed
   document.querySelectorAll(".admin-grade-section").forEach((sec) => {
     const g = sec.getAttribute("data-grade");
     if (!g) return;
     sec.style.display = gradeAllowed(g) ? "" : "none";
   });
 
+  // Board
   const board = document.getElementById("admin-board");
   if (board) {
     const card = board.closest(".card") || board;
     card.style.display = currentPerms.can.board ? "" : "none";
   }
 
+  // Site content
   const sc = document.getElementById("site-content-form");
   if (sc) {
     const card = sc.closest(".card") || sc;
     card.style.display = currentPerms.can.siteContent ? "" : "none";
   }
 
+  // Polls
   const polls = document.getElementById("polls-section");
   if (polls) polls.style.display = currentPerms.can.polls ? "" : "none";
 
+  // Logs
   const logsBtn = document.getElementById("open-logs");
   if (logsBtn) logsBtn.style.display = currentPerms.can.logs ? "" : "none";
 
+  // כפתור DEV (אם יש לך ב-HTML)
   const devBtn = document.getElementById("open-dev");
   if (devBtn) devBtn.style.display = currentPerms.can.dev ? "" : "none";
 }
@@ -283,9 +307,11 @@ function applyPermissionsToUI() {
 async function loadAdminPermissions(user) {
   const email = normalizeEmail(user?.email);
 
+  // DEV לפי אימייל - תמיד מאפשר
   if (DEV_EMAILS.includes(email)) {
     currentPerms = buildPermsFromRole("dev", ["z", "h", "t"]);
 
+    // ניצור doc אם אין עדיין (כדי שזה יהיה עקבי)
     try {
       const uref = doc(db, "adminUsers", user.uid);
       const usnap = await getDoc(uref);
@@ -306,6 +332,7 @@ async function loadAdminPermissions(user) {
     return currentPerms;
   }
 
+  // משתמש רגיל: חייב להיות ברשימת adminUsers
   const uref = doc(db, "adminUsers", user.uid);
   const usnap = await getDoc(uref);
   if (!usnap.exists()) {
@@ -324,6 +351,7 @@ async function loadAdminPermissions(user) {
 
 const GRADES = ["z", "h", "t"];
 
+// כיתות לכל שכבה
 const CLASS_IDS_BY_GRADE = {
   z: ["z1", "z2", "z3", "z4", "z5"],
   h: ["h1", "h4", "h5", "h6"],
@@ -332,14 +360,14 @@ const CLASS_IDS_BY_GRADE = {
 
 let newsData = { z: [], h: [], t: [] };
 let examsData = { z: [], h: [], t: [] };
-let tasksData = { z: [], h: [], t: [] };
 let boardData = [];
 let siteContent = {};
 let pollsData = [];
 
+// קולקציה של סקרים
 const pollsCollectionRef = collection(db, "polls");
 
-/* ------------ LOGS ------------ */
+/* ------------ LOGS – לוג כללי לכל הדברים ------------ */
 async function logSystemChange(action, entity, payload = {}) {
   if (!currentPerms || !currentPerms.can || !currentPerms.can.logs) return;
   try {
@@ -363,6 +391,7 @@ async function logSystemChange(action, entity, payload = {}) {
   }
 }
 
+/* ------------ helpers ------------ */
 function escapeHtml(str) {
   return String(str || "")
     .replace(/&/g, "&amp;")
@@ -371,6 +400,7 @@ function escapeHtml(str) {
     .replace(/"/g, "&quot;");
 }
 
+// classId -> label
 function classIdToLabel(classId) {
   const map = {
     z1: "ז1", z2: "ז2", z3: "ז3", z4: "ז4", z5: "ז5",
@@ -387,14 +417,15 @@ async function getDocSafe(pathArr, def) {
   return snap.data() || def;
 }
 
-/* ------------ FORGOT PASSWORD ------------ */
+/* ------------ FORGOT PASSWORD (reset email) ------------ */
 function setupForgotPassword() {
   const link = document.getElementById("forgotPasswordLink");
-  if (!link) return;
+  if (!link) return; // אם אין HTML עדיין - לא שוברים כלום
 
   link.addEventListener("click", async (e) => {
     e.preventDefault();
 
+    // נעדיף את האימייל שנמצא בתוך הטופס שלך
     const emailInput = document.querySelector('#login-form input[name="email"]');
     const email = (emailInput?.value || "").trim();
 
@@ -493,6 +524,7 @@ function initAuth() {
   });
 } // ✅ סוף initAuth
 
+
 /* ------------ load everything ------------ */
 async function loadAllData() {
   // NEWS
@@ -512,16 +544,7 @@ async function loadAllData() {
   // BOARD
   const b = await getDocSafe(["board", "general"], { items: [] });
   boardData = b.items || [];
-  renderBoardAdmin(); // ✅ (לא חובה, אבל מסודר)
-
-for (const g of GRADES) {
-  onSnapshot(doc(db, "tasks", g), (snap) => {
-    const data = snap.exists() ? snap.data() : { items: [] };
-    tasksData[g] = data.items || [];
-    renderTasksAdmin();
-  });
-}
-
+  renderBoardAdmin();
 
   // POLLS
   await loadPolls();
@@ -535,6 +558,7 @@ for (const g of GRADES) {
 
 /* ------------ realtime ------------ */
 function subscribeRealtimeAdmin() {
+  // NEWS
   for (const g of GRADES) {
     onSnapshot(doc(db, "news", g), (snap) => {
       const data = snap.exists() ? snap.data() : { items: [] };
@@ -543,6 +567,7 @@ function subscribeRealtimeAdmin() {
     });
   }
 
+  // EXAMS
   for (const g of GRADES) {
     onSnapshot(doc(db, "exams", g), (snap) => {
       const data = snap.exists() ? snap.data() : { items: [] };
@@ -551,20 +576,14 @@ function subscribeRealtimeAdmin() {
     });
   }
 
-  for (const g of GRADES) {
-    onSnapshot(doc(db, "tasks", g), (snap) => {
-      const data = snap.exists() ? snap.data() : { items: [] };
-      tasksData[g] = data.items || [];
-      renderTasksAdmin();
-    });
-  }
-
+  // BOARD
   onSnapshot(doc(db, "board", "general"), (snap) => {
     const data = snap.exists() ? snap.data() : { items: [] };
     boardData = data.items || [];
     renderBoardAdmin();
   });
 
+  // POLLS
   onSnapshot(pollsCollectionRef, (snap) => {
     pollsData = [];
     snap.forEach((docSnap) => {
@@ -595,6 +614,7 @@ function renderNewsAdmin() {
       .map((n) => {
         const i = n._index;
 
+        // תמונות: תומך גם imageUrls וגם imageUrl/imageUrl2
         const images = [];
         if (Array.isArray(n.imageUrls)) images.push(...n.imageUrls.filter(Boolean));
         if (n.imageUrl) images.push(n.imageUrl);
@@ -685,9 +705,11 @@ function setupNewsForms() {
       try {
         const imageUrls = [];
 
+        // קישורים ידניים (עד 2)
         if (imageUrl) imageUrls.push(imageUrl);
         if (imageUrl2) imageUrls.push(imageUrl2);
 
+        // העלאת קבצים (עד 2)
         const files = [file1, file2].filter(Boolean);
         for (let i = 0; i < files.length && imageUrls.length < 2; i++) {
           const file = files[i];
@@ -699,10 +721,11 @@ function setupNewsForms() {
           imageUrls.push(url);
         }
 
+        // ייחודיות + מקסימום 2
         const finalImages = [...new Set(imageUrls.map(x => String(x).trim()).filter(Boolean))].slice(0, 2);
 
         const newItem = {
-          classId,
+          classId,            // ✅ הכי חשוב: חדשות לכיתה
           title,
           meta,
           body,
@@ -715,6 +738,7 @@ function setupNewsForms() {
         newsData[g].push(newItem);
 
         form.reset();
+        // נחזיר את הצבע לברירת מחדל כדי שלא “ייעלם”
         if (form.color) form.color.value = "#ffffff";
 
         renderNewsAdmin();
@@ -925,124 +949,6 @@ function setupExamForms() {
     });
   }
 }
-
-/* ------------ TASKS (משימות) ------------ */
-
-async function saveTasksGrade(grade) {
-  const refDoc = doc(db, "tasks", grade);
-  await setDoc(refDoc, { items: tasksData[grade] || [] }, { merge: true });
-}
-
-function renderTasksAdmin() {
-  for (const g of GRADES) {
-    const listEl = document.getElementById(`admin-tasks-${g}`);
-    if (!listEl) continue;
-
-    const items = tasksData[g] || [];
-
-    if (!items.length) {
-      listEl.innerHTML = `<p class="empty-msg">אין משימות.</p>`;
-      continue;
-    }
-
-    const itemsWithIndex = items.map((t, idx) => ({ ...t, _index: idx }));
-    const orderedForUi = itemsWithIndex.slice().reverse();
-
-    listEl.innerHTML = orderedForUi
-      .map((t) => {
-        const i = t._index;
-        const classLabel = t.classId ? classIdToLabel(String(t.classId).toLowerCase()) : "";
-
-        const fileHtml = t.fileUrl
-          ? `<div class="admin-item-body">📎 <a href="${escapeHtml(t.fileUrl)}" target="_blank" rel="noopener">קובץ/קישור</a></div>`
-          : "";
-
-        return `
-          <div class="admin-item">
-            <div class="admin-item-main">
-              <strong>${escapeHtml(t.title || "")}</strong>
-              <span class="admin-item-meta">
-                ${classLabel ? " · כיתה " + escapeHtml(classLabel) : ""}
-              </span>
-            </div>
-
-            ${t.body ? `<div class="admin-item-body">${escapeHtml(t.body)}</div>` : ""}
-            ${fileHtml}
-
-            <button class="admin-remove" data-type="task" data-grade="${g}" data-index="${i}">
-              מחיקה
-            </button>
-          </div>
-        `;
-      })
-      .join("");
-  }
-}
-
-function setupTaskForms() {
-  for (const g of GRADES) {
-    const form = document.getElementById(`tasks-form-${g}`);
-    if (!form) continue;
-
-    // ✅ אם זה הטופס החדש (text + dueAt + file) — אל תחבר את ה-handler הישן
-    const isTasksV2 =
-      !!form.querySelector('textarea[name="text"]') ||
-      !!form.querySelector('input[name="dueAt"]') ||
-      !!form.querySelector('input[type="file"][name="file"]');
-
-    if (isTasksV2) {
-      console.log(`[admin.js] Tasks v2 detected for ${g}, skipping legacy submit handler`);
-      continue;
-    }
-
-    // ---------------------------
-    // legacy handler (כמו שהיה אצלך)
-    // ---------------------------
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const title = (form.title?.value || "").trim();
-      const body = (form.body?.value || "").trim();
-      const classId = (form.classId?.value || "").trim().toLowerCase();
-      const fileUrl = (form.fileUrl?.value || "").trim();
-
-      if (!classId) {
-        alert("חובה לבחור כיתה.");
-        return;
-      }
-      if (!CLASS_IDS_BY_GRADE[g].includes(classId)) {
-        alert("כיתה לא חוקית לשכבה הזאת.");
-        return;
-      }
-      if (!title) {
-        alert("חובה למלא כותרת.");
-        return;
-      }
-
-      try {
-        const newTask = {
-          classId,
-          title,
-          body,
-          fileUrl,
-          createdAt: new Date().toISOString(),
-        };
-
-        tasksData[g] = tasksData[g] || [];
-        tasksData[g].push(newTask);
-
-        await saveTasksGrade(g);
-        renderTasksAdmin();
-        form.reset();
-        alert("המשימה נוספה ✅");
-      } catch (err) {
-        console.error("שגיאה בשמירת משימה:", err);
-        alert("שגיאה בשמירת משימה. נסו שוב.");
-      }
-    });
-  }
-}
-
 
 /* ------------ POLLS ------------ */
 
@@ -1310,6 +1216,8 @@ function setupSiteContentForm() {
   });
 }
 
+/* ------------ DELETE + TOGGLE HANDLER ------------ */
+
 function setupDeleteHandler() {
   document.addEventListener("click", async (e) => {
     const toggleBtn = e.target.closest(".admin-toggle-poll");
@@ -1361,25 +1269,6 @@ function setupDeleteHandler() {
           itemsCount: newsData[grade].length
         });
       }
-
-    } else if (type === "task") {
-      if (!tasksData[grade]) return;
-      const deletedTask = tasksData[grade][index];
-
-      tasksData[grade].splice(index, 1);
-      renderTasksAdmin();
-      await saveTasksGrade(grade);
-
-      if (deletedTask) {
-        await logSystemChange("delete", "task", {
-          grade,
-          classId: deletedTask.classId || null,
-          subject: deletedTask.title,
-          topic: deletedTask.body,
-          itemsCount: tasksData[grade].length
-        });
-      }
-
     } else if (type === "exam") {
       if (!examsData[grade]) return;
       const deletedExam = examsData[grade][index];
@@ -1399,7 +1288,6 @@ function setupDeleteHandler() {
           itemsCount: examsData[grade].length
         });
       }
-
     } else if (type === "board") {
       const deletedBoard = boardData[index];
       boardData.splice(index, 1);
@@ -1413,7 +1301,6 @@ function setupDeleteHandler() {
           itemsCount: boardData.length
         });
       }
-
     } else if (type === "poll") {
       const pollId = btn.dataset.id;
       if (!pollId) return;
@@ -1436,7 +1323,6 @@ function setupDeleteHandler() {
     }
   });
 }
-
 
 /* ------------ GRADE FILTER ------------ */
 
@@ -1470,9 +1356,10 @@ function setupGradeFilter() {
 }
 
 /* =============================
-   NAV / MOBILE TOGGLES
+   NAV / MOBILE TOGGLES (מסודר, בלי כפילויות)
 ============================= */
 
+// Admin mobile menu toggle
 function setupAdminMobileMenu() {
   const toggle = document.getElementById("adminMobileToggle");
   const menu = document.getElementById("adminMobileMenu");
@@ -1508,6 +1395,7 @@ function setupAdminMobileMenu() {
   });
 }
 
+// Site mobile nav toggle (אם יש לך גם באתר)
 function setupSiteMobileNav() {
   const btn = document.querySelector(".nav-toggle");
   const menu = document.getElementById("nav-mobile");
@@ -1542,6 +1430,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupDeleteHandler();
   setupSiteContentForm();
   setupGradeFilter();
+
   setupAdminMobileMenu();
   setupSiteMobileNav();
 });
