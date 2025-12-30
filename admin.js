@@ -982,6 +982,20 @@ function setupTaskForms() {
     const form = document.getElementById(`tasks-form-${g}`);
     if (!form) continue;
 
+    // ✅ אם זה הטופס החדש (text + dueAt + file) — אל תחבר את ה-handler הישן
+    const isTasksV2 =
+      !!form.querySelector('textarea[name="text"]') ||
+      !!form.querySelector('input[name="dueAt"]') ||
+      !!form.querySelector('input[type="file"][name="file"]');
+
+    if (isTasksV2) {
+      console.log(`[admin.js] Tasks v2 detected for ${g}, skipping legacy submit handler`);
+      continue;
+    }
+
+    // ---------------------------
+    // legacy handler (כמו שהיה אצלך)
+    // ---------------------------
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
@@ -1009,33 +1023,24 @@ function setupTaskForms() {
           title,
           body,
           fileUrl,
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString(),
         };
 
-        if (!tasksData[g]) tasksData[g] = [];
+        tasksData[g] = tasksData[g] || [];
         tasksData[g].push(newTask);
 
-        form.reset();
-
-        renderTasksAdmin();
         await saveTasksGrade(g);
-
-        await logSystemChange("create", "task", {
-          grade: g,
-          classId,
-          subject: newTask.title,
-          topic: newTask.body,
-          itemsCount: tasksData[g].length
-        });
-
-        alert("המשימה נשמרה ✅");
+        renderTasksAdmin();
+        form.reset();
+        alert("המשימה נוספה ✅");
       } catch (err) {
         console.error("שגיאה בשמירת משימה:", err);
-        alert("שגיאה בשמירת המשימה:\n" + (err?.message || JSON.stringify(err)));
+        alert("שגיאה בשמירת משימה. נסו שוב.");
       }
     });
   }
 }
+
 
 /* ------------ POLLS ------------ */
 

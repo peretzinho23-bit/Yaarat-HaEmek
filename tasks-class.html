@@ -255,72 +255,91 @@
       }
     }
 
-    function render(list){
-      if(!list.length){
-        itemsEl.innerHTML = `<div class="empty">אין משימות לכיתה הזו.</div>`;
-        return;
-      }
+function toDateAny(x){
+  if(!x) return null;
+  if(x instanceof Date) return x;
+  if(typeof x === "string"){
+    const d = new Date(x);
+    return Number.isNaN(d.getTime()) ? null : d;
+  }
+  if(typeof x === "number"){
+    const d = new Date(x);
+    return Number.isNaN(d.getTime()) ? null : d;
+  }
+  if(typeof x === "object"){
+    // Firestore Timestamp style
+    if(typeof x.toDate === "function") return x.toDate();
+    if(typeof x.seconds === "number") return new Date(x.seconds * 1000);
+  }
+  return null;
+}
 
-      // מיון חכם: קודם לפי דדליין (אם יש), אחרת לפי createdAt
-      list = list.slice().sort((a,b)=>{
-        const ad = a._dt ? a._dt.getTime() : Infinity;
-        const bd = b._dt ? b._dt.getTime() : Infinity;
-        if (ad !== bd) return ad - bd;
+function fmtIL(d){
+  if(!d) return "";
+  try{ return d.toLocaleString("he-IL"); }catch{ return ""; }
+}
 
-        const at = new Date(a.createdAt || 0).getTime();
-        const bt = new Date(b.createdAt || 0).getTime();
-        return bt - at;
-      });
+function getDueDate(t){
+  return toDateAny(t.dueAt) || toDateAny(t.dueDate) || toDateAny(t.deadline) || null;
+}
 
-      itemsEl.innerHTML = list.map(t=>{
-        const text = String((t.text ?? t.body ?? t.content ?? "") || "").trim();
-        const subject = String(t.subject || "").trim();
-        const kind = String(t.kind || t.type || "").trim();
+function render(list){
+  if(!list.length){
+    itemsEl.innerHTML = `<div class="empty">אין משימות לכיתה הזו.</div>`;
+    return;
+  }
 
-        const dt = t._dt || null;
-        const dueTxt = dt ? fmtIL(dt) : "";
+  // מיון: דדליין קרוב קודם, ואז חדש קודם
+  list = list.slice().sort((a,b)=>{
+    const ad = getDueDate(a)?.getTime() ?? Infinity;
+    const bd = getDueDate(b)?.getTime() ?? Infinity;
+    if(ad !== bd) return ad - bd;
 
-        const fileUrl = String(t.fileUrl || "").trim();
-        const fileName = String(t.fileName || "").trim();
-        const linkUrl = String(t.linkUrl || "").trim();
-        const finalLink = fileUrl || linkUrl;
+    const at = toDateAny(a.createdAt)?.getTime() ?? 0;
+    const bt = toDateAny(b.createdAt)?.getTime() ?? 0;
+    return bt - at;
+  });
 
-        const linkHtml = finalLink
-          ? `
-            <div class="fileRow">
-              <a class="fileBtn" href="${escapeHtml(finalLink)}" target="_blank" rel="noopener">
-                📎 ${escapeHtml(fileUrl ? (fileName || "פתח קובץ") : "פתח קישור")}
-              </a>
-            </div>
-          `
-          : "";
+  itemsEl.innerHTML = list.map(t=>{
+    const text = (t.text ?? t.body ?? "").toString().trim();
 
-        const previewHtml = (fileUrl && looksLikeImage(fileUrl, t.fileType))
-          ? `<div class="preview"><img src="${escapeHtml(fileUrl)}" alt="תמונה למשימה"></div>`
-          : "";
+    const due = getDueDate(t);
+    const dueTxt = fmtIL(due);
 
-        return `
-          <div class="item">
-            <div>
-              <h3>${escapeHtml(t.title || "משימה")}</h3>
+    const fileUrl = String(t.fileUrl || t.linkUrl || "").trim();
+    const fileName = String(t.fileName || "פתח קובץ/קישור").trim();
 
-              <div class="meta">
-                <span class="tag blue"><b>שכבה:</b> ${escapeHtml(gradeLabel(grade))}</span>
-                <span class="tag"><b>כיתה:</b> ${escapeHtml(classIdToLabel(classId))}</span>
-                ${kind ? `<span class="tag good">✅ ${escapeHtml(kind)}</span>` : ""}
-                ${subject ? `<span class="tag"><b>מקצוע:</b> ${escapeHtml(subject)}</span>` : ""}
-                ${dueTxt ? `<span class="tag warn">⏰ דדליין: ${escapeHtml(dueTxt)}</span>` : ""}
-              </div>
+    const linkHtml = fileUrl
+      ? `<div style="margin-top:10px">📎 <a class="link" href="${escapeHtml(fileUrl)}" target="_blank" rel="noopener">${escapeHtml(fileName)}</a></div>`
+      : "";
 
-              ${text ? `<div class="body">${escapeHtml(text)}</div>` : ""}
+    const subject = String(t.subject || "").trim();
 
-              ${linkHtml}
-              ${previewHtml}
-            </div>
+    return `
+      <div class="item">
+        <div>
+          <h3>${escapeHtml(t.title || "משימה")}</h3>
+
+          <div class="meta">
+            <span class="tag blue"><b>שכבה:</b> ${escapeHtml(gradeLabel(grade))}</span>
+            <span class="tag"><b>כיתה:</b> ${escapeHtml(classIdToLabel(classId))}</span>
+            ${subject ? `<span class="tag"><b>מקצוע:</b> ${escapeHtml(subject)}</span>` : ""}
+            ${
+              dueTxt
+                ? `<span class="tag" style="border-color:rgba(245,158,11,.45)"><b>דדליין:</b> ${escapeHtml(dueTxt)}</span>`
+                : `<span class="tag" style="opacity:.75;border-color:rgba(245,158,11,.35)"><b>דדליין:</b> בלי דדליין</span>`
+            }
           </div>
-        `;
-      }).join("");
-    }
+
+          ${text ? `<div style="margin-top:10px; color:rgba(234,240,255,.86); line-height:1.6; white-space:pre-wrap;">${escapeHtml(text)}</div>` : ""}
+
+          ${linkHtml}
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
 
     refreshBtn.addEventListener("click", load);
     load();
