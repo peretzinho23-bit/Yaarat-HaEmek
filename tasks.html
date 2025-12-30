@@ -310,6 +310,7 @@
       padding:12px;
       margin:10px 0;
       transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+      overflow:hidden;
     }
     .task:hover{
       transform: translateY(-1px);
@@ -345,6 +346,14 @@
     }
     html[data-theme="light"] .task-body{color:#0f172a}
 
+    .task-body a{
+      color:#b9d1ff;
+      font-weight:1000;
+      text-decoration: underline;
+      word-break: break-all;
+    }
+    html[data-theme="light"] .task-body a{color:#1d4ed8}
+
     .task-link{
       margin-top:10px;
       display:inline-flex; gap:8px; align-items:center;
@@ -354,6 +363,23 @@
       word-break: break-all;
     }
     html[data-theme="light"] .task-link{color:#1d4ed8}
+
+    /* ✅ תמונות משימה */
+    .task-imgs{
+      margin-top:12px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .task-imgs img{
+      width:min(240px, 100%);
+      max-width:240px;
+      aspect-ratio: 4 / 3;
+      object-fit:cover;
+      border-radius:14px;
+      border:1px solid rgba(148,163,184,.25);
+      box-shadow: 0 14px 34px rgba(0,0,0,.18);
+    }
 
     .mini-muted{color:var(--muted); font-weight:900; font-size:.92rem}
   </style>
@@ -452,6 +478,7 @@
               <option value="newFirst">חדש קודם</option>
               <option value="oldFirst">ישן קודם</option>
               <option value="titleAsc">כותרת א-ת</option>
+              <option value="dueSoon">דדליין קרוב</option>
             </select>
           </div>
         </div>
@@ -551,6 +578,7 @@
       };
       return map[String(classId||"").toLowerCase()] || String(classId||"");
     }
+
     function gradeFromClassId(classId){
       const c = String(classId||"").toLowerCase().trim();
       if(!c) return "";
@@ -559,36 +587,120 @@
       if(c.startsWith("t")) return "t";
       return "";
     }
+
     function gradeLabel(g){
       return g==="z" ? "ז׳" : g==="h" ? "ח׳" : g==="t" ? "ט׳" : g;
     }
+
     function escapeHtml(str){
       return String(str||"")
         .replace(/&/g,"&amp;").replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+        .replace(/>/g,"&gt;").replace(/"/g,"&quot;")
+        .replace(/'/g,"&#39;");
     }
+
+    // ✅ לינקים קליקים בתוך טקסט (אחרי escape)
+    function linkifySafe(text){
+      const safe = escapeHtml(text || "");
+      return safe.replace(
+        /(https?:\/\/[^\s]+)/g,
+        '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
+      );
+    }
+
     function normalize(x){ return String(x||"").toLowerCase().trim(); }
+
+    // ✅ תמונות מכל השדות האפשריים (תאימות)
+    function extractImages(t){
+      const imgs = [];
+      if (Array.isArray(t.imageUrls)) imgs.push(...t.imageUrls);
+      if (t.imageUrl) imgs.push(t.imageUrl);
+      if (t.imageUrl2) imgs.push(t.imageUrl2);
+
+      if (Array.isArray(t.images)) imgs.push(...t.images);
+      if (t.image) imgs.push(t.image);
+
+      return [...new Set(imgs.map(x=>String(x||"").trim()).filter(Boolean))].slice(0, 3);
+    }
+
+    // ✅ date parser אחד לכל השדות (ISO / Timestamp / seconds / ms)
+    function toDateAny(v){
+      if(!v) return null;
+
+      // Firestore Timestamp object (has toDate)
+      if (typeof v?.toDate === "function") {
+        const d = v.toDate();
+        return Number.isNaN(d.getTime()) ? null : d;
+      }
+
+      // raw timestamp {seconds}
+      if (typeof v?.seconds === "number") {
+        const d = new Date(v.seconds * 1000);
+        return Number.isNaN(d.getTime()) ? null : d;
+      }
+
+      // ms number
+      if (typeof v === "number") {
+        const d = new Date(v);
+        return Number.isNaN(d.getTime()) ? null : d;
+      }
+
+      // string (ISO or anything Date can parse)
+      if (typeof v === "string") {
+        const d = new Date(v);
+        return Number.isNaN(d.getTime()) ? null : d;
+      }
+
+      return null;
+    }
+
+    // ✅ דדליין: תופס dueAt / due / deadline + fallback dueDate+dueTime
+    function getDueDate(t){
+      const raw = t?.dueAt ?? t?.due ?? t?.deadline;
+      const d = toDateAny(raw);
+      if (d) return d;
+
+      // fallback: dueDate + dueTime
+      const dd = t?.dueDate || t?.date;
+      const tm = t?.dueTime || t?.time;
+      if(!dd) return null;
+
+      // dd can be "DD/MM/YYYY"
+      const m = String(dd).trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/);
+      if(!m) return toDateAny(dd);
+
+      let day = Number(m[1]), mo = Number(m[2]), y = Number(m[3]);
+      if (y < 100) y = 2000 + y;
+      const dt = new Date(y, mo - 1, day);
+
+      if (typeof tm === "string" && /^\d{1,2}:\d{2}$/.test(tm.trim())) {
+        const [hh, mm] = tm.trim().split(":").map(Number);
+        dt.setHours(hh, mm, 0, 0);
+      } else {
+        dt.setHours(23, 59, 0, 0);
+      }
+
+      return Number.isNaN(dt.getTime()) ? null : dt;
+    }
+
+    function fmtIL(d){
+      return d ? d.toLocaleString("he-IL") : "";
+    }
 
     // ✅ חשוב: לחפש גם ב-text + subject + dueAt
     function blob(t){
       return [
         t.title,
-        t.text,          // ✅
-        t.body,          // תאימות אם יש לך ישנים
+        t.text,
+        t.body,
         t.subject,
         t.classId,
         classIdToLabel(t.classId),
         t.grade,
-        t.dueAt
+        t.dueAt,
+        t.due,
+        t.deadline
       ].map(v=>String(v||"")).join(" ").toLowerCase();
-    }
-
-    // ✅ פורמט אחיד לדדליין
-    function fmtDueAt(iso){
-      if(!iso) return "";
-      const d = new Date(iso);
-      if(Number.isNaN(d.getTime())) return "";
-      return d.toLocaleString("he-IL");
     }
 
     const itemsEl = document.getElementById("items");
@@ -711,6 +823,11 @@
       }
     }
 
+    function getCreatedDate(t){
+      // createdAt יכול להיות ISO / Timestamp / seconds / ms
+      return toDateAny(t.createdAt) || toDateAny(t.created) || toDateAny(t._createdAt) || null;
+    }
+
     function applyAndRender(){
       refreshClassDropdown();
 
@@ -725,12 +842,22 @@
       if(q) arr = arr.filter(x => blob(x).includes(q));
 
       arr.sort((a,b)=>{
-        const at = new Date(a.createdAt || 0).getTime();
-        const bt = new Date(b.createdAt || 0).getTime();
+        if(sort === "titleAsc"){
+          return String(a.title||"").localeCompare(String(b.title||""), "he");
+        }
+
+        if(sort === "dueSoon"){
+          const ad = getDueDate(a)?.getTime() ?? Infinity;
+          const bd = getDueDate(b)?.getTime() ?? Infinity;
+          return ad - bd;
+        }
+
+        // default by createdAt
+        const at = getCreatedDate(a)?.getTime() ?? 0;
+        const bt = getCreatedDate(b)?.getTime() ?? 0;
 
         if(sort === "newFirst") return bt - at;
         if(sort === "oldFirst") return at - bt;
-        if(sort === "titleAsc") return String(a.title||"").localeCompare(String(b.title||""), "he");
         return 0;
       });
 
@@ -748,26 +875,29 @@
         const g = normalize(t.grade);
         const cls = normalize(t.classId);
 
-        // ✅ תאימות: אם יש ישנים עם body
         const text = (t.text ?? t.body ?? "").toString().trim();
+        const due = getDueDate(t);
+        const dueTxt = fmtIL(due);
 
-        const dueTxt = fmtDueAt(t.dueAt);
-        const created = t.createdAt ? new Date(t.createdAt) : null;
-        const createdTxt = created && !Number.isNaN(created.getTime())
-          ? created.toLocaleDateString("he-IL")
-          : "";
+        const created = getCreatedDate(t);
+        const createdTxt = created ? created.toLocaleDateString("he-IL") : "";
 
-        // ✅ קובץ מהאדמין
         const fileUrl = String(t.fileUrl || "").trim();
         const fileName = String(t.fileName || "פתח קובץ").trim();
 
-        // תאימות: אם יש גם linkUrl
         const linkUrl = String(t.linkUrl || "").trim();
         const finalLink = fileUrl || linkUrl;
 
         const linkHtml = finalLink
           ? `<a class="task-link" href="${escapeHtml(finalLink)}" target="_blank" rel="noopener">📎 ${escapeHtml(fileUrl ? fileName : "פתח קובץ/קישור")}</a>`
           : "";
+
+        const imgs = extractImages(t);
+        const imgsHtml = imgs.length ? `
+          <div class="task-imgs">
+            ${imgs.map((url)=>`<img src="${escapeHtml(url)}" alt="תמונה למשימה">`).join("")}
+          </div>
+        ` : "";
 
         return `
           <article class="task">
@@ -780,11 +910,12 @@
               <span class="tag blue">שכבה: ${escapeHtml(gradeLabel(g))}</span>
               <span class="tag">כיתה: ${escapeHtml(classIdToLabel(cls))}</span>
               ${t.subject ? `<span class="tag good">📘 ${escapeHtml(t.subject)}</span>` : ""}
-              ${dueTxt ? `<span class="tag warn">⏰ דדליין: ${escapeHtml(dueTxt)}</span>` : ""}
+              ${dueTxt ? `<span class="tag warn">⏰ דדליין: ${escapeHtml(dueTxt)}</span>` : `<span class="tag warn" style="opacity:.75;">⏰ בלי דדליין</span>`}
             </div>
 
-            ${text ? `<div class="task-body">${escapeHtml(text)}</div>` : ""}
+            ${text ? `<div class="task-body">${linkifySafe(text)}</div>` : ""}
             ${linkHtml}
+            ${imgsHtml}
           </article>
         `;
       }).join("");
@@ -839,7 +970,12 @@
       applyAndRender();
     }
 
-    [qEl, gradeEl, classEl, sortEl].forEach(el => el.addEventListener("input", applyAndRender));
+    // selects sometimes fire change, not input (יותר בטוח)
+    qEl.addEventListener("input", applyAndRender);
+    gradeEl.addEventListener("change", applyAndRender);
+    classEl.addEventListener("change", applyAndRender);
+    sortEl.addEventListener("change", applyAndRender);
+
     refreshBtn.addEventListener("click", loadAll);
     clearBtn.addEventListener("click", clearFilters);
 
