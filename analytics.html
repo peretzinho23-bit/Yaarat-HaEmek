@@ -504,450 +504,448 @@
     </div>
   </div>
 
-  <script type="module">
-    import { db, auth } from "./firebase-config.js";
-    import {
-      collection,
-      getDocs,
-      query,
-      orderBy
-    } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
-    import {
-      onAuthStateChanged,
-      signOut
-    } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+<script type="module">
+  import { db, auth } from "./firebase-config.js";
+  import {
+    collection,
+    getDocs,
+    query,
+    orderBy,
+    limit
+  } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+  import {
+    onAuthStateChanged,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
-    /* =======================
-      SETTINGS
-    ======================= */
-    const OWNER_EMAILS = ["nadavp1119@gmail.com"]; // ✅ תוסיף אם יש עוד
-    const statusEl = document.getElementById("status");
-    const layoutEl = document.getElementById("layout");
-    const filtersEl = document.getElementById("filters");
+  /* =======================
+    SETTINGS
+  ======================= */
+  const OWNER_EMAILS = ["nadavp1119@gmail.com"]; // ✅ תוסיף אם יש עוד
+  const statusEl = document.getElementById("status");
+  const layoutEl = document.getElementById("layout");
+  const filtersEl = document.getElementById("filters");
 
-    const refreshBtn = document.getElementById("refreshBtn");
-    const signOutBtn = document.getElementById("signOutBtn");
+  const refreshBtn = document.getElementById("refreshBtn");
+  const signOutBtn = document.getElementById("signOutBtn");
 
-    const pillRange = document.getElementById("pillRange");
-    const pillDays = document.getElementById("pillDays");
+  const pillRange = document.getElementById("pillRange");
+  const pillDays = document.getElementById("pillDays");
 
-    const elTotalViews = document.getElementById("metric-total-views");
-    const elUniquePages = document.getElementById("metric-unique-pages");
-    const elActiveDays = document.getElementById("metric-active-days");
-    const elExamsViews = document.getElementById("metric-exams-views");
-    const elClassExamsViews = document.getElementById("metric-class-exams-views");
-    const elTotalNote = document.getElementById("metric-total-note");
+  const elTotalViews = document.getElementById("metric-total-views");
+  const elUniquePages = document.getElementById("metric-unique-pages");
+  const elActiveDays = document.getElementById("metric-active-days");
+  const elExamsViews = document.getElementById("metric-exams-views");
+  const elClassExamsViews = document.getElementById("metric-class-exams-views");
+  const elTotalNote = document.getElementById("metric-total-note");
 
-    const tbodyByDay = document.getElementById("table-by-day");
-    const tbodyByPage = document.getElementById("table-by-page");
-    const tbodyByHour = document.getElementById("table-by-hour");
-    const tbodyByGrade = document.getElementById("table-by-grade");
-    const tbodyByClass = document.getElementById("table-by-class");
-    const tbodyExamsByGrade = document.getElementById("table-exams-by-grade");
-    const tbodyClassExamsByClass = document.getElementById("table-classExams-by-class");
+  const tbodyByDay = document.getElementById("table-by-day");
+  const tbodyByPage = document.getElementById("table-by-page");
+  const tbodyByHour = document.getElementById("table-by-hour");
+  const tbodyByGrade = document.getElementById("table-by-grade");
+  const tbodyByClass = document.getElementById("table-by-class");
+  const tbodyExamsByGrade = document.getElementById("table-exams-by-grade");
+  const tbodyClassExamsByClass = document.getElementById("table-classExams-by-class");
 
-    const rangeSelect = document.getElementById("rangeSelect");
-    const pageFocus = document.getElementById("pageFocus");
+  const rangeSelect = document.getElementById("rangeSelect");
+  const pageFocus = document.getElementById("pageFocus");
 
-    /* =======================
-      HELPERS
-    ======================= */
-    function humanPageId(pageId) {
-      if (!pageId) return "-";
-      const map = {
-        "index": "דף הבית",
-        "home": "דף הבית (home)",
-        "classes": "דפי כיתה (class.html)",
-        "class": "דפי כיתה (class)",
-        "home-exams": "לוח מבחנים (עמוד ראשי)",
-        "exams": "לוח מבחנים",
-        "class-exams": "מבחנים לפי כיתה",
-        "admin": "פאנל ניהול",
-        "logs": "לוגים",
-        "analytics-dashboard": "אנליטיקות"
-      };
-      return map[pageId] || pageId;
-    }
+  /* =======================
+    HELPERS
+  ======================= */
+  function humanPageId(pageId) {
+    if (!pageId) return "-";
+    const map = {
+      "index": "דף הבית",
+      "home": "דף הבית (home)",
+      "classes": "דפי כיתה (class.html)",
+      "class": "דפי כיתה (class)",
+      "home-exams": "לוח מבחנים (עמוד ראשי)",
+      "exams": "לוח מבחנים",
+      "class-exams": "מבחנים לפי כיתה",
+      "admin": "פאנל ניהול",
+      "logs": "לוגים",
+      "analytics-dashboard": "אנליטיקות"
+    };
+    return map[pageId] || pageId;
+  }
 
-    function classIdToLabel(classId) {
-      const map = {
-        z1: "ז1", z2: "ז2", z3: "ז3", z4: "ז4", z5: "ז5",
-        h1: "ח1", h2: "ח2", h3: "ח3", h4: "ח4", h5: "ח5", h6: "ח6",
-        t1: "ט1", t2: "ט2", t3: "ט3", t4: "ט4", t5: "ט5"
-      };
-      return map[String(classId || "").toLowerCase()] || classId || "-";
-    }
+  function classIdToLabel(classId) {
+    const map = {
+      z1: "ז1", z2: "ז2", z3: "ז3", z4: "ז4", z5: "ז5",
+      h1: "ח1", h2: "ח2", h3: "ח3", h4: "ח4", h5: "ח5", h6: "ח6",
+      t1: "ט1", t2: "ט2", t3: "ט3", t4: "ט4", t5: "ט5"
+    };
+    return map[String(classId || "").toLowerCase()] || classId || "-";
+  }
 
-    function gradeToLabel(grade) {
-      const map = { z: "ז", h: "ח", t: "ט" };
-      return map[String(grade || "").toLowerCase()] || grade || "-";
-    }
+  function gradeToLabel(grade) {
+    const map = { z: "ז", h: "ח", t: "ט" };
+    return map[String(grade || "").toLowerCase()] || grade || "-";
+  }
 
-    function escapeHtml(str) {
-      return String(str ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
+  function escapeHtml(str) {
+    return String(str ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
 
-    function renderBarCell(value, max) {
-      const safeVal = Number(value || 0);
-      const safeMax = Number(max || 0);
-      const pct = !safeMax ? 0 : Math.max(4, Math.round((safeVal / safeMax) * 100));
-      return `
-        <div class="bar-row">
-          <div class="bar-track">
-            <div class="bar-fill" style="width:${pct}%;"></div>
-          </div>
-          <div class="bar-label">${safeVal}</div>
+  function renderBarCell(value, max) {
+    const safeVal = Number(value || 0);
+    const safeMax = Number(max || 0);
+    const pct = !safeMax ? 0 : Math.max(4, Math.round((safeVal / safeMax) * 100));
+    return `
+      <div class="bar-row">
+        <div class="bar-track">
+          <div class="bar-fill" style="width:${pct}%;"></div>
         </div>
-      `;
-    }
+        <div class="bar-label">${safeVal}</div>
+      </div>
+    `;
+  }
 
-    function formatNow() {
-      const d = new Date();
-      const pad = (n) => String(n).padStart(2, "0");
-      return `${pad(d.getDate())}/${pad(d.getMonth()+1)} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-    }
+  function formatNow() {
+    const d = new Date();
+    const pad = (n) => String(n).padStart(2, "0");
+    return `${pad(d.getDate())}/${pad(d.getMonth()+1)} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
 
-    function startOfToday() {
-      const d = new Date();
-      d.setHours(0,0,0,0);
-      return d;
-    }
+  function dayKeyFromDate(d){
+    const pad = (n)=>String(n).padStart(2,"0");
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  }
 
-    function dayKeyFromDate(d){
-      const pad = (n)=>String(n).padStart(2,"0");
-      return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-    }
+  function withinRange(dateKey, rangeVal){
+    if (rangeVal === "all") return true;
+    if (rangeVal === "today") return dateKey === dayKeyFromDate(new Date());
 
-    function withinRange(dateKey, rangeVal){
-      // rangeVal: all / 30 / 14 / 7 / today
-      if (rangeVal === "all") return true;
-      if (rangeVal === "today") {
-        return dateKey === dayKeyFromDate(new Date());
-      }
-      const days = Number(rangeVal);
-      if (!days || isNaN(days)) return true;
+    const days = Number(rangeVal);
+    if (!days || isNaN(days)) return true;
 
-      // dateKey is YYYY-MM-DD
-      const d = new Date(dateKey + "T00:00:00");
-      const cutoff = new Date();
-      cutoff.setHours(0,0,0,0);
-      cutoff.setDate(cutoff.getDate() - (days - 1));
-      return d >= cutoff;
-    }
+    const d = new Date(dateKey + "T00:00:00");
+    const cutoff = new Date();
+    cutoff.setHours(0,0,0,0);
+    cutoff.setDate(cutoff.getDate() - (days - 1));
+    return d >= cutoff;
+  }
 
-    /* =======================
-      DATA CACHE (כדי שהפילטרים יעבדו בלי לקרוא DB שוב)
-    ======================= */
-    let cachedViewsRows = [];
-    let cachedEvents = [];
+  /* =======================
+    DATA CACHE
+  ======================= */
+  let cachedViewsRows = []; // analytics_pageViews
+  let cachedDailyRows = []; // analytics_daily
+  let cachedEvents = [];    // analytics_events (יכול להיות ריק)
 
-    /* =======================
-      LOAD + RENDER
-    ======================= */
-    async function fetchAll() {
-      // views (אגרגציה לפי דף+תאריך) - לפי הקוד המקורי שלך
-      const qViews = query(collection(db, "analytics_pageViews"), orderBy("dateKey", "asc"));
-      const snapViews = await getDocs(qViews);
-      cachedViewsRows = snapViews.docs.map(d => d.data());
+  /* =======================
+    LOAD
+  ======================= */
+  async function fetchAll() {
+    // ✅ daily totals (מסמך אחד ליום)
+    const qDaily = query(collection(db, "analytics_daily"), orderBy("dateKey", "asc"), limit(400));
+    const snapDaily = await getDocs(qDaily);
+    cachedDailyRows = snapDaily.docs.map(d => d.data());
 
-      // events (שעה / שכבה / כיתה) - לפי הקוד המקורי שלך
-      const qEvents = query(collection(db, "analytics_events"), orderBy("dateKey", "desc"));
+    // ✅ pageViews (יום+דף)
+    const qViews = query(collection(db, "analytics_pageViews"), orderBy("dateKey", "asc"), limit(8000));
+    const snapViews = await getDocs(qViews);
+    cachedViewsRows = snapViews.docs.map(d => d.data());
+
+    // events (שעה/שכבה/כיתה) — רק אם באמת משתמשים בזה
+    // אם ENABLE_RAW_EVENTS=false אצלך, כנראה יהיה ריק וזה בסדר
+    try{
+      const qEvents = query(collection(db, "analytics_events"), orderBy("dateKey", "desc"), limit(12000));
       const snapEvents = await getDocs(qEvents);
       cachedEvents = snapEvents.docs.map(d => d.data());
+    } catch {
+      cachedEvents = [];
     }
+  }
 
-    function render() {
-      const rangeVal = rangeSelect.value;
-      const focusVal = pageFocus.value;
+  /* =======================
+    RENDER
+  ======================= */
+  function render() {
+    const rangeVal = rangeSelect.value;
+    const focusVal = pageFocus.value;
 
-      pillRange.textContent = `טווח: ${
-        rangeVal === "all" ? "הכול" :
-        rangeVal === "today" ? "היום" :
-        `${rangeVal} ימים`
-      }`;
+    pillRange.textContent = `טווח: ${
+      rangeVal === "all" ? "הכול" :
+      rangeVal === "today" ? "היום" :
+      `${rangeVal} ימים`
+    }`;
 
-      pillDays.textContent = `עדכון: ${formatNow()}`;
+    pillDays.textContent = `עדכון: ${formatNow()}`;
 
-      /* ---- Views aggregation ---- */
-      const viewsRows = cachedViewsRows
-        .filter(r => withinRange(String(r.dateKey || ""), rangeVal))
-        .filter(r => {
-          if (focusVal === "all") return true;
-          // פה זה רק "פוקוס" לסיכום קטן - לא מסנן את כל הטבלאות
-          return true;
-        });
+    /* ---- 1) DAILY (analytics_daily) ---- */
+    const dailyRows = cachedDailyRows
+      .filter(r => withinRange(String(r.dateKey || ""), rangeVal));
 
-      let totalViews = 0;
-      const pagesSet = new Set();
-      const daysMap = new Map();   // dateKey -> sum
-      const pagesMap = new Map();  // pageId -> sum
+    const daysArr = dailyRows
+      .map(r => ({ dateKey: String(r.dateKey || ""), views: Number(r.views || 0) }))
+      .filter(r => r.dateKey)
+      .sort((a,b) => (a.dateKey > b.dateKey ? -1 : 1)); // יורד
 
-      viewsRows.forEach(r => {
-        const v = Number(r.views || 0);
-        totalViews += v;
-        if (r.pageId) pagesSet.add(r.pageId);
+    const totalViewsDaily = daysArr.reduce((s, r) => s + r.views, 0);
 
-        const dk = String(r.dateKey || "");
-        if (dk) daysMap.set(dk, (daysMap.get(dk) || 0) + v);
-
-        const pid = String(r.pageId || "");
-        if (pid) pagesMap.set(pid, (pagesMap.get(pid) || 0) + v);
-      });
-
-      const examsViews = pagesMap.get("home-exams") || 0;
-      const classExamsViews = pagesMap.get("class-exams") || 0;
-
-      elTotalViews.textContent = totalViews.toString();
-      elUniquePages.textContent = pagesSet.size.toString();
-      elActiveDays.textContent = daysMap.size.toString();
-      elExamsViews.textContent = examsViews.toString();
-      elClassExamsViews.textContent = classExamsViews.toString();
-      elTotalNote.textContent = (focusVal === "all")
-        ? "כל הדפים"
-        : `פוקוס: ${humanPageId(focusVal)}`;
-
-      // טבלת לפי ימים
-      const daysArr = Array.from(daysMap.entries())
-        .map(([dateKey, views]) => ({ dateKey, views }))
-        .sort((a, b) => (a.dateKey > b.dateKey ? -1 : 1));
-
-      const maxDayViews = daysArr.reduce((m, r) => Math.max(m, r.views), 0);
-      tbodyByDay.innerHTML = "";
-      if (!daysArr.length) {
-        tbodyByDay.innerHTML = `<tr><td colspan="3" class="empty">אין נתונים עדיין.</td></tr>`;
-      } else {
-        daysArr.forEach(r => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${escapeHtml(r.dateKey)}</td>
-            <td>${r.views}</td>
-            <td>${renderBarCell(r.views, maxDayViews)}</td>
-          `;
-          tbodyByDay.appendChild(tr);
-        });
-      }
-
-      // טבלת לפי דפים
-      const pagesArr = Array.from(pagesMap.entries())
-        .map(([pageId, views]) => ({ pageId, views }))
-        .sort((a, b) => b.views - a.views);
-
-      tbodyByPage.innerHTML = "";
-      if (!pagesArr.length) {
-        tbodyByPage.innerHTML = `<tr><td colspan="2" class="empty">אין נתונים עדיין.</td></tr>`;
-      } else {
-        pagesArr.forEach(r => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td title="${escapeHtml(r.pageId)}">${escapeHtml(humanPageId(r.pageId))}</td>
-            <td>${r.views}</td>
-          `;
-          tbodyByPage.appendChild(tr);
-        });
-      }
-
-      /* ---- Events aggregation ---- */
-      // מסננים events לפי טווח (dateKey) כדי שיתאים ל-filter
-      const events = cachedEvents.filter(ev => withinRange(String(ev.dateKey || ""), rangeVal));
-
-      const hourMap = new Map();        // "00".."23" -> count
-      const gradeMap = new Map();       // grade -> count (כל הדפים)
-      const classMap = new Map();       // classId -> count (כל הדפים)
-      const examsByGrade = new Map();   // grade -> count (רק home-exams)
-      const classExamsByClass = new Map(); // classId -> count (רק class-exams)
-
-      events.forEach(ev => {
-        const h = String(ev.hour ?? "??");
-        hourMap.set(h, (hourMap.get(h) || 0) + 1);
-
-        if (ev.grade) {
-          const g = String(ev.grade).toLowerCase();
-          gradeMap.set(g, (gradeMap.get(g) || 0) + 1);
-        }
-        if (ev.classId) {
-          const cid = String(ev.classId).toLowerCase();
-          classMap.set(cid, (classMap.get(cid) || 0) + 1);
-        }
-
-        if (ev.pageId === "home-exams" && ev.grade) {
-          const g = String(ev.grade).toLowerCase();
-          examsByGrade.set(g, (examsByGrade.get(g) || 0) + 1);
-        }
-
-        if (ev.pageId === "class-exams" && ev.classId) {
-          const cid = String(ev.classId).toLowerCase();
-          classExamsByClass.set(cid, (classExamsByClass.get(cid) || 0) + 1);
-        }
-      });
-
-      // לפי שעה: מציג 00..23 גם אם ריק
-      const hourArr = [];
-      for (let i = 0; i < 24; i++) {
-        const hh = String(i).padStart(2, "0");
-        hourArr.push({ hour: hh, count: hourMap.get(hh) || 0 });
-      }
-      const maxHour = hourArr.reduce((m, r) => Math.max(m, r.count), 0);
-
-      tbodyByHour.innerHTML = "";
-      if (!events.length) {
-        tbodyByHour.innerHTML = `<tr><td colspan="3" class="empty">אין עדיין נתוני שעות.</td></tr>`;
-      } else {
-        hourArr.forEach(r => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${r.hour}:00</td>
-            <td>${r.count}</td>
-            <td>${renderBarCell(r.count, maxHour)}</td>
-          `;
-          tbodyByHour.appendChild(tr);
-        });
-      }
-
-      // לפי שכבה – כל הדפים
-      const gradeArr = Array.from(gradeMap.entries())
-        .map(([grade, count]) => ({ grade, count }))
-        .sort((a, b) => b.count - a.count);
-
-      tbodyByGrade.innerHTML = "";
-      if (!gradeArr.length) {
-        tbodyByGrade.innerHTML = `<tr><td colspan="2" class="empty">אין עדיין פעילויות עם grade.</td></tr>`;
-      } else {
-        gradeArr.forEach(r => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td><span class="pill">${escapeHtml(gradeToLabel(r.grade))}</span></td>
-            <td>${r.count}</td>
-          `;
-          tbodyByGrade.appendChild(tr);
-        });
-      }
-
-      // לפי כיתה – כל הדפים
-      const classArr = Array.from(classMap.entries())
-        .map(([classId, count]) => ({ classId, count }))
-        .sort((a, b) => b.count - a.count);
-
-      tbodyByClass.innerHTML = "";
-      if (!classArr.length) {
-        tbodyByClass.innerHTML = `<tr><td colspan="2" class="empty">אין עדיין פעילויות עם classId.</td></tr>`;
-      } else {
-        classArr.forEach(r => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td><span class="pill">${escapeHtml(classIdToLabel(r.classId))}</span></td>
-            <td>${r.count}</td>
-          `;
-          tbodyByClass.appendChild(tr);
-        });
-      }
-
-      // דף המבחנים הראשי – לפי שכבה
-      const examsGradeArr = Array.from(examsByGrade.entries())
-        .map(([grade, count]) => ({ grade, count }))
-        .sort((a, b) => b.count - a.count);
-
-      tbodyExamsByGrade.innerHTML = "";
-      if (!examsGradeArr.length) {
-        tbodyExamsByGrade.innerHTML = `<tr><td colspan="2" class="empty">אין עדיין צפיות בדף המבחנים הראשי עם grade.</td></tr>`;
-      } else {
-        examsGradeArr.forEach(r => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td><span class="pill">${escapeHtml(gradeToLabel(r.grade))}</span></td>
-            <td>${r.count}</td>
-          `;
-          tbodyExamsByGrade.appendChild(tr);
-        });
-      }
-
-      // דף "מבחנים לפי כיתה" – לפי כיתה
-      const classExamsArr = Array.from(classExamsByClass.entries())
-        .map(([classId, count]) => ({ classId, count }))
-        .sort((a, b) => b.count - a.count);
-
-      tbodyClassExamsByClass.innerHTML = "";
-      if (!classExamsArr.length) {
-        tbodyClassExamsByClass.innerHTML = `<tr><td colspan="2" class="empty">אין עדיין צפיות בעמוד class-exams עם classId.</td></tr>`;
-      } else {
-        classExamsArr.forEach(r => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td><span class="pill">${escapeHtml(classIdToLabel(r.classId))}</span></td>
-            <td>${r.count}</td>
-          `;
-          tbodyClassExamsByClass.appendChild(tr);
-        });
-      }
-    }
-
-    async function loadAllAndRender() {
-      statusEl.classList.remove("error");
-      statusEl.textContent = "טוען נתונים...";
-      refreshBtn.disabled = true;
-      try {
-        await fetchAll();
-        filtersEl.style.display = "";
-        layoutEl.style.display = "";
-        render();
-        statusEl.textContent = "נטען בהצלחה.";
-      } catch (err) {
-        console.error(err);
-        statusEl.classList.add("error");
-        statusEl.textContent = "שגיאה בטעינת הנתונים. תבדוק Console.";
-      } finally {
-        refreshBtn.disabled = false;
-      }
-    }
-
-    /* =======================
-      AUTH + UI
-    ======================= */
-    refreshBtn.addEventListener("click", () => loadAllAndRender());
-
-    signOutBtn.addEventListener("click", async () => {
-      try {
-        await signOut(auth);
-        location.href = "admin.html";
-      } catch (e) {
-        console.error(e);
-        alert("לא הצלחתי להתנתק. תבדוק Console.");
-      }
-    });
-
-    rangeSelect.addEventListener("change", () => render());
-    pageFocus.addEventListener("change", () => {
-      // כרגע זה רק טקסט קטן בסיכום (לא מסנן את כל הטבלאות)
-      // אם תרצה – אני אעשה מצב שמסנן טבלאות לפי דף ספציפי.
-      render();
-    });
-
-    onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        statusEl.classList.add("error");
-        statusEl.innerHTML = `
-          אין לך גישה. התחבר דרך עמוד הניהול.<br>
-          <a class="btn secondary" href="admin.html">לעמוד ההתחברות</a>
+    // טבלת לפי ימים (מבוסס daily!)
+    const maxDayViews = daysArr.reduce((m, r) => Math.max(m, r.views), 0);
+    tbodyByDay.innerHTML = "";
+    if (!daysArr.length) {
+      tbodyByDay.innerHTML = `<tr><td colspan="3" class="empty">אין נתונים עדיין.</td></tr>`;
+    } else {
+      daysArr.forEach(r => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${escapeHtml(r.dateKey)}</td>
+          <td>${r.views}</td>
+          <td>${renderBarCell(r.views, maxDayViews)}</td>
         `;
-        return;
-      }
+        tbodyByDay.appendChild(tr);
+      });
+    }
 
-      const email = String(user.email || "").toLowerCase();
-      const allowed = OWNER_EMAILS.map(e => e.toLowerCase()).includes(email);
+    /* ---- 2) PAGEVIEWS (analytics_pageViews) ---- */
+    const viewsRows = cachedViewsRows
+      .filter(r => withinRange(String(r.dateKey || ""), rangeVal));
 
-      if (!allowed) {
-        statusEl.classList.add("error");
-        statusEl.textContent = "המשתמש " + email + " אינו מורשה לצפות באנליטיקות.";
-        return;
-      }
+    const pagesSet = new Set();
+    const pagesMap = new Map(); // pageId -> sum
 
-      loadAllAndRender();
+    viewsRows.forEach(r => {
+      const v = Number(r.views || 0);
+      if (r.pageId) pagesSet.add(r.pageId);
+      const pid = String(r.pageId || "");
+      if (pid) pagesMap.set(pid, (pagesMap.get(pid) || 0) + v);
     });
-  </script>
+
+    const examsViews = pagesMap.get("home-exams") || 0;
+    const classExamsViews = pagesMap.get("class-exams") || 0;
+
+    // ✅ סה"כ צפיות: לקחת מה-DAILY (מדויק)
+    elTotalViews.textContent = totalViewsDaily.toString();
+    elUniquePages.textContent = pagesSet.size.toString();
+    elActiveDays.textContent = daysArr.length.toString();
+    elExamsViews.textContent = examsViews.toString();
+    elClassExamsViews.textContent = classExamsViews.toString();
+    elTotalNote.textContent = (focusVal === "all")
+      ? "כל הדפים"
+      : `פוקוס: ${humanPageId(focusVal)}`;
+
+    // טבלת לפי דפים
+    const pagesArr = Array.from(pagesMap.entries())
+      .map(([pageId, views]) => ({ pageId, views }))
+      .sort((a, b) => b.views - a.views);
+
+    tbodyByPage.innerHTML = "";
+    if (!pagesArr.length) {
+      tbodyByPage.innerHTML = `<tr><td colspan="2" class="empty">אין נתונים עדיין.</td></tr>`;
+    } else {
+      pagesArr.forEach(r => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td title="${escapeHtml(r.pageId)}">${escapeHtml(humanPageId(r.pageId))}</td>
+          <td>${r.views}</td>
+        `;
+        tbodyByPage.appendChild(tr);
+      });
+    }
+
+    /* ---- 3) EVENTS (אם יש) ---- */
+    const events = cachedEvents.filter(ev => withinRange(String(ev.dateKey || ""), rangeVal));
+
+    const hourMap = new Map();        // "00".."23" -> count
+    const gradeMap = new Map();       // grade -> count
+    const classMap = new Map();       // classId -> count
+    const examsByGrade = new Map();   // grade -> count (home-exams)
+    const classExamsByClass = new Map(); // classId -> count (class-exams)
+
+    events.forEach(ev => {
+      const h = String(ev.hour ?? "??");
+      hourMap.set(h, (hourMap.get(h) || 0) + 1);
+
+      if (ev.grade) {
+        const g = String(ev.grade).toLowerCase();
+        gradeMap.set(g, (gradeMap.get(g) || 0) + 1);
+      }
+      if (ev.classId) {
+        const cid = String(ev.classId).toLowerCase();
+        classMap.set(cid, (classMap.get(cid) || 0) + 1);
+      }
+
+      if (ev.pageId === "home-exams" && ev.grade) {
+        const g = String(ev.grade).toLowerCase();
+        examsByGrade.set(g, (examsByGrade.get(g) || 0) + 1);
+      }
+
+      if (ev.pageId === "class-exams" && ev.classId) {
+        const cid = String(ev.classId).toLowerCase();
+        classExamsByClass.set(cid, (classExamsByClass.get(cid) || 0) + 1);
+      }
+    });
+
+    // לפי שעה: מציג 00..23 גם אם ריק
+    const hourArr = [];
+    for (let i = 0; i < 24; i++) {
+      const hh = String(i).padStart(2, "0");
+      hourArr.push({ hour: hh, count: hourMap.get(hh) || 0 });
+    }
+    const maxHour = hourArr.reduce((m, r) => Math.max(m, r.count), 0);
+
+    tbodyByHour.innerHTML = "";
+    if (!events.length) {
+      tbodyByHour.innerHTML = `<tr><td colspan="3" class="empty">אין עדיין נתוני שעות (analytics_events כבוי).</td></tr>`;
+    } else {
+      hourArr.forEach(r => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${r.hour}:00</td>
+          <td>${r.count}</td>
+          <td>${renderBarCell(r.count, maxHour)}</td>
+        `;
+        tbodyByHour.appendChild(tr);
+      });
+    }
+
+    // לפי שכבה
+    const gradeArr = Array.from(gradeMap.entries())
+      .map(([grade, count]) => ({ grade, count }))
+      .sort((a, b) => b.count - a.count);
+
+    tbodyByGrade.innerHTML = "";
+    if (!gradeArr.length) {
+      tbodyByGrade.innerHTML = `<tr><td colspan="2" class="empty">אין עדיין פעילויות עם grade (analytics_events כבוי).</td></tr>`;
+    } else {
+      gradeArr.forEach(r => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><span class="pill">${escapeHtml(gradeToLabel(r.grade))}</span></td>
+          <td>${r.count}</td>
+        `;
+        tbodyByGrade.appendChild(tr);
+      });
+    }
+
+    // לפי כיתה
+    const classArr = Array.from(classMap.entries())
+      .map(([classId, count]) => ({ classId, count }))
+      .sort((a, b) => b.count - a.count);
+
+    tbodyByClass.innerHTML = "";
+    if (!classArr.length) {
+      tbodyByClass.innerHTML = `<tr><td colspan="2" class="empty">אין עדיין פעילויות עם classId (analytics_events כבוי).</td></tr>`;
+    } else {
+      classArr.forEach(r => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><span class="pill">${escapeHtml(classIdToLabel(r.classId))}</span></td>
+          <td>${r.count}</td>
+        `;
+        tbodyByClass.appendChild(tr);
+      });
+    }
+
+    // home-exams לפי שכבה
+    const examsGradeArr = Array.from(examsByGrade.entries())
+      .map(([grade, count]) => ({ grade, count }))
+      .sort((a, b) => b.count - a.count);
+
+    tbodyExamsByGrade.innerHTML = "";
+    if (!examsGradeArr.length) {
+      tbodyExamsByGrade.innerHTML = `<tr><td colspan="2" class="empty">אין עדיין צפיות home-exams עם grade (analytics_events כבוי).</td></tr>`;
+    } else {
+      examsGradeArr.forEach(r => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><span class="pill">${escapeHtml(gradeToLabel(r.grade))}</span></td>
+          <td>${r.count}</td>
+        `;
+        tbodyExamsByGrade.appendChild(tr);
+      });
+    }
+
+    // class-exams לפי כיתה
+    const classExamsArr = Array.from(classExamsByClass.entries())
+      .map(([classId, count]) => ({ classId, count }))
+      .sort((a, b) => b.count - a.count);
+
+    tbodyClassExamsByClass.innerHTML = "";
+    if (!classExamsArr.length) {
+      tbodyClassExamsByClass.innerHTML = `<tr><td colspan="2" class="empty">אין עדיין צפיות class-exams עם classId (analytics_events כבוי).</td></tr>`;
+    } else {
+      classExamsArr.forEach(r => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><span class="pill">${escapeHtml(classIdToLabel(r.classId))}</span></td>
+          <td>${r.count}</td>
+        `;
+        tbodyClassExamsByClass.appendChild(tr);
+      });
+    }
+  }
+
+  async function loadAllAndRender() {
+    statusEl.classList.remove("error");
+    statusEl.textContent = "טוען נתונים...";
+    refreshBtn.disabled = true;
+    try {
+      await fetchAll();
+      filtersEl.style.display = "";
+      layoutEl.style.display = "";
+      render();
+      statusEl.textContent = "נטען בהצלחה.";
+    } catch (err) {
+      console.error(err);
+      statusEl.classList.add("error");
+      statusEl.textContent = "שגיאה בטעינת הנתונים. תבדוק Console.";
+    } finally {
+      refreshBtn.disabled = false;
+    }
+  }
+
+  /* =======================
+    AUTH + UI
+  ======================= */
+  refreshBtn.addEventListener("click", () => loadAllAndRender());
+
+  signOutBtn.addEventListener("click", async () => {
+    try {
+      await signOut(auth);
+      location.href = "admin.html";
+    } catch (e) {
+      console.error(e);
+      alert("לא הצלחתי להתנתק. תבדוק Console.");
+    }
+  });
+
+  rangeSelect.addEventListener("change", () => render());
+  pageFocus.addEventListener("change", () => render());
+
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      statusEl.classList.add("error");
+      statusEl.innerHTML = `
+        אין לך גישה. התחבר דרך עמוד הניהול.<br>
+        <a class="btn secondary" href="admin.html">לעמוד ההתחברות</a>
+      `;
+      return;
+    }
+
+    const email = String(user.email || "").toLowerCase();
+    const allowed = OWNER_EMAILS.map(e => e.toLowerCase()).includes(email);
+
+    if (!allowed) {
+      statusEl.classList.add("error");
+      statusEl.textContent = "המשתמש " + email + " אינו מורשה לצפות באנליטיקות.";
+      return;
+    }
+
+    loadAllAndRender();
+  });
+</script>
+
 
   <!-- ✅ שים את זה כדי שהדשבורד גם יופיע בסטטיסטיקות שלך (רק אם אתה רוצה),
        אבל כרגע analytics.js שלך לא כותב בדאשבורד בגלל data-page=analytics-dashboard.

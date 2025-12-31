@@ -10,7 +10,6 @@
   <link rel="stylesheet" href="admin.css" />
   <link rel="stylesheet" href="admin-login-pretty.css" />
 
-
   <!-- ADMIN THEME (ONLY ADMIN) -->
   <script>
     (function () {
@@ -25,15 +24,49 @@
 
   <style>
 /* =========================
-   ADMIN – CLEAN TOP BAR (DARK ONLY)
+   ADMIN – THEME TOKENS
+   ========================= */
+:root{
+  --admin-bg: #020617;
+  --admin-text: #e3f2fd;
+  --admin-header-bg: rgba(2,6,23,.75);
+  --admin-border: rgba(148,163,184,.18);
+  --admin-card: rgba(15,23,42,.55);
+  --admin-card2: rgba(15,23,42,.35);
+  --admin-btn-bg: rgba(15,23,42,.55);
+  --admin-btn-text: #e5e7eb;
+  --admin-btn-border: rgba(148,163,184,.28);
+  --admin-shadow: 0 10px 26px rgba(0,0,0,.25);
+  --admin-shadow2: 0 14px 34px rgba(0,0,0,.35);
+  --admin-accent1: #2563eb;
+  --admin-accent2: #38bdf8;
+}
+
+/* LIGHT THEME */
+html[data-theme="light"]{
+  --admin-bg: #f3f6ff;
+  --admin-text: #0b1020;
+  --admin-header-bg: rgba(255,255,255,.70);
+  --admin-border: rgba(15,23,42,.12);
+  --admin-card: rgba(255,255,255,.78);
+  --admin-card2: rgba(255,255,255,.55);
+  --admin-btn-bg: rgba(255,255,255,.70);
+  --admin-btn-text: #0b1020;
+  --admin-btn-border: rgba(15,23,42,.14);
+  --admin-shadow: 0 10px 24px rgba(2,6,23,.10);
+  --admin-shadow2: 0 14px 34px rgba(2,6,23,.14);
+}
+
+/* =========================
+   ADMIN – CLEAN TOP BAR
    ========================= */
 
 /* רקע עמוד אדמין */
 body.admin-page{
   background:
     radial-gradient(1200px 600px at 50% -10%, rgba(56,189,248,.18), transparent 60%),
-    linear-gradient(180deg, #020617, #020617);
-  color: #e3f2fd;
+    linear-gradient(180deg, var(--admin-bg), var(--admin-bg));
+  color: var(--admin-text);
 }
 
 /* container רחב */
@@ -48,8 +81,8 @@ body.admin-page .header-main{
   position: sticky;
   top: 0;
   z-index: 9999;
-  background: rgba(2,6,23,.75);
-  border-bottom: 1px solid rgba(148,163,184,.18);
+  background: var(--admin-header-bg);
+  border-bottom: 1px solid var(--admin-border);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 }
@@ -76,7 +109,7 @@ body.admin-page .logo-circle{
   border-radius: 999px;
   overflow: hidden;
   border: 2px solid rgba(56,189,248,.35);
-  background: rgba(15,23,42,.55);
+  background: var(--admin-card2);
   box-shadow: 0 10px 26px rgba(0,0,0,.35);
   display: flex;
   align-items: center;
@@ -111,27 +144,34 @@ body.admin-page .admin-btn{
   text-decoration: none;
   white-space: nowrap;
 
-  color: #e5e7eb;
-  background: rgba(15,23,42,.55);
-  border: 1px solid rgba(148,163,184,.28);
+  color: var(--admin-btn-text);
+  background: var(--admin-btn-bg);
+  border: 1px solid var(--admin-btn-border);
 
-  box-shadow: 0 10px 26px rgba(0,0,0,.25);
+  box-shadow: var(--admin-shadow);
   transition: transform .15s ease, box-shadow .15s ease, background .2s ease, border-color .2s ease;
 }
 
 body.admin-page .admin-btn:hover{
   transform: translateY(-1px);
-  background: rgba(15,23,42,.78);
+  background: var(--admin-card);
   border-color: rgba(96,165,250,.55);
-  box-shadow: 0 14px 34px rgba(0,0,0,.35);
+  box-shadow: var(--admin-shadow2);
 }
 
 /* ACTIVE */
 body.admin-page .admin-btn.active{
-  background: linear-gradient(135deg,#2563eb,#38bdf8);
+  background: linear-gradient(135deg,var(--admin-accent1),var(--admin-accent2));
   color: #fff;
   border-color: rgba(56,189,248,.55);
   box-shadow: 0 14px 42px rgba(37,99,235,.55);
+}
+
+/* THEME BUTTON */
+body.admin-page .admin-theme-btn{
+  width: 46px;
+  padding: 8px 0;
+  font-size: 1.05rem;
 }
 
 /* ✅ המרחק שאתה רוצה: כפתורים רחוקים מהלוגו */
@@ -155,6 +195,34 @@ body.admin-page .admin-nav-right{
   body.admin-page .admin-nav-right{
     margin-inline-start: 18px;
   }
+}
+
+/* =========================
+   Admin cards / forms - make them respect theme
+   ========================= */
+body.admin-page .card{
+  background: var(--admin-card) !important;
+  border: 1px solid var(--admin-border) !important;
+  box-shadow: var(--admin-shadow) !important;
+  color: var(--admin-text) !important;
+}
+body.admin-page input,
+body.admin-page textarea,
+body.admin-page select{
+  background: rgba(255,255,255,.08);
+  color: var(--admin-text);
+  border: 1px solid rgba(148,163,184,.25);
+}
+html[data-theme="light"] body.admin-page input,
+html[data-theme="light"] body.admin-page textarea,
+html[data-theme="light"] body.admin-page select{
+  background: rgba(2,6,23,.04);
+  border: 1px solid rgba(2,6,23,.12);
+  color: var(--admin-text);
+}
+body.admin-page input::placeholder,
+body.admin-page textarea::placeholder{
+  opacity: .7;
 }
 
 /* =========================
@@ -238,12 +306,16 @@ body.admin-page .admin-nav-right{
   font-weight: 600;
   color: #93c5fd;
 }
+html[data-theme="light"] .login-links{ color: rgba(2,6,23,.55); }
+
 .login-links a{
   color: #38bdf8;
   text-decoration: none;
   position: relative;
   transition: color .15s ease, text-shadow .15s ease;
 }
+html[data-theme="light"] .login-links a{ color: #2563eb; }
+
 .login-links a::after{
   content: "";
   position: absolute;
@@ -259,6 +331,10 @@ body.admin-page .admin-nav-right{
 .login-links a:hover{
   color: #7dd3fc;
   text-shadow: 0 0 6px rgba(56,189,248,.55);
+}
+html[data-theme="light"] .login-links a:hover{
+  color: #1d4ed8;
+  text-shadow: none;
 }
 .login-links a:hover::after{ width: 100%; }
 .login-links .dot{
@@ -316,7 +392,7 @@ body.admin-page .card{
     height: 44px !important;
     border-radius: 14px !important;
     border: 1px solid rgba(148,163,184,.25) !important;
-    background: rgba(2,6,23,.55) !important;
+    background: var(--admin-header-bg) !important;
     backdrop-filter: blur(12px) !important;
     -webkit-backdrop-filter: blur(12px) !important;
     align-items:center !important;
@@ -329,6 +405,9 @@ body.admin-page .card{
     height: 2px !important;
     background: rgba(226,232,240,.92) !important;
     border-radius: 3px !important;
+  }
+  html[data-theme="light"] body.admin-page .admin-mobile-toggle span{
+    background: rgba(2,6,23,.75) !important;
   }
 
   /* mobile menu: fixed, opens from left under header */
@@ -353,9 +432,15 @@ body.admin-page .card{
     display:none !important;
     z-index: 20010 !important;
   }
+  html[data-theme="light"] body.admin-page .admin-mobile-menu{
+    background: rgba(255,255,255,.92) !important;
+    border: 1px solid rgba(2,6,23,.12) !important;
+    box-shadow: 0 22px 55px rgba(2,6,23,.16) !important;
+  }
   body.admin-page .admin-mobile-menu.open{ display:block !important; }
 
-  body.admin-page .admin-mobile-menu a.admin-btn{
+  body.admin-page .admin-mobile-menu a.admin-btn,
+  body.admin-page .admin-mobile-menu button.admin-btn{
     display:flex !important;
     align-items:center !important;
     justify-content:flex-start !important;
@@ -367,15 +452,15 @@ body.admin-page .card{
     border-radius: 14px !important;
     font-weight: 900 !important;
     font-size: 1rem !important;
-    color:#e5e7eb !important;
     text-decoration:none !important;
 
-    background: rgba(15,23,42,.55) !important;
+    background: var(--admin-btn-bg) !important;
     border: 1px solid rgba(148,163,184,.16) !important;
     box-shadow: none !important;
+    color: var(--admin-btn-text) !important;
   }
   body.admin-page .admin-mobile-menu a.admin-btn.active{
-    background: linear-gradient(135deg,#2563eb,#38bdf8) !important;
+    background: linear-gradient(135deg,var(--admin-accent1),var(--admin-accent2)) !important;
     border-color: rgba(56,189,248,.45) !important;
     color:#fff !important;
   }
@@ -422,12 +507,12 @@ body.admin-page .card{
     white-space: nowrap !important;
     cursor: pointer !important;
 
-    background: rgba(15,23,42,.55) !important;
-    color: #e5e7eb !important;
+    background: var(--admin-btn-bg) !important;
+    color: var(--admin-btn-text) !important;
     border: 1px solid rgba(148,163,184,.22) !important;
   }
   body.admin-page .admin-grade-switcher .grade-filter-btn.active{
-    background: linear-gradient(135deg,#22c55e,#38bdf8) !important;
+    background: linear-gradient(135deg,#22c55e,var(--admin-accent2)) !important;
     color: #06121f !important;
     border-color: rgba(56,189,248,.45) !important;
   }
@@ -448,6 +533,7 @@ body.admin-page .card{
 .admin-columns.one-visible > .admin-grade-section{
   grid-column: 1 / -1 !important;
 }
+
 /* ✅ FIX: הכפתורי שכבות לא יכסו את הסמל */
 @media (max-width: 900px){
 
@@ -458,10 +544,10 @@ body.admin-page .card{
 
   /* השכבות מתחת ללוגו + קצת יותר ימינה/מטה */
   body.admin-page .admin-grade-switcher{
-    top: 56px !important;        /* היה 50%/18px -> עכשיו יורד מתחת לסמל */
+    top: 56px !important;
     transform: none !important;
-    max-width: 92vw !important;  /* שלא ייכנס על האמצע */
-    padding-inline-start: 62px !important; /* מרווח כדי לא להתנגש בהמבורגר */
+    max-width: 92vw !important;
+    padding-inline-start: 62px !important;
     padding-inline-end: 12px !important;
   }
 }
@@ -472,24 +558,22 @@ body.admin-page .card{
     top: 60px !important;
   }
 }
+
 /* ✅ MOBILE: הכל לרוחב מלא, בלי רווח שחור בצד */
 @media (max-width: 900px){
 
-  /* הקונטיינר באמת 100% */
   body.admin-page .container{
     width: 100% !important;
     max-width: 100% !important;
-    padding: 0 12px !important;  /* מרווח קטן מהקצוות */
+    padding: 0 12px !important;
     margin: 0 auto !important;
   }
 
-  /* הגריד תמיד טור אחד */
   body.admin-page .admin-columns{
     grid-template-columns: 1fr !important;
     width: 100% !important;
   }
 
-  /* כל ה-sections/כרטיסים יתפסו 100% */
   body.admin-page .admin-grade-section,
   body.admin-page .admin-columns > section,
   body.admin-page .card{
@@ -499,15 +583,14 @@ body.admin-page .card{
     box-sizing: border-box !important;
   }
 
-  /* למנוע “בריחה” שגורמת לרווחים */
   body.admin-page *{
     max-width: 100%;
   }
 }
+
 /* ✅ MOBILE TOPBAR: left hamburger | center logo | right grades (LOCK) */
 @media (max-width: 900px){
 
-  /* אבא */
   body.admin-page .header-main{ position: sticky; top:0; z-index: 30000; }
   body.admin-page .admin-nav{
     position: relative !important;
@@ -515,7 +598,6 @@ body.admin-page .card{
     padding: 10px 0 !important;
   }
 
-  /* המבורגר בשמאל */
   body.admin-page .admin-mobile-toggle{
     display:flex !important;
     position:absolute !important;
@@ -526,7 +608,6 @@ body.admin-page .card{
     z-index: 30003 !important;
   }
 
-  /* הלוגו במרכז */
   body.admin-page .admin-nav-left{
     display:flex !important;
     position:absolute !important;
@@ -537,7 +618,6 @@ body.admin-page .card{
     z-index: 30002 !important;
   }
 
-  /* השכבות בימין */
   body.admin-page .admin-grade-switcher{
     position:absolute !important;
     right: 12px !important;
@@ -557,16 +637,300 @@ body.admin-page .card{
     box-shadow: none !important;
   }
 
-  /* מסתירים ניווט דסקטופ */
   body.admin-page .admin-nav-right{ display:none !important; }
 
-  /* התפריט נפתח משמאל */
   body.admin-page .admin-mobile-menu{
     position: fixed !important;
     top: 76px !important;
     left: 12px !important;
     right: auto !important;
     z-index: 30010 !important;
+  }
+}
+
+/* FOOTER look */
+body.admin-page footer{
+  margin-top: 28px;
+  padding: 18px 0;
+  text-align: center;
+  border-top: 1px solid var(--admin-border);
+  opacity: .95;
+}
+body.admin-page footer a.footer-devlink{
+  color: var(--admin-accent2);
+  font-weight: 900;
+  text-decoration: none;
+}
+html[data-theme="light"] body.admin-page footer a.footer-devlink{
+  color: var(--admin-accent1);
+}
+/* =========================================================
+   ✅ ADMIN LIGHT MODE OVERRIDES
+   Paste at the VERY END of admin.css
+   Works with: <html data-theme="light">
+   ========================================================= */
+
+html[data-theme="light"] body.admin-page{
+  background: radial-gradient(1200px 600px at 50% -10%, rgba(37,99,235,.12), transparent 60%),
+              linear-gradient(180deg, #f6f8ff, #eef2ff) !important;
+  color: #0f172a !important;
+}
+
+/* header */
+html[data-theme="light"] body.admin-page .header-main{
+  background: rgba(255,255,255,.78) !important;
+  border-bottom: 1px solid rgba(15,23,42,.10) !important;
+}
+
+/* titles/subtitles */
+html[data-theme="light"] body.admin-page .section-title,
+html[data-theme="light"] body.admin-page h1,
+html[data-theme="light"] body.admin-page h2,
+html[data-theme="light"] body.admin-page h3{
+  color: #0b1220 !important;
+  text-shadow: none !important;
+}
+
+html[data-theme="light"] body.admin-page .section-subtitle,
+html[data-theme="light"] body.admin-page p{
+  color: rgba(15,23,42,.70) !important;
+}
+
+/* cards */
+html[data-theme="light"] body.admin-page .card,
+html[data-theme="light"] body.admin-page .admin-grade-section .card{
+  background: rgba(255,255,255,.90) !important;
+  border: 1px solid rgba(15,23,42,.10) !important;
+  box-shadow: 0 18px 50px rgba(2,6,23,.10) !important;
+  color: #0f172a !important;
+}
+
+/* buttons */
+html[data-theme="light"] body.admin-page .admin-btn{
+  background: rgba(255,255,255,.85) !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(15,23,42,.14) !important;
+  box-shadow: 0 10px 26px rgba(2,6,23,.10) !important;
+}
+
+html[data-theme="light"] body.admin-page .admin-btn:hover{
+  background: rgba(255,255,255,.95) !important;
+  border-color: rgba(37,99,235,.35) !important;
+}
+
+html[data-theme="light"] body.admin-page .admin-btn.active{
+  background: linear-gradient(135deg,#2563eb,#38bdf8) !important;
+  color: #fff !important;
+  border-color: rgba(37,99,235,.45) !important;
+}
+
+/* grade switcher */
+html[data-theme="light"] body.admin-page .grade-filter-btn{
+  background: rgba(255,255,255,.85) !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(15,23,42,.14) !important;
+}
+
+html[data-theme="light"] body.admin-page .grade-filter-btn.active{
+  background: linear-gradient(135deg,#22c55e,#38bdf8) !important;
+  color: #06121f !important;
+}
+
+/* inputs */
+html[data-theme="light"] body.admin-page label{
+  color: rgba(15,23,42,.85) !important;
+}
+
+html[data-theme="light"] body.admin-page input,
+html[data-theme="light"] body.admin-page textarea,
+html[data-theme="light"] body.admin-page select{
+  background: rgba(255,255,255,.95) !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(15,23,42,.18) !important;
+}
+
+html[data-theme="light"] body.admin-page input::placeholder,
+html[data-theme="light"] body.admin-page textarea::placeholder{
+  color: rgba(15,23,42,.45) !important;
+}
+
+html[data-theme="light"] body.admin-page input:focus,
+html[data-theme="light"] body.admin-page textarea:focus,
+html[data-theme="light"] body.admin-page select:focus{
+  border-color: rgba(37,99,235,.55) !important;
+  box-shadow: 0 0 0 4px rgba(37,99,235,.15) !important;
+}
+
+/* lists/items */
+html[data-theme="light"] body.admin-page .admin-list .admin-item{
+  background: rgba(2,6,23,.03) !important;
+  border: 1px solid rgba(15,23,42,.08) !important;
+  color: #0f172a !important;
+}
+
+/* mobile menu */
+html[data-theme="light"] body.admin-page .admin-mobile-toggle{
+  background: rgba(255,255,255,.75) !important;
+  border: 1px solid rgba(15,23,42,.12) !important;
+}
+
+html[data-theme="light"] body.admin-page .admin-mobile-toggle span{
+  background: rgba(15,23,42,.85) !important;
+}
+
+html[data-theme="light"] body.admin-page .admin-mobile-menu{
+  background: rgba(255,255,255,.92) !important;
+  border: 1px solid rgba(15,23,42,.12) !important;
+  box-shadow: 0 22px 55px rgba(2,6,23,.18) !important;
+}
+
+html[data-theme="light"] body.admin-page .admin-mobile-menu a.admin-btn{
+  background: rgba(255,255,255,.92) !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(15,23,42,.12) !important;
+}
+
+/* footer */
+html[data-theme="light"] body.admin-page footer{
+  color: rgba(15,23,42,.65) !important;
+}
+/* =========================
+   FILE INPUT (RTL) – FIX
+   ========================= */
+
+/* בסיס */
+body.admin-page input[type="file"]{
+  width: 100%;
+  max-width: 100%;
+  font: inherit;
+  direction: rtl;
+  border-radius: 14px;
+  padding: 10px 12px;
+  border: 1px solid rgba(148,163,184,.22);
+  background: rgba(15,23,42,.35);
+  color: #e5e7eb;
+  box-sizing: border-box;
+}
+
+/* הכפתור "בחירת קובץ" */
+body.admin-page input[type="file"]::file-selector-button{
+  font: inherit;
+  font-weight: 900;
+  border: 1px solid rgba(148,163,184,.28);
+  border-radius: 999px;
+  padding: 8px 14px;
+  margin-inline-end: 10px; /* ב-RTL זה יושב מימין לטקסט */
+  cursor: pointer;
+  background: rgba(15,23,42,.65);
+  color: #e5e7eb;
+  transition: transform .12s ease, background .15s ease, border-color .15s ease;
+}
+
+body.admin-page input[type="file"]::file-selector-button:hover{
+  transform: translateY(-1px);
+  background: rgba(15,23,42,.85);
+  border-color: rgba(96,165,250,.55);
+}
+
+/* ✅ LIGHT MODE */
+html[data-theme="light"] body.admin-page input[type="file"]{
+  background: rgba(255,255,255,.95) !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(15,23,42,.14) !important;
+}
+
+html[data-theme="light"] body.admin-page input[type="file"]::file-selector-button{
+  background: rgba(255,255,255,.92) !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(15,23,42,.18) !important;
+  box-shadow: 0 10px 26px rgba(2,6,23,.08) !important;
+}
+
+html[data-theme="light"] body.admin-page input[type="file"]::file-selector-button:hover{
+  background: rgba(255,255,255,1) !important;
+  border-color: rgba(37,99,235,.35) !important;
+}
+/* =========================
+   ADMIN LOGIN – LIGHT MODE FIX
+   (put LAST)
+   ========================= */
+
+html[data-theme="light"] body.admin-page{
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgba(37,99,235,.12), transparent 60%),
+    linear-gradient(180deg, #eef3ff, #e9f0ff) !important;
+  color: #0f172a !important;
+}
+
+/* הכרטיס של ההתחברות */
+html[data-theme="light"] body.admin-page #login-section,
+html[data-theme="light"] body.admin-page .login-card,
+html[data-theme="light"] body.admin-page .card{
+  background: rgba(255,255,255,.92) !important;
+  border: 1px solid rgba(15,23,42,.10) !important;
+  box-shadow: 0 24px 70px rgba(2,6,23,.18) !important;
+  color: #0f172a !important;
+}
+
+/* כותרות/טקסטים בכרטיס */
+html[data-theme="light"] body.admin-page .section-title,
+html[data-theme="light"] body.admin-page h1,
+html[data-theme="light"] body.admin-page h2,
+html[data-theme="light"] body.admin-page h3{
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] body.admin-page .section-subtitle,
+html[data-theme="light"] body.admin-page #auth-status{
+  color: rgba(15,23,42,.72) !important;
+}
+
+/* תוויות */
+html[data-theme="light"] body.admin-page label{
+  color: rgba(15,23,42,.80) !important;
+  font-weight: 800 !important;
+}
+
+/* אינפוטים/טקסטאריה/סלקט */
+html[data-theme="light"] body.admin-page input,
+html[data-theme="light"] body.admin-page textarea,
+html[data-theme="light"] body.admin-page select{
+  background: rgba(255,255,255,.98) !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(15,23,42,.14) !important;
+  box-shadow: 0 10px 26px rgba(2,6,23,.06) !important;
+}
+
+html[data-theme="light"] body.admin-page input::placeholder,
+html[data-theme="light"] body.admin-page textarea::placeholder{
+  color: rgba(15,23,42,.45) !important;
+}
+
+/* כפתור כניסה */
+html[data-theme="light"] body.admin-page #login-form button,
+html[data-theme="light"] body.admin-page button[type="submit"]{
+  color: #0b1020 !important;
+  border: 1px solid rgba(37,99,235,.25) !important;
+  box-shadow: 0 16px 40px rgba(37,99,235,.18) !important;
+}
+
+/* לינקים מתחת */
+html[data-theme="light"] body.admin-page .login-links{
+  color: rgba(15,23,42,.70) !important;
+}
+html[data-theme="light"] body.admin-page .login-links a{
+  color: #2563eb !important;
+}
+/* =========================
+   MOBILE: move grade switcher below header
+   ========================= */
+@media (max-width: 900px){
+  body.admin-page .admin-grade-switcher{
+    position: static !important;
+    margin-top: 12px !important;
+    padding: 0 12px !important;
+    max-width: 100% !important;
+    justify-content: center !important;
   }
 }
 
@@ -593,6 +957,9 @@ body.admin-page .card{
         </button>
 
         <div class="admin-mobile-menu" id="adminMobileMenu">
+          <!-- ✅ THEME BUTTON (MOBILE MENU) -->
+          <button class="admin-btn admin-theme-btn" id="admin-theme-toggle-mobile" type="button" aria-label="שינוי מצב תצוגה">🌙</button>
+
           <a href="admin.html" class="admin-btn active">Admin</a>
           <a href="#news" class="admin-btn">חדשות</a>
           <a href="#grades" class="admin-btn">השכבות</a>
@@ -603,6 +970,9 @@ body.admin-page .card{
         </div>
 
         <div class="admin-nav-right">
+          <!-- ✅ THEME BUTTON (DESKTOP TOPBAR) -->
+          <button class="admin-btn admin-theme-btn" id="admin-theme-toggle" type="button" aria-label="שינוי מצב תצוגה">🌙</button>
+
           <a href="admin.html" class="admin-btn active">Admin</a>
           <a href="#news" class="admin-btn">חדשות</a>
           <a href="#grades" class="admin-btn">השכבות</a>
@@ -637,7 +1007,7 @@ body.admin-page .card{
           <p class="section-subtitle">כניסה למנהלי המערכת בלבד</p>
         </div>
 
-<form id="login-form" autocomplete="off" novalidate>
+        <form id="login-form" autocomplete="off" novalidate>
           <label>אימייל</label>
           <input type="email" name="email" required />
 
@@ -1076,6 +1446,17 @@ body.admin-page .card{
           </div>
         </div>
 
+        <footer>
+          © כל הזכויות שמורות לבית ספר יערת העמק ·
+          Developed By
+          <a
+            class="footer-devlink"
+            href="https://ptzwebsitebuilding.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Peretzinho</a>
+        </footer>
+
       </div><!-- /#admin-section -->
 
     </div><!-- /.container -->
@@ -1147,8 +1528,8 @@ document.addEventListener("DOMContentLoaded", () => {
     closeMenu();
   });
 
-  menu.querySelectorAll("a").forEach((a) => {
-    a.addEventListener("click", () => closeMenu());
+  menu.querySelectorAll("a,button").forEach((el) => {
+    el.addEventListener("click", () => closeMenu());
   });
 
   document.addEventListener("keydown", (e) => {
@@ -1156,45 +1537,35 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-    (function () {
-      const key = "admin_theme";
-      const themeBtn = document.getElementById("admin-theme-toggle");
-      const navToggle = document.getElementById("navToggle");
-      const navMobile = document.getElementById("nav-mobile");
+// ===== THEME TOGGLE (admin_theme) =====
+(function () {
+  const key = "admin_theme";
+  const btnDesktop = document.getElementById("admin-theme-toggle");
+  const btnMobile = document.getElementById("admin-theme-toggle-mobile");
 
-      function setIcon(theme){
-        if (!themeBtn) return;
-        themeBtn.textContent = (theme === "dark") ? "🌙" : "☀️";
-      }
+  function setIcon(theme){
+    const icon = (theme === "dark") ? "🌙" : "☀️";
+    if (btnDesktop) btnDesktop.textContent = icon;
+    if (btnMobile) btnMobile.textContent = icon;
+  }
 
-      function apply(theme){
-        document.documentElement.setAttribute("data-theme", theme);
-        try { localStorage.setItem(key, theme); } catch {}
-        setIcon(theme);
-      }
+  function apply(theme){
+    document.documentElement.setAttribute("data-theme", theme);
+    try { localStorage.setItem(key, theme); } catch {}
+    setIcon(theme);
+  }
 
-      const current = document.documentElement.getAttribute("data-theme") || "dark";
-      apply(current);
+  const current = document.documentElement.getAttribute("data-theme") || "dark";
+  apply(current);
 
-      if (themeBtn){
-        themeBtn.addEventListener("click", function(){
-          const now = document.documentElement.getAttribute("data-theme") || "dark";
-          apply(now === "dark" ? "light" : "dark");
-        });
-      }
+  function toggleTheme(){
+    const now = document.documentElement.getAttribute("data-theme") || "dark";
+    apply(now === "dark" ? "light" : "dark");
+  }
 
-      if (navToggle && navMobile){
-        navToggle.addEventListener("click", () => navMobile.classList.toggle("open"));
-        navMobile.querySelectorAll("a").forEach(a=>{
-          a.addEventListener("click", ()=> navMobile.classList.remove("open"));
-        });
-        document.addEventListener("click", (e)=>{
-          if (!navMobile.classList.contains("open")) return;
-          const inside = navMobile.contains(e.target) || navToggle.contains(e.target);
-          if (!inside) navMobile.classList.remove("open");
-        });
-      }
-    })();
+  if (btnDesktop) btnDesktop.addEventListener("click", toggleTheme);
+  if (btnMobile) btnMobile.addEventListener("click", toggleTheme);
+})();
   </script>
 
   <script type="module" src="admin.js?v=7"></script>

@@ -4030,3 +4030,122 @@ body.admin-page.register-page{
 .footer-devlink:hover {
   opacity: 0.8;
 }
+/* ===================================
+   FINAL POLISH — CLEAN OVERRIDE
+   שים ממש בסוף הקובץ
+=================================== */
+
+/* 1) קו תחתון לכותרות — אחד, אחיד, לא 100 גרסאות */
+.section-title{
+  position: relative;
+  display: inline-block;
+  padding-bottom: 8px;
+}
+.section-title::after{
+  content:"";
+  position:absolute;
+  right:0;
+  bottom:0;
+  height:3px;
+  width: 92%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #60a5fa, #38bdf8, #93c5fd);
+  opacity:.9;
+}
+
+/* 2) כרטיסים — הובר עדין ויוקרתי */
+.grade-card,
+.card,
+.contact-box,
+.board-item,
+.home-news-item,
+.home-exam-item{
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.grade-card:hover,
+.card:hover,
+.contact-box:hover,
+.board-item:hover,
+.home-news-item:hover,
+.home-exam-item:hover{
+  transform: translateY(-3px);
+  box-shadow: 0 18px 40px rgba(15,23,42,.18);
+  border-color: rgba(56,189,248,.55);
+}
+
+/* 3) ניווט — underline אלגנטי רק על קישורים רגילים (לא על הכפתורים) */
+.nav-right a:not(.personal-btn):not(.btn):not(.btn-outline){
+  position: relative;
+}
+.nav-right a:not(.personal-btn):not(.btn):not(.btn-outline)::after{
+  content:"";
+  position:absolute;
+  left:8px; right:8px;
+  bottom:-4px;
+  height:2px;
+  border-radius:999px;
+  transform: scaleX(0);
+  transition: transform .18s ease;
+  background: linear-gradient(90deg, #38bdf8, #6366f1);
+  opacity:.9;
+}
+.nav-right a:not(.personal-btn):not(.btn):not(.btn-outline):hover::after{
+  transform: scaleX(1);
+}
+
+/* 4) כפתור מרחב אישי — גרסה אחת בלבד, נקייה */
+a.personal-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-weight: 850;
+  color:#fff;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  box-shadow: 0 10px 28px rgba(37,99,235,.35);
+  transition: transform .15s ease, box-shadow .2s ease, filter .2s ease;
+}
+a.personal-btn:hover{
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+  box-shadow: 0 16px 44px rgba(37,99,235,.48);
+}
+
+/* 5) לייט מוד — רקע חי עדין (בלי להפוך הכל ללבן משעמם) */
+html[data-theme="light"] body{
+  background:
+    radial-gradient(900px 420px at 85% 10%, rgba(56,189,248,.12), transparent 60%),
+    radial-gradient(900px 420px at 15% 25%, rgba(37,99,235,.10), transparent 60%),
+    linear-gradient(180deg, #f8fbff 0%, #f2f6ff 100%);
+}
+
+/* =========================
+   FOOTER — SAME AS INDEX
+   ========================= */
+
+.site-footer{
+  background: #ffffff;
+  border-top: 1px solid #e5e7eb;
+  padding: 16px 0;
+}
+
+.site-footer .footer-text{
+  margin: 0;
+  text-align: center;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: .2px;
+  color: #0b1120;
+}
+
+.site-footer .footer-devlink{
+  font-weight: 900;
+  color: #0b1120;
+  text-decoration: none;
+  margin: 0 8px;
+}
+
+.site-footer .footer-devlink:hover{
+  opacity: .75;
+}
