@@ -1,6 +1,7 @@
 // analytics.js – לוגים + דשבורד אנליטיקות ליערת העמק (Firestore)
-// ✅ analytics_pageViews = אגרגציה נקייה (מסמך אחד ליום+דף)
-// ✅ לא יוצר מסמך לכל כניסה: מעדכן את אותו docId: YYYY-MM-DD__page
+// ✅ analytics_pageViews = אגרגציה (מסמך אחד ליום+דף) – נשאר כמו שהיה
+// ✅ FIX: לא שולחים null לשדות lastGrade/lastClassId -> זה מפיל Rules אצלך
+// ✅ NEW: analytics_daily = מסמך אחד ליום (YYYY-MM-DD) שסופר צפיות יומיות
 // ✅ בלי increment() כדי לא להיתקע מול Rules
 // אופציונלי: analytics_events = לוג גולמי (כבוי)
 
@@ -25,13 +26,15 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/fi
    CONFIG
 ============================= */
 
-const PAGEVIEWS_COLLECTION = "analytics_pageViews";
+const PAGEVIEWS_COLLECTION = "analytics_pageViews"; // קיים – נשאר
+const DAILY_COLLECTION = "analytics_daily";         // חדש – מסמך אחד ליום
 
 // RAW EVENTS (מומלץ להשאיר כבוי כדי לא ליצור מלא מסמכים)
 const EVENTS_COLLECTION = "analytics_events";
 const ENABLE_RAW_EVENTS = false;
 
 const pageviewsRef = collection(db, PAGEVIEWS_COLLECTION);
+const dailyRef = collection(db, DAILY_COLLECTION);
 const eventsRef = collection(db, EVENTS_COLLECTION);
 
 // מניעת כפילויות מרענון/טעינות כפולות
@@ -116,6 +119,7 @@ function getPageMeta() {
 }
 
 function shouldSkipLogging(page) {
+  // לא לספור צפיות לדשבורד אנליטיקות עצמו
   return page === "analytics-dashboard";
 }
 
@@ -144,11 +148,51 @@ function isPermissionDenied(err) {
 }
 
 /* =============================
-   1) LOG PAGE VIEW (AGGREGATED)
-   - Transaction: views = (oldViews + 1)
-   - לא יוצר מסמך לכל כניסה
+   UTIL: REMOVE NULL/UNDEFINED FIELDS
+   (כדי לא להפיל Rules שמבקשים string ולא null)
 ============================= */
+function cleanOptionalStrings(obj) {
+  const out = { ...obj };
+  for (const k of Object.keys(out)) {
+    const v = out[k];
+    if (v === null || v === undefined) delete out[k];
+    // אם מישהו דוחף "null" כמחרוזת בטעות:
+    if (typeof v === "string" && v.trim().toLowerCase() === "null") delete out[k];
+  }
+  return out;
+}
 
+/* =============================
+   0) NEW: LOG DAILY VIEW
+   - analytics_daily/{YYYY-MM-DD}
+   - views = views + 1 (transaction)
+============================= */
+async function logDailyView(dateKey) {
+  const ref = doc(db, DAILY_COLLECTION, dateKey);
+
+  await runTransaction(db, async (tx) => {
+    const snap = await tx.get(ref);
+    const current = snap.exists() ? Number(snap.data()?.views || 0) : 0;
+    const next = current + 1;
+
+    tx.set(
+      ref,
+      {
+        dateKey,
+        views: next,
+        updatedAt: serverTimestamp(),
+      },
+      { merge: true }
+    );
+  });
+}
+
+/* =============================
+   1) LOG PAGE VIEW (AGGREGATED BY DAY+PAGE)
+   - Transaction: views = (oldViews + 1)
+   - FIX: לא שולחים null לשדות optional
+   - בנוסף: קורא גם ל-logDailyView() כדי לספור יומי
+============================= */
 async function logPageView() {
   console.log("analytics: logPageView start", location.pathname);
 
@@ -162,6 +206,19 @@ async function logPageView() {
     const hour = pad2(now.getHours());
     const path = getPathWithQuery();
 
+    // 1) NEW: daily counter (לא מפריע לישן)
+    try {
+      await logDailyView(dateKey);
+    } catch (e) {
+      // לא מפילים את האתר על daily
+      if (isPermissionDenied(e)) {
+        console.warn("analytics: daily permission denied (skipped)");
+      } else {
+        console.warn("analytics: daily failed (skipped)", e?.message || e);
+      }
+    }
+
+    // 2) Existing: per day + page
     const docId = `${dateKey}__${page}`;
     const ref = doc(db, PAGEVIEWS_COLLECTION, docId);
 
@@ -170,38 +227,38 @@ async function logPageView() {
       const current = snap.exists() ? Number(snap.data()?.views || 0) : 0;
       const next = current + 1;
 
-      // ✅ שולחים מספר רגיל – תואם Rules
-      tx.set(
-        ref,
-        {
-          dateKey,
-          pageId: page,
-          views: next,
+      // ✅ חשוב: לא לשלוח null לשדות optional כדי לא להפיל validAggPageView()
+      const payload = cleanOptionalStrings({
+        dateKey,
+        pageId: page,
+        views: next,
 
-          lastPath: path,
-          lastHour: hour,
-          lastGrade: grade || null,
-          lastClassId: classId || null,
+        lastPath: path,
+        lastHour: hour,
+        lastGrade: grade,       // אם null -> ימחק מה-payload
+        lastClassId: classId,   // אם null -> ימחק מה-payload
 
-          updatedAt: serverTimestamp(),
-        },
-        { merge: true }
-      );
+        updatedAt: serverTimestamp(),
+      });
+
+      tx.set(ref, payload, { merge: true });
     });
 
     console.log("analytics: wrote pageViews doc", docId);
 
     if (ENABLE_RAW_EVENTS) {
-      await addDoc(eventsRef, {
+      const rawPayload = cleanOptionalStrings({
         dateKey,
         hour,
         pageId: page,
-        grade: grade || null,
-        classId: classId || null,
+        grade,
+        classId,
         path,
-        createdAt: serverTimestamp(),
+               createdAt: serverTimestamp(),
         userAgent: navigator.userAgent || null,
       });
+
+      await addDoc(eventsRef, rawPayload);
     }
   } catch (err) {
     if (isPermissionDenied(err)) {
@@ -238,6 +295,10 @@ async function canReadAnalyticsDashboard(user) {
   }
 }
 
+/**
+ * נשאיר את הדשבורד כמו שהיה (קורא analytics_pageViews)
+ * ואם תרצה אחרי זה – אני אוסיף לך גם טבלת "צפיות יומיות" מתוך analytics_daily
+ */
 async function loadAnalyticsDashboard() {
   const statusEl = document.getElementById("analytics-status");
   if (statusEl) statusEl.textContent = "טוען נתוני אנליטיקות...";
