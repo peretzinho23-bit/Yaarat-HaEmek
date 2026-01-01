@@ -869,6 +869,900 @@ html[data-theme="dark"] .home-class-hints .pill{
   border-color: rgba(148,163,184,0.22);
   color: rgba(255,255,255,0.72);
 }
+.site-footer{
+  border-top: 1px solid rgba(148,163,184,.35);
+  background: rgba(255,255,255,.92);
+  padding: 14px 0;
+}
+
+html[data-theme="dark"] .site-footer{
+  background: rgba(2,6,23,.55);
+  border-top-color: rgba(148,163,184,.18);
+}
+
+.footer-inner{
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.footer-copy{
+  font-weight: 800;
+  font-size: .92rem;
+  opacity: .9;
+  white-space: nowrap;
+}
+
+html[data-theme="dark"] .footer-copy{ color: #e5e7eb; opacity: .85; }
+
+.footer-links{
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.footer-links a{
+  text-decoration: none;
+  font-weight: 800;
+  font-size: .92rem;
+  color: #0f172a;
+  opacity: .85;
+}
+
+.footer-links a:hover{ opacity: 1; text-decoration: underline; }
+
+html[data-theme="dark"] .footer-links a{
+  color: #e5e7eb;
+  opacity: .8;
+}
+
+.footer-right{
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.footer-social{
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.soc{
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font-weight: 900;
+  color: #fff;
+  text-decoration: none;
+  box-shadow: 0 10px 20px rgba(15,23,42,.12);
+  transform: translateY(0);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.soc:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(15,23,42,.16);
+}
+
+/* צבעים */
+.soc.yt{ background:#ef4444; }
+.soc.fb{ background:#2563eb; }
+.soc.tt{ background:#06b6d4; }
+.soc.ig{ background:#7c3aed; }
+
+.footer-logo img{
+  width: 90px;
+  height: auto;
+  display: block;
+}
+
+/* רספונסיבי למובייל */
+@media (max-width: 860px){
+  .footer-inner{
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .footer-copy{ order: 3; }
+  .footer-links{ order: 2; }
+  .footer-right{ order: 1; }
+}
+.site-footer{
+  border-top: 1px solid rgba(148,163,184,.35);
+  background: rgba(255,255,255,.92);
+  padding: 14px 0;
+}
+
+html[data-theme="dark"] .site-footer{
+  background: rgba(2,6,23,.55);
+  border-top-color: rgba(148,163,184,.18);
+}
+
+.footer-inner{
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.footer-right{
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+  justify-content: flex-start; /* ב-RTL זה צד ימין ויזואלית */
+}
+
+.footer-logo img{
+  width: 110px;
+  height: auto;
+  display: block;
+}
+
+.footer-social{
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.soc-img{
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(148,163,184,.35);
+  background: rgba(255,255,255,.9);
+  box-shadow: 0 10px 20px rgba(15,23,42,.12);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.soc-img img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.soc-img:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(15,23,42,.16);
+}
+
+html[data-theme="dark"] .soc-img{
+  background: rgba(15,23,42,.7);
+  border-color: rgba(148,163,184,.18);
+}
+
+.footer-links{
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  flex: 2;
+}
+
+.footer-links a{
+  text-decoration: none;
+  font-weight: 800;
+  font-size: .92rem;
+  color: #0f172a;
+  opacity: .85;
+}
+
+.footer-links a:hover{ opacity: 1; text-decoration: underline; }
+
+html[data-theme="dark"] .footer-links a{
+  color: #e5e7eb;
+  opacity: .8;
+}
+
+.footer-left{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex: 1;
+  text-align: left;
+}
+
+.footer-copy{
+  font-weight: 800;
+  font-size: .92rem;
+  opacity: .9;
+  white-space: nowrap;
+}
+
+html[data-theme="dark"] .footer-copy{ color: #e5e7eb; opacity: .85; }
+
+.footer-devlink{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  padding: 6px 12px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 900;
+  font-size: .9rem;
+  color: #0f172a;
+  background: rgba(255,255,255,.92);
+  border: 1px solid rgba(148,163,184,.55);
+  box-shadow: 0 10px 22px rgba(15,23,42,.10);
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+
+.footer-devlink:hover{
+  transform: translateY(-1px);
+  background: #eff6ff;
+  box-shadow: 0 14px 30px rgba(15,23,42,.14);
+}
+
+html[data-theme="dark"] .footer-devlink{
+  color: #e5e7eb;
+  background: rgba(15,23,42,.55);
+  border-color: rgba(148,163,184,.22);
+}
+
+/* מובייל */
+@media (max-width: 860px){
+  .footer-inner{
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .footer-right{ justify-content: center; }
+  .footer-left{ align-items: center; }
+  .footer-copy{ white-space: normal; }
+}
+.site-footer{
+  border-top: 1px solid rgba(148,163,184,.25);
+  background: rgba(255,255,255,.92);
+  padding: 18px 0;
+}
+
+html[data-theme="dark"] .site-footer{
+  background: rgba(2,6,23,.55);
+  border-top-color: rgba(148,163,184,.18);
+}
+
+.footer-inner{
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 18px;
+
+  display: grid;
+  grid-template-columns: 1fr auto 1fr; /* right | center | left */
+  align-items: center;
+  gap: 18px;
+}
+
+/* ===== RIGHT ===== */
+.footer-right{
+  display:flex;
+  align-items:center;
+  gap: 14px;
+  justify-content:flex-start; /* RTL => צד ימין ויזואלית */
+}
+
+.footer-logo{
+  height: 42px;
+  width: auto;
+  display:block;
+  filter: drop-shadow(0 8px 18px rgba(15,23,42,.12));
+}
+
+.footer-social{display:flex;gap:10px;align-items:center}
+
+.soc{
+  width: 34px; height: 34px;
+  border-radius: 999px;
+  overflow:hidden;
+  display:inline-flex;
+  border:1px solid rgba(148,163,184,.35);
+  background: rgba(255,255,255,.9);
+  box-shadow: 0 10px 22px rgba(15,23,42,.10);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.soc img{width:100%;height:100%;object-fit:cover;display:block}
+.soc:hover{transform:translateY(-1px);box-shadow:0 14px 30px rgba(15,23,42,.16)}
+
+html[data-theme="dark"] .soc{
+  background: rgba(15,23,42,.7);
+  border-color: rgba(148,163,184,.18);
+}
+
+/* ===== CENTER ===== */
+.footer-links{
+  display:flex;
+  gap: 18px;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+
+.footer-links a{
+  text-decoration:none;
+  font-weight: 900;
+  font-size: .92rem;
+  color:#0f172a;
+  opacity:.78;
+  padding: 6px 10px;
+  border-radius: 999px;
+  transition: background .15s ease, opacity .15s ease;
+}
+.footer-links a:hover{
+  opacity: 1;
+  background: rgba(37,99,235,.08);
+}
+
+html[data-theme="dark"] .footer-links a{
+  color:#e5e7eb;
+  opacity:.8;
+}
+html[data-theme="dark"] .footer-links a:hover{
+  background: rgba(56,189,248,.10);
+}
+
+/* ===== LEFT ===== */
+.footer-left{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap: 6px;
+}
+
+.footer-copy{
+  font-weight: 800;
+  font-size: .92rem;
+  opacity: .9;
+  white-space: nowrap;
+}
+
+html[data-theme="dark"] .footer-copy{color:#e5e7eb;opacity:.85}
+
+.footer-dev{
+  text-decoration:none;
+  font-weight: 900;
+  font-size: .9rem;
+  color:#0f172a;
+  opacity:.85;
+}
+.footer-dev span{
+  font-weight: 1000;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.footer-dev:hover{opacity:1}
+
+html[data-theme="dark"] .footer-dev{color:#e5e7eb}
+
+/* ===== MOBILE ===== */
+@media (max-width: 880px){
+  .footer-inner{
+    grid-template-columns: 1fr;
+    text-align:center;
+    justify-items:center;
+  }
+  .footer-right{justify-content:center}
+  .footer-left{align-items:center}
+  .footer-copy{white-space: normal}
+}
+/* ===== SITE FOOTER ===== */
+.site-footer{
+  border-top: 1px solid rgba(148,163,184,.25);
+  background: #ffffff;
+  padding: 22px 0;
+}
+
+html[data-theme="dark"] .site-footer{
+  background: rgba(2,6,23,.65);
+  border-top-color: rgba(148,163,184,.18);
+}
+
+/* inner layout */
+.footer-inner{
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* shared side */
+.footer-side{
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* RIGHT – logo + socials */
+.footer-right{
+  justify-content: flex-end;
+}
+
+.footer-brand{
+  display: inline-flex;
+  align-items: center;
+}
+
+.footer-logo{
+  height: 46px;
+  width: auto;
+  display: block;
+}
+
+/* socials */
+.footer-social{
+  display: flex;
+  gap: 10px;
+}
+
+.footer-social .soc{
+  width: 67px;
+  height: 67px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(15,23,42,.05);
+  border: 1px solid rgba(148,163,184,.35);
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+
+.footer-social .soc img{
+  width: 67px;
+  height: 67px;
+  object-fit: contain;
+}
+
+.footer-social .soc:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(15,23,42,.18);
+  background: rgba(59,130,246,.12);
+}
+
+html[data-theme="dark"] .footer-social .soc{
+  background: rgba(15,23,42,.6);
+  border-color: rgba(148,163,184,.22);
+}
+
+/* LEFT – copyright + dev */
+.footer-left{
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.footer-copy{
+  font-size: .95rem;
+  font-weight: 700;
+  opacity: .9;
+}
+
+.footer-dev{
+  font-size: .9rem;
+  text-decoration: none;
+  color: #0f172a;
+  font-weight: 800;
+  opacity: .85;
+}
+
+.footer-dev span{
+  font-weight: 900;
+}
+
+.footer-dev:hover{
+  opacity: 1;
+  text-decoration: underline;
+}
+
+html[data-theme="dark"] .footer-copy,
+html[data-theme="dark"] .footer-dev{
+  color: #e5e7eb;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 720px){
+  .footer-inner{
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .footer-left{
+    align-items: center;
+  }
+
+  .footer-right{
+    justify-content: center;
+  }
+}
+/* ===== FOOTER LAYOUT ===== */
+.site-footer{
+  border-top: 1px solid rgba(148,163,184,.25);
+  background: #fff;
+  padding: 18px 0;
+}
+
+html[data-theme="dark"] .site-footer{
+  background: rgba(2,6,23,.65);
+  border-top-color: rgba(148,163,184,.18);
+}
+
+.footer-inner{
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 18px;
+
+  display: grid;
+  grid-template-columns: 1fr auto 1fr; /* ימין | אמצע | שמאל */
+  align-items: center;
+}
+
+/* ===== RIGHT: socials ===== */
+.footer-right{
+  display: flex;
+  gap: 10px;
+  justify-content: flex-start;
+}
+
+.footer-right .soc{
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(15,23,42,.05);
+  border: 1px solid rgba(148,163,184,.35);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.footer-right .soc img{
+  width: 18px;
+  height: 18px;
+}
+
+.footer-right .soc:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(15,23,42,.18);
+}
+
+/* ===== CENTER: copyright ===== */
+.footer-center{
+  text-align: center;
+  font-size: .95rem;
+  font-weight: 700;
+  opacity: .9;
+}
+
+/* ===== LEFT: developed by ===== */
+.footer-left{
+  display: flex;
+  justify-content: flex-end;
+}
+
+.footer-dev{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.footer-dev img{
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.footer-dev:hover{
+  text-decoration: underline;
+}
+
+html[data-theme="dark"] .footer-center,
+html[data-theme="dark"] .footer-dev{
+  color: #e5e7eb;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 720px){
+  .footer-inner{
+    grid-template-columns: 1fr;
+    gap: 12px;
+    text-align: center;
+  }
+
+  .footer-right,
+  .footer-left{
+    justify-content: center;
+  }
+}
+.site-footer{
+  background: #fff;
+  border-top: 1px solid rgba(15,23,42,.08);
+}
+
+.footer-inner{
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 12px 18px;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: center;
+}
+
+/* ימין – רשתות */
+.footer-right{
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.footer-social .soc img{
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(148,163,184,.35);
+  padding: 4px;
+  background: #fff;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.footer-social .soc img:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(15,23,42,.18);
+}
+
+/* אמצע – זכויות */
+.footer-copy{
+  text-align: center;
+  font-weight: 700;
+  color: #1e293b;
+  font-size: .95rem;
+}
+
+/* שמאל – Developed by */
+.footer-left{
+  display: flex;
+  justify-content: flex-start;
+}
+
+.footer-dev{
+  font-weight: 700;
+  text-decoration: none;
+  color: #0f172a;
+}
+
+.footer-dev span{
+  font-weight: 900;
+}
+
+/* מובייל */
+@media (max-width: 700px){
+  .footer-inner{
+    grid-template-columns: 1fr;
+    gap: 10px;
+    text-align: center;
+  }
+
+  .footer-right,
+  .footer-left{
+    justify-content: center;
+  }
+}
+.site-footer{
+  width: 100%;
+  background: #fff;
+  border-top: 1px solid rgba(15,23,42,.08);
+}
+
+.footer-inner{
+  width: 100%;
+  max-width: none;          /* ✅ מבטל הגבלה */
+  margin: 0;                /* ✅ לא ממורכז בתוך קופסה */
+  padding: 18px 34px;       /* ✅ אוויר */
+  
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: center;
+}
+.footer-right{ justify-content: flex-end; }
+.footer-left{ justify-content: flex-start; }
+.footer-copy{ text-align: center; }
+.footer-social{
+  display:flex;
+  gap: 14px;
+  align-items:center;
+}
+
+.footer-social .soc img{
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+}
+.site-footer{
+  width:100%;
+  background:#ffffff;
+  border-top:2px solid rgba(15,23,42,.12); /* עוגן */
+}
+
+.footer-inner{
+  width:100%;
+  max-width:none;
+  margin:0;
+  padding:20px 36px;          /* פחות אוויר מלמעלה */
+  
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  align-items:center;
+}
+
+/* ===== מרכז – זכויות ===== */
+.footer-copy{
+  text-align:center;
+  font-size:1.02rem;          /* ⬅️ גדול יותר */
+  font-weight:800;            /* ⬅️ מודגש */
+  color:#0f172a;
+}
+
+/* ===== שמאל – Developed by ===== */
+.footer-left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.footer-dev{
+  font-size:.95rem;
+  font-weight:800;
+  color:#1e293b;
+  text-decoration:underline;
+}
+
+.footer-dev span{
+  font-weight:900;
+}
+
+/* ===== ימין – רשתות ===== */
+.footer-right{
+  display:flex;
+  justify-content:flex-end;
+}
+
+.footer-social{
+  display:flex;
+  gap:12px;
+}
+
+.footer-social img{
+  width:67px;                 /* ⬅️ קצת יותר גדול */
+  height:67px;
+  border-radius:70%;
+  background:#fff;
+  box-shadow:0 4px 12px rgba(15,23,42,.12); /* לא מרחף – “יושב” */
+}
+.footer-social{
+  display:flex;
+  gap:16px;               /* יותר רווח ביניהן */
+}
+
+.footer-social img{
+  width:67px;             /* ⬅️ זה העיקר */
+  height:67px;
+  border-radius:50%;
+  background:#fff;
+  padding:6px;            /* נותן “גוף” */
+  box-shadow:0 6px 18px rgba(15,23,42,.18);
+  transition:transform .2s ease, box-shadow .2s ease;
+}
+
+.footer-social img:hover{
+  transform:translateY(-2px) scale(1.05);
+  box-shadow:0 10px 26px rgba(15,23,42,.25);
+}
+.footer-social img{
+  width:67px;
+  height:67px;
+}
+.footer-social{
+  display:flex;
+  gap:22px;
+  align-items:center;
+}
+
+.footer-social img{
+  width:72px;          /* ⬅️ גדול. נקודה. */
+  height:72px;
+  border-radius:50%;
+
+  background:#fff;
+  padding:10px;
+
+  box-shadow:
+    0 8px 22px rgba(15,23,42,.22),
+    inset 0 0 0 1px rgba(15,23,42,.08);
+
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease;
+}
+
+.footer-social img:hover{
+  transform:translateY(-3px) scale(1.08);
+  box-shadow:
+    0 14px 36px rgba(15,23,42,.35);
+}
+/* ✅ Social buttons – clean + not huge */
+.site-footer .footer-right{
+  display:flex !important;
+  justify-content:flex-end !important;
+  align-items:center !important;
+  gap:14px !important;
+}
+
+.site-footer .footer-right .soc{
+  width:52px !important;
+  height:52px !important;
+  border-radius:999px !important;
+  overflow:hidden !important;
+
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  background:#fff !important;
+  border:1px solid rgba(15,23,42,.12) !important;
+  box-shadow:0 6px 16px rgba(15,23,42,.10) !important;
+
+  transition:transform .18s ease, box-shadow .18s ease !important;
+}
+
+.site-footer .footer-right .soc:hover{
+  transform:translateY(-2px) !important;
+  box-shadow:0 10px 24px rgba(15,23,42,.16) !important;
+}
+
+/* התמונה בפנים: לא להתפוצץ, לשבת יפה */
+.site-footer .footer-right .soc img{
+  width:70% !important;
+  height:70% !important;
+  object-fit:contain !important;
+  display:block !important;
+}
+
+/* דארק */
+html[data-theme="dark"] .site-footer .footer-right .soc{
+  background: rgba(15,23,42,.55) !important;
+  border-color: rgba(148,163,184,.22) !important;
+  box-shadow:0 8px 20px rgba(0,0,0,.35) !important;
+}
 
   </style>
 </head>
@@ -1266,16 +2160,40 @@ html[data-theme="dark"] .home-class-hints .pill{
     </div>
   </section>
 
-  <footer>
-  © כל הזכויות שמורות לבית ספר יערת העמק ·
-  Developed By
-  <a
-    class="footer-devlink"
-    href="https://ptzwebsitebuilding.vercel.app/"
-    target="_blank"
-    rel="noopener noreferrer"
-  >Peretzinho</a></a>
-  </footer>
+<footer class="site-footer">
+  <div class="footer-inner">
+
+    <!-- RIGHT: socials -->
+    <div class="footer-col footer-right">
+      <a class="soc" href="https://www.facebook.com/p/%D7%97%D7%98%D7%99%D7%91%D7%AA-%D7%94%D7%A0%D7%A2%D7%95%D7%A8%D7%99%D7%9D-%D7%99%D7%A2%D7%A8%D7%AA-%D7%94%D7%A2%D7%9E%D7%A7-%D7%9E%D7%92%D7%93%D7%9C-%D7%94%D7%A2%D7%9E%D7%A7-61565220180198/"
+         target="_blank" rel="noopener">
+        <img src="FACE.JPG" alt="Facebook">
+      </a>
+      <a class="soc" href="https://www.instagram.com/yaarathaemeq/"
+         target="_blank" rel="noopener">
+        <img src="INST.JPG" alt="Instagram">
+      </a>
+    </div>
+
+    <!-- CENTER: copyright -->
+    <div class="footer-col footer-center">
+      © 2026 · כל הזכויות שמורות לבית ספר יערת העמק
+    </div>
+
+    <!-- LEFT: developed by -->
+    <div class="footer-col footer-left">
+      <a href="https://ptzwebsitebuilding.vercel.app/"
+         target="_blank" rel="noopener"
+         class="footer-dev">
+        <img src="Peretzinho.jpg" alt="Peretzinho">
+        <span>Developed by Peretzinho</span>
+      </a>
+    </div>
+
+  </div>
+</footer>
+
+
 
   <div id="to-top">↑</div>
 
