@@ -1,35 +1,945 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Page Not Found</title>
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="robots" content="noindex,follow" />
+  <title>404 · הלכת לאיבוד</title>
 
-    <style media="screen">
-      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
-      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px 16px; border-radius: 3px; }
-      #message h3 { color: #888; font-weight: normal; font-size: 16px; margin: 16px 0 12px; }
-      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
-      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
-      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
-      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
-      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
-      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
-      @media (max-width: 600px) {
-        body, #message { margin-top: 0; background: white; box-shadow: none; }
-        body { border-top: 16px solid #ffa100; }
+  <style>
+    /* =========================
+       404 · YAARAT HAEMEK
+       Single-file premium 404
+       ========================= */
+
+    :root{
+      --bg0:#020617;
+      --bg1:#0b1020;
+      --glass: rgba(255,255,255,.06);
+      --glass2: rgba(255,255,255,.04);
+      --stroke: rgba(148,163,184,.22);
+      --txt: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.70);
+      --muted2: rgba(255,255,255,.55);
+      --brand:#3b82f6;
+      --brand2:#38bdf8;
+      --good:#22c55e;
+      --warn:#f59e0b;
+      --bad:#ef4444;
+
+      --radius: 24px;
+      --shadow: 0 22px 70px rgba(0,0,0,.55);
+
+      --pad: clamp(16px, 2.5vw, 28px);
+      --max: 1100px;
+
+      --ui: rgba(255,255,255,.10);
+      --ui2: rgba(255,255,255,.14);
+
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --sys: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+
+    html[data-theme="light"]{
+      --bg0:#eef5ff;
+      --bg1:#ffffff;
+      --glass: rgba(15,23,42,.04);
+      --glass2: rgba(15,23,42,.03);
+      --stroke: rgba(15,23,42,.12);
+      --txt: rgba(15,23,42,.92);
+      --muted: rgba(15,23,42,.70);
+      --muted2: rgba(15,23,42,.55);
+      --ui: rgba(15,23,42,.06);
+      --ui2: rgba(15,23,42,.08);
+      --shadow: 0 20px 70px rgba(15,23,42,.14);
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family: var(--sys);
+      color: var(--txt);
+      overflow-x:hidden;
+
+      background:
+        radial-gradient(1200px 520px at 20% 10%, rgba(59,130,246,.35), transparent 60%),
+        radial-gradient(900px 500px at 85% 20%, rgba(56,189,248,.22), transparent 55%),
+        radial-gradient(900px 600px at 50% 120%, rgba(245,158,11,.12), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+    }
+
+    /* subtle noise */
+    body:before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.06;
+      mix-blend-mode: overlay;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E");
+      background-size: 180px 180px;
+    }
+
+    .page{
+      position:relative;
+      width:100%;
+      padding: clamp(18px, 3vw, 34px);
+    }
+
+    .topbar{
+      max-width: var(--max);
+      margin: 0 auto;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      text-decoration:none;
+      color:inherit;
+      user-select:none;
+    }
+
+    .logo{
+      width:44px;height:44px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(59,130,246,.9), rgba(56,189,248,.7));
+      box-shadow: 0 14px 36px rgba(37,99,235,.25);
+      display:grid;place-items:center;
+      border:1px solid rgba(255,255,255,.22);
+      position:relative;
+      overflow:hidden;
+    }
+    .logo:after{
+      content:"";
+      position:absolute; inset:-30%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.55), transparent 55%);
+      transform: rotate(10deg);
+      opacity:.55;
+    }
+    .logo span{
+      position:relative;
+      font-weight:1000;
+      letter-spacing:.2px;
+      text-shadow: 0 10px 24px rgba(0,0,0,.35);
+    }
+
+    .brand-txt{
+      display:flex; flex-direction:column; line-height:1.1;
+    }
+    .brand-txt b{ font-weight:1000; letter-spacing:.2px; }
+    .brand-txt small{ opacity:.75; font-weight:700; }
+
+    .top-actions{
+      display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      border-radius:999px;
+      padding:10px 12px;
+      background: var(--glass);
+      border:1px solid var(--stroke);
+      box-shadow: 0 10px 28px rgba(0,0,0,.18);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      user-select:none;
+    }
+
+    .pill kbd{
+      font-family: var(--mono);
+      font-size:.85rem;
+      padding:4px 8px;
+      border-radius:10px;
+      background: var(--ui);
+      border:1px solid var(--stroke);
+      opacity:.9;
+    }
+
+    .btn{
+      all:unset;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      border-radius:999px;
+      padding: 11px 16px;
+      font-weight:900;
+      letter-spacing:.2px;
+      background: rgba(59,130,246,.92);
+      color:#fff;
+      box-shadow: 0 16px 44px rgba(37,99,235,.35);
+      border:1px solid rgba(255,255,255,.18);
+      transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+      user-select:none;
+    }
+    .btn:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 22px 60px rgba(37,99,235,.55);
+      filter: brightness(1.03);
+    }
+    .btn:active{ transform: translateY(0); filter: brightness(.98); }
+
+    .btn.secondary{
+      background: var(--glass);
+      color: var(--txt);
+      box-shadow: 0 14px 38px rgba(0,0,0,.16);
+      border:1px solid var(--stroke);
+    }
+
+    .btn.icon{
+      width:44px;height:44px;
+      padding:0;
+      border-radius:16px;
+      font-size:1.15rem;
+      background: var(--glass);
+      border:1px solid var(--stroke);
+      box-shadow: 0 14px 38px rgba(0,0,0,.16);
+    }
+
+    /* =========================
+       HERO
+       ========================= */
+    .hero{
+      max-width: var(--max);
+      margin: 22px auto 0;
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 18px;
+      align-items:stretch;
+    }
+
+    @media (max-width: 980px){
+      .hero{ grid-template-columns:1fr; }
+    }
+
+    .card{
+      border-radius: var(--radius);
+      background: var(--glass);
+      border:1px solid var(--stroke);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      overflow:hidden;
+      position:relative;
+    }
+
+    .card:before{
+      content:"";
+      position:absolute;
+      inset:-1px;
+      background:
+        radial-gradient(900px 260px at 20% 0%, rgba(59,130,246,.18), transparent 60%),
+        radial-gradient(700px 260px at 85% 10%, rgba(56,189,248,.14), transparent 55%);
+      pointer-events:none;
+      opacity:.9;
+    }
+
+    .card-inner{
+      position:relative;
+      padding: var(--pad);
+    }
+
+    .big{
+      display:flex;
+      flex-direction:column;
+      gap: 12px;
+    }
+
+    .codeRow{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap: 14px;
+      flex-wrap:wrap;
+    }
+
+    .code{
+      font-size: clamp(64px, 7vw, 92px);
+      line-height:1;
+      font-weight: 1000;
+      letter-spacing: .8px;
+      text-shadow: 0 18px 60px rgba(59,130,246,.35);
+    }
+
+    .tag{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      border-radius:999px;
+      padding: 8px 12px;
+      font-weight:900;
+      background: rgba(245,158,11,.14);
+      border:1px solid rgba(245,158,11,.28);
+      color: var(--txt);
+      white-space:nowrap;
+    }
+    .tag i{ font-style:normal; }
+
+    .title{
+      font-size: clamp(18px, 2.2vw, 28px);
+      margin:0;
+      font-weight: 1000;
+      letter-spacing: .15px;
+    }
+    .sub{
+      margin:0;
+      color: var(--muted);
+      line-height:1.6;
+      font-weight:700;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top: 8px;
+    }
+
+    .miniGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    @media (max-width:520px){
+      .miniGrid{ grid-template-columns:1fr; }
+    }
+
+    .mini{
+      border-radius:18px;
+      background: var(--glass2);
+      border:1px solid var(--stroke);
+      padding: 12px 12px 10px;
+      position:relative;
+      overflow:hidden;
+    }
+    .mini h4{
+      margin:0 0 6px;
+      font-size:.92rem;
+      font-weight:1000;
+      letter-spacing:.2px;
+    }
+    .mini p{
+      margin:0;
+      font-size:.9rem;
+      color: var(--muted);
+      line-height:1.5;
+      font-weight:700;
+    }
+    .mini .tiny{
+      margin-top:8px;
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      opacity:.95;
+    }
+
+    .chip{
+      font-family: var(--mono);
+      font-size:.78rem;
+      padding: 6px 10px;
+      border-radius:999px;
+      background: var(--ui);
+      border:1px solid var(--stroke);
+      color: var(--txt);
+      user-select:none;
+    }
+
+    /* =========================
+       GAME CARD
+       ========================= */
+    .game{
+      display:flex;
+      flex-direction:column;
+      gap: 12px;
+    }
+
+    .gameHead{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+    }
+
+    .gameHead h3{
+      margin:0;
+      font-size: 1.05rem;
+      font-weight:1000;
+      letter-spacing:.2px;
+    }
+
+    .score{
+      font-family: var(--mono);
+      font-size:.9rem;
+      padding: 8px 10px;
+      border-radius: 14px;
+      background: var(--ui);
+      border:1px solid var(--stroke);
+      user-select:none;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      white-space:nowrap;
+    }
+
+    canvas{
+      width:100%;
+      height: 260px;
+      border-radius: 18px;
+      background:
+        radial-gradient(900px 260px at 30% 0%, rgba(59,130,246,.22), transparent 60%),
+        radial-gradient(700px 260px at 85% 10%, rgba(56,189,248,.16), transparent 55%),
+        rgba(0,0,0,.12);
+      border:1px solid var(--stroke);
+      display:block;
+      box-shadow: 0 18px 45px rgba(0,0,0,.25);
+    }
+
+    .gameHelp{
+      margin:0;
+      color: var(--muted);
+      font-weight:700;
+      font-size:.92rem;
+      line-height:1.5;
+    }
+
+    .secret{
+      margin-top: 6px;
+      font-size: .82rem;
+      color: var(--muted2);
+      user-select:none;
+      cursor:pointer;
+    }
+    .secret:hover{ color: var(--txt); }
+
+    /* =========================
+       FLOATERS / PARTY
+       ========================= */
+    .float{
+      position:fixed;
+      left: 10%;
+      top: 110vh;
+      font-size: 26px;
+      opacity:.9;
+      pointer-events:none;
+      animation: rise linear forwards;
+      filter: drop-shadow(0 10px 16px rgba(0,0,0,.28));
+    }
+    @keyframes rise{
+      to{
+        transform: translateY(-130vh) rotate(25deg);
+        opacity:0;
       }
-    </style>
-  </head>
-  <body>
-    <div id="message">
-      <h2>404</h2>
-      <h1>Page Not Found</h1>
-      <p>The specified file was not found on this website. Please check the URL for mistakes and try again.</p>
-      <h3>Why am I seeing this?</h3>
-      <p>This page was generated by the Firebase Command-Line Interface. To modify it, edit the <code>404.html</code> file in your project's configured <code>public</code> directory.</p>
-    תפנו לנדב פרץ הגבר שיסדר
+    }
+
+    body.party{
+      animation: hue 8s linear infinite;
+    }
+    @keyframes hue{
+      from{ filter:hue-rotate(0deg); }
+      to{ filter:hue-rotate(360deg); }
+    }
+
+    /* toast */
+    .toast{
+      position:fixed;
+      bottom: 18px;
+      left: 18px;
+      right: 18px;
+      margin:auto;
+      width: min(720px, calc(100% - 36px));
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(2,6,23,.85);
+      color:#fff;
+      border:1px solid rgba(148,163,184,.28);
+      box-shadow: 0 20px 60px rgba(0,0,0,.45);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      transform: translateY(20px);
+      opacity:0;
+      pointer-events:none;
+      transition: .25s ease;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index:9999;
+    }
+    html[data-theme="light"] .toast{
+      background: rgba(255,255,255,.92);
+      color:#0f172a;
+      border-color: rgba(15,23,42,.12);
+    }
+    .toast.show{
+      transform: translateY(0);
+      opacity:1;
+      pointer-events:auto;
+    }
+    .toast b{ font-weight:1000; }
+    .toast small{ opacity:.75; font-weight:700; }
+    .toast button{
+      all:unset;
+      cursor:pointer;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(59,130,246,.92);
+      color:#fff;
+      font-weight:900;
+      border:1px solid rgba(255,255,255,.18);
+    }
+    .toast button:hover{ filter:brightness(1.05); }
+
+    /* accessibility */
+    .sr-only{
+      position:absolute;
+      width:1px;height:1px;
+      padding:0;margin:-1px;
+      overflow:hidden;clip:rect(0,0,0,0);
+      white-space:nowrap;border:0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="חזרה לאתר">
+        <div class="logo" aria-hidden="true"><span>י</span></div>
+        <div class="brand-txt">
+          <b>יערת העמק</b>
+          <small>חטיבת הנעורים · אתר רשמי</small>
+        </div>
+      </a>
+
+      <div class="top-actions">
+        <div class="pill" title="קיצור דרך סודי">
+          <span>סוד:</span>
+          <kbd>Shift</kbd><span>+</span><kbd>P</kbd>
+        </div>
+        <button class="btn icon" id="themeBtn" type="button" aria-label="מצב כהה/בהיר">🌙</button>
+        <button class="btn secondary" id="copyBtn" type="button">העתק קישור</button>
+      </div>
+    </header>
+
+    <main class="hero">
+      <!-- LEFT big -->
+      <section class="card">
+        <div class="card-inner big">
+          <div class="codeRow">
+            <div class="code">404</div>
+            <div class="tag"><i>🧭</i> הלכת לאיבוד</div>
+          </div>
+
+          <h1 class="title" id="title">אין פה כלום. אפס. נאדה.</h1>
+          <p class="sub" id="sub">
+            השרת מסתכל עליך כזה: <b>“אחי… איזה דף?”</b><br/>
+            אבל אל דאגה — יש לך קיצורי דרך כדי לחזור מהר.
+          </p>
+
+          <div class="actions">
+            <a class="btn" href="/" id="homeBtn">⬅ חזרה לדף הבית</a>
+            <button class="btn secondary" id="randomBtn" type="button">מצא לי משהו באתר</button>
+            <button class="btn secondary" id="reportBtn" type="button">דווח על תקלה</button>
+          </div>
+
+          <div class="miniGrid">
+            <div class="mini">
+              <h4>📌 מה ניסית לפתוח?</h4>
+              <p id="pathLine">/</p>
+              <div class="tiny">
+                <span class="chip" id="timeChip">טוען…</span>
+                <span class="chip" id="uaChip">דפדפן</span>
+              </div>
+            </div>
+
+            <div class="mini">
+              <h4>🧠 טיפ של נדב</h4>
+              <p id="tipLine">תנסה לא להמציא URLים. זה עושה 404.</p>
+              <div class="tiny">
+                <span class="chip">Esc: סוגר הודעות</span>
+                <span class="chip">R: ריפרש בדיחה</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mini" style="margin-top:12px">
+            <h4>😂 בדיחת 404</h4>
+            <p id="jokeLine">טוען…</p>
+          </div>
+
+          <p class="secret" id="dontClick">אל תלחץ פה. באמת.</p>
+        </div>
+      </section>
+
+      <!-- RIGHT game -->
+      <aside class="card">
+        <div class="card-inner game">
+          <div class="gameHead">
+            <h3>🎯 משחק: תפוס את ה“404”</h3>
+            <div class="score">
+              <span>נקודות:</span><b id="score">0</b>
+              <span style="opacity:.65">|</span>
+              <span>שיא:</span><b id="best">0</b>
+            </div>
+          </div>
+
+          <canvas id="c" width="900" height="520" aria-label="משחק 404"></canvas>
+          <p class="gameHelp">
+            לוחצים על הכדור “404” כדי לצבור נקודות.<br/>
+            אם אתה עושה 30+ נקודות… יש הפתעה. 😈
+          </p>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <div>
+      <b id="toastTitle">הודעה</b><br/>
+      <small id="toastMsg">...</small>
     </div>
-    
-  </body>
+    <button id="toastBtn" type="button">אוקיי</button>
+  </div>
+
+  <script>
+    // =========================
+    // Helpers
+    // =========================
+    const $ = (q, el=document) => el.querySelector(q);
+    const clamp = (n, a, b) => Math.min(b, Math.max(a, n));
+    const rnd = (a,b)=> a + Math.random()*(b-a);
+
+    // =========================
+    // Theme (dark/light)
+    // =========================
+    (function initTheme(){
+      const saved = localStorage.getItem("yaarat_theme");
+      const prefersLight = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches;
+      const theme = saved || (prefersLight ? "light" : "dark");
+      document.documentElement.setAttribute("data-theme", theme);
+      $("#themeBtn").textContent = theme === "dark" ? "🌙" : "☀️";
+    })();
+
+    $("#themeBtn").addEventListener("click", ()=>{
+      const curr = document.documentElement.getAttribute("data-theme") || "dark";
+      const next = curr === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", next);
+      localStorage.setItem("yaarat_theme", next);
+      $("#themeBtn").textContent = next === "dark" ? "🌙" : "☀️";
+      toast("מצב תצוגה", next === "dark" ? "עברת למצב כהה 🌙" : "עברת למצב בהיר ☀️");
+    });
+
+    // =========================
+    // Info lines
+    // =========================
+    const path = location.pathname + location.search + location.hash;
+    $("#pathLine").textContent = path || "/";
+
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2,"0");
+    const mm = String(now.getMinutes()).padStart(2,"0");
+    $("#timeChip").textContent = `שעה: ${hh}:${mm}`;
+
+    const ua = navigator.userAgent || "";
+    $("#uaChip").textContent = ua.includes("Chrome") ? "Chrome" :
+                              ua.includes("Firefox") ? "Firefox" :
+                              ua.includes("Safari") ? "Safari" : "דפדפן";
+
+    // =========================
+    // Jokes + tips
+    // =========================
+    const jokes = [
+      "הדף הזה יצא להפסקה ולא חזר.",
+      "404: כמו שיעור חופשי — כולם מדברים עליו, אף אחד לא רואה אותו.",
+      "אפילו השרת אמר: 'נדב, אל תמציא כתובות.'",
+      "זה לא באג. זה פיצ'ר… אבל פיצ'ר עצוב.",
+      "הדף ביקש ריטלין ונעלם.",
+      "רגע… מי נתן לך הרשאות להגיע לפה?",
+      "404: הדף נמצא במגדל העמק… אבל בכתובת אחרת.",
+      "הגעת לפה? או שאתה האקר או שאתה פשוט סקרן.",
+      "הדף הזה נגנב על ידי ערסים. סתם, הוא פשוט לא קיים."
+    ];
+    const tips = [
+      "אם חיפשת דף כיתה – תעבור דרך דף הבית ותבחר שכבה+כיתה.",
+      "אם זה קישור ישן – כנראה שהשם של הקובץ השתנה.",
+      "הכי בטוח: ללחוץ על הלוגו למעלה ולחזור להתחלה.",
+      "אל תדפוק URLים באוויר. זה יוליד 404ים.",
+      "אם זה קרה אחרי עדכון – תעשה רענון קשוח (Ctrl+F5)."
+    ];
+
+    function refreshJoke(){
+      $("#jokeLine").textContent = jokes[Math.floor(Math.random()*jokes.length)];
+      $("#tipLine").textContent = tips[Math.floor(Math.random()*tips.length)];
+    }
+    refreshJoke();
+
+    document.addEventListener("keydown", (e)=>{
+      if(e.key.toLowerCase()==="r") refreshJoke();
+    });
+
+    // =========================
+    // Random navigate (safe)
+    // =========================
+    const randomPages = [
+      "/", "/about.html", "/news.html", "/polls.html",
+      "/index.html#home-news", "/index.html#grades", "/index.html#contact"
+    ];
+    $("#randomBtn").addEventListener("click", ()=>{
+      const url = randomPages[Math.floor(Math.random()*randomPages.length)];
+      toast("מצאתי לך משהו", `שולח אותך ל: ${url}`);
+      setTimeout(()=> location.href = url, 500);
+    });
+
+    // =========================
+    // Report bug
+    // =========================
+    $("#reportBtn").addEventListener("click", ()=>{
+      const msg =
+`היי, יש קישור שבור באתר:
+עמוד: ${path}
+זמן: ${new Date().toLocaleString("he-IL")}
+דפדפן: ${$("#uaChip").textContent}`;
+      navigator.clipboard?.writeText(msg).then(()=>{
+        toast("העתקתי דיווח", "שלח למנהל/נדב בווצאפ/מייל – כבר מוכן 👌");
+      }).catch(()=>{
+        toast("לא הצלחתי להעתיק", "תפתח את הקונסול ותצלם מסך 😅");
+      });
+    });
+
+    // =========================
+    // Copy link
+    // =========================
+    $("#copyBtn").addEventListener("click", ()=>{
+      navigator.clipboard?.writeText(location.href).then(()=>{
+        toast("הועתק!", "הקישור לדף הזה הועתק ללוח 👌");
+      }).catch(()=> toast("באסה", "הדפדפן חסם העתקה."));
+    });
+
+    // =========================
+    // Toast
+    // =========================
+    const t = $("#toast");
+    const tBtn = $("#toastBtn");
+    let toastTimer = null;
+
+    function toast(title, msg, btnText="אוקיי"){
+      $("#toastTitle").textContent = title;
+      $("#toastMsg").textContent = msg;
+      tBtn.textContent = btnText;
+      t.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(()=> t.classList.remove("show"), 4200);
+    }
+    tBtn.addEventListener("click", ()=> t.classList.remove("show"));
+    document.addEventListener("keydown", (e)=>{
+      if(e.key==="Escape") t.classList.remove("show");
+    });
+
+    // =========================
+    // SECRET: "Don't click"
+    // =========================
+    let clicks = 0;
+    $("#dontClick").addEventListener("click", ()=>{
+      clicks++;
+      if(clicks === 1) toast("אמרתי לא ללחוץ", "לחצת. זה עליך.");
+      else if(clicks === 2) toast("עוד פעם?", "אוקיי… אתה בודק גבולות.");
+      else if(clicks === 3) party();
+      else toast("די אחי", "אין יותר. (או שכן?)");
+    });
+
+    // Keyboard secret: Shift + P
+    document.addEventListener("keydown", (e)=>{
+      if(e.shiftKey && e.key.toLowerCase()==="p"){
+        party();
+      }
+    });
+
+    function party(){
+      document.body.classList.toggle("party");
+      toast("PARTY MODE", "ברוך הבא למצב פסיכי 😈 (Shift+P שוב לכבות)");
+      for(let i=0;i<16;i++){
+        spawnFloat(["😂","🔥","🚀","💀","🤯","🧠","🎉"][Math.floor(Math.random()*7)]);
+      }
+    }
+
+    function spawnFloat(char){
+      const el = document.createElement("div");
+      el.className="float";
+      el.textContent = char;
+      el.style.left = rnd(6, 94) + "vw";
+      el.style.animationDuration = rnd(3.8, 7.2) + "s";
+      el.style.fontSize = rnd(20, 40) + "px";
+      document.body.appendChild(el);
+      setTimeout(()=> el.remove(), 8000);
+    }
+
+    // =========================
+    // Mini game (canvas)
+    // =========================
+    const canvas = $("#c");
+    const ctx = canvas.getContext("2d");
+    let W = canvas.width, H = canvas.height;
+
+    const state = {
+      score: 0,
+      best: Number(localStorage.getItem("yaarat_404_best")||0),
+      x: W*0.35,
+      y: H*0.55,
+      r: 44,
+      vx: 2.1,
+      vy: 1.6,
+      hue: 210,
+      wob: 0
+    };
+
+    $("#best").textContent = state.best;
+
+    function resizeCanvasCSS(){
+      // keep crisp
+      const rect = canvas.getBoundingClientRect();
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      canvas.width = Math.floor(rect.width * dpr);
+      canvas.height = Math.floor(rect.height * dpr);
+      W = canvas.width; H = canvas.height;
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+    }
+
+    window.addEventListener("resize", resizeCanvasCSS);
+    setTimeout(resizeCanvasCSS, 50);
+
+    function draw(){
+      const rect = canvas.getBoundingClientRect();
+      const cssW = rect.width, cssH = rect.height;
+
+      // background grid
+      ctx.clearRect(0,0,cssW,cssH);
+
+      // animated subtle stars
+      for(let i=0;i<24;i++){
+        const px = (i*37 % 100) / 100 * cssW;
+        const py = (i*91 % 100) / 100 * cssH;
+        ctx.globalAlpha = .15;
+        ctx.beginPath();
+        ctx.arc(px, py, 1.2 + (Math.sin((performance.now()/800)+(i))*0.8), 0, Math.PI*2);
+        ctx.fillStyle = "white";
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+
+      // ball move
+      state.x += state.vx;
+      state.y += state.vy;
+
+      const r = state.r;
+      if(state.x - r < 12 || state.x + r > cssW - 12) state.vx *= -1;
+      if(state.y - r < 12 || state.y + r > cssH - 12) state.vy *= -1;
+
+      // hue shift
+      state.hue = (state.hue + 0.35) % 360;
+      state.wob += 0.06;
+
+      // glow
+      const gx = state.x, gy = state.y;
+      const grad = ctx.createRadialGradient(gx, gy, 6, gx, gy, r*2.2);
+      grad.addColorStop(0, `hsla(${state.hue}, 90%, 62%, .65)`);
+      grad.addColorStop(.35, `hsla(${state.hue+30}, 90%, 60%, .24)`);
+      grad.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(gx, gy, r*2.2, 0, Math.PI*2);
+      ctx.fill();
+
+      // body
+      const grad2 = ctx.createLinearGradient(gx-r, gy-r, gx+r, gy+r);
+      grad2.addColorStop(0, `hsla(${state.hue}, 92%, 60%, .95)`);
+      grad2.addColorStop(1, `hsla(${state.hue+55}, 92%, 55%, .85)`);
+      ctx.fillStyle = grad2;
+      ctx.beginPath();
+      ctx.arc(gx, gy, r + Math.sin(state.wob)*1.2, 0, Math.PI*2);
+      ctx.fill();
+
+      // stroke
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "rgba(255,255,255,.22)";
+      ctx.beginPath();
+      ctx.arc(gx, gy, r, 0, Math.PI*2);
+      ctx.stroke();
+
+      // text 404
+      ctx.font = "900 22px " + getComputedStyle(document.body).fontFamily;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "rgba(255,255,255,.95)";
+      ctx.fillText("404", gx, gy);
+
+      requestAnimationFrame(draw);
+    }
+    draw();
+
+    function hit(mx, my){
+      const rect = canvas.getBoundingClientRect();
+      const x = mx - rect.left;
+      const y = my - rect.top;
+      const dx = x - state.x;
+      const dy = y - state.y;
+      return Math.sqrt(dx*dx + dy*dy) <= state.r + 6;
+    }
+
+    function addPoint(){
+      state.score++;
+      $("#score").textContent = state.score;
+
+      // speed up gradually
+      const s = 0.12;
+      state.vx += (state.vx>0? s : -s);
+      state.vy += (state.vy>0? s : -s);
+
+      spawnFloat("🎯");
+
+      if(state.score > state.best){
+        state.best = state.score;
+        $("#best").textContent = state.best;
+        localStorage.setItem("yaarat_404_best", String(state.best));
+      }
+
+      if(state.score === 10) toast("מתחמם", "10 נקודות… אתה רציני.");
+      if(state.score === 20) toast("אוקיי", "20 נקודות… יש לך זמן אה?");
+      if(state.score === 30){
+        toast("הפתעה 😈", "פתחת מצב PARTY אוטומטי");
+        party();
+        console.log("%cברוך הבא לקונסול הסודי 😈", "font-size:18px;font-weight:900;color:#38bdf8");
+        console.log("טיפ: Shift+P עושה מצב PARTY. R מחליף בדיחות. Esc סוגר הודעות.");
+      }
+    }
+
+    canvas.addEventListener("pointerdown", (e)=>{
+      if(hit(e.clientX, e.clientY)){
+        addPoint();
+      }else{
+        // miss
+        if(Math.random()<0.22) spawnFloat("💀");
+      }
+    });
+
+    // =========================
+    // Small polish
+    // =========================
+    // change headline based on query
+    const qp = new URLSearchParams(location.search);
+    if(qp.get("q")){
+      $("#title").textContent = "חיפשת משהו שלא קיים… עדיין.";
+      $("#sub").innerHTML = `חיפשת: <b>${qp.get("q")}</b><br/>נסה את דף הבית או תבחר משהו מהרשימה.`;
+    }
+  </script>
+</body>
 </html>
