@@ -570,6 +570,708 @@ html[data-theme="light"] .boom-chip{background:rgba(255,255,255,.92);border-colo
   background: rgba(148,163,184,.14);
   border: 1px solid rgba(148,163,184,.28);
 }
+/* =========================
+   EXAM CARD – CLEAN LOOK
+   ========================= */
+
+.exam-card,
+.exam-item {
+  background: var(--card-bg, #f8fafc);
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 16px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+}
+
+/* מקצוע */
+.exam-title {
+  font-size: 1.05rem;
+  font-weight: 900;
+  margin-bottom: 6px;
+  color: var(--text-main, #0f172a);
+}
+
+/* תאריך + שעה */
+.exam-meta {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: linear-gradient(135deg,#60a5fa,#38bdf8);
+  color: #fff;
+  margin-bottom: 10px;
+}
+
+/* נושא המבחן */
+.exam-topic {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(15,23,42,0.04);
+  color: #1e293b;
+}
+
+/* DARK MODE */
+[data-theme="dark"] .exam-card,
+[data-theme="dark"] .exam-item {
+  background: rgba(15,23,42,.6);
+  border-color: rgba(148,163,184,.15);
+}
+
+[data-theme="dark"] .exam-title {
+  color: #e5e7eb;
+}
+
+[data-theme="dark"] .exam-topic {
+  background: rgba(2,6,23,.55);
+  color: #e5e7eb;
+}
+/* =========================
+   EXAMS (Class page) – FINAL CLEAN
+   ========================= */
+
+#ex.list { display: grid; gap: 12px; }
+
+/* כרטיס מבחן */
+#ex.list .item{
+  text-align: right !important;
+  border-radius: 18px !important;
+  padding: 14px 14px !important;
+  border: 1px solid rgba(148,163,184,.28) !important;
+  background: rgba(255,255,255,.92) !important;
+  box-shadow: 0 12px 30px rgba(15,23,42,.10) !important;
+  display: grid !important;
+  gap: 10px !important;
+}
+
+/* דארק */
+html[data-theme="dark"] #ex.list .item{
+  background: rgba(2,6,23,.45) !important;
+  border-color: rgba(148,163,184,.18) !important;
+  box-shadow: 0 18px 55px rgba(0,0,0,.45) !important;
+}
+
+/* כותרת מקצוע */
+#ex.list .item b,
+#ex.list .item strong{
+  font-size: 1.05rem !important;
+  font-weight: 950 !important;
+  color: #0f172a !important;
+  margin: 0 !important;
+}
+html[data-theme="dark"] #ex.list .item b,
+html[data-theme="dark"] #ex.list .item strong{
+  color:#e5e7eb !important;
+}
+
+/* אזור תגים (ספירה לאחור + תאריך) */
+#ex .exam-tags{
+  display:flex !important;
+  gap:8px !important;
+  align-items:center !important;
+  flex-wrap:wrap !important;
+}
+
+/* תג תאריך */
+#ex.list .item .meta{
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:8px !important;
+  padding: 6px 12px !important;
+  border-radius: 999px !important;
+  font-weight: 900 !important;
+  font-size: .85rem !important;
+  background: rgba(37,99,235,.10) !important;
+  border: 1px solid rgba(37,99,235,.18) !important;
+  color: #1d4ed8 !important;
+  width: fit-content !important;
+}
+html[data-theme="dark"] #ex.list .item .meta{
+  background: rgba(56,189,248,.10) !important;
+  border-color: rgba(56,189,248,.18) !important;
+  color: #93c5fd !important;
+}
+
+/* תג ספירה לאחור */
+#ex .exam-countdown{
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:8px !important;
+  padding: 6px 12px !important;
+  border-radius: 999px !important;
+  font-weight: 950 !important;
+  font-size: .85rem !important;
+  background: rgba(34,197,94,.12) !important;
+  border: 1px solid rgba(34,197,94,.22) !important;
+  color: #065f46 !important;
+}
+html[data-theme="dark"] #ex .exam-countdown{
+  background: rgba(34,197,94,.10) !important;
+  border-color: rgba(34,197,94,.18) !important;
+  color:#86efac !important;
+}
+
+/* נושא המבחן */
+#ex.list .item .body{
+  padding: 10px 12px !important;
+  border-radius: 14px !important;
+  background: rgba(15,23,42,.04) !important;
+  border: 1px solid rgba(15,23,42,.06) !important;
+  color: #111827 !important;
+  line-height: 1.65 !important;
+  white-space: pre-wrap !important;
+}
+html[data-theme="dark"] #ex.list .item .body{
+  background: rgba(2,6,23,.55) !important;
+  border-color: rgba(148,163,184,.14) !important;
+  color:#e5e7eb !important;
+}
+
+/* תן תחושה “פרימיום” */
+#ex.list .item:hover{
+  transform: translateY(-1px) !important;
+  box-shadow: 0 18px 40px rgba(15,23,42,.16) !important;
+}
+html[data-theme="dark"] #ex.list .item:hover{
+  box-shadow: 0 24px 70px rgba(0,0,0,.55) !important;
+}
+/* =========================
+   EXAMS – BEAUTIFUL TAGS (COUNTDOWN ABOVE DATE)
+   Works with: .exam-tags + .exam-countdown + .meta inside
+   ========================= */
+
+#ex .item{
+  border-radius: 18px;
+  padding: 14px 14px 12px;
+  border: 1px solid rgba(148,163,184,.22);
+  background: rgba(255,255,255,.78);
+  box-shadow: 0 10px 28px rgba(15,23,42,.08);
+}
+html[data-theme="dark"] #ex .item{
+  background: rgba(2,6,23,.38);
+  border-color: rgba(148,163,184,.16);
+  box-shadow: 0 14px 40px rgba(0,0,0,.28);
+}
+
+#ex .exam-tags{
+  display: inline-flex;
+  flex-direction: column;         /* ✅ countdown מעל התאריך */
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* countdown chip */
+#ex .exam-countdown{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 7px 12px;
+  border-radius: 999px;
+
+  font-weight: 900;
+  font-size: .92rem;
+  letter-spacing: .2px;
+
+  color: #0b1220;
+  background: linear-gradient(135deg, rgba(34,197,94,.22), rgba(56,189,248,.22));
+  border: 1px solid rgba(34,197,94,.28);
+
+  box-shadow: 0 10px 24px rgba(34,197,94,.10);
+}
+html[data-theme="dark"] #ex .exam-countdown{
+  color: #eaf2ff;
+  background: linear-gradient(135deg, rgba(34,197,94,.18), rgba(56,189,248,.18));
+  border-color: rgba(56,189,248,.22);
+  box-shadow: 0 12px 34px rgba(56,189,248,.12);
+}
+
+/* date/time chip (meta) */
+#ex .exam-tags .meta{
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 8px 14px;
+  border-radius: 999px;
+
+  font-weight: 900;
+  font-size: .92rem;
+
+  color: #ffffff;
+  background: linear-gradient(135deg, #2563eb, #38bdf8);
+  border: 1px solid rgba(37,99,235,.30);
+
+  box-shadow: 0 12px 28px rgba(37,99,235,.16);
+  opacity: 1 !important;
+}
+
+/* make it feel premium */
+#ex .item:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 16px 42px rgba(15,23,42,.12);
+}
+html[data-theme="dark"] #ex .item:hover{
+  box-shadow: 0 18px 54px rgba(0,0,0,.38);
+}
+
+/* (optional) if you want a tiny icon look */
+#ex .exam-countdown::before{
+  content: "⏳";
+  font-size: 1rem;
+  opacity: .9;
+}
+#ex .exam-tags .meta::before{
+  content: "📅";
+  font-size: 1rem;
+}
+
+/* responsive: keep it centered and not huge */
+@media (max-width: 480px){
+  #ex .exam-countdown,
+  #ex .exam-tags .meta{
+    font-size: .88rem;
+    padding: 7px 12px;
+  }
+}
+/* =========================
+   EXAM CARD – FINAL LAYOUT
+   TIME TOP / TOPICS MIDDLE / DATE BOTTOM
+   ========================= */
+
+/* כל כרטיס מבחן */
+#ex .item{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+}
+
+/* ===== זמן שנשאר – למעלה ===== */
+#ex .exam-countdown{
+  order: -2; /* הכי למעלה */
+  align-self: center;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 10px 18px;
+  border-radius: 14px;
+
+  font-size: 1rem;
+  font-weight: 900;
+
+  color: #065f46;
+  background: linear-gradient(135deg,#dcfce7,#bbf7d0);
+  border: 1px solid rgba(34,197,94,.35);
+  box-shadow: 0 10px 26px rgba(34,197,94,.18);
+}
+
+#ex .exam-countdown::before{
+  content: "⏳";
+}
+
+/* דארק */
+html[data-theme="dark"] #ex .exam-countdown{
+  color: #ecfeff;
+  background: linear-gradient(135deg, rgba(34,197,94,.22), rgba(56,189,248,.22));
+  border-color: rgba(56,189,248,.25);
+}
+
+/* ===== גוף המבחן (נושאים) – באמצע ===== */
+#ex .item .exam-topic,
+#ex .item .body,
+#ex .item div:not(.exam-countdown):not(.meta){
+  order: 0;
+}
+
+/* ===== תאריך + שעה – למטה ===== */
+#ex .item .meta{
+  order: 2; /* תמיד אחרון */
+  align-self: center;
+
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+
+  margin-top: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+
+  font-size: .78rem;
+  font-weight: 800;
+
+  color: #1e3a8a;
+  background: rgba(219,234,254,.9);
+  border: 1px solid rgba(37,99,235,.25);
+}
+
+#ex .item .meta::before{
+  content: "📅";
+  font-size: .9rem;
+}
+
+/* דארק */
+html[data-theme="dark"] #ex .item .meta{
+  color: #e0f2fe;
+  background: rgba(30,58,138,.35);
+  border-color: rgba(147,197,253,.25);
+}
+
+/* מובייל */
+@media (max-width: 420px){
+  #ex .exam-countdown{
+    font-size: .95rem;
+    padding: 9px 16px;
+  }
+  #ex .item .meta{
+    font-size: .75rem;
+  }
+}
+/* =========================
+   EXAMS (Class page) – FINAL UI
+   Works with ANY HTML that JS renders (with small helper JS below)
+   ========================= */
+
+#ex .item{
+  border-radius: 18px;
+  border: 1px solid rgba(148,163,184,.28);
+  background: rgba(255,255,255,.92);
+  box-shadow: 0 18px 45px rgba(15,23,42,.10);
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+html[data-theme="dark"] #ex .item{
+  background: rgba(2,6,23,.35);
+  border-color: rgba(148,163,184,.18);
+  box-shadow: 0 18px 55px rgba(0,0,0,.35);
+}
+
+/* כותרת מקצוע */
+#ex .item b,
+#ex .item strong{
+  display:block;
+  font-size: 1.05rem;
+  font-weight: 1000;
+  margin-bottom: 8px;
+  color: #0f172a;
+}
+html[data-theme="dark"] #ex .item b,
+html[data-theme="dark"] #ex .item strong{
+  color:#e5e7eb;
+}
+
+/* “נושאים” – הקופסה האפורה */
+#ex .exam-topics,
+#ex .item .body{
+  border-radius: 16px;
+  padding: 12px 12px;
+  background: rgba(15,23,42,.04);
+  border: 1px solid rgba(148,163,184,.22);
+  line-height: 1.7;
+  color:#1e293b;
+  margin-top: 6px;
+}
+html[data-theme="dark"] #ex .exam-topics,
+html[data-theme="dark"] #ex .item .body{
+  background: rgba(2,6,23,.45);
+  border-color: rgba(148,163,184,.14);
+  color:#e5e7eb;
+}
+
+/* ===== ריבוע “זמן שנשאר” למעלה ===== */
+#ex .exam-countdown{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+
+  width: 100%;
+  border-radius: 16px;
+  padding: 12px 14px;
+
+  font-weight: 1000;
+  font-size: 1rem;
+
+  border: 1px solid rgba(34,197,94,.35);
+  background: linear-gradient(135deg,#dcfce7,#bbf7d0);
+  color:#065f46;
+
+  box-shadow: 0 12px 30px rgba(34,197,94,.18);
+}
+
+#ex .exam-countdown::before{ content:"⏳"; }
+
+html[data-theme="dark"] #ex .exam-countdown{
+  background: linear-gradient(135deg, rgba(34,197,94,.18), rgba(56,189,248,.16));
+  border-color: rgba(56,189,248,.22);
+  color:#e0f2fe;
+}
+
+/* ===== תאריך למטה, קטן, שורה אחת ===== */
+#ex .exam-date{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+
+  margin-top: 10px;
+  padding: 7px 12px;
+  border-radius: 999px;
+
+  font-size: .82rem;
+  font-weight: 900;
+
+  background: rgba(219,234,254,.9);
+  border: 1px solid rgba(37,99,235,.22);
+  color:#1e3a8a;
+}
+
+#ex .exam-date::before{ content:"📅"; }
+
+html[data-theme="dark"] #ex .exam-date{
+  background: rgba(30,58,138,.28);
+  border-color: rgba(147,197,253,.20);
+  color:#e0f2fe;
+}
+
+/* ===== דחיפות (מגיע מה-JS) ===== */
+#ex .exam-countdown.is-urgent{
+  background: linear-gradient(135deg,#fee2e2,#fecaca);
+  border-color: rgba(239,68,68,.35);
+  color:#7f1d1d;
+  box-shadow: 0 12px 30px rgba(239,68,68,.18);
+}
+#ex .exam-countdown.is-soon{
+  background: linear-gradient(135deg,#fef9c3,#fde68a);
+  border-color: rgba(245,158,11,.35);
+  color:#78350f;
+  box-shadow: 0 12px 30px rgba(245,158,11,.15);
+}
+/* ===== EXAM FIX – HARD OVERRIDES (PUT LAST) ===== */
+#ex .item { position: relative; overflow: hidden; }
+
+/* countdown must NEVER stretch */
+#ex .exam-countdown{
+  width: 100% !important;
+  max-height: none !important;
+  height: auto !important;
+  padding: 10px 12px !important;
+  margin: 0 0 10px 0 !important;
+  border-radius: 16px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+
+  line-height: 1.1 !important;
+}
+
+/* remove any weird internal spacing */
+#ex .exam-countdown *{
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1.1 !important;
+}
+
+/* date pill stays small + one line */
+#ex .exam-date{
+  width: fit-content !important;
+  max-width: 100% !important;
+  margin: 12px auto 0 auto !important;
+  padding: 7px 12px !important;
+  border-radius: 999px !important;
+  white-space: nowrap !important;
+}
+
+/* if you have an extra “calendar-only” element – hide it */
+#ex .item .exam-date:empty{ display:none !important; }
+
+/* topics block stays in the middle */
+#ex .exam-topics, #ex .item .body{
+  margin-top: 8px !important;
+}
+/* ========== EXAMS – FINAL CLEAN (PUT LAST) ========== */
+#ex .item{
+  border-radius: 18px;
+  border: 1px solid rgba(148,163,184,.28);
+  background: rgba(255,255,255,.92);
+  box-shadow: 0 18px 45px rgba(15,23,42,.10);
+  padding: 14px;
+  margin-bottom: 12px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  overflow: hidden;
+}
+html[data-theme="dark"] #ex .item{
+  background: rgba(2,6,23,.35);
+  border-color: rgba(148,163,184,.18);
+  box-shadow: 0 18px 55px rgba(0,0,0,.35);
+}
+
+/* countdown TOP – box */
+#ex .exam-countdown{
+  width: 100%;
+  border-radius: 16px;
+  padding: 12px 14px;
+  font-weight: 1000;
+  font-size: 1rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  background: linear-gradient(135deg,#dcfce7,#bbf7d0);
+  border: 1px solid rgba(34,197,94,.35);
+  color:#065f46;
+}
+#ex .exam-countdown::before{ content:"⏳"; }
+html[data-theme="dark"] #ex .exam-countdown{
+  background: linear-gradient(135deg, rgba(34,197,94,.18), rgba(56,189,248,.16));
+  border-color: rgba(56,189,248,.22);
+  color:#e0f2fe;
+}
+
+/* subject title stays normal */
+#ex .item b, #ex .item strong{
+  display:block;
+  font-size: 1.05rem;
+  font-weight: 1000;
+  margin: 0;
+  color:#0f172a;
+}
+html[data-theme="dark"] #ex .item b,
+html[data-theme="dark"] #ex .item strong{ color:#e5e7eb; }
+
+/* topics middle */
+#ex .item .body{
+  border-radius: 16px;
+  padding: 12px;
+  background: rgba(15,23,42,.04);
+  border: 1px solid rgba(148,163,184,.22);
+  line-height: 1.7;
+  color:#1e293b;
+}
+html[data-theme="dark"] #ex .item .body{
+  background: rgba(2,6,23,.45);
+  border-color: rgba(148,163,184,.14);
+  color:#e5e7eb;
+}
+
+/* date BOTTOM – small one line */
+#ex .exam-date{
+  align-self: center;
+  width: fit-content;
+  max-width: 100%;
+  white-space: nowrap;
+
+  padding: 7px 12px;
+  border-radius: 999px;
+
+  font-size: .82rem;
+  font-weight: 900;
+
+  background: rgba(219,234,254,.9);
+  border: 1px solid rgba(37,99,235,.22);
+  color:#1e3a8a;
+}
+#ex .exam-date::before{ content:"📅 "; }
+html[data-theme="dark"] #ex .exam-date{
+  background: rgba(30,58,138,.28);
+  border-color: rgba(147,197,253,.20);
+  color:#e0f2fe;
+}
+/* countdown stays ONE LINE and never overflows */
+#ex .exam-countdown{
+  white-space: nowrap !important;
+  overflow: hidden !important;
+overflow: visible !important;
+
+  flex-wrap: nowrap !important;   /* מבטל שבירה */
+  min-width: 0 !important;
+}
+
+/* אם עדיין נשבר בגלל ה-before (⏳) */
+#ex .exam-countdown::before{
+  flex: 0 0 auto !important;
+}
+
+/* במובייל עוד יותר קטן */
+@media (max-width: 420px){
+  #ex .exam-countdown{
+    font-size: .92rem !important;
+    padding: 10px 12px !important;
+    gap: 8px !important;
+  }
+}
+/* ✅ אל תחתוך את ה-pillים */
+#ex .item{
+  overflow: visible !important;
+  padding-bottom: 18px !important; /* שיהיה מקום לתאריך */
+}
+
+/* לפעמים הכרטיס העוטף חותך בגלל overflow hidden */
+#ex-section,
+#ex-section .cardx,
+#content,
+.grid{
+  overflow: visible !important;
+}
+
+/* התאריך למטה לא יידחף החוצה */
+#ex .exam-date,
+#ex .item .meta{
+  margin: 12px auto 0 auto !important;
+  max-width: 100% !important;
+}
+/* ===== URGENCY OVERRIDES (PUT LAST) ===== */
+#ex .exam-countdown.is-urgent{
+  background: linear-gradient(135deg,#fee2e2,#fecaca) !important;
+  border-color: rgba(239,68,68,.40) !important;
+  color: #7f1d1d !important;
+  box-shadow: 0 12px 30px rgba(239,68,68,.22) !important;
+}
+
+#ex .exam-countdown.is-soon{
+  background: linear-gradient(135deg,#fef9c3,#fde68a) !important;
+  border-color: rgba(245,158,11,.40) !important;
+  color: #78350f !important;
+  box-shadow: 0 12px 30px rgba(245,158,11,.20) !important;
+}
+
+/* אם יש לך before שמוסיף ⏳ ומצבע מוזר */
+#ex .exam-countdown.is-urgent::before,
+#ex .exam-countdown.is-soon::before{
+  opacity: .95 !important;
+}
+/* ===== URGENCY – DARK FIX (PUT LAST) ===== */
+html[data-theme="dark"] #ex .exam-countdown.is-urgent{
+  background: linear-gradient(135deg, rgba(239,68,68,.30), rgba(244,63,94,.22)) !important;
+  border-color: rgba(239,68,68,.40) !important;
+  color: #fff1f2 !important;
+  box-shadow: 0 14px 40px rgba(239,68,68,.22) !important;
+}
+
+html[data-theme="dark"] #ex .exam-countdown.is-soon{
+  background: linear-gradient(135deg, rgba(245,158,11,.30), rgba(250,204,21,.22)) !important;
+  border-color: rgba(245,158,11,.40) !important;
+  color: #fffbeb !important;
+  box-shadow: 0 14px 40px rgba(245,158,11,.18) !important;
+}
 
   </style>
 </head>

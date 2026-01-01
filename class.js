@@ -1024,3 +1024,211 @@ if (!classId || !isKnownClass(classId)) {
 } else {
   openClass(classId);
 }
+(function () {
+  const exRoot = document.getElementById("ex");
+  if (!exRoot) return;
+
+  function parseMetaToDate(metaText) {
+    const t = (metaText || "").replace(/\s+/g, " ").trim();
+    const dateMatch = t.match(/(\d{1,2})\/(\d{1,2})\/(\d{2,4})/);
+    if (!dateMatch) return null;
+
+    let dd = parseInt(dateMatch[1], 10);
+    let mm = parseInt(dateMatch[2], 10);
+    let yy = parseInt(dateMatch[3], 10);
+    if (yy < 100) yy = 2000 + yy;
+
+    let hh = 8, min = 0;
+    const timeMatch = t.match(/(\d{1,2}):(\d{2})/);
+    if (timeMatch) {
+      hh = parseInt(timeMatch[1], 10);
+      min = parseInt(timeMatch[2], 10);
+    }
+    return new Date(yy, mm - 1, dd, hh, min, 0, 0);
+  }
+
+  function formatCountdown(ms) {
+    const past = ms < 0;
+    ms = Math.abs(ms);
+
+    const totalMin = Math.floor(ms / 60000);
+    const days = Math.floor(totalMin / (60 * 24));
+    const hours = Math.floor((totalMin % (60 * 24)) / 60);
+    const mins = totalMin % 60;
+
+    if (days >= 1) return `${past ? "עבר" : "עוד"} ${days} ימים • ${hours} ש׳`;
+    if (hours >= 1) return `${past ? "עבר" : "עוד"} ${hours} ש׳ • ${mins} ד׳`;
+    return `${past ? "עבר" : "עוד"} ${mins} ד׳`;
+  }
+
+  function enhanceOnce() {
+    const items = exRoot.querySelectorAll(".item");
+    items.forEach((item) => {
+      if (item.dataset.examEnhanced === "1") return;
+
+      const meta = item.querySelector(".meta");
+      if (!meta) return;
+
+      // wrapper
+// countdown chip
+const cd = document.createElement("div");
+cd.className = "exam-countdown";
+cd.textContent = "טוען…";
+
+// ✅ countdown למעלה
+item.insertBefore(cd, item.firstChild);
+
+// ✅ התאריך (meta) למטה
+meta.classList.add("exam-date");
+item.appendChild(meta);
+
+
+
+      const dt = parseMetaToDate(meta.textContent);
+      if (dt) {
+        item.dataset.examTs = String(dt.getTime());
+      } else {
+        cd.textContent = "תאריך לא מזוהה";
+      }
+
+      item.dataset.examEnhanced = "1";
+    });
+  }
+
+function tick() {
+  const now = Date.now();
+
+  exRoot.querySelectorAll('.item[data-exam-ts]').forEach((item) => {
+    const ts = Number(item.dataset.examTs);
+    const cd = item.querySelector(".exam-countdown");
+    if (!cd || !Number.isFinite(ts)) return;
+
+    const diffMs = ts - now;
+
+    // טקסט
+    cd.textContent = formatCountdown(diffMs);
+
+    // ✅ צבעים לפי זמן אמיתי (לא לפי טקסט)
+    cd.classList.remove("is-urgent", "is-soon");
+
+    if (diffMs <= 0) return;                 // כבר עבר
+    if (diffMs <= 24 * 60 * 60 * 1000) {     // פחות מ-24 שעות
+      cd.classList.add("is-urgent");
+    } else if (diffMs <= 7 * 24 * 60 * 60 * 1000) { // פחות משבוע
+      cd.classList.add("is-soon");
+    }
+  });
+}
+
+
+  // ✅ Try a few times because class.js loads async and renders later
+  let tries = 0;
+  const maxTries = 20; // ~5s
+  const timer = setInterval(() => {
+    tries++;
+    enhanceOnce();
+    tick();
+
+    // stop when we already enhanced at least 1 item, or after max tries
+    const enhanced = exRoot.querySelector('[data-exam-enhanced="1"]');
+    if (enhanced || tries >= maxTries) clearInterval(timer);
+  }, 250);
+
+  // update countdown every 30s (cheap)
+  setInterval(tick, 30000);
+})();
+/* =========================
+   Exam UI fixer:
+   - Finds countdown and date blocks by text (no hardcoded codes)
+   - Moves countdown to top, date to bottom under topics
+   - Adds urgency colors: <24h red, <7d yellow, else green
+   - Safe: try/catch so it won't crash the site
+   ========================= */
+(function(){
+  function pickCountdown(el){
+    const t = (el.textContent || "").trim();
+    return t.includes("עוד") && (t.includes("ימים") || t.includes("שעות") || t.includes("דקות"));
+  }
+  function pickDate(el){
+    const t = (el.textContent || "").trim();
+    // catches dd/mm/yy + time
+    return /(\d{1,2}\/\d{1,2}\/\d{2,4})/.test(t);
+  }
+
+  function parseUrgency(countdownText){
+    const t = countdownText.replace(/\s+/g," ").trim();
+
+    // "עוד 12 ימים"
+    const mDays = t.match(/עוד\s+(\d+)\s+ימים/);
+    if (mDays) return { days: parseInt(mDays[1],10), hours: null };
+
+    // "עוד 5 שעות"
+    const mHours = t.match(/עוד\s+(\d+)\s+שעות/);
+    if (mHours) return { days: 0, hours: parseInt(mHours[1],10) };
+
+    // "עוד 40 דקות"
+    const mMin = t.match(/עוד\s+(\d+)\s+דקות/);
+    if (mMin) return { days: 0, hours: 0 };
+
+    return null;
+  }
+
+  function run(){
+    const list = document.querySelectorAll("#ex .item");
+    if (!list.length) return;
+
+    list.forEach(item=>{
+      try{
+        // collect direct children blocks
+        const kids = Array.from(item.children);
+
+        // find countdown + date by text heuristics
+        const countdownEl = kids.find(pickCountdown);
+        const dateEl = kids.find(pickDate);
+
+        if (countdownEl){
+          countdownEl.classList.add("exam-countdown");
+          // put right after title (title is usually first child with bold)
+          // if not found, just prepend
+          const titleEl = kids.find(k => k.querySelector && (k.querySelector("b,strong")));
+          if (titleEl && titleEl.nextSibling){
+            item.insertBefore(countdownEl, titleEl.nextSibling);
+          } else {
+            item.insertBefore(countdownEl, item.firstChild);
+          }
+
+          // urgency colors
+          const u = parseUrgency(countdownEl.textContent || "");
+          countdownEl.classList.remove("is-urgent","is-soon");
+          if (u){
+            if (u.days === 0) countdownEl.classList.add("is-urgent");
+            else if (u.days <= 7) countdownEl.classList.add("is-soon");
+          }
+        }
+
+        if (dateEl){
+          dateEl.classList.add("exam-date");
+          // move date to bottom (after topics/body)
+          item.appendChild(dateEl);
+        }
+
+        // mark topics box if exists (optional)
+        const body = item.querySelector(".body");
+        if (body) body.classList.add("exam-topics");
+
+      } catch(e){
+        // never crash the site
+        console.warn("Exam UI fixer failed for one item", e);
+      }
+    });
+  }
+
+  // run now + after async render
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", run);
+  } else {
+    run();
+  }
+  setTimeout(run, 800);
+  setTimeout(run, 1800);
+})();
