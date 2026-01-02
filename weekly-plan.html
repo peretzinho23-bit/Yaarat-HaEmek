@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>יומן שיתופי · תוכנית שבועית</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .wrap{max-width:980px;margin:0 auto;padding:18px}
+    .card{border:1px solid rgba(148,163,184,.35);background:rgba(255,255,255,.06);border-radius:18px;padding:14px}
+    html[data-theme="light"] .card{background:rgba(255,255,255,.92);border-color:rgba(15,23,42,.12)}
+    .title{font-weight:1000;font-size:1.2rem;margin:0 0 8px}
+    .meta{opacity:.75;font-weight:800;margin-bottom:12px}
+    .imgWrap{border-radius:16px;overflow:hidden;border:1px solid rgba(148,163,184,.25);background:rgba(0,0,0,.12)}
+    .imgWrap img{width:100%;display:block;cursor:zoom-in}
+    .btn{cursor:pointer;padding:10px 14px;border-radius:14px;border:1px solid rgba(148,163,184,.35);background:rgba(255,255,255,.10);color:inherit;font-weight:900}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-top:12px}
+    .status{opacity:.8;font-weight:800}
+    /* full screen modal */
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;padding:16px;z-index:9999}
+    .modal.open{display:flex}
+    .modal img{max-width:95vw;max-height:90vh;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.5);cursor:zoom-out}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="card">
+      <h1 class="title" id="wpTitle">תוכנית שבועית</h1>
+      <div class="meta" id="wpMeta">טוען…</div>
+
+      <div class="imgWrap">
+        <img id="wpImg" alt="תוכנית שבועית" style="display:none;">
+        <div id="wpEmpty" class="status" style="padding:14px;">אין תוכנית שבועית כרגע.</div>
+      </div>
+
+      <div class="row">
+        <div class="status" id="wpStatus"></div>
+        <a class="btn" href="index.html">← חזרה לדף הבית</a>
+      </div>
+    </div>
+  </main>
+
+  <div class="modal" id="imgModal" aria-hidden="true">
+    <img id="modalImg" alt="תוכנית שבועית במסך מלא">
+  </div>
+
+  <script type="module">
+    import { db } from "./firebase-config.js";
+    import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+    const titleEl = document.getElementById("wpTitle");
+    const metaEl = document.getElementById("wpMeta");
+    const imgEl = document.getElementById("wpImg");
+    const emptyEl = document.getElementById("wpEmpty");
+    const statusEl = document.getElementById("wpStatus");
+
+    const modal = document.getElementById("imgModal");
+    const modalImg = document.getElementById("modalImg");
+
+    function fmtTime(ts){
+      if (!ts) return "";
+      const d = ts.toDate ? ts.toDate() : new Date(ts);
+      const hh = String(d.getHours()).padStart(2,"0");
+      const mm = String(d.getMinutes()).padStart(2,"0");
+      return `${d.toLocaleDateString("he-IL")} · ${hh}:${mm}`;
+    }
+
+    onSnapshot(doc(db, "weeklyPlans", "current"), (snap) => {
+      if (!snap.exists()) {
+        metaEl.textContent = "אין תוכנית שבועית.";
+        imgEl.style.display = "none";
+        emptyEl.style.display = "block";
+        return;
+      }
+
+      const data = snap.data() || {};
+      titleEl.textContent = data.title || "תוכנית שבועית";
+      metaEl.textContent = data.updatedAt ? `עודכן: ${fmtTime(data.updatedAt)}` : "";
+
+      if (data.imageUrl) {
+        imgEl.src = data.imageUrl;
+        imgEl.style.display = "block";
+        emptyEl.style.display = "none";
+      } else {
+        imgEl.style.display = "none";
+        emptyEl.style.display = "block";
+      }
+
+      statusEl.textContent = data.notes ? `הערה: ${data.notes}` : "";
+    });
+
+    imgEl.addEventListener("click", () => {
+      modalImg.src = imgEl.src;
+      modal.classList.add("open");
+      modal.setAttribute("aria-hidden", "false");
+    });
+    modal.addEventListener("click", () => {
+      modal.classList.remove("open");
+      modal.setAttribute("aria-hidden", "true");
+    });
+  </script>
+</body>
+</html>

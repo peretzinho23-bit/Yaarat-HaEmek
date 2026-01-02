@@ -340,6 +340,9 @@ function getBoomDayKey() {
   if (isMobileView() && selectedDayKey) return selectedDayKey;
   return todayDayKey();
 }
+function isPhoneDevice() {
+  return /Android|iPhone|iPod|IEMobile|Opera Mini/i.test(navigator.userAgent || "");
+}
 
 // ✅ helper: מחזיר עכשיו+הבא כולל הפסקות
 function getNowNextBlocks(dayKey) {
@@ -446,10 +449,12 @@ function setSelectedDayKey(key) {
 function renderMobileDayFromLastGrid() {
   if (!ttMobileWrap || !daySchedule) return;
 
-  if (!lastTimetableGrid) {
+  // ✅ Desktop: don't render mobile schedule at all
+  if (!isMobileView()) {
     daySchedule.innerHTML = "";
     return;
   }
+
 
   const dayKey = selectedDayKey || "sun";
   const dayLabel = (DAYS.find(d => d.key === dayKey)?.label) || "";
@@ -520,12 +525,17 @@ function renderMobileDayFromLastGrid() {
     </div>
   `).join("");
 
-  daySchedule.innerHTML = `
-    <div style="font-weight:900; margin: 4px 0 10px; opacity:.9;">${escapeHtml(dayLabel)}</div>
-    ${rows.join("") || `<div style="opacity:.75;">אין שיעורים ליום הזה.</div>`}
+const showBetween = isPhoneDevice(); // ✅ רק בטלפון אמיתי
+
+daySchedule.innerHTML = `
+  <div style="font-weight:900; margin: 4px 0 10px; opacity:.9;">${escapeHtml(dayLabel)}</div>
+  ${rows.join("") || `<div style="opacity:.75;">אין שיעורים ליום הזה.</div>`}
+  ${showBetween ? `
     <div style="margin-top:12px; font-weight:900; opacity:.85;">בין לבין</div>
     ${betweenHtml}
-  `;
+  ` : ``}
+`;
+
 }
 
 function syncTimetableMobileVisibility() {

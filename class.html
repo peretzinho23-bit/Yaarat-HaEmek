@@ -446,11 +446,17 @@ html[data-theme="dark"] #news .news-body a:visited{
 }
 /* ===== MOBILE Timetable: day slider/picker (ADD ONLY) ===== */
 .tt-mobile{display:none;margin-top:10px}
-@media (max-width: 768px){
-  /* במובייל נסתיר את הטבלה הענקית (שוברת מסך) ונראה בחירת יום */
+@media (max-width: 820px){
   #tt .tt-wrap-table{display:none !important;}
   .tt-mobile{display:block;}
 }
+/* 🔒 HARD LOCK: mobile timetable NEVER on desktop */
+#tt-mobile { display: none !important; }
+
+@media (max-width: 820px){
+  #tt-mobile { display: block !important; }
+}
+
 
 .tt-mobile-top{
   display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;

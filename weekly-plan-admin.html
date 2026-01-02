@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>אדמין · העלאת תוכנית שבועית</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .wrap{max-width:860px;margin:0 auto;padding:18px}
+    .card{border:1px solid rgba(148,163,184,.35);background:rgba(255,255,255,.06);border-radius:18px;padding:14px}
+    html[data-theme="light"] .card{background:rgba(255,255,255,.92);border-color:rgba(15,23,42,.12)}
+    label{font-weight:900;display:block;margin:10px 0 6px}
+    input,textarea{width:100%;padding:10px 12px;border-radius:14px;border:1px solid rgba(148,163,184,.35);background:rgba(0,0,0,.15);color:inherit}
+    .btn{cursor:pointer;padding:10px 14px;border-radius:14px;border:1px solid rgba(148,163,184,.35);background:rgba(255,255,255,.10);color:inherit;font-weight:900}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}
+    .status{font-weight:900;opacity:.85}
+    .preview{margin-top:12px;border-radius:16px;overflow:hidden;border:1px solid rgba(148,163,184,.25)}
+    .preview img{width:100%;display:block}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="card">
+      <h1 style="margin:0 0 8px;font-weight:1000;">העלאת תוכנית שבועית</h1>
+      <div class="status" id="st">—</div>
+
+      <label>כותרת</label>
+      <input id="title" placeholder="תוכנית שבועית – שבוע X" />
+
+      <label>הערה (אופציונלי)</label>
+      <textarea id="notes" rows="3" placeholder="משהו קצר לתלמידים..."></textarea>
+
+      <label>תמונה (JPG/PNG)</label>
+      <input id="file" type="file" accept="image/*" />
+
+      <div class="preview" id="pvWrap" style="display:none;">
+        <img id="pv" alt="תצוגה מקדימה">
+      </div>
+
+      <div class="row">
+        <button class="btn" id="uploadBtn">⬆️ העלה ועדכן</button>
+        <a class="btn" href="weekly-plan.html">👀 צפייה בדף</a>
+        <a class="btn" href="index.html">← חזרה</a>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { db, auth } from "./firebase-config.js";
+    import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-storage.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+
+    const st = document.getElementById("st");
+    const titleEl = document.getElementById("title");
+    const notesEl = document.getElementById("notes");
+    const fileEl = document.getElementById("file");
+    const uploadBtn = document.getElementById("uploadBtn");
+    const pvWrap = document.getElementById("pvWrap");
+    const pv = document.getElementById("pv");
+
+    const storage = getStorage();
+
+    // 🔒 אם צריך: רק מחובר יכול להעלות
+    onAuthStateChanged(auth, (u) => {
+      if (!u) {
+        st.textContent = "חייבים להתחבר כדי להעלות.";
+        uploadBtn.disabled = true;
+      } else {
+        st.textContent = "מחובר. אפשר להעלות.";
+      }
+    });
+
+    fileEl.addEventListener("change", () => {
+      const f = fileEl.files?.[0];
+      if (!f) { pvWrap.style.display = "none"; return; }
+      pv.src = URL.createObjectURL(f);
+      pvWrap.style.display = "block";
+    });
+
+    uploadBtn.addEventListener("click", async () => {
+      try{
+        const f = fileEl.files?.[0];
+        if (!f) { st.textContent = "בחר תמונה קודם."; return; }
+
+        // הגבלת גודל (נגיד 6MB)
+        if (f.size > 6 * 1024 * 1024) {
+          st.textContent = "התמונה גדולה מדי. מקסימום 6MB.";
+          return;
+        }
+
+        uploadBtn.disabled = true;
+        st.textContent = "מעלה תמונה…";
+
+        const ext = (f.type.includes("png") ? "png" : "jpg");
+        const path = `weeklyPlans/current_${Date.now()}.${ext}`;
+        const r = ref(storage, path);
+
+        await uploadBytes(r, f, { contentType: f.type });
+        const url = await getDownloadURL(r);
+
+        st.textContent = "שומר למסד נתונים…";
+
+        await setDoc(doc(db, "weeklyPlans", "current"), {
+          title: titleEl.value.trim() || "תוכנית שבועית",
+          notes: notesEl.value.trim() || "",
+          imageUrl: url,
+          updatedAt: serverTimestamp()
+        }, { merge: true });
+
+        st.textContent = "✅ עודכן בהצלחה!";
+      } catch(e){
+        console.error(e);
+        st.textContent = "❌ שגיאה בהעלאה (בדוק Console/Rules).";
+      } finally {
+        uploadBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
