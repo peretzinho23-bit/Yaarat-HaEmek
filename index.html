@@ -1763,6 +1763,96 @@ html[data-theme="dark"] .site-footer .footer-right .soc{
   border-color: rgba(148,163,184,.22) !important;
   box-shadow:0 8px 20px rgba(0,0,0,.35) !important;
 }
+/* ===== HERO MINI CARDS UPGRADE ===== */
+.hero-mini-card{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.hero-mini-text{
+  margin:0;
+  font-size:.92rem;
+  line-height:1.6;
+}
+
+/* label "עדכון אחרון" */
+.hero-latest-label{
+  display:inline-flex;
+  align-items:center;
+  width:fit-content;
+  padding:6px 12px;
+  border-radius:999px;
+  font-weight:1000;
+  font-size:.92rem;
+  color:#0b1220;
+  background: rgba(15,23,42,.08);
+  border:1px solid rgba(15,23,42,.10);
+}
+
+html[data-theme="dark"] .hero-latest-label{
+  color:#ffffff;
+  background: rgba(255,255,255,.08);
+  border-color: rgba(148,163,184,.18);
+}
+
+.hero-latest-snippet{
+  margin:0;
+  font-size:.92rem;
+  line-height:1.6;
+  opacity:.92;
+  display:-webkit-box;
+  -webkit-line-clamp:2;      /* ⬅️ רק 2 שורות */
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+
+.hero-latest-btn,
+.hero-council-btn{
+  margin-top:auto;
+  display:inline-flex;
+  justify-content:center;
+  align-items:center;
+  text-decoration:none;
+  border-radius:999px;
+  padding:10px 14px;
+  font-weight:1000;
+  font-size:.92rem;
+  border:1px solid rgba(37,99,235,.25);
+  background: rgba(37,99,235,.08);
+  color:#1d4ed8;
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+
+.hero-latest-btn:hover,
+.hero-council-btn:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(37,99,235,.18);
+  background: rgba(37,99,235,.14);
+}
+
+html[data-theme="dark"] .hero-latest-btn,
+html[data-theme="dark"] .hero-council-btn{
+  color:#e5f0ff;
+  border-color: rgba(56,189,248,.22);
+  background: rgba(56,189,248,.10);
+}
+
+html[data-theme="dark"] .hero-latest-btn:hover,
+html[data-theme="dark"] .hero-council-btn:hover{
+  box-shadow: 0 18px 40px rgba(0,0,0,.35);
+  background: rgba(56,189,248,.16);
+}
+.hero-latest-title{
+  margin-top:2px;
+  font-weight: 1000;
+  font-size: 1rem;
+  color: #0b1220;
+}
+
+html[data-theme="dark"] .hero-latest-title{
+  color:#fff;
+}
 
   </style>
 </head>
@@ -1879,33 +1969,43 @@ html[data-theme="dark"] .site-footer .footer-right .soc{
           <a href="#home-exams" class="btn-outline">מבחנים קרובים</a>
         </div>
       </div>
+<div class="hero-home-cards">
 
-      <div class="hero-home-cards">
-<div class="grade-card glass-card">
-          <h3>שעות פעילות</h3>
-          <p style="font-size:0.9rem; margin-top:4px;">
-            א'–ה': 08:10–16:00 · ו': 08:10–12:00
-          </p>
-        </div>
+  <!-- 1) שעות פעילות -->
+  <div class="grade-card glass-card hero-mini-card">
+    <h3>שעות פעילות</h3>
+    <p class="hero-mini-text">
+      א'–ה': 08:10–16:00 · ו': 08:10–12:00
+    </p>
+  </div>
 
-        <div class="grade-card">
-          <h3>עדכון מהנהלת בית הספר</h3>
-          <p style="font-size:0.9rem; margin-top:4px;">
-            הודעות רשמיות יתעדכנו כאן ובאזור לוח המודעות.
-          </p>
-        </div>
+  <!-- 2) עדכון הנהלה + עדכון אחרון + טיזר + כפתור -->
+  <div class="grade-card hero-mini-card hero-latest-card" id="hero-latest">
+    <h3>עדכון מהנהלת בית הספר</h3>
 
-        <div class="grade-card hero-quick-card">
-          <h3 id="hero-side-title">מידע מהיר</h3>
-          <ul id="hero-side-list">
-            <li>📍 מגדל העמק</li>
-            <li>🧑‍🎓 שכבות ז'–ט'</li>
-            <li>👩‍🏫 צוות חינוכי מסור</li>
-            <li>🤝 שיתופי פעולה קהילתיים</li>
-          </ul>
-        </div>
-      </div>
-    </div>
+<div class="hero-latest-title">עדכון אחרון</div>
+
+    <p class="hero-latest-snippet" id="hero-latest-snippet">
+      טוען את העדכון האחרון...
+    </p>
+
+    <a class="hero-latest-btn" id="hero-latest-btn" href="news.html">
+      לכתבה המלאה →
+    </a>
+  </div>
+
+  <!-- 3) מועצת תלמידים (אופציה ב') -->
+  <div class="grade-card hero-mini-card hero-council-card">
+    <h3>מועצת תלמידים</h3>
+    <p class="hero-mini-text">
+      יוזמות, פעילויות והצעות שמובלות על ידי תלמידי בית הספר,
+      בשיתוף עם ההנהלה והצוות החינוכי.
+    </p>
+    <a class="hero-council-btn" href="council.html">לפעילות מועצת תלמידים →</a>
+  </div>
+
+</div>
+
   </section>
 
   <section id="about" class="section-light reveal-on-scroll">
@@ -1936,64 +2036,9 @@ html[data-theme="dark"] .site-footer .footer-right .soc{
       </div>
     </div>
   </section>
-   
-<div id="urgent-wrap" class="urgent-wrap" style="display:none;"></div>
+  <div id="urgent-wrap" class="urgent-wrap" style="display:none;"></div>
 
-  <section class="section-dark-strong reveal-on-scroll">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title" id="important-title">חשוב לדעת</h2>
-        <p class="section-subtitle" id="important-subtitle">
-          כמה דברים שימושיים לתלמידים – לפני שממשיכים לגלול.
-        </p>
-      </div>
-
-      <div class="home-grid">
-        <div class="grade-card">
-          <h3 id="important-card-1-title">💻 סביבת למידה דיגיטלית</h3>
-          <p id="important-card-1-body" style="font-size:0.9rem;">
-            חלק גדול מהמידע והקבצים נמצא באתר – חדשות, מבחנים, וטפסים חשובים.
-          </p>
-        </div>
-
-        <div class="grade-card">
-          <h3 id="important-card-2-title">🤝 עם מי מדברים?</h3>
-          <p id="important-card-2-body" style="font-size:0.9rem;">
-            יש קושי? מורה, מחנכת, יועצת או צוות הנהלה – כולם כאן כדי לעזור.
-          </p>
-        </div>
-
-        <div class="grade-card">
-          <h3 id="important-card-3-title">📣 עדכונים שוטפים</h3>
-          <p id="important-card-3-body" style="font-size:0.9rem;">
-            החדשות, לוח המודעות והודעות החשובות תמיד יתעדכנו כאן בזמן אמת.
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="home-news" class="section-light reveal-on-scroll">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title" id="home-news-title">חדשות אחרונות</h2>
-        <p class="section-subtitle" id="home-news-subtitle">
-          הכתבה האחרונה שפורסמה בלוח המודעות – ובכפתור למטה תוכלו לעבור לכל הכתבות.
-        </p>
-      </div>
-
-      <div class="home-grid">
-        <div class="grade-card">
-          <h3>העדכון האחרון מבית הספר</h3>
-          <div id="home-board" class="home-board-list">
-            <p class="empty-msg">אין עדיין חדשות באתר.</p>
-          </div>
-          <a href="news.html" class="all-news-btn">לצפייה בכל החדשות והמודעות »</a>
-        </div>
-      </div>
-    </div>
-  </section>
-<section id="home-class-picker" class="section-light reveal-on-scroll">
+   <section id="home-class-picker" class="section-light reveal-on-scroll">
   <div class="container">
 
     <div class="home-class-wrap">
@@ -2033,6 +2078,62 @@ html[data-theme="dark"] .site-footer .footer-right .soc{
 
   </div>
 </section>
+  <section id="home-news" class="section-light reveal-on-scroll">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title" id="home-news-title">חדשות אחרונות</h2>
+        <p class="section-subtitle" id="home-news-subtitle">
+          הכתבה האחרונה שפורסמה בלוח המודעות – ובכפתור למטה תוכלו לעבור לכל הכתבות.
+        </p>
+      </div>
+
+      <div class="home-grid">
+        <div class="grade-card">
+          <h3>העדכון האחרון מבית הספר</h3>
+          <div id="home-board" class="home-board-list">
+            <p class="empty-msg">אין עדיין חדשות באתר.</p>
+          </div>
+          <a href="news.html" class="all-news-btn">לצפייה בכל החדשות והמודעות »</a>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="section-dark-strong reveal-on-scroll">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title" id="important-title">חשוב לדעת</h2>
+        <p class="section-subtitle" id="important-subtitle">
+          כמה דברים שימושיים לתלמידים – לפני שממשיכים לגלול.
+        </p>
+      </div>
+
+      <div class="home-grid">
+        <div class="grade-card">
+          <h3 id="important-card-1-title">💻 סביבת למידה דיגיטלית</h3>
+          <p id="important-card-1-body" style="font-size:0.9rem;">
+            חלק גדול מהמידע והקבצים נמצא באתר – חדשות, מבחנים, וטפסים חשובים.
+          </p>
+        </div>
+
+        <div class="grade-card">
+          <h3 id="important-card-2-title">🤝 עם מי מדברים?</h3>
+          <p id="important-card-2-body" style="font-size:0.9rem;">
+            יש קושי? מורה, מחנכת, יועצת או צוות הנהלה – כולם כאן כדי לעזור.
+          </p>
+        </div>
+
+        <div class="grade-card">
+          <h3 id="important-card-3-title">📣 עדכונים שוטפים</h3>
+          <p id="important-card-3-body" style="font-size:0.9rem;">
+            החדשות, לוח המודעות והודעות החשובות תמיד יתעדכנו כאן בזמן אמת.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
 
 
 </div>
@@ -2196,6 +2297,77 @@ html[data-theme="dark"] .site-footer .footer-right .soc{
 
 
   <div id="to-top">↑</div>
+
+<script>
+(function () {
+  const snippetEl = document.getElementById("hero-latest-snippet");
+  const btnEl = document.getElementById("hero-latest-btn");
+  const board = document.getElementById("home-board");
+  if (!snippetEl || !btnEl || !board) return;
+
+  function getCleanText(el){
+    return (el?.textContent || "").replace(/\s+/g," ").trim();
+  }
+
+  function hasRealNews(){
+    const t = getCleanText(board);
+    if (!t) return false;
+    if (t.includes("אין עדיין חדשות")) return false;
+    if (t.includes("אין עדיין חדשות באתר")) return false;
+    return true;
+  }
+
+  function applyLatest(){
+    // לוקח את הבלוק הראשון שהוא לא empty-msg
+    const firstItem =
+      board.querySelector(":scope > :not(.empty-msg)") ||
+      board.querySelector(".news-item, .board-item, article, .post, .card") ||
+      board;
+
+    const text = getCleanText(firstItem);
+    if (!text) return false;
+
+    // מחפש לינק לכתבה
+    const link =
+      firstItem.querySelector("a[href]") ||
+      board.querySelector("a[href]");
+
+    snippetEl.textContent = text;
+
+    if (link && link.getAttribute("href")) {
+      btnEl.href = link.getAttribute("href");
+      btnEl.textContent = "לכתבה המלאה →";
+    } else {
+      btnEl.href = "news.html";
+      btnEl.textContent = "לכל העדכונים →";
+    }
+    return true;
+  }
+
+  function showEmpty(){
+    snippetEl.textContent = "עדיין אין עדכון חדש. ברגע שיעלה – הוא יופיע כאן.";
+    btnEl.href = "news.html";
+    btnEl.textContent = "לכל העדכונים →";
+  }
+
+  // 1) אם כבר יש חדשות – מיישם
+  if (hasRealNews() && applyLatest()) return;
+
+  // 2) מחכה לטעינה אמיתית (poll קצר) ואז מיישם
+  let tries = 0;
+  const timer = setInterval(() => {
+    tries++;
+    if (hasRealNews() && applyLatest()) {
+      clearInterval(timer);
+    }
+    if (tries >= 30) { // ~15 שניות
+      clearInterval(timer);
+      if (!hasRealNews()) showEmpty();
+    }
+  }, 500);
+
+})();
+</script>
 
 
   <script>

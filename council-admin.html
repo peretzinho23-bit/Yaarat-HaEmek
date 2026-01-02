@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ניהול מועצת תלמידים – יערת העמק</title>
+
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="admin.css" />
+  <link rel="stylesheet" href="admin-login-pretty.css" />
+
+  <script>
+    (function () {
+      try {
+        const key = "admin_theme";
+        const saved = localStorage.getItem(key);
+        const theme = saved || "dark";
+        document.documentElement.setAttribute("data-theme", theme);
+      } catch {}
+    })();
+  </script>
+
+  <style>
+    .council-grid{ display:grid; gap:18px; align-items:start; margin-top:14px; }
+    @media (min-width: 1100px){ .council-grid{ grid-template-columns: 1.05fr .95fr; } }
+    .hintline{ opacity:.85; font-weight:800; margin-top:6px; }
+    .pillrow{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
+    .pill{ padding:7px 12px; border-radius:999px; border:1px solid rgba(148,163,184,.22); background: rgba(15,23,42,.35); font-weight:900; }
+    html[data-theme="light"] .pill{ background: rgba(2,6,23,.04); border:1px solid rgba(2,6,23,.12); }
+
+    .council-item{ border:1px solid rgba(148,163,184,.18); border-radius:14px; padding:10px 12px; margin-bottom:10px; background: rgba(15,23,42,.25); }
+    html[data-theme="light"] .council-item{ background: rgba(2,6,23,.03); border:1px solid rgba(15,23,42,.10); }
+    .council-item h4{ margin:0; font-size:1rem; }
+    .council-meta{ opacity:.8; font-weight:800; font-size:.85rem; margin-top:4px; }
+    .council-body{ margin-top:8px; font-size:.92rem; line-height:1.5; white-space:pre-line; max-height: 8.2em; overflow:auto; }
+    .council-actions{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+    .thumbs{ display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
+    .thumbs img{ width:92px; height:70px; border-radius:10px; object-fit:cover; display:block; border:1px solid rgba(148,163,184,.18); }
+
+    .toast{
+      position: fixed; left: 14px; bottom: 14px; z-index: 999999;
+      padding: 10px 12px; border-radius: 12px;
+      background: rgba(2,6,23,.92);
+      border: 1px solid rgba(148,163,184,.18);
+      box-shadow: 0 18px 55px rgba(0,0,0,.40);
+      font-weight: 900;
+      display:none;
+      max-width: min(420px, calc(100% - 28px));
+    }
+    .toast.show{ display:block; }
+    html[data-theme="light"] .toast{ background: rgba(255,255,255,.92); color:#0b1020; }
+  </style>
+</head>
+
+<body class="admin-page" data-page="council-admin">
+
+  <header class="header-main">
+    <div class="container">
+      <div class="admin-nav">
+        <div class="admin-nav-left">
+          <a href="index.html" class="logo-circle" aria-label="דף הבית">
+            <img src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png" class="logo-img" alt="סמל יערת העמק">
+          </a>
+        </div>
+
+        <button class="admin-mobile-toggle" id="adminMobileToggle" aria-label="תפריט" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+
+        <div class="admin-mobile-menu" id="adminMobileMenu">
+          <button class="admin-btn admin-theme-btn" id="admin-theme-toggle-mobile" type="button" aria-label="שינוי מצב תצוגה">🌙</button>
+          <a href="index.html" class="admin-btn">דף הבית</a>
+          <a href="council.html" class="admin-btn">מועצת תלמידים</a>
+          <a href="council-admin.html" class="admin-btn active">ניהול מועצה</a>
+          <a href="admin.html" class="admin-btn">חזרה לאדמין</a>
+        </div>
+
+        <div class="admin-nav-right">
+          <button class="admin-btn admin-theme-btn" id="admin-theme-toggle" type="button" aria-label="שינוי מצב תצוגה">🌙</button>
+          <a href="index.html" class="admin-btn">דף הבית</a>
+          <a href="council.html" class="admin-btn">מועצת תלמידים</a>
+          <a href="council-admin.html" class="admin-btn active">ניהול מועצה</a>
+          <a href="admin.html" class="admin-btn">חזרה לאדמין</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section>
+    <div class="container">
+
+      <p id="auth-status" class="section-subtitle">בודק התחברות...</p>
+
+      <div id="login-section">
+        <div class="section-header">
+          <h2 class="section-title">התחברות אדמין</h2>
+          <p class="section-subtitle">כניסה למנהלי המערכת בלבד</p>
+        </div>
+
+        <form id="login-form" autocomplete="off" novalidate>
+          <label>אימייל</label>
+          <input type="email" name="email" required />
+          <label>סיסמה</label>
+          <input type="password" name="password" required />
+          <button type="submit" style="width:100%;margin-top:10px;">כניסה</button>
+        </form>
+
+        <div class="login-links">
+          <a class="login-link" href="reset-password.html">שכחתי סיסמה?</a>
+          <span class="dot" aria-hidden="true">•</span>
+          <a class="login-link" href="register.html">בקשת הרשמה</a>
+        </div>
+      </div>
+
+      <div id="admin-section" class="admin-layout" style="display:none;">
+        <button id="logout-btn" class="btn-outline">התנתקות</button>
+
+        <div class="section-header">
+          <h2 class="section-title">ניהול עדכוני מועצת תלמידים</h2>
+          <p class="section-subtitle">הוספה / עריכה / מחיקה + תמונות. כל שינוי מופיע מייד ב־council.html</p>
+        </div>
+
+        <div class="council-grid">
+          <div class="card">
+            <h3 style="margin:0 0 10px;">הוספה / עריכה</h3>
+
+            <div class="pillrow">
+              <span class="pill">📌 נעוץ</span>
+              <span class="pill">🖼️ תמונות</span>
+              <span class="pill">✏️ עריכה/מחיקה</span>
+            </div>
+
+            <form id="council-form">
+              <input type="hidden" id="editId" value="" />
+
+              <label>כותרת</label>
+              <input id="title" required maxlength="120" placeholder="לדוגמה: אסיפת מועצה ביום רביעי 🗳️" />
+
+              <label>מידע קצר (אופציונלי)</label>
+              <input id="meta" maxlength="160" placeholder="לדוגמה: 12:20 · חדר מועצה" />
+
+              <label>תוכן</label>
+              <textarea id="body" required maxlength="5000" placeholder="מה העדכון? מה צריך לדעת?"></textarea>
+
+              <label style="display:flex; gap:10px; align-items:center; margin-top:10px;">
+                <input type="checkbox" id="pinned">
+                <span style="font-weight:900;">נעוץ?</span>
+              </label>
+
+              <label>תגים (מופרדים בפסיק)</label>
+              <input id="tags" maxlength="200" placeholder="אירוע, ספורט, תרומה" />
+
+              <label>תמונות (אפשר כמה)</label>
+              <input id="images" type="file" accept="image/*" multiple />
+
+              <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+                <button class="btn" type="submit">שמור</button>
+                <button class="btn" type="button" id="clearBtn" style="opacity:.9;">נקה</button>
+                <button class="btn" type="button" id="deleteBtn" style="opacity:.9; display:none; background: rgba(239,68,68,.12); border:1px solid rgba(239,68,68,.35);">מחק</button>
+              </div>
+
+              <div class="hintline">העלית תמונות? אחרי שמירה תראה אותן גם בליסט.</div>
+            </form>
+          </div>
+
+          <div class="card">
+            <h3 style="margin:0 0 10px;">העדכונים הקיימים</h3>
+
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+              <button class="btn" id="refreshBtn" type="button">רענון</button>
+              <button class="btn" id="toggleSortBtn" type="button" style="opacity:.92;">נעוצים קודם</button>
+            </div>
+
+            <div id="council-list" class="admin-list">טוען…</div>
+          </div>
+        </div>
+
+        <footer>
+          © כל הזכויות שמורות לבית ספר יערת העמק · Developed By
+          <a class="footer-devlink" href="https://ptzwebsitebuilding.vercel.app/" target="_blank" rel="noopener noreferrer">Peretzinho</a>
+        </footer>
+      </div>
+    </div>
+  </section>
+
+  <script type="module">
+    import { auth, db, storage } from "./firebase-config.js";
+
+    import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+    import { collection, addDoc, doc, getDoc, updateDoc, deleteDoc, serverTimestamp, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+    import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-storage.js";
+
+    /* THEME + MOBILE (כמו אדמין) */
+    const tDesk = document.getElementById("admin-theme-toggle");
+    const tMob  = document.getElementById("admin-theme-toggle-mobile");
+    function syncThemeBtn(){
+      const t = document.documentElement.getAttribute("data-theme") || "dark";
+      const icon = (t === "dark") ? "☀️" : "🌙";
+      if(tDesk) tDesk.textContent = icon;
+      if(tMob)  tMob.textContent  = icon;
+    }
+    function toggleTheme(){
+      const cur = document.documentElement.getAttribute("data-theme") || "dark";
+      const next = (cur === "dark") ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", next);
+      localStorage.setItem("admin_theme", next);
+      syncThemeBtn();
+    }
+    tDesk?.addEventListener("click", toggleTheme);
+    tMob?.addEventListener("click", toggleTheme);
+    syncThemeBtn();
+
+    const mobBtn = document.getElementById("adminMobileToggle");
+    const mobMenu = document.getElementById("adminMobileMenu");
+    mobBtn?.addEventListener("click", ()=>{
+      const open = mobMenu.classList.toggle("open");
+      mobBtn.setAttribute("aria-expanded", String(open));
+    });
+
+    /* UI */
+    const authStatus   = document.getElementById("auth-status");
+    const loginSection = document.getElementById("login-section");
+    const adminSection = document.getElementById("admin-section");
+    const loginForm    = document.getElementById("login-form");
+    const logoutBtn    = document.getElementById("logout-btn");
+
+    const listEl        = document.getElementById("council-list");
+    const refreshBtn    = document.getElementById("refreshBtn");
+    const toggleSortBtn = document.getElementById("toggleSortBtn");
+
+    const form     = document.getElementById("council-form");
+    const editIdEl = document.getElementById("editId");
+    const titleEl  = document.getElementById("title");
+    const metaEl   = document.getElementById("meta");
+    const bodyEl   = document.getElementById("body");
+    const pinnedEl = document.getElementById("pinned");
+    const tagsEl   = document.getElementById("tags");
+    const imagesEl = document.getElementById("images");
+    const clearBtn = document.getElementById("clearBtn");
+    const deleteBtn= document.getElementById("deleteBtn");
+
+    /* TOAST */
+    const toast = document.createElement("div");
+    toast.className = "toast";
+    document.body.appendChild(toast);
+    let toastT;
+    function showToast(msg){
+      toast.textContent = msg;
+      toast.classList.add("show");
+      clearTimeout(toastT);
+      toastT = setTimeout(()=>toast.classList.remove("show"), 2400);
+    }
+
+    /* הרשאות כמו שצריך (תואם rules) */
+    const DEV_EMAILS = ["nadavp1119@gmail.com", "peretzinho23@gmail.com"].map(e=>e.toLowerCase());
+    const ALLOWED_ROLES = ["teacher","gradelead","counselor","principal","dev","admin"];
+
+    function norm(s){ return String(s||"").trim().toLowerCase(); }
+    function roleNorm(role){
+      const r = norm(role);
+      if(r === "grade_lead") return "gradelead";
+      return r;
+    }
+
+    async function assertAccess(user){
+      const email = norm(user?.email);
+      if(DEV_EMAILS.includes(email)) return { role:"dev", by:"email" };
+
+      const snap = await getDoc(doc(db, "adminUsers", user.uid));
+      if(!snap.exists()) throw new Error("אין הרשאה (אין adminUsers).");
+
+      const role = roleNorm((snap.data()||{}).role);
+      if(!ALLOWED_ROLES.includes(role)) throw new Error("אין הרשאה לניהול מועצה.");
+
+      return { role, by:"role" };
+    }
+
+    const COL = "council_updates";
+    let currentUser = null;
+    let pinnedFirst = true;
+    let unsub = null;
+    let lastItems = [];
+
+    function esc(s){
+      return String(s||"")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;");
+    }
+    function fmtDate(ts){
+      try{
+        const d = ts?.toDate ? ts.toDate() : null;
+        if(!d) return "";
+        return new Intl.DateTimeFormat("he-IL", { dateStyle:"medium", timeStyle:"short" }).format(d);
+      }catch{ return ""; }
+    }
+    function tsSort(ts){
+      try{
+        if(!ts) return 0;
+        if(typeof ts.seconds === "number") return ts.seconds;
+        const d = ts.toDate?.();
+        return d ? Math.floor(d.getTime()/1000) : 0;
+      }catch{ return 0; }
+    }
+    function parseTags(s){
+      return String(s||"").split(",").map(x=>x.trim()).filter(Boolean).slice(0,12);
+    }
+
+    function resetForm(){
+      editIdEl.value = "";
+      titleEl.value = "";
+      metaEl.value = "";
+      bodyEl.value = "";
+      pinnedEl.checked = false;
+      tagsEl.value = "";
+      imagesEl.value = "";
+      deleteBtn.style.display = "none";
+    }
+
+    async function uploadImages(docId, files){
+      const urls = [];
+      for(const f of files){
+        const safe = f.name.replace(/[^\w.\-]+/g, "_");
+        const path = `council_updates/${docId}/${Date.now()}_${safe}`;
+        const r = ref(storage, path);
+        await uploadBytes(r, f);
+        urls.push(await getDownloadURL(r));
+      }
+      return urls;
+    }
+
+    function renderList(items){
+      lastItems = items || [];
+      let list = [...lastItems];
+
+      if(pinnedFirst){
+        list.sort((a,b)=> (b.pinned===true)-(a.pinned===true) || tsSort(b.createdAt)-tsSort(a.createdAt));
+      }else{
+        list.sort((a,b)=> tsSort(b.createdAt)-tsSort(a.createdAt));
+      }
+
+      if(!list.length){
+        listEl.innerHTML = `<div class="section-subtitle">אין עדיין עדכונים.</div>`;
+        return;
+      }
+
+      listEl.innerHTML = list.slice(0,160).map(x=>{
+        const imgs = Array.isArray(x.images) ? x.images : [];
+        return `
+          <div class="council-item" data-id="${x.id}">
+            <h4>${x.pinned ? "📌 " : ""}${esc(x.title || "עדכון")}</h4>
+            <div class="council-meta">${esc(x.meta||"")}${x.createdAt ? ((x.meta?" · ":"") + fmtDate(x.createdAt)) : ""}</div>
+            <div class="council-body">${esc(x.body||"")}</div>
+            ${imgs.length ? `<div class="thumbs">${imgs.slice(0,8).map(u=>`<img src="${u}" alt="תמונה">`).join("")}</div>` : ``}
+            <div class="council-actions">
+              <button class="btn" data-act="edit">ערוך</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      listEl.querySelectorAll('[data-act="edit"]').forEach(btn=>{
+        btn.addEventListener("click", async (e)=>{
+          const wrap = e.target.closest(".council-item");
+          const id = wrap.getAttribute("data-id");
+          await loadToForm(id);
+        });
+      });
+    }
+
+    function startLiveList(){
+      if(unsub) try{unsub()}catch{}
+      listEl.textContent = "טוען…";
+
+      // ✅ בלי אינדקס: רק createdAt
+      const qy = query(collection(db, COL), orderBy("createdAt","desc"));
+      unsub = onSnapshot(qy, (snap)=>{
+        const items = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+        renderList(items);
+      }, (err)=>{
+        console.error(err);
+        listEl.innerHTML = `<div class="section-subtitle">שגיאה בטעינה. בדוק Rules.</div>`;
+        showToast("❌ שגיאה בטעינה (Rules?)");
+      });
+    }
+
+    async function loadToForm(id){
+      try{
+        const snap = await getDoc(doc(db, COL, id));
+        if(!snap.exists()){ showToast("לא נמצא עדכון"); return; }
+        const d = snap.data();
+        editIdEl.value = id;
+        titleEl.value = d.title || "";
+        metaEl.value = d.meta || "";
+        bodyEl.value = d.body || "";
+        pinnedEl.checked = !!d.pinned;
+        tagsEl.value = (Array.isArray(d.tags) ? d.tags : []).join(", ");
+        imagesEl.value = "";
+        deleteBtn.style.display = "inline-block";
+        showToast("נטען לעריכה ✅");
+        window.scrollTo({top:0, behavior:"smooth"});
+      }catch(err){
+        console.error(err);
+        showToast("שגיאה בטעינה");
+      }
+    }
+
+    async function saveUpdate(){
+      if(!currentUser){ showToast("אתה לא מחובר"); return; }
+
+      const title = titleEl.value.trim();
+      const meta  = metaEl.value.trim();
+      const body  = bodyEl.value.trim();
+      const pinned= !!pinnedEl.checked;
+      const tags  = parseTags(tagsEl.value);
+      const files = Array.from(imagesEl.files || []);
+
+      if(!title || !body){ showToast("חסר כותרת או תוכן"); return; }
+
+      const submitBtn = form.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+
+      try{
+        const editId = editIdEl.value;
+
+        if(!editId){
+     const now = new Date();
+
+const refDoc = await addDoc(collection(db, COL), {
+  title, meta, body, pinned, tags,
+  images: [],
+
+  authorEmail: currentUser.email || "",
+  authorUid: currentUser.uid,
+
+  // ✅ חשוב: שמים createdAt אמיתי כדי שלא יהיה null בכלל
+  createdAt: now,
+  updatedAt: now
+});
+
+// ואם בא לך עדיין לשמור גם שרת:
+await updateDoc(doc(db, COL, refDoc.id), {
+  createdAt: serverTimestamp(),
+  updatedAt: serverTimestamp()
+});
+
+
+          if(files.length){
+            const urls = await uploadImages(refDoc.id, files);
+            await updateDoc(doc(db, COL, refDoc.id), { images: urls, updatedAt: serverTimestamp() });
+          }
+
+          showToast("פורסם ✅");
+          resetForm();
+
+        }else{
+          const refD = doc(db, COL, editId);
+          const prev = await getDoc(refD);
+          const prevData = prev.exists() ? prev.data() : {};
+          const prevImgs = Array.isArray(prevData.images) ? prevData.images : [];
+          const addUrls = files.length ? await uploadImages(editId, files) : [];
+
+          await updateDoc(refD, {
+            title, meta, body, pinned, tags,
+            images: [...prevImgs, ...addUrls].slice(0, 18),
+            updatedAt: serverTimestamp()
+          });
+
+          showToast("עודכן ✅");
+        }
+
+      }catch(err){
+        console.error(err);
+        showToast("❌ שגיאה בשמירה (Rules?)");
+      }finally{
+        submitBtn.disabled = false;
+      }
+    }
+
+    async function deleteUpdate(){
+      const id = editIdEl.value;
+      if(!id) return;
+      if(!confirm("למחוק את העדכון?")) return;
+
+      try{
+        await deleteDoc(doc(db, COL, id));
+        showToast("נמחק ✅");
+        resetForm();
+      }catch(err){
+        console.error(err);
+        showToast("❌ שגיאה במחיקה (Rules?)");
+      }
+    }
+
+    /* AUTH FLOW */
+    onAuthStateChanged(auth, async (u)=>{
+      currentUser = u || null;
+
+      if(u){
+        try{
+          await assertAccess(u);
+          authStatus.textContent = `מחובר: ${u.email}`;
+          loginSection.style.display = "none";
+          adminSection.style.display = "block";
+          showToast("✅ גישה מאושרת");
+          startLiveList();
+          return;
+        }catch(e){
+          authStatus.textContent = `מחובר אבל אין הרשאה: ${u.email}`;
+          showToast("❌ אין הרשאה. מתנתק...");
+          try{ await signOut(auth); }catch{}
+        }
+      }
+
+      authStatus.textContent = "לא מחובר";
+      loginSection.style.display = "block";
+      adminSection.style.display = "none";
+      if(unsub) try{unsub()}catch{}
+    });
+
+    loginForm.addEventListener("submit", async (e)=>{
+      e.preventDefault();
+      const email = (loginForm.email.value || "").trim();
+      const password = loginForm.password.value || "";
+      if(!email || !password){ showToast("תמלא אימייל וסיסמה"); return; }
+
+      try{
+        await signInWithEmailAndPassword(auth, email, password);
+        showToast("התחברת ✅");
+      }catch(err){
+        console.error(err);
+        showToast("❌ התחברות נכשלה");
+      }
+    });
+
+    logoutBtn.addEventListener("click", async ()=>{
+      try{ await signOut(auth); showToast("התנתקת"); }
+      catch(err){ console.error(err); showToast("שגיאה בהתנתקות"); }
+    });
+
+    form.addEventListener("submit", (e)=>{ e.preventDefault(); saveUpdate(); });
+    clearBtn.addEventListener("click", ()=>{ resetForm(); showToast("נוקה"); });
+    deleteBtn.addEventListener("click", deleteUpdate);
+
+    refreshBtn.addEventListener("click", startLiveList);
+    toggleSortBtn.addEventListener("click", ()=>{
+      pinnedFirst = !pinnedFirst;
+      toggleSortBtn.textContent = pinnedFirst ? "נעוצים קודם" : "לפי זמן בלבד";
+      renderList(lastItems);
+    });
+
+    resetForm();
+  </script>
+</body>
+</html>

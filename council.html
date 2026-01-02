@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="he" dir="rtl" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>מועצת תלמידים · יערת העמק</title>
+  <meta name="description" content="עדכונים אחרונים ממועצת התלמידים של חטיבת הנעורים יערת העמק." />
+  <meta name="theme-color" content="#0b1020" />
+
+  <style>
+    :root{
+      --bg:#f3f6ff; --card:#ffffff; --text:#0f172a; --muted:#475569;
+      --line:rgba(15,23,42,.10); --brand:#2563eb; --brand2:#38bdf8;
+      --shadow:0 18px 55px rgba(15,23,42,.10); --radius:22px; --pill:rgba(37,99,235,.08);
+    }
+    html[data-theme="dark"]{
+      --bg:#050b18; --card:rgba(2,6,23,.70); --text:#e5e7eb; --muted:rgba(226,232,240,.70);
+      --line:rgba(148,163,184,.18); --shadow:0 22px 70px rgba(0,0,0,.55); --pill:rgba(56,189,248,.10);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Arial;
+      background: radial-gradient(1200px 500px at 80% -10%, rgba(37,99,235,.15), transparent 60%),
+                  radial-gradient(900px 420px at 10% 120%, rgba(56,189,248,.12), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+    }
+    a{color:inherit}
+    .container{width:min(1100px, calc(100% - 28px)); margin:0 auto;}
+
+    /* TOP BAR */
+    .header{
+      position:sticky; top:0; z-index:999;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      background: color-mix(in srgb, var(--bg) 75%, transparent);
+      border-bottom:1px solid var(--line);
+    }
+    .nav{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:12px 0; gap:12px;
+      position:relative;
+    }
+    .nav-side{display:flex; gap:10px; align-items:center; flex:1;}
+    .nav-right{justify-content:flex-start;}
+    .nav-left{justify-content:flex-end;}
+    .nav a.link{
+      text-decoration:none;
+      padding:9px 14px;
+      border-radius:999px;
+      font-weight:900;
+      font-size:.92rem;
+      background: color-mix(in srgb, var(--card) 90%, transparent);
+      border:1px solid var(--line);
+      box-shadow:0 10px 24px rgba(15,23,42,.06);
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .nav a.link:hover{transform:translateY(-1px); box-shadow:0 14px 34px rgba(15,23,42,.10)}
+    .logo-wrap{
+      width:64px; height:64px; border-radius:999px; overflow:hidden;
+      border:2px solid color-mix(in srgb, var(--brand) 30%, transparent);
+      background: color-mix(in srgb, var(--card) 95%, transparent);
+      box-shadow:0 14px 32px rgba(15,23,42,.10);
+      display:flex; align-items:center; justify-content:center;
+      flex:0 0 auto;
+    }
+    .logo-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+    .pill-btn{
+      text-decoration:none;
+      padding:10px 16px;
+      border-radius:999px;
+      font-weight:1000;
+      background: linear-gradient(135deg, var(--brand), var(--brand2));
+      color:white;
+      border:none;
+      box-shadow:0 14px 42px rgba(37,99,235,.35);
+    }
+    .theme{
+      all:unset; cursor:pointer;
+      width:44px; height:44px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      border:1px solid var(--line);
+      background: color-mix(in srgb, var(--card) 92%, transparent);
+      box-shadow:0 10px 24px rgba(15,23,42,.08);
+      font-size:1.35rem;
+    }
+    .nav-toggle{display:none}
+    .mobile{display:none}
+    @media (max-width:900px){
+      .nav-right,.nav-left{display:none}
+      .nav{justify-content:center}
+      .nav-toggle{
+        display:flex; position:absolute; left:0; top:50%; transform:translateY(-50%);
+        flex-direction:column; gap:4px; border:none; background:transparent; cursor:pointer;
+      }
+      .nav-toggle span{width:22px;height:2px;background:var(--text);opacity:.8}
+      .theme{position:absolute; right:0; top:50%; transform:translateY(-50%)}
+      .mobile{
+        display:none;
+        position:absolute;
+        top: calc(100% + 10px);
+        left:0;
+        width:min(260px, calc(100% - 14px));
+        background: color-mix(in srgb, var(--card) 95%, transparent);
+        border:1px solid var(--line);
+        border-radius:18px;
+        padding:10px;
+        box-shadow: var(--shadow);
+      }
+      .mobile.open{display:block}
+      .mobile a{
+        display:block; text-decoration:none;
+        padding:10px 12px; border-radius:14px;
+        border:1px solid var(--line);
+        margin:8px 0;
+        font-weight:900;
+        background: color-mix(in srgb, var(--card) 92%, transparent);
+      }
+      .mobile a.pill-btn{border:none; color:#fff}
+    }
+
+    /* HERO + LIST */
+    .hero{ padding:28px 0 10px; }
+    .hero-card{
+      border-radius:var(--radius);
+      border:1px solid var(--line);
+      background: color-mix(in srgb, var(--card) 92%, transparent);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+    .hero-card::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(900px 260px at 80% -40%, rgba(37,99,235,.25), transparent 60%),
+        radial-gradient(700px 260px at 0% 120%, rgba(56,189,248,.18), transparent 55%);
+      pointer-events:none;
+    }
+    .hero-inner{position:relative; z-index:1; padding:22px 18px;}
+    .hero-title{ margin:0 0 6px; font-size:1.55rem; font-weight:1100; }
+    .hero-sub{margin:0; color:var(--muted); font-weight:700}
+    .hero-row{ margin-top:14px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background: var(--pill);
+      font-weight:900;
+      color: color-mix(in srgb, var(--text) 80%, var(--brand));
+      text-decoration:none;
+    }
+    .chip small{opacity:.75; font-weight:900}
+
+    .tools{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:10px 0 14px; }
+    .search{
+      flex:1; min-width:180px;
+      display:flex; align-items:center; gap:10px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:10px 14px;
+      background: color-mix(in srgb, var(--card) 92%, transparent);
+      box-shadow:0 12px 30px rgba(15,23,42,.06);
+    }
+    .search input{ border:none; outline:none; background:transparent; width:100%; font-weight:900; color:var(--text); }
+    .btn{
+      border:none; cursor:pointer;
+      border-radius:999px; padding:10px 14px;
+      font-weight:1000;
+      background: color-mix(in srgb, var(--card) 92%, transparent);
+      border:1px solid var(--line);
+    }
+    .btn.primary{
+      background: linear-gradient(135deg, var(--brand), var(--brand2));
+      color:#fff; border:none;
+      box-shadow:0 14px 42px rgba(37,99,235,.35);
+    }
+    .grid{ display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:14px; }
+    @media (max-width:900px){ .grid{grid-template-columns:1fr;} }
+    .card{
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      background: color-mix(in srgb, var(--card) 92%, transparent);
+      box-shadow:0 16px 45px rgba(15,23,42,.08);
+      overflow:hidden;
+      position:relative;
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+    .card:hover{ transform: translateY(-2px); box-shadow:0 22px 60px rgba(15,23,42,.12); }
+    .card-top{ padding:16px 16px 0; display:flex; gap:10px; align-items:flex-start; justify-content:space-between; }
+    .title{margin:0; font-size:1.08rem; font-weight:1100;}
+    .meta{margin:6px 0 0; color:var(--muted); font-weight:800; font-size:.88rem;}
+    .pin{
+      display:inline-flex; align-items:center; gap:8px;
+      font-weight:1000; font-size:.82rem;
+      padding:7px 10px;
+      border-radius:999px;
+      background: rgba(245,158,11,.12);
+      border:1px solid rgba(245,158,11,.35);
+      color: color-mix(in srgb, var(--text) 85%, #f59e0b);
+      white-space:nowrap;
+    }
+    .body{
+      padding:12px 16px 14px;
+      color: color-mix(in srgb, var(--text) 88%, transparent);
+      font-weight:750;
+      line-height:1.65;
+      white-space:pre-line;
+    }
+    .gallery{ display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap:8px; padding:0 16px 16px; }
+    .gallery.one{grid-template-columns:1fr;}
+    .gallery.two{grid-template-columns:1fr 1fr;}
+    .ph{
+      border-radius:16px;
+      border:1px solid var(--line);
+      overflow:hidden;
+      background: rgba(0,0,0,.04);
+      aspect-ratio: 16/10;
+      cursor:pointer;
+    }
+    .ph img{width:100%;height:100%;object-fit:cover;display:block;}
+    .tagrow{ padding:0 16px 16px; display:flex; gap:8px; flex-wrap:wrap; }
+    .tag{
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background: color-mix(in srgb, var(--card) 90%, transparent);
+      font-weight:1000;
+      font-size:.82rem;
+      color: color-mix(in srgb, var(--text) 82%, var(--brand));
+    }
+
+    .modal{ position:fixed; inset:0; display:none; place-items:center; background: rgba(0,0,0,.55); z-index:99999; padding:16px; }
+    .modal.open{display:grid}
+    .modal-inner{
+      width:min(980px, 100%);
+      border-radius:22px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.12);
+      background: #000;
+      box-shadow:0 30px 90px rgba(0,0,0,.55);
+      position:relative;
+    }
+    .modal-inner img{width:100%;height:auto;display:block}
+    .modal-close{
+      position:absolute; top:10px; left:10px;
+      border:none; cursor:pointer;
+      width:44px;height:44px;border-radius:50%;
+      background: rgba(255,255,255,.12);
+      color:#fff; font-size:1.2rem;
+      backdrop-filter: blur(10px);
+    }
+    .empty{
+      border:1px dashed var(--line);
+      border-radius:var(--radius);
+      padding:18px;
+      text-align:center;
+      color:var(--muted);
+      font-weight:900;
+      background: color-mix(in srgb, var(--card) 85%, transparent);
+    }
+    footer{
+      padding: 26px 0 34px;
+      color: var(--muted);
+      font-weight: 850;
+      text-align:center;
+    }
+    .footer-devlink{font-weight:1100}
+  </style>
+</head>
+
+<body>
+  <header class="header">
+    <div class="container">
+      <nav class="nav" aria-label="ניווט ראשי">
+        <div class="nav-side nav-right">
+          <a class="link" href="index.html#home-news">חדשות</a>
+          <a class="link" href="polls.html">סקרים</a>
+          <a class="link" href="about.html">אודות</a>
+          <a class="link" href="council.html">מועצת תלמידים</a>
+        </div>
+
+        <a class="logo-wrap" href="index.html" aria-label="דף הבית">
+          <img src="logo.png" alt="לוגו יערת העמק" onerror="this.src='https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png'">
+        </a>
+
+        <div class="nav-side nav-left">
+          <a class="pill-btn" href="redirect-edu.html">למרחב האישי</a>
+          <a class="link" href="teachers.html">פורטל מורים</a>
+          <a class="link" href="admin.html">Admin</a>
+        </div>
+
+        <button class="theme" id="themeToggle" type="button" aria-label="מצב כהה/בהיר">🌙</button>
+
+        <button class="nav-toggle" id="navToggle" type="button" aria-label="פתח תפריט" aria-expanded="false" aria-controls="mobile">
+          <span></span><span></span><span></span>
+        </button>
+
+        <div class="mobile" id="mobile" aria-hidden="true">
+          <a href="index.html#home-news">חדשות</a>
+          <a href="polls.html">סקרים</a>
+          <a href="about.html">אודות</a>
+          <a href="council.html">מועצת תלמידים</a>
+          <a href="redirect-edu.html" class="pill-btn">למרחב האישי</a>
+          <a href="teachers.html">פורטל מורים</a>
+          <a href="admin.html">Admin</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <div class="hero-card">
+        <div class="hero-inner">
+          <h1 class="hero-title">עדכונים אחרונים ממועצת תלמידים</h1>
+          <p class="hero-sub">יוזמות, אירועים, החלטות ושטויות חכמות (רק קצת).</p>
+
+          <div class="hero-row">
+            <span class="chip" title="כמה עדכונים נעוצים">📌 <span id="statPinned">0</span> <small>נעוצים</small></span>
+            <span class="chip" title="כמה עדכונים סה״כ">📰 <span id="statTotal">0</span> <small>עדכונים</small></span>
+            <a class="chip" href="council-admin.html" title="ניהול (מורשים בלבד)">⚙️ ניהול מועצה</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="tools">
+        <div class="search">
+          🔎
+          <input id="q" type="search" placeholder="חפש לפי כותרת/תוכן/תג..." />
+        </div>
+        <button class="btn" id="btnRefresh">רענון</button>
+        <button class="btn primary" id="btnPinned">נעוצים קודם</button>
+      </div>
+
+      <div class="section">
+        <div class="grid" id="grid">
+          <div class="empty">טוען עדכונים…</div>
+        </div>
+      </div>
+
+      <footer>
+        © כל הזכויות שמורות לבית ספר יערת העמק · Developed By
+        <a class="footer-devlink" href="https://ptzwebsitebuilding.vercel.app/" target="_blank" rel="noopener noreferrer">Peretzinho</a>
+      </footer>
+    </div>
+  </section>
+
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="תמונה">
+    <div class="modal-inner">
+      <button class="modal-close" id="modalClose" type="button" aria-label="סגור">✕</button>
+      <img id="modalImg" alt="תמונה">
+    </div>
+  </div>
+
+  <script type="module">
+    /* THEME */
+    const html = document.documentElement;
+    const THEME_KEY = "theme";
+    function applyTheme(t){
+      html.setAttribute("data-theme", t);
+      const btn = document.getElementById("themeToggle");
+      if(btn) btn.textContent = (t === "dark") ? "☀️" : "🌙";
+    }
+    applyTheme(localStorage.getItem(THEME_KEY) || html.getAttribute("data-theme") || "light");
+    document.getElementById("themeToggle")?.addEventListener("click", () => {
+      const next = (html.getAttribute("data-theme") === "dark") ? "light" : "dark";
+      localStorage.setItem(THEME_KEY, next);
+      applyTheme(next);
+    });
+
+    /* MOBILE NAV */
+    const navToggle = document.getElementById("navToggle");
+    const mobile = document.getElementById("mobile");
+    navToggle?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const open = mobile.classList.toggle("open");
+      navToggle.setAttribute("aria-expanded", String(open));
+      mobile.setAttribute("aria-hidden", String(!open));
+    });
+    document.addEventListener("click", (e) => {
+      if(!mobile?.classList.contains("open")) return;
+      if(mobile.contains(e.target) || navToggle.contains(e.target)) return;
+      mobile.classList.remove("open");
+      navToggle.setAttribute("aria-expanded", "false");
+      mobile.setAttribute("aria-hidden", "true");
+    });
+
+    /* FIREBASE (בלי index!) */
+    import { db } from "./firebase-config.js";
+    import { collection, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+    const COL = "council_updates";
+
+    const grid = document.getElementById("grid");
+    const qInput = document.getElementById("q");
+    const btnRefresh = document.getElementById("btnRefresh");
+    const btnPinned = document.getElementById("btnPinned");
+    const statPinned = document.getElementById("statPinned");
+    const statTotal = document.getElementById("statTotal");
+
+    let all = [];
+    let pinnedFirst = true;
+    let unsub = null;
+
+    function fmtDate(ts){
+      try{
+        const d = ts?.toDate ? ts.toDate() : null;
+        if(!d) return "";
+        return new Intl.DateTimeFormat("he-IL", { dateStyle:"medium", timeStyle:"short" }).format(d);
+      }catch{ return ""; }
+    }
+    function esc(s){
+      return (s ?? "").toString()
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+    function tsSort(ts){
+      try{
+        if(!ts) return 0;
+        if(typeof ts.seconds === "number") return ts.seconds;
+        const d = ts.toDate?.();
+        return d ? Math.floor(d.getTime()/1000) : 0;
+      }catch{ return 0; }
+    }
+
+    function render(list){
+      if(!list.length){
+        grid.innerHTML = `<div class="empty">אין עדיין עדכונים של מועצת תלמידים. 👀</div>`;
+        return;
+      }
+
+      grid.innerHTML = list.map(item => {
+        const imgs = Array.isArray(item.images) ? item.images.filter(Boolean) : [];
+        const gClass = imgs.length === 1 ? "one" : imgs.length === 2 ? "two" : "";
+        const tags = Array.isArray(item.tags) ? item.tags.filter(Boolean) : [];
+        const dateStr = item.createdAt ? fmtDate(item.createdAt) : "";
+        const metaParts = [];
+        if(item.meta) metaParts.push(item.meta);
+        if(dateStr) metaParts.push(dateStr);
+        const metaLine = metaParts.join(" · ");
+
+        return `
+          <article class="card" data-id="${esc(item.id)}">
+            <div class="card-top">
+              <div>
+                <h3 class="title">${esc(item.title || "עדכון")}</h3>
+                <div class="meta">${esc(metaLine)}</div>
+              </div>
+              ${item.pinned ? `<div class="pin">📌 נעוץ</div>` : ``}
+            </div>
+
+            <div class="body">${esc(item.body || "")}</div>
+
+            ${imgs.length ? `
+              <div class="gallery ${gClass}">
+                ${imgs.slice(0, 6).map((u,i)=>`
+                  <div class="ph" data-img="${esc(u)}" title="פתח תמונה">
+                    <img src="${esc(u)}" loading="lazy" alt="תמונה ${i+1}">
+                  </div>
+                `).join("")}
+              </div>
+            ` : ``}
+
+            ${tags.length ? `
+              <div class="tagrow">
+                ${tags.slice(0, 10).map(t=>`<span class="tag">#${esc(t)}</span>`).join("")}
+              </div>
+            ` : ``}
+          </article>
+        `;
+      }).join("");
+
+      grid.querySelectorAll("[data-img]").forEach(el=>{
+        el.addEventListener("click", ()=> openModal(el.getAttribute("data-img")));
+      });
+    }
+
+    function applyFilters(){
+      const q = (qInput.value || "").trim().toLowerCase();
+      let list = [...all];
+
+      if(pinnedFirst){
+        list.sort((a,b)=> (b.pinned===true)-(a.pinned===true) || tsSort(b.createdAt)-tsSort(a.createdAt));
+      }else{
+        list.sort((a,b)=> tsSort(b.createdAt)-tsSort(a.createdAt));
+      }
+
+      if(q){
+        list = list.filter(x=>{
+          const hay = [x.title, x.body, x.meta, ...(Array.isArray(x.tags)?x.tags:[])]
+            .filter(Boolean).join(" ").toLowerCase();
+          return hay.includes(q);
+        });
+      }
+
+      statTotal.textContent = String(all.length);
+      statPinned.textContent = String(all.filter(x=>x.pinned).length);
+      render(list);
+    }
+
+    function start(){
+      if(unsub) try{unsub()}catch{}
+      const qy = query(collection(db, COL), orderBy("createdAt","desc"), limit(200)); // ✅ בלי index
+      unsub = onSnapshot(qy, (snap)=>{
+        all = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+        applyFilters();
+      }, (err)=>{
+        console.error(err);
+        grid.innerHTML = `<div class="empty">שגיאה בטעינה. בדוק חוקים/חיבור Firebase.</div>`;
+        all = [];
+        statTotal.textContent = "0";
+        statPinned.textContent = "0";
+      });
+    }
+
+    btnRefresh.addEventListener("click", start);
+    qInput.addEventListener("input", applyFilters);
+    btnPinned.addEventListener("click", ()=>{
+      pinnedFirst = !pinnedFirst;
+      btnPinned.textContent = pinnedFirst ? "נעוצים קודם" : "לפי זמן בלבד";
+      applyFilters();
+    });
+
+    /* MODAL */
+    const modal = document.getElementById("modal");
+    const modalImg = document.getElementById("modalImg");
+    const modalClose = document.getElementById("modalClose");
+    function openModal(url){
+      if(!url) return;
+      modalImg.src = url;
+      modal.classList.add("open");
+    }
+    function closeModal(){
+      modal.classList.remove("open");
+      modalImg.src = "";
+    }
+    modalClose.addEventListener("click", closeModal);
+    modal.addEventListener("click", (e)=>{ if(e.target === modal) closeModal(); });
+    document.addEventListener("keydown", (e)=>{ if(e.key==="Escape") closeModal(); });
+
+    start();
+  </script>
+</body>
+</html>
