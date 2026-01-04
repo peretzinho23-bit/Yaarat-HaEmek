@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>ניהול תוכנית יומית – יערת העמק</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .page-wrap{max-width:1000px;margin:0 auto;padding:18px}
+    .cardx{border-radius:18px;border:1px solid rgba(148,163,184,.35);background:rgba(255,255,255,.06);padding:14px}
+    html[data-theme="light"] .cardx{background:rgba(255,255,255,.92);border-color:rgba(15,23,42,.12);color:#0f172a}
+    .row{display:grid;grid-template-columns:1fr;gap:12px}
+    @media(min-width:900px){.row{grid-template-columns:1fr 1fr}}
+    label{font-weight:900;display:block;margin-bottom:6px}
+    input,textarea,select{
+      width:100%;padding:10px 12px;border-radius:14px;border:1px solid rgba(148,163,184,.35);
+      background:rgba(0,0,0,.12);color:inherit;outline:none
+    }
+    html[data-theme="light"] input, html[data-theme="light"] textarea, html[data-theme="light"] select{background:rgba(255,255,255,.92)}
+    textarea{min-height:90px;resize:vertical}
+    .btn{cursor:pointer;padding:10px 14px;border-radius:14px;border:1px solid rgba(148,163,184,.35);background:rgba(255,255,255,.10);color:inherit;font-weight:900}
+    .btn.primary{background:rgba(56,189,248,.18);border-color:rgba(56,189,248,.35)}
+    .muted{opacity:.75}
+    .hide{display:none !important}
+    .topline{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}
+    .pill{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;border:1px solid rgba(148,163,184,.35);background:rgba(255,255,255,.06)}
+    html[data-theme="light"] .pill{background:rgba(255,255,255,.92);border-color:rgba(15,23,42,.12)}
+  </style>
+</head>
+
+<body>
+  <!-- אותו טופבר כמו אצלך (אם כבר יש לך בקבצים אחרים – תשאיר כמו שם) -->
+  <header class="header-main">
+    <div class="container">
+      <nav class="nav nav-centered" aria-label="ניווט ראשי">
+        <div class="nav-side nav-right-links">
+          <a href="index.html">← דף הבית</a>
+        </div>
+
+        <div class="nav-center">
+          <a href="index.html" class="logo-circle" aria-label="דף הבית">
+            <img src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png" alt="סמל יערת העמק" class="logo-img" />
+          </a>
+        </div>
+
+        <div class="nav-side nav-left-links">
+          <a href="#editor">עריכת שבוע</a>
+        </div>
+
+        <button id="theme-toggle" class="theme-toggle-btn" type="button" aria-label="מצב כהה/בהיר">🌙</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-wrap">
+    <div class="topline">
+      <div class="pill"><b>ניהול תוכנית יומית</b> <span class="muted">· שבועי → מתעדכן יומית באינדקס</span></div>
+      <div class="pill muted" id="statusPill">בודק התחברות…</div>
+    </div>
+
+    <!-- LOGIN -->
+    <section class="cardx" id="loginCard" style="margin-top:12px;">
+      <h2 style="margin:0 0 10px;">התחברות מנהל</h2>
+      <div class="row">
+        <div>
+          <label>אימייל</label>
+          <input id="email" type="email" placeholder="name@gmail.com" />
+        </div>
+        <div>
+          <label>סיסמה</label>
+          <input id="pass" type="password" placeholder="••••••••" />
+        </div>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <button class="btn primary" id="loginBtn">התחבר</button>
+        <button class="btn" id="logoutBtn" style="display:none;">התנתק</button>
+        <div class="muted" id="loginMsg"></div>
+      </div>
+    </section>
+
+    <!-- EDITOR -->
+    <section class="cardx hide" id="editor" style="margin-top:12px;">
+      <div class="topline" style="margin-bottom:10px;">
+        <div>
+          <div style="font-weight:1000;font-size:1.05rem;">עריכת השבוע</div>
+          <div class="muted">בחר שבוע (יום ראשון) → שמור → האינדקס יציג אוטומטית את היום הנכון</div>
+        </div>
+
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <div>
+            <label style="margin:0 0 6px;">יום ראשון של השבוע</label>
+            <input id="weekStart" type="date" />
+          </div>
+          <button class="btn" id="loadBtn" style="margin-top:22px;">טען</button>
+          <button class="btn primary" id="saveBtn" style="margin-top:22px;">שמור</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <div><label>ראשון</label><textarea id="sun"></textarea></div>
+        <div><label>שני</label><textarea id="mon"></textarea></div>
+        <div><label>שלישי</label><textarea id="tue"></textarea></div>
+        <div><label>רביעי</label><textarea id="wed"></textarea></div>
+        <div><label>חמישי</label><textarea id="thu"></textarea></div>
+        <div><label>שישי</label><textarea id="fri"></textarea></div>
+      </div>
+
+      <div class="muted" id="saveMsg" style="margin-top:10px;"></div>
+    </section>
+  </main>
+
+  <script>
+    // Theme toggle (כמו אצלך)
+    (function () {
+      const btn = document.getElementById("theme-toggle");
+      if (!btn) return;
+      function applyTheme(theme) {
+        document.documentElement.setAttribute("data-theme", theme);
+        btn.textContent = theme === "dark" ? "🌙" : "☀️";
+        try { localStorage.setItem("theme", theme); } catch {}
+      }
+      let saved = "dark";
+      try { saved = localStorage.getItem("theme") || "dark"; } catch {}
+      applyTheme(saved);
+      btn.addEventListener("click", () => {
+        const cur = document.documentElement.getAttribute("data-theme") || "dark";
+        applyTheme(cur === "dark" ? "light" : "dark");
+      });
+    })();
+  </script>
+
+  <script type="module" src="tohnit-nihol.js?v=1"></script>
+</body>
+</html>
