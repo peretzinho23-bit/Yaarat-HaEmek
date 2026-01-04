@@ -2097,39 +2097,7 @@ html[data-theme="dark"] .hero-latest-title{
       </div>
     </div>
   </section>
-  <section class="section-dark-strong reveal-on-scroll">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title" id="important-title">חשוב לדעת</h2>
-        <p class="section-subtitle" id="important-subtitle">
-          כמה דברים שימושיים לתלמידים – לפני שממשיכים לגלול.
-        </p>
-      </div>
 
-      <div class="home-grid">
-        <div class="grade-card">
-          <h3 id="important-card-1-title">💻 סביבת למידה דיגיטלית</h3>
-          <p id="important-card-1-body" style="font-size:0.9rem;">
-            חלק גדול מהמידע והקבצים נמצא באתר – חדשות, מבחנים, וטפסים חשובים.
-          </p>
-        </div>
-
-        <div class="grade-card">
-          <h3 id="important-card-2-title">🤝 עם מי מדברים?</h3>
-          <p id="important-card-2-body" style="font-size:0.9rem;">
-            יש קושי? מורה, מחנכת, יועצת או צוות הנהלה – כולם כאן כדי לעזור.
-          </p>
-        </div>
-
-        <div class="grade-card">
-          <h3 id="important-card-3-title">📣 עדכונים שוטפים</h3>
-          <p id="important-card-3-body" style="font-size:0.9rem;">
-            החדשות, לוח המודעות והודעות החשובות תמיד יתעדכנו כאן בזמן אמת.
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
 
 
 
@@ -2143,46 +2111,1525 @@ html[data-theme="dark"] .hero-latest-title{
 <script src="home-class-picker.js" defer></script>
 
 
-  
-  <!-- GRADES -->
-  <section id="grades" class="section-dark-strong reveal-on-scroll">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title" id="grades-section-title">היכרות עם השכבות</h2>
-        <p class="section-subtitle" id="grades-section-subtitle">
-          בחר שכבה כדי לראות חדשות, מבחנים ועדכונים שמתאימים אליך.
-        </p>
+
+
+<section class="section-light reveal-on-scroll" id="grades-intro" style="padding-top:0; margin-top:-10px;">
+  <div class="container">
+    <div class="section-header">
+      <h3 class="section-title" style="font-size:1.4rem;">🎮 משחקים באתר</h3>
+      <p class="section-subtitle">חמישה משחקים קצרים ומגניבים להעביר את הזמן</p>
+    </div>
+
+    <!-- ===== MOBILE PICKER (chips) ===== -->
+    <div class="game-picker" aria-label="בחר משחק">
+      <button class="gchip" type="button" data-game="reaction">⚡ תגובה</button>
+      <button class="gchip" type="button" data-game="quiz">🧠 מתמטיקה</button>
+      <button class="gchip" type="button" data-game="memory">🧩 Memory</button>
+      <button class="gchip" type="button" data-game="dodge">🛡️ Dodge</button>
+      <button class="gchip" type="button" data-game="snake">🐍 Snake</button>
+    </div>
+
+    <!-- ===== DESKTOP GRID (cards) ===== -->
+    <div class="home-grid game-grid" style="margin-top:18px;">
+      <div class="grade-card game-card" data-game="reaction">
+        <h3>⚡ מבחן תגובה</h3>
+        <p style="font-size:0.9rem;">לחץ ברגע שזה נהיה ירוק.</p>
+        <button class="btn game-open-btn" type="button">שחק עכשיו</button>
+      </div>
+
+      <div class="grade-card game-card" data-game="quiz">
+        <h3>🧠 מתמטיקה (מאגר ענק)</h3>
+        <p style="font-size:0.9rem;">שאלות בלי חזרות — על אמת.</p>
+        <button class="btn game-open-btn" type="button">שחק עכשיו</button>
+      </div>
+
+      <div class="grade-card game-card" data-game="memory">
+        <h3>🧩 Memory</h3>
+        <p style="font-size:0.9rem;">קומבו + טיימר + שיאים.</p>
+        <button class="btn game-open-btn" type="button">שחק עכשיו</button>
+      </div>
+
+      <div class="grade-card game-card" data-game="dodge">
+        <h3>🛡️ Dodge Arena</h3>
+        <p style="font-size:0.9rem;">במובייל יש ג’ויסטיק.</p>
+        <button class="btn game-open-btn" type="button">שחק עכשיו</button>
+      </div>
+
+      <div class="grade-card game-card" data-game="snake">
+        <h3>🐍 Snake</h3>
+        <p style="font-size:0.9rem;">במובייל יש D-Pad.</p>
+        <button class="btn game-open-btn" type="button">שחק עכשיו</button>
       </div>
     </div>
-  </section>
 
-  <section class="section-light reveal-on-scroll" id="grades-intro" style="padding-top:0; margin-top:-10px;">
-    <div class="container">
-      <div class="section-header">
-        <h3 class="section-title" style="font-size:1.4rem;">קצת על כל שכבה</h3>
-        <p class="section-subtitle">
-          מבט קצר על מה שמייחד כל שכבה – האופי, האתגרים, הקפיצות בלמידה והחוויה האישית של התלמידים.
-        </p>
-      </div>
-
-      <div class="home-grid" style="margin-top:20px;">
-        <div class="grade-card">
-          <h3>על שכבת ז'</h3>
-          <p id="grade-z-text" style="font-size:0.9rem;">תיאור שכבת ז' יתעדכן כאן דרך לוח הניהול.</p>
+    <!-- GAME PANEL -->
+    <div id="gameHubPanel" class="gamehub-panel" style="display:none; margin-top:16px;">
+      <div class="gamehub-head">
+        <div>
+          <div class="gamehub-title" id="gameHubTitle">משחק</div>
+          <div class="gamehub-sub" id="gameHubSub">—</div>
         </div>
 
-        <div class="grade-card">
-          <h3>על שכבת ח'</h3>
-          <p id="grade-h-text" style="font-size:0.9rem;">תיאור שכבת ח' יתעדכן כאן דרך לוח הניהול.</p>
-        </div>
-
-        <div class="grade-card">
-          <h3>על שכבת ט'</h3>
-          <p id="grade-t-text" style="font-size:0.9rem;">תיאור שכבת ט' יתעדכן כאן דרך לוח הניהול.</p>
+        <div class="gamehub-actions">
+          <button class="btn-outline" id="gameFullscreenBtn" type="button" style="display:none;">מסך מלא ⛶</button>
+          <button class="btn-outline" id="gameResetBtn" type="button">איפוס</button>
+          <button class="btn" id="gameCloseBtn" type="button">סגור ✕</button>
         </div>
       </div>
+
+      <div id="gameHubBody" class="gamehub-body"></div>
     </div>
-  </section>
+  </div>
+
+  <style>
+    /* ===== Picker UX ===== */
+    .game-picker{
+      display:none;
+      gap:10px;
+      overflow:auto;
+      padding:4px 2px 10px;
+      scroll-snap-type:x mandatory;
+      -webkit-overflow-scrolling:touch;
+    }
+    .gchip{
+      scroll-snap-align:start;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.35);
+      background: rgba(255,255,255,.85);
+      padding:10px 12px;
+      font-weight:1000;
+      cursor:pointer;
+      white-space:nowrap;
+      transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+    }
+    .gchip:hover{ transform: translateY(-1px); box-shadow:0 12px 26px rgba(15,23,42,0.10); background:#eff6ff; }
+    .gchip.active{ background: rgba(37,99,235,.10); border-color: rgba(37,99,235,.35); }
+    html[data-theme="dark"] .gchip{
+      background: rgba(2,6,23,.55);
+      border-color: rgba(148,163,184,.22);
+      color:#e5e7eb;
+    }
+    html[data-theme="dark"] .gchip:hover{ background: rgba(56,189,248,.12); box-shadow:0 18px 40px rgba(0,0,0,.35); }
+    html[data-theme="dark"] .gchip.active{ background: rgba(56,189,248,.14); border-color: rgba(56,189,248,.30); }
+
+    /* ===== Game grid/cards ===== */
+    .game-card{ display:flex; flex-direction:column; gap:10px; }
+    .game-open-btn{ margin-top:auto; border-radius:999px; font-weight:1000; padding:10px 14px; }
+
+    /* ===== Panel ===== */
+    .gamehub-panel{
+      border-radius:24px;
+      border:1px solid rgba(148,163,184,0.45);
+      background: rgba(255,255,255,0.92);
+      box-shadow:0 18px 45px rgba(15,23,42,0.10);
+      overflow:hidden;
+    }
+    html[data-theme="dark"] .gamehub-panel{
+      background: rgba(15,23,42,0.88);
+      border-color: rgba(148,163,184,0.22);
+      box-shadow:0 18px 55px rgba(0,0,0,0.45);
+    }
+
+    .gamehub-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:14px 14px;
+      border-bottom:1px solid rgba(148,163,184,0.22);
+    }
+    .gamehub-title{ font-weight:1100; font-size:1.05rem; letter-spacing:.2px; color:#0f172a; }
+    .gamehub-sub{ font-size:.9rem; opacity:.85; color:#334155; margin-top:4px; }
+    html[data-theme="dark"] .gamehub-title{ color:#fff; }
+    html[data-theme="dark"] .gamehub-sub{ color:rgba(255,255,255,0.72); }
+
+    .gamehub-actions{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .gamehub-body{ padding:16px; }
+
+    /* ===== Shared cards ===== */
+    .gh-card{
+      max-width:860px; margin:0 auto;
+      border-radius:18px;
+      border:1px solid rgba(148,163,184,.35);
+      background: rgba(15,23,42,.04);
+      padding:14px;
+    }
+    html[data-theme="dark"] .gh-card{
+      background: rgba(2,6,23,.35);
+      border-color: rgba(148,163,184,.22);
+    }
+    .gh-row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between; }
+    .gh-pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:7px 12px; border-radius:999px;
+      font-weight:1000; font-size:.9rem;
+      border:1px solid rgba(148,163,184,.35);
+      background: rgba(255,255,255,.75);
+    }
+    html[data-theme="dark"] .gh-pill{ background: rgba(15,23,42,.65); border-color: rgba(148,163,184,.20); color:#e5e7eb; }
+    .gh-help{ opacity:.85; font-weight:900; line-height:1.55; }
+    html[data-theme="dark"] .gh-help{ color:rgba(255,255,255,.78); }
+
+    /* ===== Reaction ===== */
+    .rx-wrap{ display:flex; flex-direction:column; gap:12px; align-items:center; text-align:center; padding:8px 0; }
+    .rx-btn{
+      width:min(520px, 100%);
+      height:120px;
+      border-radius:18px;
+      border:1px solid rgba(148,163,184,.35);
+      font-weight:1100;
+      font-size:1.05rem;
+      cursor:pointer;
+      user-select:none;
+    }
+
+    /* ===== Quiz ===== */
+    .q-wrap{ max-width:780px; margin:0 auto; display:flex; flex-direction:column; gap:12px; }
+    .q-q{ font-weight:1100; font-size:1.05rem; }
+    .q-opts{ display:flex; flex-direction:column; gap:8px; }
+    .q-opts button{
+      text-align:right;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid rgba(148,163,184,.35);
+      background: rgba(255,255,255,0.92);
+      cursor:pointer;
+      font-weight:1000;
+      transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+    }
+    .q-opts button:hover{ transform: translateY(-1px); box-shadow:0 12px 26px rgba(15,23,42,0.10); background:#eff6ff; }
+    html[data-theme="dark"] .q-opts button{
+      background: rgba(2,6,23,0.45);
+      border-color: rgba(148,163,184,.22);
+      color:#e5e7eb;
+    }
+    html[data-theme="dark"] .q-opts button:hover{ background: rgba(56,189,248,0.10); box-shadow:0 18px 40px rgba(0,0,0,.35); }
+    .q-meta{ display:flex; justify-content:space-between; gap:10px; opacity:.88; font-weight:1100; flex-wrap:wrap; }
+    .q-result{
+      border-radius:16px; padding:12px;
+      border:1px solid rgba(148,163,184,.25);
+      background: rgba(37,99,235,.06);
+      font-weight:1100;
+    }
+    html[data-theme="dark"] .q-result{
+      background: rgba(56,189,248,.10);
+      border-color: rgba(148,163,184,.18);
+      color:#e5f0ff;
+    }
+    .q-mini{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between;
+      margin-top:10px;
+    }
+    .q-mini .btn-outline{
+      border-radius:999px;
+      padding:9px 12px;
+      font-weight:1000;
+    }
+
+    /* ===== Memory ===== */
+    .mem-wrap{ max-width:860px; margin:0 auto; display:flex; flex-direction:column; gap:12px; }
+    .mem-grid{ display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:10px; }
+    @media (max-width:520px){ .mem-grid{ grid-template-columns: repeat(4, minmax(0,1fr)); gap:8px; } }
+    .mem-card{
+      aspect-ratio: 1/1;
+      border-radius:16px;
+      border:1px solid rgba(148,163,184,.35);
+      background: rgba(255,255,255,.90);
+      cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      font-weight:1100;
+      font-size:1.25rem;
+      user-select:none;
+      transition: transform .12s ease, box-shadow .12s ease;
+    }
+    .mem-card:hover{ transform: translateY(-1px); box-shadow:0 12px 26px rgba(15,23,42,.10); }
+    html[data-theme="dark"] .mem-card{
+      background: rgba(2,6,23,.50);
+      border-color: rgba(148,163,184,.22);
+      color:#e5e7eb;
+    }
+    .mem-card.revealed{ background: rgba(34,197,94,.16); }
+    html[data-theme="dark"] .mem-card.revealed{ background: rgba(34,197,94,.18); }
+    .mem-card.matched{
+      background: rgba(37,99,235,.12);
+      border-color: rgba(37,99,235,.35);
+      cursor:default;
+    }
+    html[data-theme="dark"] .mem-card.matched{
+      background: rgba(56,189,248,.14);
+      border-color: rgba(56,189,248,.30);
+    }
+
+    /* ===== Canvas games ===== */
+    .canvas-wrap{ max-width:920px; margin:0 auto; display:flex; flex-direction:column; gap:10px; }
+    .canvas-box{
+      border-radius:18px;
+      border:1px solid rgba(148,163,184,.35);
+      background: rgba(255,255,255,.86);
+      padding:10px;
+    }
+    html[data-theme="dark"] .canvas-box{
+      background: rgba(2,6,23,.45);
+      border-color: rgba(148,163,184,.22);
+    }
+    canvas.game-canvas{
+      width:100%;
+      height:auto;
+      border-radius:14px;
+      display:block;
+      background: rgba(15,23,42,.06);
+      border:1px solid rgba(148,163,184,.25);
+      touch-action:none;
+    }
+    html[data-theme="dark"] canvas.game-canvas{
+      background: rgba(2,6,23,.35);
+      border-color: rgba(148,163,184,.18);
+    }
+
+    /* ===== Mobile controls ===== */
+    .mcontrols{ display:none; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap; margin-top:10px; }
+    .pad{
+      display:grid;
+      grid-template-columns: 52px 52px 52px;
+      grid-template-rows: 52px 52px 52px;
+      gap:8px;
+      user-select:none;
+      touch-action:none;
+    }
+    .pad button{
+      border-radius:14px;
+      border:1px solid rgba(148,163,184,.35);
+      background: rgba(255,255,255,.85);
+      font-weight:1100;
+      cursor:pointer;
+    }
+    html[data-theme="dark"] .pad button{
+      background: rgba(2,6,23,.55);
+      border-color: rgba(148,163,184,.22);
+      color:#e5e7eb;
+    }
+
+    .joy{
+      width:160px; height:160px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.35);
+      background: rgba(255,255,255,.65);
+      position:relative;
+      overflow:hidden;
+      touch-action:none;
+    }
+    html[data-theme="dark"] .joy{
+      background: rgba(2,6,23,.45);
+      border-color: rgba(148,163,184,.22);
+    }
+    .joy .knob{
+      width:70px; height:70px;
+      border-radius:999px;
+      position:absolute;
+      left:50%; top:50%;
+      transform: translate(-50%,-50%);
+      border:1px solid rgba(148,163,184,.35);
+      background: rgba(37,99,235,.14);
+    }
+    html[data-theme="dark"] .joy .knob{ background: rgba(56,189,248,.16); border-color: rgba(148,163,184,.22); }
+
+    .kbd{
+      font-weight:1100;
+      padding:4px 8px;
+      border-radius:10px;
+      border:1px solid rgba(148,163,184,.35);
+      background: rgba(255,255,255,.75);
+      display:inline-flex; align-items:center; gap:6px;
+    }
+    html[data-theme="dark"] .kbd{ background: rgba(15,23,42,.65); border-color: rgba(148,163,184,.20); color:#e5e7eb; }
+
+    /* ===== Responsive behavior ===== */
+    @media (max-width:780px){
+      .game-picker{ display:flex; }
+      .game-grid{ display:none !important; }
+      .gamehub-body{ padding:12px; }
+      .rx-btn{ height:106px; }
+      .gamehub-head{ flex-direction:column; align-items:flex-start; }
+      .gamehub-actions{ width:100%; justify-content:flex-end; }
+      .mcontrols{ display:flex; }
+    }
+  </style>
+
+ <script>
+(function(){
+  const panel = document.getElementById("gameHubPanel");
+  const titleEl = document.getElementById("gameHubTitle");
+  const subEl   = document.getElementById("gameHubSub");
+  const bodyEl  = document.getElementById("gameHubBody");
+  const closeBtn= document.getElementById("gameCloseBtn");
+  const resetBtn= document.getElementById("gameResetBtn");
+  const fsBtn   = document.getElementById("gameFullscreenBtn");
+
+  let currentGame = null;
+  let cleanup = null;
+
+  const isMobile = () => matchMedia("(max-width: 780px)").matches;
+  const themeIsDark = () => document.documentElement.dataset.theme === "dark";
+
+  function openPanel(){
+    panel.style.display = "block";
+    if (isMobile()) panel.scrollIntoView({ behavior:"smooth", block:"start" });
+  }
+  function closePanel(){
+    if (cleanup) { try{ cleanup(); }catch(e){} cleanup=null; }
+    currentGame = null;
+    bodyEl.innerHTML = "";
+    panel.style.display = "none";
+    fsBtn.style.display = "none";
+    fsBtn.onclick = null;
+  }
+
+  closeBtn.addEventListener("click", closePanel);
+  resetBtn.addEventListener("click", () => { if (currentGame) loadGame(currentGame); });
+
+  // chips
+  document.querySelectorAll(".gchip").forEach(ch=>{
+    ch.addEventListener("click", ()=>{
+      document.querySelectorAll(".gchip").forEach(x=>x.classList.remove("active"));
+      ch.classList.add("active");
+      loadGame(ch.dataset.game);
+    });
+  });
+
+  // cards
+  document.querySelectorAll(".game-card .game-open-btn").forEach(btn=>{
+    btn.addEventListener("click", (e)=>{
+      const card = e.target.closest(".game-card");
+      const g = card?.dataset?.game;
+      if (!g) return;
+      loadGame(g);
+    });
+  });
+
+  function loadGame(gameKey){
+    if (cleanup) { try{ cleanup(); }catch(e){} cleanup=null; }
+    currentGame = gameKey;
+    bodyEl.innerHTML = "";
+    fsBtn.style.display = "none";
+    fsBtn.onclick = null;
+
+    if (gameKey === "reaction"){
+      titleEl.textContent = "⚡ מבחן תגובה";
+      subEl.textContent   = "חכה שזה יהפוך לירוק — ואז תלחץ מהר.";
+      cleanup = renderReactionGame(bodyEl);
+      openPanel(); return;
+    }
+    if (gameKey === "quiz"){
+      titleEl.textContent = "🧠 מתמטיקה — מאגר שאלות (8 בכל סשן)";
+      subEl.textContent   = "קצר, מהיר, ומתחלף כל פעם.";
+      cleanup = renderMathQuiz(bodyEl);
+      openPanel(); return;
+    }
+    if (gameKey === "memory"){
+      titleEl.textContent = "🧩 Memory";
+      subEl.textContent   = "קומבו + טיימר + שיאים.";
+      cleanup = renderMemoryGame(bodyEl);
+      openPanel(); return;
+    }
+    if (gameKey === "dodge"){
+      titleEl.textContent = "🛡️ Dodge Arena";
+      subEl.textContent   = "מחשב: עכבר · מובייל: אצבע (גרור על הקנבס).";
+      cleanup = renderDodgeGame(bodyEl);
+      openPanel(); return;
+    }
+    if (gameKey === "snake"){
+      titleEl.textContent = "🐍 Snake";
+      subEl.textContent   = "מחשב: עכבר · מובייל: אצבע (תזיז לכיוון שאתה רוצה).";
+      cleanup = renderSnakeGame(bodyEl);
+      openPanel(); return;
+    }
+
+    titleEl.textContent = "משחק";
+    subEl.textContent = "לא נמצא.";
+    bodyEl.innerHTML = "<div class='gh-card'>משהו לא הסתדר.</div>";
+    openPanel();
+  }
+
+  /* ======================
+     Game 1: Reaction
+  ====================== */
+  function renderReactionGame(root){
+    const wrap = document.createElement("div");
+    wrap.className = "rx-wrap";
+    wrap.innerHTML = `
+      <div class="gh-card">
+        <div class="gh-row">
+          <span class="gh-pill">מטרה: זמן הכי נמוך</span>
+          <span class="gh-pill">נפסל אם לוחצים מוקדם</span>
+        </div>
+        <div class="gh-help" style="margin-top:10px;">
+          לחץ רק כשהכפתור ירוק.
+        </div>
+      </div>
+
+      <button class="rx-btn" id="rxBtn">לחץ כדי להתחיל</button>
+      <div id="rxResult" style="font-weight:1100; opacity:.9;"></div>
+    `;
+    root.appendChild(wrap);
+
+    const btn = wrap.querySelector("#rxBtn");
+    const res = wrap.querySelector("#rxResult");
+
+    let state = "idle";
+    let timer = null;
+    let startTime = 0;
+
+    function setBtn(text, bg, color){
+      btn.textContent = text;
+      btn.style.background = bg;
+      btn.style.color = color;
+    }
+    function reset(){
+      state = "idle";
+      res.textContent = "";
+      setBtn("לחץ כדי להתחיל",
+        themeIsDark() ? "rgba(56,189,248,.10)" : "rgba(37,99,235,.10)",
+        themeIsDark() ? "#e5e7eb" : "#0f172a"
+      );
+      if (timer) { clearTimeout(timer); timer=null; }
+    }
+    function start(){
+      state = "waiting";
+      res.textContent = "מחכה…";
+      setBtn("תחכה…",
+        themeIsDark() ? "rgba(245,158,11,.20)" : "rgba(245,158,11,.18)",
+        themeIsDark() ? "#e5e7eb" : "#0f172a"
+      );
+      const delay = 850 + Math.random()*2600;
+      timer = setTimeout(()=>{
+        state = "ready";
+        startTime = performance.now();
+        res.textContent = "עכשיו!";
+        setBtn("לחץ!!!",
+          themeIsDark() ? "rgba(34,197,94,.25)" : "rgba(34,197,94,.22)",
+          themeIsDark() ? "#e5e7eb" : "#0f172a"
+        );
+      }, delay);
+    }
+    function grade(ms){
+      if (ms < 185) return "🧠 פסיכי.";
+      if (ms < 240) return "⚡ מטורף.";
+      if (ms < 320) return "🔥 חזק.";
+      if (ms < 430) return "🙂 סבבה.";
+      return "🐢 עוד אימון.";
+    }
+
+    btn.addEventListener("click", ()=>{
+      if (state === "idle"){ start(); return; }
+      if (state === "waiting"){
+        res.textContent = "נפסלת 😅 לחצת מוקדם.";
+        setBtn("אופס… נסה שוב",
+          themeIsDark() ? "rgba(239,68,68,.18)" : "rgba(239,68,68,.16)",
+          themeIsDark() ? "#e5e7eb" : "#0f172a"
+        );
+        if (timer) { clearTimeout(timer); timer=null; }
+        state = "idle";
+        return;
+      }
+      if (state === "ready"){
+        const ms = Math.round(performance.now() - startTime);
+        res.textContent = `${ms}ms — ${grade(ms)}`;
+        setBtn("שחק שוב",
+          themeIsDark() ? "rgba(56,189,248,.10)" : "rgba(37,99,235,.10)",
+          themeIsDark() ? "#e5e7eb" : "#0f172a"
+        );
+        state = "idle";
+        return;
+      }
+    });
+
+    reset();
+    return function cleanup(){ if (timer) clearTimeout(timer); };
+  }
+
+  /* ======================
+     Game 2: MATH QUIZ (8 questions max)
+  ====================== */
+  function renderMathQuiz(root){
+    const wrap = document.createElement("div");
+    wrap.className = "q-wrap";
+    root.appendChild(wrap);
+
+    const SESSION_SIZE = 8;     // ✅ גג 8
+    const OPTIONS = 4;
+
+    const used = new Set();
+    const session = [];
+
+    let idx = 0, score = 0;
+    const startT = performance.now();
+
+    while (session.length < SESSION_SIZE){
+      session.push(genQuestion(used));
+    }
+
+    function render(){
+      wrap.innerHTML = "";
+
+      if (idx >= session.length){
+        const sec = Math.round((performance.now()-startT)/1000);
+        const pct = Math.round((score/session.length)*100);
+        wrap.innerHTML = `
+          <div class="q-result">סיימת! ציון: ${score}/${session.length} (${pct}%) · זמן: ${sec}s</div>
+          <div class="q-mini" style="margin-top:10px;">
+            <button class="btn" type="button" id="newSession">סשן חדש (עוד 8)</button>
+            <button class="btn-outline" type="button" id="closeQuiz">סגור</button>
+          </div>
+        `;
+        wrap.querySelector("#newSession").addEventListener("click", ()=> loadGame("quiz"));
+        wrap.querySelector("#closeQuiz").addEventListener("click", closePanel);
+        return;
+      }
+
+      const item = session[idx];
+
+      const meta = document.createElement("div");
+      meta.className = "q-meta";
+      meta.innerHTML = `
+        <div>שאלה ${idx+1}/${session.length}</div>
+        <div>ניקוד: ${score}</div>
+        <div>סוג: ${item.tag}</div>
+      `;
+      wrap.appendChild(meta);
+
+      const qEl = document.createElement("div");
+      qEl.className = "q-q";
+      qEl.textContent = item.q;
+      wrap.appendChild(qEl);
+
+      const opts = document.createElement("div");
+      opts.className = "q-opts";
+
+      item.options.forEach((txt, i)=>{
+        const b = document.createElement("button");
+        b.type = "button";
+        b.textContent = txt;
+        b.addEventListener("click", ()=>{
+          if (i === item.correct) score++;
+          idx++;
+          render();
+        });
+        opts.appendChild(b);
+      });
+
+      wrap.appendChild(opts);
+
+      const mini = document.createElement("div");
+      mini.className = "q-mini";
+      mini.innerHTML = `
+        <span class="gh-help" style="opacity:.8;">טיפ: אל תנחש. תחשב.</span>
+        <button class="btn-outline" type="button" id="skipQ">דלג</button>
+      `;
+      wrap.appendChild(mini);
+
+      mini.querySelector("#skipQ").addEventListener("click", ()=>{
+        idx++;
+        render();
+      });
+    }
+
+    render();
+    return function cleanup(){};
+
+    function genQuestion(usedSet){
+      const types = ["arith","percent","linear","seq","frac","geo","powers","roots","avg"];
+      const type = types[Math.floor(Math.random()*types.length)];
+
+      let qObj = null;
+      for (let tries=0; tries<250; tries++){
+        qObj = buildByType(type);
+        if (!qObj) continue;
+
+        const key = qObj.key;
+        if (!usedSet.has(key)){
+          usedSet.add(key);
+          qObj.options = makeOptions(qObj.ans, OPTIONS, qObj.rangeHint);
+          qObj.correct = qObj.options.indexOf(qObj.ansText);
+          if (qObj.correct === -1){
+            qObj.options[0] = qObj.ansText;
+            shuffle(qObj.options);
+            qObj.correct = qObj.options.indexOf(qObj.ansText);
+          }
+          return { q: qObj.qText, options: qObj.options, correct: qObj.correct, tag: qObj.tag };
+        }
+      }
+
+      const a = 7, b = 8;
+      const arr = shuffle([String(a*b), String(a*b+2), String(a*b-2), String(a*b+8)]);
+      return { q: `כמה זה ${a}×${b}?`, options: arr, correct: arr.indexOf(String(a*b)), tag: "כפל" };
+    }
+
+    function buildByType(type){
+      if (type === "arith"){
+        const a = r(12,99), b = r(12,99);
+        const op = pick(["+","-","×"]);
+        const ans = (op==="+")? a+b : (op==="-"? a-b : a*b);
+        const key = `arith:${a}${op}${b}`;
+        return mk(`${a} ${op} ${b} = ?`, ans, "חישוב", key, {min: -200, max: 9801});
+      }
+      if (type === "percent"){
+        const base = r(80, 900);
+        const p = pick([5,10,12,15,20,25,30,35,40]);
+        const ans = Math.round((base * p)/100);
+        const key = `pct:${p}of${base}`;
+        return mk(`כמה זה ${p}% מתוך ${base}?`, ans, "אחוזים", key, {min:0,max:900});
+      }
+      if (type === "linear"){
+        const a = pick([2,3,4,5,6,7,8,9]);
+        const x = r(2, 30);
+        const b = r(-20, 30);
+        const c = a*x + b;
+        const key = `lin:${a}x${b}=${c}`;
+        return mk(`אם ${a}x ${b>=0?"+":""}${b} = ${c}, מה x?`, x, "משוואה", key, {min:-50,max:60});
+      }
+      if (type === "seq"){
+        const k = r(-4, 8);
+        const term = (t)=> t*t + k;
+        const s = [1,2,3,4].map(term);
+        const ans = term(5);
+        const key = `seq:${k}`;
+        return mk(`השלם סדרה: ${s.join(", ")}, ?`, ans, "סדרה", key, {min:-10,max:80});
+      }
+      if (type === "frac"){
+        const a = pick([1,2,3,4,5,6,7,8,9]);
+        const b = pick([2,3,4,5,6,7,8,9,10,12]);
+        if (a>=b) return null;
+        const val = a/b;
+        const key = `frac:${a}/${b}`;
+        const ans = Math.round(val*100);
+        return mk(`כמה אחוז זה בערך ${a}/${b}? (בעיגול)`, ans, "שברים", key, {min:0,max:100});
+      }
+      if (type === "geo"){
+        const d = r(2, 14);
+        const t = pick([10,15,20,25,30,40,45,50,60,75]);
+        const ans = Math.round(d / (t/60));
+        const key = `geo:${d}in${t}`;
+        return mk(`אם עוברים ${d} ק"מ ב-${t} דקות — מה המהירות בקמ"ש? (בעיגול)`, ans, "מהירות", key, {min:1,max:200});
+      }
+      if (type === "powers"){
+        const base = pick([2,3,4,5,6,7,8,9]);
+        const exp = pick([2,3,4]);
+        const ans = Math.pow(base, exp);
+        const key = `pow:${base}^${exp}`;
+        return mk(`כמה זה ${base}^${exp}?`, ans, "חזקות", key, {min:0,max:10000});
+      }
+      if (type === "roots"){
+        const n = pick([9,16,25,36,49,64,81,100,121,144]);
+        const ans = Math.round(Math.sqrt(n));
+        const key = `root:${n}`;
+        return mk(`מה השורש הריבועי של ${n}?`, ans, "שורשים", key, {min:0,max:50});
+      }
+      if (type === "avg"){
+        const a = r(10, 90), b = r(10, 90), c = r(10, 90);
+        const ans = Math.round((a+b+c)/3);
+        const key = `avg:${a},${b},${c}`;
+        return mk(`מה הממוצע (בעיגול) של ${a}, ${b}, ${c}?`, ans, "ממוצע", key, {min:0,max:100});
+      }
+      return null;
+    }
+
+    function mk(qText, ans, tag, key, rangeHint){
+      const ansText = String(ans);
+      return { qText, ans, ansText, tag, key, rangeHint };
+    }
+
+    function makeOptions(ansText, n, hint){
+      const ans = Number(ansText);
+      const opts = new Set([String(ans)]);
+      const min = hint?.min ?? (ans-30);
+      const max = hint?.max ?? (ans+30);
+
+      let guard = 0;
+      while (opts.size < n && guard++ < 500){
+        let cand;
+        if (Math.random() < 0.65){
+          const delta = pick([1,2,3,4,5,6,7,8,9,10,12,15,20]);
+          cand = ans + (Math.random()<0.5 ? -delta : delta);
+        } else {
+          cand = r(min, max);
+        }
+        if (cand === ans) continue;
+        opts.add(String(cand));
+      }
+      const arr = Array.from(opts);
+      shuffle(arr);
+      return arr;
+    }
+  }
+
+  /* ======================
+     Game 3: Memory
+  ====================== */
+  function renderMemoryGame(root){
+    const symbols = ["🍉","⚽","🎧","🎮","🧠","🚀","📚","🔥","⭐","🎯","🧊","🍕"];
+    const pairs = isMobile() ? 8 : 10;
+    const chosen = shuffle(symbols.slice()).slice(0, pairs);
+    let deck = [...chosen, ...chosen].map((sym, i)=>({ id:i, sym }));
+    shuffle(deck);
+
+    let revealed = [];
+    let matched = new Set();
+    let moves = 0, combo = 0, bestCombo = 0;
+    let locked = false;
+
+    const start = performance.now();
+    let timerId = null;
+
+    const wrap = document.createElement("div");
+    wrap.className = "mem-wrap";
+    wrap.innerHTML = `
+      <div class="gh-card">
+        <div class="gh-row">
+          <span class="gh-pill">מהלכים: <span id="memMoves">0</span></span>
+          <span class="gh-pill">קומבו: <span id="memCombo">0</span></span>
+          <span class="gh-pill">זמן: <span id="memTime">0</span>s</span>
+        </div>
+        <div class="gh-help" style="margin-top:10px;">תמצא זוגות. רצף נכון מעלה קומבו.</div>
+      </div>
+
+      <div class="mem-grid" id="memGrid"></div>
+
+      <div id="memEnd" class="gh-card" style="display:none;">
+        <div style="font-weight:1100; font-size:1.05rem;">סיימת!</div>
+        <div class="gh-help" style="margin-top:8px;">
+          מהלכים: <b id="memEndMoves"></b> · זמן: <b id="memEndTime"></b>s · קומבו שיא: <b id="memEndBest"></b>
+        </div>
+      </div>
+    `;
+    root.appendChild(wrap);
+
+    const grid = wrap.querySelector("#memGrid");
+    const movesEl = wrap.querySelector("#memMoves");
+    const comboEl = wrap.querySelector("#memCombo");
+    const timeEl  = wrap.querySelector("#memTime");
+    const endBox  = wrap.querySelector("#memEnd");
+
+    function render(){
+      grid.innerHTML = "";
+      deck.forEach((card, idx)=>{
+        const el = document.createElement("button");
+        el.type = "button";
+        el.className = "mem-card";
+        const isMatched = matched.has(idx);
+        const isRevealed = revealed.includes(idx);
+
+        if (isMatched) el.classList.add("matched");
+        else if (isRevealed) el.classList.add("revealed");
+
+        el.textContent = (isMatched || isRevealed) ? card.sym : "❔";
+        el.disabled = isMatched || locked;
+
+        el.addEventListener("click", ()=>onPick(idx));
+        grid.appendChild(el);
+      });
+    }
+
+    function onPick(idx){
+      if (locked) return;
+      if (matched.has(idx)) return;
+      if (revealed.includes(idx)) return;
+
+      revealed.push(idx);
+      if (revealed.length === 1){ render(); return; }
+
+      moves++;
+      movesEl.textContent = String(moves);
+      locked = true;
+      render();
+
+      const [a,b] = revealed;
+      const ok = deck[a].sym === deck[b].sym;
+
+      setTimeout(()=>{
+        if (ok){
+          matched.add(a); matched.add(b);
+          combo++;
+          bestCombo = Math.max(bestCombo, combo);
+        } else {
+          combo = 0;
+        }
+        comboEl.textContent = String(combo);
+        revealed = [];
+        locked = false;
+        render();
+
+        if (matched.size === deck.length){
+          const sec = Math.round((performance.now()-start)/1000);
+          endBox.style.display = "block";
+          wrap.querySelector("#memEndMoves").textContent = String(moves);
+          wrap.querySelector("#memEndTime").textContent = String(sec);
+          wrap.querySelector("#memEndBest").textContent = String(bestCombo);
+          if (timerId) { clearInterval(timerId); timerId=null; }
+        }
+      }, ok ? 420 : 620);
+    }
+
+    function tick(){
+      const sec = Math.round((performance.now()-start)/1000);
+      timeEl.textContent = String(sec);
+    }
+
+    timerId = setInterval(tick, 250);
+    tick();
+    render();
+
+    return function cleanup(){ if (timerId) clearInterval(timerId); };
+  }
+
+  /* ======================
+     Game 4: Dodge Arena (MOUSE/FINGER CONTROL)
+  ====================== */
+  function renderDodgeGame(root){
+    const wrap = document.createElement("div");
+    wrap.className = "canvas-wrap";
+
+    wrap.innerHTML = `
+      <div class="gh-card">
+        <div class="gh-row">
+          <span class="gh-pill">ניקוד: <span id="dgScore">0</span></span>
+          <span class="gh-pill">שיא: <span id="dgBest">0</span></span>
+          <span class="gh-pill">רמה: <span id="dgLvl">1</span></span>
+        </div>
+        <div class="gh-help" style="margin-top:10px;">
+          ✅ שליטה: <span class="kbd">עכבר</span> / <span class="kbd">אצבע</span> על הקנבס. (מקלדת עדיין עובדת כגיבוי)
+          <span class="kbd">P</span> עצור/המשך.
+        </div>
+      </div>
+
+      <div class="canvas-box" id="dgBox">
+        <canvas class="game-canvas" id="dgCanvas" width="860" height="460"></canvas>
+      </div>
+
+      <div class="gh-card" id="dgEnd" style="display:none;">
+        <div style="font-weight:1100;font-size:1.05rem;">נגמר 😈</div>
+        <div class="gh-help" style="margin-top:8px;">איפוס כדי להתחיל מחדש.</div>
+      </div>
+    `;
+    root.appendChild(wrap);
+
+    const box = wrap.querySelector("#dgBox");
+    const canvas = wrap.querySelector("#dgCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const scoreEl = wrap.querySelector("#dgScore");
+    const bestEl  = wrap.querySelector("#dgBest");
+    const lvlEl   = wrap.querySelector("#dgLvl");
+    const endEl   = wrap.querySelector("#dgEnd");
+
+    let best = Number(localStorage.getItem("yaarat_game_dodge_best") || "0");
+    bestEl.textContent = String(best);
+
+    // Fullscreen on mobile
+    fsBtn.style.display = isMobile() ? "inline-flex" : "none";
+    fsBtn.onclick = async ()=>{
+      try{
+        if (!document.fullscreenElement) await box.requestFullscreen?.();
+        else await document.exitFullscreen?.();
+      }catch(e){}
+    };
+
+    function fitCanvas(){
+      const rect = canvas.getBoundingClientRect();
+      const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+      const targetW = Math.floor(rect.width * dpr);
+      const targetH = Math.floor((rect.width * (460/860)) * dpr);
+      if (canvas.width !== targetW || canvas.height !== targetH){
+        canvas.width = targetW;
+        canvas.height = targetH;
+      }
+    }
+    fitCanvas();
+
+    let running = true;
+    let paused = false;
+    let lastT = performance.now();
+
+    const player = { x: 0, y: 0, r: 10, vx:0, vy:0, speed: 900 }; // speed high, follows pointer
+    let bullets = [];
+    let particles = [];
+    let score = 0;
+    let level = 1;
+    let spawnTimer = 0;
+    let spawnEvery = 0.85;
+    let bulletSpeed = 150;
+    let keys = Object.create(null);
+
+    // pointer target
+    let pointerDown = false;
+    let target = { x: null, y: null };
+
+    function W(){ return canvas.width; }
+    function H(){ return canvas.height; }
+
+    function reset(){
+      bullets = [];
+      particles = [];
+      score = 0;
+      level = 1;
+      spawnTimer = 0;
+      spawnEvery = 0.85;
+      bulletSpeed = 150;
+      player.r = 10;
+      player.x = W()/2; player.y = H()/2;
+      target.x = player.x; target.y = player.y;
+      endEl.style.display = "none";
+      paused = false;
+      running = true;
+      lastT = performance.now();
+    }
+
+    function togglePause(){ if (running) paused = !paused; }
+
+    function spawnBullet(){
+      const w=W(), h=H();
+      const edge = Math.floor(Math.random()*4);
+      let x,y;
+      if (edge===0){ x = Math.random()*w; y = -14; }
+      if (edge===1){ x = w+14; y = Math.random()*h; }
+      if (edge===2){ x = Math.random()*w; y = h+14; }
+      if (edge===3){ x = -14; y = Math.random()*h; }
+
+      const dx = player.x - x;
+      const dy = player.y - y;
+      const jitter = (Math.random()*0.55 - 0.275);
+      const ang = Math.atan2(dy,dx) + jitter;
+
+      const sp = bulletSpeed * (0.9 + Math.random()*0.35);
+      bullets.push({ x,y, vx: Math.cos(ang)*sp, vy: Math.sin(ang)*sp, r: 6 + Math.random()*3, life: 12 });
+    }
+
+    function addBurst(x,y, n=18){
+      for (let i=0;i<n;i++){
+        const a = Math.random()*Math.PI*2;
+        const sp = 70 + Math.random()*200;
+        particles.push({ x,y, vx: Math.cos(a)*sp, vy: Math.sin(a)*sp, life: 0.6 + Math.random()*0.7 });
+      }
+    }
+
+    function clampPlayer(){
+      player.x = Math.max(player.r, Math.min(W()-player.r, player.x));
+      player.y = Math.max(player.r, Math.min(H()-player.r, player.y));
+    }
+
+    function step(dt){
+      // pointer-follow (main)
+      if (target.x != null && target.y != null){
+        const dx = target.x - player.x;
+        const dy = target.y - player.y;
+        const dist = Math.hypot(dx,dy);
+        if (dist > 0.0001){
+          const maxMove = player.speed * dt;
+          const k = Math.min(1, maxMove / dist);
+          player.x += dx * k;
+          player.y += dy * k;
+        }
+        clampPlayer();
+      }
+
+      // keyboard fallback (small influence)
+      let ix = 0, iy = 0;
+      if (keys["ArrowLeft"] || keys["a"] || keys["A"]) ix -= 1;
+      if (keys["ArrowRight"]|| keys["d"] || keys["D"]) ix += 1;
+      if (keys["ArrowUp"]   || keys["w"] || keys["W"]) iy -= 1;
+      if (keys["ArrowDown"] || keys["s"] || keys["S"]) iy += 1;
+      if (ix || iy){
+        const ilen = Math.hypot(ix,iy) || 1;
+        ix/=ilen; iy/=ilen;
+        player.x += ix * 420 * dt;
+        player.y += iy * 420 * dt;
+        clampPlayer();
+        target.x = player.x; target.y = player.y; // keep target synced if keyboard used
+      }
+
+      // difficulty
+      score += dt * (10 + level*2.2);
+      const newLevel = 1 + Math.floor(score/120);
+      if (newLevel !== level){
+        level = newLevel;
+        spawnEvery = Math.max(0.23, 0.85 - (level-1)*0.06);
+        bulletSpeed = 150 + (level-1)*24;
+        addBurst(player.x, player.y, 8);
+      }
+
+      spawnTimer += dt;
+      while (spawnTimer >= spawnEvery){
+        spawnTimer -= spawnEvery;
+        spawnBullet();
+        if (level >= 6 && Math.random() < 0.25) spawnBullet();
+      }
+
+      // bullets
+      for (let i=bullets.length-1;i>=0;i--){
+        const b = bullets[i];
+        b.x += b.vx*dt;
+        b.y += b.vy*dt;
+        b.life -= dt;
+
+        const dist = Math.hypot(b.x-player.x, b.y-player.y);
+        if (dist < b.r + player.r){
+          running = false;
+          endEl.style.display = "block";
+          addBurst(player.x, player.y, 32);
+          if (score > best){
+            best = Math.floor(score);
+            localStorage.setItem("yaarat_game_dodge_best", String(best));
+          }
+          break;
+        }
+        if (b.life <= 0 || b.x < -60 || b.x > W()+60 || b.y < -60 || b.y > H()+60){
+          bullets.splice(i,1);
+        }
+      }
+
+      // particles
+      for (let i=particles.length-1;i>=0;i--){
+        const p = particles[i];
+        p.x += p.vx*dt; p.y += p.vy*dt;
+        p.vx *= (1 - 2.1*dt); p.vy *= (1 - 2.1*dt);
+        p.life -= dt;
+        if (p.life <= 0) particles.splice(i,1);
+      }
+    }
+
+    function draw(){
+      const w=W(), h=H();
+      ctx.clearRect(0,0,w,h);
+
+      // grid
+      ctx.globalAlpha = themeIsDark() ? 0.22 : 0.20;
+      ctx.strokeStyle = themeIsDark() ? "#93c5fd" : "#2563eb";
+      ctx.lineWidth = 1;
+      const stepG = Math.max(42, Math.round(w/18));
+      for (let x=stepG;x<w;x+=stepG){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke(); }
+      for (let y=stepG;y<h;y+=stepG){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
+      ctx.globalAlpha = 1;
+
+      // bullets
+      bullets.forEach(b=>{
+        ctx.beginPath();
+        ctx.fillStyle = themeIsDark() ? "rgba(239,68,68,.88)" : "rgba(239,68,68,.72)";
+        ctx.arc(b.x,b.y,b.r,0,Math.PI*2);
+        ctx.fill();
+      });
+
+      // player
+      ctx.beginPath();
+      ctx.fillStyle = themeIsDark() ? "rgba(34,197,94,.95)" : "rgba(34,197,94,.82)";
+      ctx.arc(player.x, player.y, player.r, 0, Math.PI*2);
+      ctx.fill();
+
+      // ring
+      ctx.globalAlpha = 0.25;
+      ctx.lineWidth = Math.max(5, Math.round(w/180));
+      ctx.strokeStyle = themeIsDark() ? "#38bdf8" : "#2563eb";
+      ctx.beginPath();
+      ctx.arc(player.x, player.y, player.r+10, 0, Math.PI*2);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+
+      // particles
+      particles.forEach(p=>{
+        ctx.globalAlpha = Math.max(0, Math.min(1, p.life));
+        ctx.fillStyle = "#f59e0b";
+        ctx.fillRect(p.x, p.y, 3, 3);
+      });
+      ctx.globalAlpha = 1;
+
+      // HUD
+      ctx.globalAlpha = 0.85;
+      ctx.fillStyle = themeIsDark() ? "#e5e7eb" : "#0f172a";
+      ctx.font = "900 14px system-ui, -apple-system, Segoe UI, Arial";
+      ctx.fillText(paused ? "PAUSED" : "DODGE", 12, 20);
+      ctx.globalAlpha = 1;
+    }
+
+    function loop(t){
+      const dt = Math.min(0.033, (t-lastT)/1000);
+      lastT = t;
+
+      fitCanvas();
+      if (running && !paused) step(dt);
+      draw();
+
+      scoreEl.textContent = String(Math.floor(score));
+      bestEl.textContent  = String(best);
+      lvlEl.textContent   = String(level);
+
+      raf = requestAnimationFrame(loop);
+    }
+
+    function canvasPosFromEvent(ev){
+      const rect = canvas.getBoundingClientRect();
+      const dpr = canvas.width / rect.width;
+      return {
+        x: (ev.clientX - rect.left) * dpr,
+        y: (ev.clientY - rect.top)  * dpr
+      };
+    }
+
+    function onPointerDown(ev){
+      pointerDown = true;
+      canvas.setPointerCapture?.(ev.pointerId);
+      const p = canvasPosFromEvent(ev);
+      target.x = p.x; target.y = p.y;
+    }
+    function onPointerMove(ev){
+      if (!pointerDown && !isMobile()) {
+        // desktop hover-move control too
+        const p = canvasPosFromEvent(ev);
+        target.x = p.x; target.y = p.y;
+        return;
+      }
+      if (!pointerDown) return;
+      const p = canvasPosFromEvent(ev);
+      target.x = p.x; target.y = p.y;
+    }
+    function onPointerUp(){
+      pointerDown = false;
+    }
+
+    function onKeyDown(e){
+      keys[e.key] = true;
+      if (e.key === "p" || e.key === "P") togglePause();
+      if (e.key === "r" || e.key === "R") reset();
+    }
+    function onKeyUp(e){ keys[e.key] = false; }
+
+    let raf = requestAnimationFrame(loop);
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("keyup", onKeyUp);
+    window.addEventListener("resize", fitCanvas);
+
+    canvas.addEventListener("pointerdown", onPointerDown);
+    canvas.addEventListener("pointermove", onPointerMove);
+    canvas.addEventListener("pointerup", onPointerUp);
+    canvas.addEventListener("pointercancel", onPointerUp);
+    canvas.addEventListener("pointerleave", ()=>{ if(!isMobile()) pointerDown=false; });
+
+    reset();
+
+    return function cleanup(){
+      cancelAnimationFrame(raf);
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("keyup", onKeyUp);
+      window.removeEventListener("resize", fitCanvas);
+      canvas.removeEventListener("pointerdown", onPointerDown);
+      canvas.removeEventListener("pointermove", onPointerMove);
+      canvas.removeEventListener("pointerup", onPointerUp);
+      canvas.removeEventListener("pointercancel", onPointerUp);
+      fsBtn.onclick = null;
+    };
+  }
+
+  /* ======================
+     Game 5: Snake (MOUSE/FINGER CONTROL)
+  ====================== */
+  function renderSnakeGame(root){
+    const wrap = document.createElement("div");
+    wrap.className = "canvas-wrap";
+
+    wrap.innerHTML = `
+      <div class="gh-card">
+        <div class="gh-row">
+          <span class="gh-pill">ניקוד: <span id="snScore">0</span></span>
+          <span class="gh-pill">שיא: <span id="snBest">0</span></span>
+          <span class="gh-pill">מהירות: <span id="snSpd">1</span>x</span>
+        </div>
+        <div class="gh-help" style="margin-top:10px;">
+          ✅ שליטה: <span class="kbd">עכבר</span> / <span class="kbd">אצבע</span> (תזיז לכיוון הרצוי). מקלדת עדיין עובדת כגיבוי.
+        </div>
+      </div>
+
+      <div class="canvas-box" id="snBox">
+        <canvas class="game-canvas" id="snCanvas" width="860" height="460"></canvas>
+      </div>
+
+      <div class="gh-card" id="snEnd" style="display:none;">
+        <div style="font-weight:1100;font-size:1.05rem;">נגמר 🐍</div>
+        <div class="gh-help" style="margin-top:8px;">איפוס כדי להתחיל מחדש.</div>
+      </div>
+    `;
+    root.appendChild(wrap);
+
+    const box = wrap.querySelector("#snBox");
+    const canvas = wrap.querySelector("#snCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // fullscreen mobile
+    fsBtn.style.display = isMobile() ? "inline-flex" : "none";
+    fsBtn.onclick = async ()=>{
+      try{
+        if (!document.fullscreenElement) await box.requestFullscreen?.();
+        else await document.exitFullscreen?.();
+      }catch(e){}
+    };
+
+    function fitCanvas(){
+      const rect = canvas.getBoundingClientRect();
+      const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+      const targetW = Math.floor(rect.width * dpr);
+      const targetH = Math.floor((rect.width * (460/860)) * dpr);
+      if (canvas.width !== targetW || canvas.height !== targetH){
+        canvas.width = targetW;
+        canvas.height = targetH;
+      }
+    }
+    fitCanvas();
+
+    const scoreEl = wrap.querySelector("#snScore");
+    const bestEl  = wrap.querySelector("#snBest");
+    const spdEl   = wrap.querySelector("#snSpd");
+    const endEl   = wrap.querySelector("#snEnd");
+
+    let best = Number(localStorage.getItem("yaarat_game_snake_best") || "0");
+    bestEl.textContent = String(best);
+
+    let snake, dir, nextDir, food, score, alive;
+    let tickMs = 140;
+    let acc = 0;
+    let last = performance.now();
+    let keys = Object.create(null);
+    let raf = null;
+
+    // pointer steering
+    let pointerDown = false;
+    let steer = { x: null, y: null };
+
+    function reset(){
+      const w = canvas.width, h = canvas.height;
+      const cell = isMobile() ? 26 : 22;
+      const cols = Math.floor(w/cell);
+      const rows = Math.floor(h/cell);
+
+      wrap.__cell = cell;
+      wrap.__cols = cols;
+      wrap.__rows = rows;
+
+      snake = [{x: Math.floor(cols/2), y: Math.floor(rows/2)}];
+      dir = {x:1,y:0};
+      nextDir = {x:1,y:0};
+      score = 0;
+      alive = true;
+      tickMs = 140;
+      acc = 0;
+      endEl.style.display = "none";
+      placeFood();
+      last = performance.now();
+    }
+
+    function placeFood(){
+      const cols = wrap.__cols, rows = wrap.__rows;
+      while(true){
+        const f = { x: Math.floor(Math.random()*cols), y: Math.floor(Math.random()*rows) };
+        if (!snake.some(s=>s.x===f.x && s.y===f.y)){ food = f; break; }
+      }
+    }
+
+    function setDir(nx,ny){
+      if (nx === -dir.x && ny === -dir.y) return;
+      nextDir = {x:nx,y:ny};
+    }
+
+    function steerToPointer(){
+      if (steer.x == null || steer.y == null) return;
+      const cell = wrap.__cell;
+
+      const head = snake[0];
+      const hx = head.x * cell + cell/2;
+      const hy = head.y * cell + cell/2;
+
+      const dx = steer.x - hx;
+      const dy = steer.y - hy;
+
+      // choose dominant axis
+      if (Math.abs(dx) > Math.abs(dy)){
+        if (dx > 0) setDir(1,0);
+        else setDir(-1,0);
+      } else {
+        if (dy > 0) setDir(0,1);
+        else setDir(0,-1);
+      }
+    }
+
+    function step(){
+      if (!alive) return;
+
+      // pointer steering first (so it feels immediate)
+      steerToPointer();
+
+      dir = nextDir;
+
+      const cols = wrap.__cols, rows = wrap.__rows;
+      const head = snake[0];
+      const nh = { x: head.x + dir.x, y: head.y + dir.y };
+
+      if (nh.x < 0 || nh.x >= cols || nh.y < 0 || nh.y >= rows){ die(); return; }
+      if (snake.some((s,i)=> i>0 && s.x===nh.x && s.y===nh.y)){ die(); return; }
+
+      snake.unshift(nh);
+
+      if (nh.x === food.x && nh.y === food.y){
+        score += 10;
+        placeFood();
+        if (tickMs > 72) tickMs -= 3;
+      } else {
+        snake.pop();
+      }
+    }
+
+    function die(){
+      alive = false;
+      endEl.style.display = "block";
+      if (score > best){
+        best = score;
+        localStorage.setItem("yaarat_game_snake_best", String(best));
+      }
+    }
+
+    function draw(){
+      const w = canvas.width, h = canvas.height;
+      const cell = wrap.__cell;
+      const cols = wrap.__cols, rows = wrap.__rows;
+
+      ctx.clearRect(0,0,w,h);
+
+      // grid
+      ctx.globalAlpha = themeIsDark() ? 0.16 : 0.14;
+      ctx.strokeStyle = themeIsDark() ? "#93c5fd" : "#2563eb";
+      for (let x=0;x<=cols;x++){
+        ctx.beginPath(); ctx.moveTo(x*cell,0); ctx.lineTo(x*cell,rows*cell); ctx.stroke();
+      }
+      for (let y=0;y<=rows;y++){
+        ctx.beginPath(); ctx.moveTo(0,y*cell); ctx.lineTo(cols*cell,y*cell); ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+
+      // food
+      ctx.fillStyle = themeIsDark() ? "rgba(239,68,68,.9)" : "rgba(239,68,68,.75)";
+      ctx.fillRect(food.x*cell+3, food.y*cell+3, cell-6, cell-6);
+
+      // snake
+      snake.forEach((s,i)=>{
+        ctx.fillStyle = i===0
+          ? (themeIsDark() ? "rgba(34,197,94,.95)" : "rgba(34,197,94,.82)")
+          : (themeIsDark() ? "rgba(56,189,248,.55)" : "rgba(37,99,235,.30)");
+        ctx.fillRect(s.x*cell+2, s.y*cell+2, cell-4, cell-4);
+      });
+
+      if (!alive){
+        ctx.globalAlpha = 0.85;
+        ctx.fillStyle = themeIsDark() ? "#e5e7eb" : "#0f172a";
+        ctx.font = "1100 22px system-ui, -apple-system, Segoe UI, Arial";
+        ctx.fillText("GAME OVER", 12, 30);
+        ctx.globalAlpha = 1;
+      }
+    }
+
+    function loop(t){
+      const dt = t - last;
+      last = t;
+      acc += dt;
+
+      fitCanvas();
+      while (acc >= tickMs){ acc -= tickMs; step(); }
+      draw();
+
+      scoreEl.textContent = String(score);
+      bestEl.textContent = String(best);
+      spdEl.textContent = String(Math.round(140 / tickMs * 10)/10);
+
+      raf = requestAnimationFrame(loop);
+    }
+
+    function onKeyDown(e){
+      keys[e.key] = true;
+      if (e.key==="ArrowLeft" || e.key==="a" || e.key==="A") setDir(-1,0);
+      if (e.key==="ArrowRight"|| e.key==="d" || e.key==="D") setDir(1,0);
+      if (e.key==="ArrowUp"   || e.key==="w" || e.key==="W") setDir(0,-1);
+      if (e.key==="ArrowDown" || e.key==="s" || e.key==="S") setDir(0,1);
+      if (e.key==="r" || e.key==="R") reset();
+    }
+    function onKeyUp(e){ keys[e.key] = false; }
+
+    function canvasPosFromEvent(ev){
+      const rect = canvas.getBoundingClientRect();
+      const dpr = canvas.width / rect.width;
+      return {
+        x: (ev.clientX - rect.left) * dpr,
+        y: (ev.clientY - rect.top)  * dpr
+      };
+    }
+
+    function onPointerDown(ev){
+      pointerDown = true;
+      canvas.setPointerCapture?.(ev.pointerId);
+      const p = canvasPosFromEvent(ev);
+      steer.x = p.x; steer.y = p.y;
+    }
+    function onPointerMove(ev){
+      if (!pointerDown && !isMobile()){
+        // desktop hover steering too
+        const p = canvasPosFromEvent(ev);
+        steer.x = p.x; steer.y = p.y;
+        return;
+      }
+      if (!pointerDown) return;
+      const p = canvasPosFromEvent(ev);
+      steer.x = p.x; steer.y = p.y;
+    }
+    function onPointerUp(){
+      pointerDown = false;
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("keyup", onKeyUp);
+    window.addEventListener("resize", fitCanvas);
+
+    canvas.addEventListener("pointerdown", onPointerDown);
+    canvas.addEventListener("pointermove", onPointerMove);
+    canvas.addEventListener("pointerup", onPointerUp);
+    canvas.addEventListener("pointercancel", onPointerUp);
+    canvas.addEventListener("pointerleave", ()=>{ if(!isMobile()) pointerDown=false; });
+
+    reset();
+    raf = requestAnimationFrame(loop);
+
+    return function cleanup(){
+      cancelAnimationFrame(raf);
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("keyup", onKeyUp);
+      window.removeEventListener("resize", fitCanvas);
+      canvas.removeEventListener("pointerdown", onPointerDown);
+      canvas.removeEventListener("pointermove", onPointerMove);
+      canvas.removeEventListener("pointerup", onPointerUp);
+      canvas.removeEventListener("pointercancel", onPointerUp);
+      fsBtn.onclick = null;
+    };
+  }
+
+  // helpers
+  function shuffle(arr){
+    for (let i=arr.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [arr[i],arr[j]]=[arr[j],arr[i]];
+    }
+    return arr;
+  }
+  function r(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+  function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+})();
+</script>
+
+</section>
+
+
+
 
   <section id="home-poll-mini" class="section-light reveal-on-scroll">
     <div class="container">
