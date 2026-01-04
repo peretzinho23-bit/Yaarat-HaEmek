@@ -2455,1178 +2455,1193 @@ html[data-theme="dark"] .hero-latest-title{
     }
   </style>
 
- <script>
-(function(){
-  const panel = document.getElementById("gameHubPanel");
-  const titleEl = document.getElementById("gameHubTitle");
-  const subEl   = document.getElementById("gameHubSub");
-  const bodyEl  = document.getElementById("gameHubBody");
-  const closeBtn= document.getElementById("gameCloseBtn");
-  const resetBtn= document.getElementById("gameResetBtn");
-  const fsBtn   = document.getElementById("gameFullscreenBtn");
+  <script>
+  (function(){
+    const panel = document.getElementById("gameHubPanel");
+    const titleEl = document.getElementById("gameHubTitle");
+    const subEl   = document.getElementById("gameHubSub");
+    const bodyEl  = document.getElementById("gameHubBody");
+    const closeBtn= document.getElementById("gameCloseBtn");
+    const resetBtn= document.getElementById("gameResetBtn");
+    const fsBtn   = document.getElementById("gameFullscreenBtn");
 
-  let currentGame = null;
-  let cleanup = null;
+    let currentGame = null;
+    let cleanup = null;
 
-  const isMobile = () => matchMedia("(max-width: 780px)").matches;
-  const themeIsDark = () => document.documentElement.dataset.theme === "dark";
+    const isMobile = () => matchMedia("(max-width: 780px)").matches;
+    const themeIsDark = () => document.documentElement.dataset.theme === "dark";
 
-  function openPanel(){
-    panel.style.display = "block";
-    if (isMobile()) panel.scrollIntoView({ behavior:"smooth", block:"start" });
-  }
-  function closePanel(){
-    if (cleanup) { try{ cleanup(); }catch(e){} cleanup=null; }
-    currentGame = null;
-    bodyEl.innerHTML = "";
-    panel.style.display = "none";
-    fsBtn.style.display = "none";
-    fsBtn.onclick = null;
-  }
+    function openPanel(){
+      panel.style.display = "block";
+      if (isMobile()) panel.scrollIntoView({ behavior:"smooth", block:"start" });
+    }
+    function closePanel(){
+      if (cleanup) { try{ cleanup(); }catch(e){} cleanup=null; }
+      currentGame = null;
+      bodyEl.innerHTML = "";
+      panel.style.display = "none";
+      fsBtn.style.display = "none";
+      fsBtn.onclick = null;
+    }
 
-  closeBtn.addEventListener("click", closePanel);
-  resetBtn.addEventListener("click", () => { if (currentGame) loadGame(currentGame); });
+    closeBtn.addEventListener("click", closePanel);
+    resetBtn.addEventListener("click", () => { if (currentGame) loadGame(currentGame); });
 
-  // chips
-  document.querySelectorAll(".gchip").forEach(ch=>{
-    ch.addEventListener("click", ()=>{
-      document.querySelectorAll(".gchip").forEach(x=>x.classList.remove("active"));
-      ch.classList.add("active");
-      loadGame(ch.dataset.game);
+    // chips
+    document.querySelectorAll(".gchip").forEach(ch=>{
+      ch.addEventListener("click", ()=>{
+        document.querySelectorAll(".gchip").forEach(x=>x.classList.remove("active"));
+        ch.classList.add("active");
+        loadGame(ch.dataset.game);
+      });
     });
-  });
 
-  // cards
-  document.querySelectorAll(".game-card .game-open-btn").forEach(btn=>{
-    btn.addEventListener("click", (e)=>{
-      const card = e.target.closest(".game-card");
-      const g = card?.dataset?.game;
-      if (!g) return;
-      loadGame(g);
+    // cards
+    document.querySelectorAll(".game-card .game-open-btn").forEach(btn=>{
+      btn.addEventListener("click", (e)=>{
+        const card = e.target.closest(".game-card");
+        const g = card?.dataset?.game;
+        if (!g) return;
+        loadGame(g);
+      });
     });
-  });
 
-  function loadGame(gameKey){
-    if (cleanup) { try{ cleanup(); }catch(e){} cleanup=null; }
-    currentGame = gameKey;
-    bodyEl.innerHTML = "";
-    fsBtn.style.display = "none";
-    fsBtn.onclick = null;
+    function loadGame(gameKey){
+      if (cleanup) { try{ cleanup(); }catch(e){} cleanup=null; }
+      currentGame = gameKey;
+      bodyEl.innerHTML = "";
+      fsBtn.style.display = "none";
+      fsBtn.onclick = null;
 
-    if (gameKey === "reaction"){
-      titleEl.textContent = "⚡ מבחן תגובה";
-      subEl.textContent   = "חכה שזה יהפוך לירוק — ואז תלחץ מהר.";
-      cleanup = renderReactionGame(bodyEl);
-      openPanel(); return;
-    }
-    if (gameKey === "quiz"){
-      titleEl.textContent = "🧠 מתמטיקה — מאגר שאלות (8 בכל סשן)";
-      subEl.textContent   = "קצר, מהיר, ומתחלף כל פעם.";
-      cleanup = renderMathQuiz(bodyEl);
-      openPanel(); return;
-    }
-    if (gameKey === "memory"){
-      titleEl.textContent = "🧩 Memory";
-      subEl.textContent   = "קומבו + טיימר + שיאים.";
-      cleanup = renderMemoryGame(bodyEl);
-      openPanel(); return;
-    }
-    if (gameKey === "dodge"){
-      titleEl.textContent = "🛡️ Dodge Arena";
-      subEl.textContent   = "מחשב: עכבר · מובייל: אצבע (גרור על הקנבס).";
-      cleanup = renderDodgeGame(bodyEl);
-      openPanel(); return;
-    }
-    if (gameKey === "snake"){
-      titleEl.textContent = "🐍 Snake";
-      subEl.textContent   = "מחשב: עכבר · מובייל: אצבע (תזיז לכיוון שאתה רוצה).";
-      cleanup = renderSnakeGame(bodyEl);
-      openPanel(); return;
-    }
-
-    titleEl.textContent = "משחק";
-    subEl.textContent = "לא נמצא.";
-    bodyEl.innerHTML = "<div class='gh-card'>משהו לא הסתדר.</div>";
-    openPanel();
-  }
-
-  /* ======================
-     Game 1: Reaction
-  ====================== */
-  function renderReactionGame(root){
-    const wrap = document.createElement("div");
-    wrap.className = "rx-wrap";
-    wrap.innerHTML = `
-      <div class="gh-card">
-        <div class="gh-row">
-          <span class="gh-pill">מטרה: זמן הכי נמוך</span>
-          <span class="gh-pill">נפסל אם לוחצים מוקדם</span>
-        </div>
-        <div class="gh-help" style="margin-top:10px;">
-          לחץ רק כשהכפתור ירוק.
-        </div>
-      </div>
-
-      <button class="rx-btn" id="rxBtn">לחץ כדי להתחיל</button>
-      <div id="rxResult" style="font-weight:1100; opacity:.9;"></div>
-    `;
-    root.appendChild(wrap);
-
-    const btn = wrap.querySelector("#rxBtn");
-    const res = wrap.querySelector("#rxResult");
-
-    let state = "idle";
-    let timer = null;
-    let startTime = 0;
-
-    function setBtn(text, bg, color){
-      btn.textContent = text;
-      btn.style.background = bg;
-      btn.style.color = color;
-    }
-    function reset(){
-      state = "idle";
-      res.textContent = "";
-      setBtn("לחץ כדי להתחיל",
-        themeIsDark() ? "rgba(56,189,248,.10)" : "rgba(37,99,235,.10)",
-        themeIsDark() ? "#e5e7eb" : "#0f172a"
-      );
-      if (timer) { clearTimeout(timer); timer=null; }
-    }
-    function start(){
-      state = "waiting";
-      res.textContent = "מחכה…";
-      setBtn("תחכה…",
-        themeIsDark() ? "rgba(245,158,11,.20)" : "rgba(245,158,11,.18)",
-        themeIsDark() ? "#e5e7eb" : "#0f172a"
-      );
-      const delay = 850 + Math.random()*2600;
-      timer = setTimeout(()=>{
-        state = "ready";
-        startTime = performance.now();
-        res.textContent = "עכשיו!";
-        setBtn("לחץ!!!",
-          themeIsDark() ? "rgba(34,197,94,.25)" : "rgba(34,197,94,.22)",
-          themeIsDark() ? "#e5e7eb" : "#0f172a"
-        );
-      }, delay);
-    }
-    function grade(ms){
-      if (ms < 185) return "🧠 פסיכי.";
-      if (ms < 240) return "⚡ מטורף.";
-      if (ms < 320) return "🔥 חזק.";
-      if (ms < 430) return "🙂 סבבה.";
-      return "🐢 עוד אימון.";
-    }
-
-    btn.addEventListener("click", ()=>{
-      if (state === "idle"){ start(); return; }
-      if (state === "waiting"){
-        res.textContent = "נפסלת 😅 לחצת מוקדם.";
-        setBtn("אופס… נסה שוב",
-          themeIsDark() ? "rgba(239,68,68,.18)" : "rgba(239,68,68,.16)",
-          themeIsDark() ? "#e5e7eb" : "#0f172a"
-        );
-        if (timer) { clearTimeout(timer); timer=null; }
-        state = "idle";
-        return;
+      if (gameKey === "reaction"){
+        titleEl.textContent = "⚡ מבחן תגובה";
+        subEl.textContent   = "חכה שזה יהפוך לירוק — ואז תלחץ מהר.";
+        cleanup = renderReactionGame(bodyEl);
+        openPanel(); return;
       }
-      if (state === "ready"){
-        const ms = Math.round(performance.now() - startTime);
-        res.textContent = `${ms}ms — ${grade(ms)}`;
-        setBtn("שחק שוב",
+      if (gameKey === "quiz"){
+        titleEl.textContent = "🧠 מתמטיקה — מאגר שאלות (8 בכל סשן)";
+        subEl.textContent   = "קצר, מהיר, ומתחלף כל פעם.";
+        cleanup = renderMathQuiz(bodyEl);
+        openPanel(); return;
+      }
+      if (gameKey === "memory"){
+        titleEl.textContent = "🧩 Memory";
+        subEl.textContent   = "קומבו + טיימר + שיאים.";
+        cleanup = renderMemoryGame(bodyEl);
+        openPanel(); return;
+      }
+      if (gameKey === "dodge"){
+        titleEl.textContent = "🛡️ Dodge Arena";
+        subEl.textContent   = "מחשב: WASD/חצים · מובייל: ג’ויסטיק.";
+        cleanup = renderDodgeGame(bodyEl);
+        openPanel(); return;
+      }
+      if (gameKey === "snake"){
+        titleEl.textContent = "🐍 Snake";
+        subEl.textContent   = "מחשב: חצים/WASD · מובייל: D-Pad.";
+        cleanup = renderSnakeGame(bodyEl);
+        openPanel(); return;
+      }
+
+      titleEl.textContent = "משחק";
+      subEl.textContent = "לא נמצא.";
+      bodyEl.innerHTML = "<div class='gh-card'>משהו לא הסתדר.</div>";
+      openPanel();
+    }
+
+    /* ======================
+       Game 1: Reaction
+    ====================== */
+    function renderReactionGame(root){
+      const wrap = document.createElement("div");
+      wrap.className = "rx-wrap";
+      wrap.innerHTML = `
+        <div class="gh-card">
+          <div class="gh-row">
+            <span class="gh-pill">מטרה: זמן הכי נמוך</span>
+            <span class="gh-pill">נפסל אם לוחצים מוקדם</span>
+          </div>
+          <div class="gh-help" style="margin-top:10px;">לחץ רק כשהכפתור ירוק.</div>
+        </div>
+
+        <button class="rx-btn" id="rxBtn">לחץ כדי להתחיל</button>
+        <div id="rxResult" style="font-weight:1100; opacity:.9;"></div>
+      `;
+      root.appendChild(wrap);
+
+      const btn = wrap.querySelector("#rxBtn");
+      const res = wrap.querySelector("#rxResult");
+
+      let state = "idle";
+      let timer = null;
+      let startTime = 0;
+
+      function setBtn(text, bg, color){
+        btn.textContent = text;
+        btn.style.background = bg;
+        btn.style.color = color;
+      }
+      function reset(){
+        state = "idle";
+        res.textContent = "";
+        setBtn("לחץ כדי להתחיל",
           themeIsDark() ? "rgba(56,189,248,.10)" : "rgba(37,99,235,.10)",
           themeIsDark() ? "#e5e7eb" : "#0f172a"
         );
-        state = "idle";
-        return;
+        if (timer) { clearTimeout(timer); timer=null; }
       }
-    });
+      function start(){
+        state = "waiting";
+        res.textContent = "מחכה…";
+        setBtn("תחכה…",
+          themeIsDark() ? "rgba(245,158,11,.20)" : "rgba(245,158,11,.18)",
+          themeIsDark() ? "#e5e7eb" : "#0f172a"
+        );
+        const delay = 850 + Math.random()*2600;
+        timer = setTimeout(()=>{
+          state = "ready";
+          startTime = performance.now();
+          res.textContent = "עכשיו!";
+          setBtn("לחץ!!!",
+            themeIsDark() ? "rgba(34,197,94,.25)" : "rgba(34,197,94,.22)",
+            themeIsDark() ? "#e5e7eb" : "#0f172a"
+          );
+        }, delay);
+      }
+      function grade(ms){
+        if (ms < 185) return "🧠 פסיכי.";
+        if (ms < 240) return "⚡ מטורף.";
+        if (ms < 320) return "🔥 חזק.";
+        if (ms < 430) return "🙂 סבבה.";
+        return "🐢 עוד אימון.";
+      }
 
-    reset();
-    return function cleanup(){ if (timer) clearTimeout(timer); };
-  }
+      btn.addEventListener("click", ()=>{
+        if (state === "idle"){ start(); return; }
+        if (state === "waiting"){
+          res.textContent = "נפסלת 😅 לחצת מוקדם.";
+          setBtn("אופס… נסה שוב",
+            themeIsDark() ? "rgba(239,68,68,.18)" : "rgba(239,68,68,.16)",
+            themeIsDark() ? "#e5e7eb" : "#0f172a"
+          );
+          if (timer) { clearTimeout(timer); timer=null; }
+          state = "idle";
+          return;
+        }
+        if (state === "ready"){
+          const ms = Math.round(performance.now() - startTime);
+          res.textContent = `${ms}ms — ${grade(ms)}`;
+          setBtn("שחק שוב",
+            themeIsDark() ? "rgba(56,189,248,.10)" : "rgba(37,99,235,.10)",
+            themeIsDark() ? "#e5e7eb" : "#0f172a"
+          );
+          state = "idle";
+          return;
+        }
+      });
 
-  /* ======================
-     Game 2: MATH QUIZ (8 questions max)
-  ====================== */
-  function renderMathQuiz(root){
-    const wrap = document.createElement("div");
-    wrap.className = "q-wrap";
-    root.appendChild(wrap);
-
-    const SESSION_SIZE = 8;     // ✅ גג 8
-    const OPTIONS = 4;
-
-    const used = new Set();
-    const session = [];
-
-    let idx = 0, score = 0;
-    const startT = performance.now();
-
-    while (session.length < SESSION_SIZE){
-      session.push(genQuestion(used));
+      reset();
+      return function cleanup(){ if (timer) clearTimeout(timer); };
     }
 
-    function render(){
-      wrap.innerHTML = "";
+    /* ======================
+       Game 2: MATH QUIZ (8 questions max)
+    ====================== */
+    function renderMathQuiz(root){
+      const wrap = document.createElement("div");
+      wrap.className = "q-wrap";
+      root.appendChild(wrap);
 
-      if (idx >= session.length){
-        const sec = Math.round((performance.now()-startT)/1000);
-        const pct = Math.round((score/session.length)*100);
-        wrap.innerHTML = `
-          <div class="q-result">סיימת! ציון: ${score}/${session.length} (${pct}%) · זמן: ${sec}s</div>
-          <div class="q-mini" style="margin-top:10px;">
-            <button class="btn" type="button" id="newSession">סשן חדש (עוד 8)</button>
-            <button class="btn-outline" type="button" id="closeQuiz">סגור</button>
-          </div>
-        `;
-        wrap.querySelector("#newSession").addEventListener("click", ()=> loadGame("quiz"));
-        wrap.querySelector("#closeQuiz").addEventListener("click", closePanel);
-        return;
+      const SESSION_SIZE = 8;
+      const OPTIONS = 4;
+
+      const used = new Set();
+      const session = [];
+
+      let idx = 0, score = 0;
+      const startT = performance.now();
+
+      while (session.length < SESSION_SIZE){
+        session.push(genQuestion(used));
       }
 
-      const item = session[idx];
+      function render(){
+        wrap.innerHTML = "";
 
-      const meta = document.createElement("div");
-      meta.className = "q-meta";
-      meta.innerHTML = `
-        <div>שאלה ${idx+1}/${session.length}</div>
-        <div>ניקוד: ${score}</div>
-        <div>סוג: ${item.tag}</div>
-      `;
-      wrap.appendChild(meta);
+        if (idx >= session.length){
+          const sec = Math.round((performance.now()-startT)/1000);
+          const pct = Math.round((score/session.length)*100);
+          wrap.innerHTML = `
+            <div class="q-result">סיימת! ציון: ${score}/${session.length} (${pct}%) · זמן: ${sec}s</div>
+            <div class="q-mini" style="margin-top:10px;">
+              <button class="btn" type="button" id="newSession">סשן חדש (עוד 8)</button>
+              <button class="btn-outline" type="button" id="closeQuiz">סגור</button>
+            </div>
+          `;
+          wrap.querySelector("#newSession").addEventListener("click", ()=> loadGame("quiz"));
+          wrap.querySelector("#closeQuiz").addEventListener("click", closePanel);
+          return;
+        }
 
-      const qEl = document.createElement("div");
-      qEl.className = "q-q";
-      qEl.textContent = item.q;
-      wrap.appendChild(qEl);
+        const item = session[idx];
 
-      const opts = document.createElement("div");
-      opts.className = "q-opts";
+        const meta = document.createElement("div");
+        meta.className = "q-meta";
+        meta.innerHTML = `
+          <div>שאלה ${idx+1}/${session.length}</div>
+          <div>ניקוד: ${score}</div>
+          <div>סוג: ${item.tag}</div>
+        `;
+        wrap.appendChild(meta);
 
-      item.options.forEach((txt, i)=>{
-        const b = document.createElement("button");
-        b.type = "button";
-        b.textContent = txt;
-        b.addEventListener("click", ()=>{
-          if (i === item.correct) score++;
+        const qEl = document.createElement("div");
+        qEl.className = "q-q";
+        qEl.textContent = item.q;
+        wrap.appendChild(qEl);
+
+        const opts = document.createElement("div");
+        opts.className = "q-opts";
+
+        item.options.forEach((txt, i)=>{
+          const b = document.createElement("button");
+          b.type = "button";
+          b.textContent = txt;
+          b.addEventListener("click", ()=>{
+            if (i === item.correct) score++;
+            idx++;
+            render();
+          });
+          opts.appendChild(b);
+        });
+
+        wrap.appendChild(opts);
+
+        const mini = document.createElement("div");
+        mini.className = "q-mini";
+        mini.innerHTML = `
+          <span class="gh-help" style="opacity:.8;">טיפ: אל תנחש. תחשב.</span>
+          <button class="btn-outline" type="button" id="skipQ">דלג</button>
+        `;
+        wrap.appendChild(mini);
+
+        mini.querySelector("#skipQ").addEventListener("click", ()=>{
           idx++;
           render();
         });
-        opts.appendChild(b);
-      });
+      }
 
-      wrap.appendChild(opts);
+      render();
+      return function cleanup(){};
 
-      const mini = document.createElement("div");
-      mini.className = "q-mini";
-      mini.innerHTML = `
-        <span class="gh-help" style="opacity:.8;">טיפ: אל תנחש. תחשב.</span>
-        <button class="btn-outline" type="button" id="skipQ">דלג</button>
-      `;
-      wrap.appendChild(mini);
+      function genQuestion(usedSet){
+        const types = ["arith","percent","linear","seq","frac","geo","powers","roots","avg"];
+        const type = types[Math.floor(Math.random()*types.length)];
 
-      mini.querySelector("#skipQ").addEventListener("click", ()=>{
-        idx++;
-        render();
-      });
-    }
+        let qObj = null;
+        for (let tries=0; tries<250; tries++){
+          qObj = buildByType(type);
+          if (!qObj) continue;
 
-    render();
-    return function cleanup(){};
-
-    function genQuestion(usedSet){
-      const types = ["arith","percent","linear","seq","frac","geo","powers","roots","avg"];
-      const type = types[Math.floor(Math.random()*types.length)];
-
-      let qObj = null;
-      for (let tries=0; tries<250; tries++){
-        qObj = buildByType(type);
-        if (!qObj) continue;
-
-        const key = qObj.key;
-        if (!usedSet.has(key)){
-          usedSet.add(key);
-          qObj.options = makeOptions(qObj.ans, OPTIONS, qObj.rangeHint);
-          qObj.correct = qObj.options.indexOf(qObj.ansText);
-          if (qObj.correct === -1){
-            qObj.options[0] = qObj.ansText;
-            shuffle(qObj.options);
+          const key = qObj.key;
+          if (!usedSet.has(key)){
+            usedSet.add(key);
+            qObj.options = makeOptions(qObj.ans, OPTIONS, qObj.rangeHint);
             qObj.correct = qObj.options.indexOf(qObj.ansText);
+            if (qObj.correct === -1){
+              qObj.options[0] = qObj.ansText;
+              shuffle(qObj.options);
+              qObj.correct = qObj.options.indexOf(qObj.ansText);
+            }
+            return { q: qObj.qText, options: qObj.options, correct: qObj.correct, tag: qObj.tag };
           }
-          return { q: qObj.qText, options: qObj.options, correct: qObj.correct, tag: qObj.tag };
         }
+
+        const a = 7, b = 8;
+        const arr = shuffle([String(a*b), String(a*b+2), String(a*b-2), String(a*b+8)]);
+        return { q: `כמה זה ${a}×${b}?`, options: arr, correct: arr.indexOf(String(a*b)), tag: "כפל" };
       }
 
-      const a = 7, b = 8;
-      const arr = shuffle([String(a*b), String(a*b+2), String(a*b-2), String(a*b+8)]);
-      return { q: `כמה זה ${a}×${b}?`, options: arr, correct: arr.indexOf(String(a*b)), tag: "כפל" };
-    }
-
-    function buildByType(type){
-      if (type === "arith"){
-        const a = r(12,99), b = r(12,99);
-        const op = pick(["+","-","×"]);
-        const ans = (op==="+")? a+b : (op==="-"? a-b : a*b);
-        const key = `arith:${a}${op}${b}`;
-        return mk(`${a} ${op} ${b} = ?`, ans, "חישוב", key, {min: -200, max: 9801});
-      }
-      if (type === "percent"){
-        const base = r(80, 900);
-        const p = pick([5,10,12,15,20,25,30,35,40]);
-        const ans = Math.round((base * p)/100);
-        const key = `pct:${p}of${base}`;
-        return mk(`כמה זה ${p}% מתוך ${base}?`, ans, "אחוזים", key, {min:0,max:900});
-      }
-      if (type === "linear"){
-        const a = pick([2,3,4,5,6,7,8,9]);
-        const x = r(2, 30);
-        const b = r(-20, 30);
-        const c = a*x + b;
-        const key = `lin:${a}x${b}=${c}`;
-        return mk(`אם ${a}x ${b>=0?"+":""}${b} = ${c}, מה x?`, x, "משוואה", key, {min:-50,max:60});
-      }
-      if (type === "seq"){
-        const k = r(-4, 8);
-        const term = (t)=> t*t + k;
-        const s = [1,2,3,4].map(term);
-        const ans = term(5);
-        const key = `seq:${k}`;
-        return mk(`השלם סדרה: ${s.join(", ")}, ?`, ans, "סדרה", key, {min:-10,max:80});
-      }
-      if (type === "frac"){
-        const a = pick([1,2,3,4,5,6,7,8,9]);
-        const b = pick([2,3,4,5,6,7,8,9,10,12]);
-        if (a>=b) return null;
-        const val = a/b;
-        const key = `frac:${a}/${b}`;
-        const ans = Math.round(val*100);
-        return mk(`כמה אחוז זה בערך ${a}/${b}? (בעיגול)`, ans, "שברים", key, {min:0,max:100});
-      }
-      if (type === "geo"){
-        const d = r(2, 14);
-        const t = pick([10,15,20,25,30,40,45,50,60,75]);
-        const ans = Math.round(d / (t/60));
-        const key = `geo:${d}in${t}`;
-        return mk(`אם עוברים ${d} ק"מ ב-${t} דקות — מה המהירות בקמ"ש? (בעיגול)`, ans, "מהירות", key, {min:1,max:200});
-      }
-      if (type === "powers"){
-        const base = pick([2,3,4,5,6,7,8,9]);
-        const exp = pick([2,3,4]);
-        const ans = Math.pow(base, exp);
-        const key = `pow:${base}^${exp}`;
-        return mk(`כמה זה ${base}^${exp}?`, ans, "חזקות", key, {min:0,max:10000});
-      }
-      if (type === "roots"){
-        const n = pick([9,16,25,36,49,64,81,100,121,144]);
-        const ans = Math.round(Math.sqrt(n));
-        const key = `root:${n}`;
-        return mk(`מה השורש הריבועי של ${n}?`, ans, "שורשים", key, {min:0,max:50});
-      }
-      if (type === "avg"){
-        const a = r(10, 90), b = r(10, 90), c = r(10, 90);
-        const ans = Math.round((a+b+c)/3);
-        const key = `avg:${a},${b},${c}`;
-        return mk(`מה הממוצע (בעיגול) של ${a}, ${b}, ${c}?`, ans, "ממוצע", key, {min:0,max:100});
-      }
-      return null;
-    }
-
-    function mk(qText, ans, tag, key, rangeHint){
-      const ansText = String(ans);
-      return { qText, ans, ansText, tag, key, rangeHint };
-    }
-
-    function makeOptions(ansText, n, hint){
-      const ans = Number(ansText);
-      const opts = new Set([String(ans)]);
-      const min = hint?.min ?? (ans-30);
-      const max = hint?.max ?? (ans+30);
-
-      let guard = 0;
-      while (opts.size < n && guard++ < 500){
-        let cand;
-        if (Math.random() < 0.65){
-          const delta = pick([1,2,3,4,5,6,7,8,9,10,12,15,20]);
-          cand = ans + (Math.random()<0.5 ? -delta : delta);
-        } else {
-          cand = r(min, max);
+      function buildByType(type){
+        if (type === "arith"){
+          const a = r(12,99), b = r(12,99);
+          const op = pick(["+","-","×"]);
+          const ans = (op==="+")? a+b : (op==="-"? a-b : a*b);
+          const key = `arith:${a}${op}${b}`;
+          return mk(`${a} ${op} ${b} = ?`, ans, "חישוב", key, {min: -200, max: 9801});
         }
-        if (cand === ans) continue;
-        opts.add(String(cand));
+        if (type === "percent"){
+          const base = r(80, 900);
+          const p = pick([5,10,12,15,20,25,30,35,40]);
+          const ans = Math.round((base * p)/100);
+          const key = `pct:${p}of${base}`;
+          return mk(`כמה זה ${p}% מתוך ${base}?`, ans, "אחוזים", key, {min:0,max:900});
+        }
+        if (type === "linear"){
+          const a = pick([2,3,4,5,6,7,8,9]);
+          const x = r(2, 30);
+          const b = r(-20, 30);
+          const c = a*x + b;
+          const key = `lin:${a}x${b}=${c}`;
+          return mk(`אם ${a}x ${b>=0?"+":""}${b} = ${c}, מה x?`, x, "משוואה", key, {min:-50,max:60});
+        }
+        if (type === "seq"){
+          const k = r(-4, 8);
+          const term = (t)=> t*t + k;
+          const s = [1,2,3,4].map(term);
+          const ans = term(5);
+          const key = `seq:${k}`;
+          return mk(`השלם סדרה: ${s.join(", ")}, ?`, ans, "סדרה", key, {min:-10,max:80});
+        }
+        if (type === "frac"){
+          const a = pick([1,2,3,4,5,6,7,8,9]);
+          const b = pick([2,3,4,5,6,7,8,9,10,12]);
+          if (a>=b) return null;
+          const val = a/b;
+          const key = `frac:${a}/${b}`;
+          const ans = Math.round(val*100);
+          return mk(`כמה אחוז זה בערך ${a}/${b}? (בעיגול)`, ans, "שברים", key, {min:0,max:100});
+        }
+        if (type === "geo"){
+          const d = r(2, 14);
+          const t = pick([10,15,20,25,30,40,45,50,60,75]);
+          const ans = Math.round(d / (t/60));
+          const key = `geo:${d}in${t}`;
+          return mk(`אם עוברים ${d} ק"מ ב-${t} דקות — מה המהירות בקמ"ש? (בעיגול)`, ans, "מהירות", key, {min:1,max:200});
+        }
+        if (type === "powers"){
+          const base = pick([2,3,4,5,6,7,8,9]);
+          const exp = pick([2,3,4]);
+          const ans = Math.pow(base, exp);
+          const key = `pow:${base}^${exp}`;
+          return mk(`כמה זה ${base}^${exp}?`, ans, "חזקות", key, {min:0,max:10000});
+        }
+        if (type === "roots"){
+          const n = pick([9,16,25,36,49,64,81,100,121,144]);
+          const ans = Math.round(Math.sqrt(n));
+          const key = `root:${n}`;
+          return mk(`מה השורש הריבועי של ${n}?`, ans, "שורשים", key, {min:0,max:50});
+        }
+        if (type === "avg"){
+          const a = r(10, 90), b = r(10, 90), c = r(10, 90);
+          const ans = Math.round((a+b+c)/3);
+          const key = `avg:${a},${b},${c}`;
+          return mk(`מה הממוצע (בעיגול) של ${a}, ${b}, ${c}?`, ans, "ממוצע", key, {min:0,max:100});
+        }
+        return null;
       }
-      const arr = Array.from(opts);
-      shuffle(arr);
-      return arr;
-    }
-  }
 
-  /* ======================
-     Game 3: Memory
-  ====================== */
-  function renderMemoryGame(root){
-    const symbols = ["🍉","⚽","🎧","🎮","🧠","🚀","📚","🔥","⭐","🎯","🧊","🍕"];
-    const pairs = isMobile() ? 8 : 10;
-    const chosen = shuffle(symbols.slice()).slice(0, pairs);
-    let deck = [...chosen, ...chosen].map((sym, i)=>({ id:i, sym }));
-    shuffle(deck);
+      function mk(qText, ans, tag, key, rangeHint){
+        const ansText = String(ans);
+        return { qText, ans, ansText, tag, key, rangeHint };
+      }
 
-    let revealed = [];
-    let matched = new Set();
-    let moves = 0, combo = 0, bestCombo = 0;
-    let locked = false;
+      function makeOptions(ansText, n, hint){
+        const ans = Number(ansText);
+        const opts = new Set([String(ans)]);
+        const min = hint?.min ?? (ans-30);
+        const max = hint?.max ?? (ans+30);
 
-    const start = performance.now();
-    let timerId = null;
-
-    const wrap = document.createElement("div");
-    wrap.className = "mem-wrap";
-    wrap.innerHTML = `
-      <div class="gh-card">
-        <div class="gh-row">
-          <span class="gh-pill">מהלכים: <span id="memMoves">0</span></span>
-          <span class="gh-pill">קומבו: <span id="memCombo">0</span></span>
-          <span class="gh-pill">זמן: <span id="memTime">0</span>s</span>
-        </div>
-        <div class="gh-help" style="margin-top:10px;">תמצא זוגות. רצף נכון מעלה קומבו.</div>
-      </div>
-
-      <div class="mem-grid" id="memGrid"></div>
-
-      <div id="memEnd" class="gh-card" style="display:none;">
-        <div style="font-weight:1100; font-size:1.05rem;">סיימת!</div>
-        <div class="gh-help" style="margin-top:8px;">
-          מהלכים: <b id="memEndMoves"></b> · זמן: <b id="memEndTime"></b>s · קומבו שיא: <b id="memEndBest"></b>
-        </div>
-      </div>
-    `;
-    root.appendChild(wrap);
-
-    const grid = wrap.querySelector("#memGrid");
-    const movesEl = wrap.querySelector("#memMoves");
-    const comboEl = wrap.querySelector("#memCombo");
-    const timeEl  = wrap.querySelector("#memTime");
-    const endBox  = wrap.querySelector("#memEnd");
-
-    function render(){
-      grid.innerHTML = "";
-      deck.forEach((card, idx)=>{
-        const el = document.createElement("button");
-        el.type = "button";
-        el.className = "mem-card";
-        const isMatched = matched.has(idx);
-        const isRevealed = revealed.includes(idx);
-
-        if (isMatched) el.classList.add("matched");
-        else if (isRevealed) el.classList.add("revealed");
-
-        el.textContent = (isMatched || isRevealed) ? card.sym : "❔";
-        el.disabled = isMatched || locked;
-
-        el.addEventListener("click", ()=>onPick(idx));
-        grid.appendChild(el);
-      });
+        let guard = 0;
+        while (opts.size < n && guard++ < 500){
+          let cand;
+          if (Math.random() < 0.65){
+            const delta = pick([1,2,3,4,5,6,7,8,9,10,12,15,20]);
+            cand = ans + (Math.random()<0.5 ? -delta : delta);
+          } else {
+            cand = r(min, max);
+          }
+          if (cand === ans) continue;
+          opts.add(String(cand));
+        }
+        const arr = Array.from(opts);
+        shuffle(arr);
+        return arr;
+      }
     }
 
-    function onPick(idx){
-      if (locked) return;
-      if (matched.has(idx)) return;
-      if (revealed.includes(idx)) return;
+    /* ======================
+       Game 3: Memory
+    ====================== */
+    function renderMemoryGame(root){
+      const symbols = ["🍉","⚽","🎧","🎮","🧠","🚀","📚","🔥","⭐","🎯","🧊","🍕"];
+      const pairs = isMobile() ? 8 : 10;
+      const chosen = shuffle(symbols.slice()).slice(0, pairs);
+      let deck = [...chosen, ...chosen].map((sym, i)=>({ id:i, sym }));
+      shuffle(deck);
 
-      revealed.push(idx);
-      if (revealed.length === 1){ render(); return; }
+      let revealed = [];
+      let matched = new Set();
+      let moves = 0, combo = 0, bestCombo = 0;
+      let locked = false;
 
-      moves++;
-      movesEl.textContent = String(moves);
-      locked = true;
+      const start = performance.now();
+      let timerId = null;
+
+      const wrap = document.createElement("div");
+      wrap.className = "mem-wrap";
+      wrap.innerHTML = `
+        <div class="gh-card">
+          <div class="gh-row">
+            <span class="gh-pill">מהלכים: <span id="memMoves">0</span></span>
+            <span class="gh-pill">קומבו: <span id="memCombo">0</span></span>
+            <span class="gh-pill">זמן: <span id="memTime">0</span>s</span>
+          </div>
+          <div class="gh-help" style="margin-top:10px;">תמצא זוגות. רצף נכון מעלה קומבו.</div>
+        </div>
+
+        <div class="mem-grid" id="memGrid"></div>
+
+        <div id="memEnd" class="gh-card" style="display:none;">
+          <div style="font-weight:1100; font-size:1.05rem;">סיימת!</div>
+          <div class="gh-help" style="margin-top:8px;">
+            מהלכים: <b id="memEndMoves"></b> · זמן: <b id="memEndTime"></b>s · קומבו שיא: <b id="memEndBest"></b>
+          </div>
+        </div>
+      `;
+      root.appendChild(wrap);
+
+      const grid = wrap.querySelector("#memGrid");
+      const movesEl = wrap.querySelector("#memMoves");
+      const comboEl = wrap.querySelector("#memCombo");
+      const timeEl  = wrap.querySelector("#memTime");
+      const endBox  = wrap.querySelector("#memEnd");
+
+      function render(){
+        grid.innerHTML = "";
+        deck.forEach((card, idx)=>{
+          const el = document.createElement("button");
+          el.type = "button";
+          el.className = "mem-card";
+          const isMatched = matched.has(idx);
+          const isRevealed = revealed.includes(idx);
+
+          if (isMatched) el.classList.add("matched");
+          else if (isRevealed) el.classList.add("revealed");
+
+          el.textContent = (isMatched || isRevealed) ? card.sym : "❔";
+          el.disabled = isMatched || locked;
+
+          el.addEventListener("click", ()=>onPick(idx));
+          grid.appendChild(el);
+        });
+      }
+
+      function onPick(idx){
+        if (locked) return;
+        if (matched.has(idx)) return;
+        if (revealed.includes(idx)) return;
+
+        revealed.push(idx);
+        if (revealed.length === 1){ render(); return; }
+
+        moves++;
+        movesEl.textContent = String(moves);
+        locked = true;
+        render();
+
+        const [a,b] = revealed;
+        const ok = deck[a].sym === deck[b].sym;
+
+        setTimeout(()=>{
+          if (ok){
+            matched.add(a); matched.add(b);
+            combo++;
+            bestCombo = Math.max(bestCombo, combo);
+          } else {
+            combo = 0;
+          }
+          comboEl.textContent = String(combo);
+          revealed = [];
+          locked = false;
+          render();
+
+          if (matched.size === deck.length){
+            const sec = Math.round((performance.now()-start)/1000);
+            endBox.style.display = "block";
+            wrap.querySelector("#memEndMoves").textContent = String(moves);
+            wrap.querySelector("#memEndTime").textContent = String(sec);
+            wrap.querySelector("#memEndBest").textContent = String(bestCombo);
+            if (timerId) { clearInterval(timerId); timerId=null; }
+          }
+        }, ok ? 420 : 620);
+      }
+
+      function tick(){
+        const sec = Math.round((performance.now()-start)/1000);
+        timeEl.textContent = String(sec);
+      }
+
+      timerId = setInterval(tick, 250);
+      tick();
       render();
 
-      const [a,b] = revealed;
-      const ok = deck[a].sym === deck[b].sym;
-
-      setTimeout(()=>{
-        if (ok){
-          matched.add(a); matched.add(b);
-          combo++;
-          bestCombo = Math.max(bestCombo, combo);
-        } else {
-          combo = 0;
-        }
-        comboEl.textContent = String(combo);
-        revealed = [];
-        locked = false;
-        render();
-
-        if (matched.size === deck.length){
-          const sec = Math.round((performance.now()-start)/1000);
-          endBox.style.display = "block";
-          wrap.querySelector("#memEndMoves").textContent = String(moves);
-          wrap.querySelector("#memEndTime").textContent = String(sec);
-          wrap.querySelector("#memEndBest").textContent = String(bestCombo);
-          if (timerId) { clearInterval(timerId); timerId=null; }
-        }
-      }, ok ? 420 : 620);
+      return function cleanup(){ if (timerId) clearInterval(timerId); };
     }
 
-    function tick(){
-      const sec = Math.round((performance.now()-start)/1000);
-      timeEl.textContent = String(sec);
-    }
+    /* ======================
+       Game 4: Dodge Arena (JOYSTICK on mobile)
+    ====================== */
+    function renderDodgeGame(root){
+      const wrap = document.createElement("div");
+      wrap.className = "canvas-wrap";
 
-    timerId = setInterval(tick, 250);
-    tick();
-    render();
-
-    return function cleanup(){ if (timerId) clearInterval(timerId); };
-  }
-
-  /* ======================
-     Game 4: Dodge Arena (MOUSE/FINGER CONTROL)
-  ====================== */
-  function renderDodgeGame(root){
-    const wrap = document.createElement("div");
-    wrap.className = "canvas-wrap";
-
-    wrap.innerHTML = `
-      <div class="gh-card">
-        <div class="gh-row">
-          <span class="gh-pill">ניקוד: <span id="dgScore">0</span></span>
-          <span class="gh-pill">שיא: <span id="dgBest">0</span></span>
-          <span class="gh-pill">רמה: <span id="dgLvl">1</span></span>
+      wrap.innerHTML = `
+        <div class="gh-card">
+          <div class="gh-row">
+            <span class="gh-pill">ניקוד: <span id="dgScore">0</span></span>
+            <span class="gh-pill">שיא: <span id="dgBest">0</span></span>
+            <span class="gh-pill">רמה: <span id="dgLvl">1</span></span>
+          </div>
+          <div class="gh-help" style="margin-top:10px;">
+            מחשב: <span class="kbd">WASD</span>/<span class="kbd">חצים</span> · מובייל: ג’ויסטיק.
+            <span class="kbd">P</span> עצור/המשך.
+          </div>
         </div>
-        <div class="gh-help" style="margin-top:10px;">
-          ✅ שליטה: <span class="kbd">עכבר</span> / <span class="kbd">אצבע</span> על הקנבס. (מקלדת עדיין עובדת כגיבוי)
-          <span class="kbd">P</span> עצור/המשך.
+
+        <div class="canvas-box" id="dgBox">
+          <canvas class="game-canvas" id="dgCanvas" width="860" height="460"></canvas>
+
+          <div class="mcontrols">
+            <div class="joy" id="dgJoy" aria-label="גויסטיק">
+              <div class="knob" id="dgKnob"></div>
+            </div>
+
+            <div class="pad" aria-label="פעולות">
+              <button type="button" id="dgPause">⏯</button>
+              <button type="button" id="dgNothing1" style="opacity:.55; cursor:default;" disabled>•</button>
+              <button type="button" id="dgRestart">↻</button>
+
+              <button type="button" id="dgSlow">🐢</button>
+              <button type="button" id="dgNothing2" style="opacity:.55; cursor:default;" disabled>•</button>
+              <button type="button" id="dgBoost">🚀</button>
+
+              <button type="button" id="dgNothing3" style="opacity:.55; cursor:default;" disabled>•</button>
+              <button type="button" id="dgNothing4" style="opacity:.55; cursor:default;" disabled>•</button>
+              <button type="button" id="dgNothing5" style="opacity:.55; cursor:default;" disabled>•</button>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div class="canvas-box" id="dgBox">
-        <canvas class="game-canvas" id="dgCanvas" width="860" height="460"></canvas>
-      </div>
+        <div class="gh-card" id="dgEnd" style="display:none;">
+          <div style="font-weight:1100;font-size:1.05rem;">נגמר 😈</div>
+          <div class="gh-help" style="margin-top:8px;">איפוס כדי להתחיל מחדש.</div>
+        </div>
+      `;
+      root.appendChild(wrap);
 
-      <div class="gh-card" id="dgEnd" style="display:none;">
-        <div style="font-weight:1100;font-size:1.05rem;">נגמר 😈</div>
-        <div class="gh-help" style="margin-top:8px;">איפוס כדי להתחיל מחדש.</div>
-      </div>
-    `;
-    root.appendChild(wrap);
+      const box = wrap.querySelector("#dgBox");
+      const canvas = wrap.querySelector("#dgCanvas");
+      const ctx = canvas.getContext("2d");
 
-    const box = wrap.querySelector("#dgBox");
-    const canvas = wrap.querySelector("#dgCanvas");
-    const ctx = canvas.getContext("2d");
+      const scoreEl = wrap.querySelector("#dgScore");
+      const bestEl  = wrap.querySelector("#dgBest");
+      const lvlEl   = wrap.querySelector("#dgLvl");
+      const endEl   = wrap.querySelector("#dgEnd");
 
-    const scoreEl = wrap.querySelector("#dgScore");
-    const bestEl  = wrap.querySelector("#dgBest");
-    const lvlEl   = wrap.querySelector("#dgLvl");
-    const endEl   = wrap.querySelector("#dgEnd");
+      let best = Number(localStorage.getItem("yaarat_game_dodge_best") || "0");
+      bestEl.textContent = String(best);
 
-    let best = Number(localStorage.getItem("yaarat_game_dodge_best") || "0");
-    bestEl.textContent = String(best);
-
-    // Fullscreen on mobile
-    fsBtn.style.display = isMobile() ? "inline-flex" : "none";
-    fsBtn.onclick = async ()=>{
-      try{
-        if (!document.fullscreenElement) await box.requestFullscreen?.();
-        else await document.exitFullscreen?.();
-      }catch(e){}
-    };
-
-    function fitCanvas(){
-      const rect = canvas.getBoundingClientRect();
-      const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
-      const targetW = Math.floor(rect.width * dpr);
-      const targetH = Math.floor((rect.width * (460/860)) * dpr);
-      if (canvas.width !== targetW || canvas.height !== targetH){
-        canvas.width = targetW;
-        canvas.height = targetH;
-      }
-    }
-    fitCanvas();
-
-    let running = true;
-    let paused = false;
-    let lastT = performance.now();
-
-    const player = { x: 0, y: 0, r: 10, vx:0, vy:0, speed: 900 }; // speed high, follows pointer
-    let bullets = [];
-    let particles = [];
-    let score = 0;
-    let level = 1;
-    let spawnTimer = 0;
-    let spawnEvery = 0.85;
-    let bulletSpeed = 150;
-    let keys = Object.create(null);
-
-    // pointer target
-    let pointerDown = false;
-    let target = { x: null, y: null };
-
-    function W(){ return canvas.width; }
-    function H(){ return canvas.height; }
-
-    function reset(){
-      bullets = [];
-      particles = [];
-      score = 0;
-      level = 1;
-      spawnTimer = 0;
-      spawnEvery = 0.85;
-      bulletSpeed = 150;
-      player.r = 10;
-      player.x = W()/2; player.y = H()/2;
-      target.x = player.x; target.y = player.y;
-      endEl.style.display = "none";
-      paused = false;
-      running = true;
-      lastT = performance.now();
-    }
-
-    function togglePause(){ if (running) paused = !paused; }
-
-    function spawnBullet(){
-      const w=W(), h=H();
-      const edge = Math.floor(Math.random()*4);
-      let x,y;
-      if (edge===0){ x = Math.random()*w; y = -14; }
-      if (edge===1){ x = w+14; y = Math.random()*h; }
-      if (edge===2){ x = Math.random()*w; y = h+14; }
-      if (edge===3){ x = -14; y = Math.random()*h; }
-
-      const dx = player.x - x;
-      const dy = player.y - y;
-      const jitter = (Math.random()*0.55 - 0.275);
-      const ang = Math.atan2(dy,dx) + jitter;
-
-      const sp = bulletSpeed * (0.9 + Math.random()*0.35);
-      bullets.push({ x,y, vx: Math.cos(ang)*sp, vy: Math.sin(ang)*sp, r: 6 + Math.random()*3, life: 12 });
-    }
-
-    function addBurst(x,y, n=18){
-      for (let i=0;i<n;i++){
-        const a = Math.random()*Math.PI*2;
-        const sp = 70 + Math.random()*200;
-        particles.push({ x,y, vx: Math.cos(a)*sp, vy: Math.sin(a)*sp, life: 0.6 + Math.random()*0.7 });
-      }
-    }
-
-    function clampPlayer(){
-      player.x = Math.max(player.r, Math.min(W()-player.r, player.x));
-      player.y = Math.max(player.r, Math.min(H()-player.r, player.y));
-    }
-
-    function step(dt){
-      // pointer-follow (main)
-      if (target.x != null && target.y != null){
-        const dx = target.x - player.x;
-        const dy = target.y - player.y;
-        const dist = Math.hypot(dx,dy);
-        if (dist > 0.0001){
-          const maxMove = player.speed * dt;
-          const k = Math.min(1, maxMove / dist);
-          player.x += dx * k;
-          player.y += dy * k;
-        }
-        clampPlayer();
-      }
-
-      // keyboard fallback (small influence)
-      let ix = 0, iy = 0;
-      if (keys["ArrowLeft"] || keys["a"] || keys["A"]) ix -= 1;
-      if (keys["ArrowRight"]|| keys["d"] || keys["D"]) ix += 1;
-      if (keys["ArrowUp"]   || keys["w"] || keys["W"]) iy -= 1;
-      if (keys["ArrowDown"] || keys["s"] || keys["S"]) iy += 1;
-      if (ix || iy){
-        const ilen = Math.hypot(ix,iy) || 1;
-        ix/=ilen; iy/=ilen;
-        player.x += ix * 420 * dt;
-        player.y += iy * 420 * dt;
-        clampPlayer();
-        target.x = player.x; target.y = player.y; // keep target synced if keyboard used
-      }
-
-      // difficulty
-      score += dt * (10 + level*2.2);
-      const newLevel = 1 + Math.floor(score/120);
-      if (newLevel !== level){
-        level = newLevel;
-        spawnEvery = Math.max(0.23, 0.85 - (level-1)*0.06);
-        bulletSpeed = 150 + (level-1)*24;
-        addBurst(player.x, player.y, 8);
-      }
-
-      spawnTimer += dt;
-      while (spawnTimer >= spawnEvery){
-        spawnTimer -= spawnEvery;
-        spawnBullet();
-        if (level >= 6 && Math.random() < 0.25) spawnBullet();
-      }
-
-      // bullets
-      for (let i=bullets.length-1;i>=0;i--){
-        const b = bullets[i];
-        b.x += b.vx*dt;
-        b.y += b.vy*dt;
-        b.life -= dt;
-
-        const dist = Math.hypot(b.x-player.x, b.y-player.y);
-        if (dist < b.r + player.r){
-          running = false;
-          endEl.style.display = "block";
-          addBurst(player.x, player.y, 32);
-          if (score > best){
-            best = Math.floor(score);
-            localStorage.setItem("yaarat_game_dodge_best", String(best));
-          }
-          break;
-        }
-        if (b.life <= 0 || b.x < -60 || b.x > W()+60 || b.y < -60 || b.y > H()+60){
-          bullets.splice(i,1);
-        }
-      }
-
-      // particles
-      for (let i=particles.length-1;i>=0;i--){
-        const p = particles[i];
-        p.x += p.vx*dt; p.y += p.vy*dt;
-        p.vx *= (1 - 2.1*dt); p.vy *= (1 - 2.1*dt);
-        p.life -= dt;
-        if (p.life <= 0) particles.splice(i,1);
-      }
-    }
-
-    function draw(){
-      const w=W(), h=H();
-      ctx.clearRect(0,0,w,h);
-
-      // grid
-      ctx.globalAlpha = themeIsDark() ? 0.22 : 0.20;
-      ctx.strokeStyle = themeIsDark() ? "#93c5fd" : "#2563eb";
-      ctx.lineWidth = 1;
-      const stepG = Math.max(42, Math.round(w/18));
-      for (let x=stepG;x<w;x+=stepG){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke(); }
-      for (let y=stepG;y<h;y+=stepG){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
-      ctx.globalAlpha = 1;
-
-      // bullets
-      bullets.forEach(b=>{
-        ctx.beginPath();
-        ctx.fillStyle = themeIsDark() ? "rgba(239,68,68,.88)" : "rgba(239,68,68,.72)";
-        ctx.arc(b.x,b.y,b.r,0,Math.PI*2);
-        ctx.fill();
-      });
-
-      // player
-      ctx.beginPath();
-      ctx.fillStyle = themeIsDark() ? "rgba(34,197,94,.95)" : "rgba(34,197,94,.82)";
-      ctx.arc(player.x, player.y, player.r, 0, Math.PI*2);
-      ctx.fill();
-
-      // ring
-      ctx.globalAlpha = 0.25;
-      ctx.lineWidth = Math.max(5, Math.round(w/180));
-      ctx.strokeStyle = themeIsDark() ? "#38bdf8" : "#2563eb";
-      ctx.beginPath();
-      ctx.arc(player.x, player.y, player.r+10, 0, Math.PI*2);
-      ctx.stroke();
-      ctx.globalAlpha = 1;
-
-      // particles
-      particles.forEach(p=>{
-        ctx.globalAlpha = Math.max(0, Math.min(1, p.life));
-        ctx.fillStyle = "#f59e0b";
-        ctx.fillRect(p.x, p.y, 3, 3);
-      });
-      ctx.globalAlpha = 1;
-
-      // HUD
-      ctx.globalAlpha = 0.85;
-      ctx.fillStyle = themeIsDark() ? "#e5e7eb" : "#0f172a";
-      ctx.font = "900 14px system-ui, -apple-system, Segoe UI, Arial";
-      ctx.fillText(paused ? "PAUSED" : "DODGE", 12, 20);
-      ctx.globalAlpha = 1;
-    }
-
-    function loop(t){
-      const dt = Math.min(0.033, (t-lastT)/1000);
-      lastT = t;
-
-      fitCanvas();
-      if (running && !paused) step(dt);
-      draw();
-
-      scoreEl.textContent = String(Math.floor(score));
-      bestEl.textContent  = String(best);
-      lvlEl.textContent   = String(level);
-
-      raf = requestAnimationFrame(loop);
-    }
-
-    function canvasPosFromEvent(ev){
-      const rect = canvas.getBoundingClientRect();
-      const dpr = canvas.width / rect.width;
-      return {
-        x: (ev.clientX - rect.left) * dpr,
-        y: (ev.clientY - rect.top)  * dpr
+      // Fullscreen button on mobile only
+      fsBtn.style.display = isMobile() ? "inline-flex" : "none";
+      fsBtn.onclick = async ()=>{
+        try{
+          if (!document.fullscreenElement) await box.requestFullscreen?.();
+          else await document.exitFullscreen?.();
+        }catch(e){}
       };
-    }
 
-    function onPointerDown(ev){
-      pointerDown = true;
-      canvas.setPointerCapture?.(ev.pointerId);
-      const p = canvasPosFromEvent(ev);
-      target.x = p.x; target.y = p.y;
-    }
-    function onPointerMove(ev){
-      if (!pointerDown && !isMobile()) {
-        // desktop hover-move control too
-        const p = canvasPosFromEvent(ev);
-        target.x = p.x; target.y = p.y;
-        return;
+      // safer fit: don't let canvas become 0 => freezes / crashes
+      function safeFitCanvas(){
+        const rect = canvas.getBoundingClientRect();
+        if (!rect.width || rect.width < 80) return; // 👈 קריטי: לא מגדילים ל-0
+        const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+        const targetW = Math.floor(rect.width * dpr);
+        const targetH = Math.floor((rect.width * (460/860)) * dpr);
+        if (targetW < 160 || targetH < 120) return;
+        if (canvas.width !== targetW || canvas.height !== targetH){
+          canvas.width = targetW;
+          canvas.height = targetH;
+        }
       }
-      if (!pointerDown) return;
-      const p = canvasPosFromEvent(ev);
-      target.x = p.x; target.y = p.y;
-    }
-    function onPointerUp(){
-      pointerDown = false;
-    }
+      safeFitCanvas();
 
-    function onKeyDown(e){
-      keys[e.key] = true;
-      if (e.key === "p" || e.key === "P") togglePause();
-      if (e.key === "r" || e.key === "R") reset();
-    }
-    function onKeyUp(e){ keys[e.key] = false; }
+      let running = true;
+      let paused = false;
+      let lastT = performance.now();
 
-    let raf = requestAnimationFrame(loop);
-    window.addEventListener("keydown", onKeyDown);
-    window.addEventListener("keyup", onKeyUp);
-    window.addEventListener("resize", fitCanvas);
+      const player = { x: 0, y: 0, r: 10, vx:0, vy:0, speed: 300 };
+      let bullets = [];
+      let particles = [];
+      let score = 0;
+      let level = 1;
+      let spawnTimer = 0;
+      let spawnEvery = 0.85;
+      let bulletSpeed = 150;
+      let keys = Object.create(null);
 
-    canvas.addEventListener("pointerdown", onPointerDown);
-    canvas.addEventListener("pointermove", onPointerMove);
-    canvas.addEventListener("pointerup", onPointerUp);
-    canvas.addEventListener("pointercancel", onPointerUp);
-    canvas.addEventListener("pointerleave", ()=>{ if(!isMobile()) pointerDown=false; });
+      // mobile joystick vector
+      let joyVec = {x:0,y:0};
+      let boost = 0;
+      let slow  = 0;
 
-    reset();
+      function W(){ return canvas.width; }
+      function H(){ return canvas.height; }
 
-    return function cleanup(){
-      cancelAnimationFrame(raf);
-      window.removeEventListener("keydown", onKeyDown);
-      window.removeEventListener("keyup", onKeyUp);
-      window.removeEventListener("resize", fitCanvas);
-      canvas.removeEventListener("pointerdown", onPointerDown);
-      canvas.removeEventListener("pointermove", onPointerMove);
-      canvas.removeEventListener("pointerup", onPointerUp);
-      canvas.removeEventListener("pointercancel", onPointerUp);
-      fsBtn.onclick = null;
-    };
-  }
-
-  /* ======================
-     Game 5: Snake (MOUSE/FINGER CONTROL)
-  ====================== */
-  function renderSnakeGame(root){
-    const wrap = document.createElement("div");
-    wrap.className = "canvas-wrap";
-
-    wrap.innerHTML = `
-      <div class="gh-card">
-        <div class="gh-row">
-          <span class="gh-pill">ניקוד: <span id="snScore">0</span></span>
-          <span class="gh-pill">שיא: <span id="snBest">0</span></span>
-          <span class="gh-pill">מהירות: <span id="snSpd">1</span>x</span>
-        </div>
-        <div class="gh-help" style="margin-top:10px;">
-          ✅ שליטה: <span class="kbd">עכבר</span> / <span class="kbd">אצבע</span> (תזיז לכיוון הרצוי). מקלדת עדיין עובדת כגיבוי.
-        </div>
-      </div>
-
-      <div class="canvas-box" id="snBox">
-        <canvas class="game-canvas" id="snCanvas" width="860" height="460"></canvas>
-      </div>
-
-      <div class="gh-card" id="snEnd" style="display:none;">
-        <div style="font-weight:1100;font-size:1.05rem;">נגמר 🐍</div>
-        <div class="gh-help" style="margin-top:8px;">איפוס כדי להתחיל מחדש.</div>
-      </div>
-    `;
-    root.appendChild(wrap);
-
-    const box = wrap.querySelector("#snBox");
-    const canvas = wrap.querySelector("#snCanvas");
-    const ctx = canvas.getContext("2d");
-
-    // fullscreen mobile
-    fsBtn.style.display = isMobile() ? "inline-flex" : "none";
-    fsBtn.onclick = async ()=>{
-      try{
-        if (!document.fullscreenElement) await box.requestFullscreen?.();
-        else await document.exitFullscreen?.();
-      }catch(e){}
-    };
-
-    function fitCanvas(){
-      const rect = canvas.getBoundingClientRect();
-      const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
-      const targetW = Math.floor(rect.width * dpr);
-      const targetH = Math.floor((rect.width * (460/860)) * dpr);
-      if (canvas.width !== targetW || canvas.height !== targetH){
-        canvas.width = targetW;
-        canvas.height = targetH;
+      function reset(){
+        safeFitCanvas();
+        bullets = [];
+        particles = [];
+        score = 0;
+        level = 1;
+        spawnTimer = 0;
+        spawnEvery = 0.85;
+        bulletSpeed = 150;
+        player.r = 10;
+        player.speed = 300;
+        player.x = (W() || 860)/2;
+        player.y = (H() || 460)/2;
+        endEl.style.display = "none";
+        paused = false;
+        running = true;
+        lastT = performance.now();
       }
-    }
-    fitCanvas();
 
-    const scoreEl = wrap.querySelector("#snScore");
-    const bestEl  = wrap.querySelector("#snBest");
-    const spdEl   = wrap.querySelector("#snSpd");
-    const endEl   = wrap.querySelector("#snEnd");
+      function togglePause(){ if (running) paused = !paused; }
+      function spawnBullet(){
+        const w=W(), h=H();
+        const edge = Math.floor(Math.random()*4);
+        let x,y;
+        if (edge===0){ x = Math.random()*w; y = -14; }
+        if (edge===1){ x = w+14; y = Math.random()*h; }
+        if (edge===2){ x = Math.random()*w; y = h+14; }
+        if (edge===3){ x = -14; y = Math.random()*h; }
 
-    let best = Number(localStorage.getItem("yaarat_game_snake_best") || "0");
-    bestEl.textContent = String(best);
+        const dx = player.x - x;
+        const dy = player.y - y;
+        const jitter = (Math.random()*0.55 - 0.275);
+        const ang = Math.atan2(dy,dx) + jitter;
 
-    let snake, dir, nextDir, food, score, alive;
-    let tickMs = 140;
-    let acc = 0;
-    let last = performance.now();
-    let keys = Object.create(null);
-    let raf = null;
-
-    // pointer steering
-    let pointerDown = false;
-    let steer = { x: null, y: null };
-
-    function reset(){
-      const w = canvas.width, h = canvas.height;
-      const cell = isMobile() ? 26 : 22;
-      const cols = Math.floor(w/cell);
-      const rows = Math.floor(h/cell);
-
-      wrap.__cell = cell;
-      wrap.__cols = cols;
-      wrap.__rows = rows;
-
-      snake = [{x: Math.floor(cols/2), y: Math.floor(rows/2)}];
-      dir = {x:1,y:0};
-      nextDir = {x:1,y:0};
-      score = 0;
-      alive = true;
-      tickMs = 140;
-      acc = 0;
-      endEl.style.display = "none";
-      placeFood();
-      last = performance.now();
-    }
-
-    function placeFood(){
-      const cols = wrap.__cols, rows = wrap.__rows;
-      while(true){
-        const f = { x: Math.floor(Math.random()*cols), y: Math.floor(Math.random()*rows) };
-        if (!snake.some(s=>s.x===f.x && s.y===f.y)){ food = f; break; }
+        const sp = bulletSpeed * (0.9 + Math.random()*0.35);
+        bullets.push({
+          x,y, vx: Math.cos(ang)*sp, vy: Math.sin(ang)*sp,
+          r: 6 + Math.random()*3, life: 12
+        });
       }
-    }
-
-    function setDir(nx,ny){
-      if (nx === -dir.x && ny === -dir.y) return;
-      nextDir = {x:nx,y:ny};
-    }
-
-    function steerToPointer(){
-      if (steer.x == null || steer.y == null) return;
-      const cell = wrap.__cell;
-
-      const head = snake[0];
-      const hx = head.x * cell + cell/2;
-      const hy = head.y * cell + cell/2;
-
-      const dx = steer.x - hx;
-      const dy = steer.y - hy;
-
-      // choose dominant axis
-      if (Math.abs(dx) > Math.abs(dy)){
-        if (dx > 0) setDir(1,0);
-        else setDir(-1,0);
-      } else {
-        if (dy > 0) setDir(0,1);
-        else setDir(0,-1);
+      function addBurst(x,y, n=18){
+        for (let i=0;i<n;i++){
+          const a = Math.random()*Math.PI*2;
+          const sp = 70 + Math.random()*200;
+          particles.push({ x,y, vx: Math.cos(a)*sp, vy: Math.sin(a)*sp, life: 0.6 + Math.random()*0.7 });
+        }
       }
-    }
 
-    function step(){
-      if (!alive) return;
+      function step(dt){
+        const w=W(), h=H();
+        if (!w || !h) return;
 
-      // pointer steering first (so it feels immediate)
-      steerToPointer();
+        // input (desktop)
+        let ix = 0, iy = 0;
+        if (keys["ArrowLeft"] || keys["a"] || keys["A"]) ix -= 1;
+        if (keys["ArrowRight"]|| keys["d"] || keys["D"]) ix += 1;
+        if (keys["ArrowUp"]   || keys["w"] || keys["W"]) iy -= 1;
+        if (keys["ArrowDown"] || keys["s"] || keys["S"]) iy += 1;
 
-      dir = nextDir;
+        // input (mobile joystick)
+        if (isMobile()){
+          ix += joyVec.x;
+          iy += joyVec.y;
+        }
 
-      const cols = wrap.__cols, rows = wrap.__rows;
-      const head = snake[0];
-      const nh = { x: head.x + dir.x, y: head.y + dir.y };
+        const ilen = Math.hypot(ix,iy) || 1;
+        if (ix!==0 || iy!==0){ ix/=ilen; iy/=ilen; }
 
-      if (nh.x < 0 || nh.x >= cols || nh.y < 0 || nh.y >= rows){ die(); return; }
-      if (snake.some((s,i)=> i>0 && s.x===nh.x && s.y===nh.y)){ die(); return; }
+        let sp = player.speed;
+        if (boost>0){ sp *= 1.22; boost -= dt; }
+        if (slow>0){ sp *= 0.72; slow -= dt; }
 
-      snake.unshift(nh);
+        player.vx = ix * sp;
+        player.vy = iy * sp;
 
-      if (nh.x === food.x && nh.y === food.y){
-        score += 10;
-        placeFood();
-        if (tickMs > 72) tickMs -= 3;
-      } else {
-        snake.pop();
+        player.x += player.vx * dt;
+        player.y += player.vy * dt;
+
+        player.x = Math.max(player.r, Math.min(w-player.r, player.x));
+        player.y = Math.max(player.r, Math.min(h-player.r, player.y));
+
+        // difficulty
+        score += dt * (10 + level*2.2);
+        const newLevel = 1 + Math.floor(score/120);
+        if (newLevel !== level){
+          level = newLevel;
+          spawnEvery = Math.max(0.23, 0.85 - (level-1)*0.06);
+          bulletSpeed = 150 + (level-1)*24;
+          player.speed = 300 + (level-1)*7;
+          addBurst(player.x, player.y, 8);
+        }
+
+        spawnTimer += dt;
+        while (spawnTimer >= spawnEvery){
+          spawnTimer -= spawnEvery;
+          spawnBullet();
+          if (level >= 6 && Math.random() < 0.25) spawnBullet();
+        }
+
+        // bullets
+        for (let i=bullets.length-1;i>=0;i--){
+          const b = bullets[i];
+          b.x += b.vx*dt;
+          b.y += b.vy*dt;
+          b.life -= dt;
+
+          const dist = Math.hypot(b.x-player.x, b.y-player.y);
+          if (dist < b.r + player.r){
+            running = false;
+            endEl.style.display = "block";
+            addBurst(player.x, player.y, 32);
+            if (score > best){
+              best = Math.floor(score);
+              localStorage.setItem("yaarat_game_dodge_best", String(best));
+            }
+            break;
+          }
+          if (b.life <= 0 || b.x < -60 || b.x > w+60 || b.y < -60 || b.y > h+60){
+            bullets.splice(i,1);
+          }
+        }
+
+        // particles
+        for (let i=particles.length-1;i>=0;i--){
+          const p = particles[i];
+          p.x += p.vx*dt; p.y += p.vy*dt;
+          p.vx *= (1 - 2.1*dt); p.vy *= (1 - 2.1*dt);
+          p.life -= dt;
+          if (p.life <= 0) particles.splice(i,1);
+        }
       }
-    }
 
-    function die(){
-      alive = false;
-      endEl.style.display = "block";
-      if (score > best){
-        best = score;
-        localStorage.setItem("yaarat_game_snake_best", String(best));
-      }
-    }
+      function draw(){
+        const w=W(), h=H();
+        if (!w || !h) return;
 
-    function draw(){
-      const w = canvas.width, h = canvas.height;
-      const cell = wrap.__cell;
-      const cols = wrap.__cols, rows = wrap.__rows;
+        ctx.clearRect(0,0,w,h);
 
-      ctx.clearRect(0,0,w,h);
+        // grid
+        ctx.globalAlpha = themeIsDark() ? 0.22 : 0.20;
+        ctx.strokeStyle = themeIsDark() ? "#93c5fd" : "#2563eb";
+        ctx.lineWidth = 1;
+        const stepG = Math.max(42, Math.round(w/18));
+        for (let x=stepG;x<w;x+=stepG){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke(); }
+        for (let y=stepG;y<h;y+=stepG){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
+        ctx.globalAlpha = 1;
 
-      // grid
-      ctx.globalAlpha = themeIsDark() ? 0.16 : 0.14;
-      ctx.strokeStyle = themeIsDark() ? "#93c5fd" : "#2563eb";
-      for (let x=0;x<=cols;x++){
-        ctx.beginPath(); ctx.moveTo(x*cell,0); ctx.lineTo(x*cell,rows*cell); ctx.stroke();
-      }
-      for (let y=0;y<=rows;y++){
-        ctx.beginPath(); ctx.moveTo(0,y*cell); ctx.lineTo(cols*cell,y*cell); ctx.stroke();
-      }
-      ctx.globalAlpha = 1;
+        // bullets
+        bullets.forEach(b=>{
+          ctx.beginPath();
+          ctx.fillStyle = themeIsDark() ? "rgba(239,68,68,.88)" : "rgba(239,68,68,.72)";
+          ctx.arc(b.x,b.y,b.r,0,Math.PI*2);
+          ctx.fill();
+        });
 
-      // food
-      ctx.fillStyle = themeIsDark() ? "rgba(239,68,68,.9)" : "rgba(239,68,68,.75)";
-      ctx.fillRect(food.x*cell+3, food.y*cell+3, cell-6, cell-6);
+        // player
+        ctx.beginPath();
+        ctx.fillStyle = themeIsDark() ? "rgba(34,197,94,.95)" : "rgba(34,197,94,.82)";
+        ctx.arc(player.x, player.y, player.r, 0, Math.PI*2);
+        ctx.fill();
 
-      // snake
-      snake.forEach((s,i)=>{
-        ctx.fillStyle = i===0
-          ? (themeIsDark() ? "rgba(34,197,94,.95)" : "rgba(34,197,94,.82)")
-          : (themeIsDark() ? "rgba(56,189,248,.55)" : "rgba(37,99,235,.30)");
-        ctx.fillRect(s.x*cell+2, s.y*cell+2, cell-4, cell-4);
-      });
+        // ring
+        ctx.globalAlpha = 0.25;
+        ctx.lineWidth = Math.max(5, Math.round(w/180));
+        ctx.strokeStyle = themeIsDark() ? "#38bdf8" : "#2563eb";
+        ctx.beginPath();
+        ctx.arc(player.x, player.y, player.r+10, 0, Math.PI*2);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
 
-      if (!alive){
+        // particles
+        particles.forEach(p=>{
+          ctx.globalAlpha = Math.max(0, Math.min(1, p.life));
+          ctx.fillStyle = "#f59e0b";
+          ctx.fillRect(p.x, p.y, 3, 3);
+        });
+        ctx.globalAlpha = 1;
+
+        // HUD
         ctx.globalAlpha = 0.85;
         ctx.fillStyle = themeIsDark() ? "#e5e7eb" : "#0f172a";
-        ctx.font = "1100 22px system-ui, -apple-system, Segoe UI, Arial";
-        ctx.fillText("GAME OVER", 12, 30);
+        ctx.font = "900 14px system-ui, -apple-system, Segoe UI, Arial";
+        ctx.fillText(paused ? "PAUSED" : "DODGE", 12, 20);
         ctx.globalAlpha = 1;
       }
-    }
 
-    function loop(t){
-      const dt = t - last;
-      last = t;
-      acc += dt;
+      function loop(t){
+        const dt = Math.min(0.033, (t-lastT)/1000);
+        lastT = t;
 
-      fitCanvas();
-      while (acc >= tickMs){ acc -= tickMs; step(); }
-      draw();
+        safeFitCanvas();
+        if (running && !paused) step(dt);
+        draw();
 
-      scoreEl.textContent = String(score);
-      bestEl.textContent = String(best);
-      spdEl.textContent = String(Math.round(140 / tickMs * 10)/10);
+        scoreEl.textContent = String(Math.floor(score));
+        bestEl.textContent  = String(best);
+        lvlEl.textContent   = String(level);
 
-      raf = requestAnimationFrame(loop);
-    }
+        raf = requestAnimationFrame(loop);
+      }
 
-    function onKeyDown(e){
-      keys[e.key] = true;
-      if (e.key==="ArrowLeft" || e.key==="a" || e.key==="A") setDir(-1,0);
-      if (e.key==="ArrowRight"|| e.key==="d" || e.key==="D") setDir(1,0);
-      if (e.key==="ArrowUp"   || e.key==="w" || e.key==="W") setDir(0,-1);
-      if (e.key==="ArrowDown" || e.key==="s" || e.key==="S") setDir(0,1);
-      if (e.key==="r" || e.key==="R") reset();
-    }
-    function onKeyUp(e){ keys[e.key] = false; }
+      function onKeyDown(e){
+        keys[e.key] = true;
+        if (e.key === "p" || e.key === "P") togglePause();
+      }
+      function onKeyUp(e){ keys[e.key] = false; }
 
-    function canvasPosFromEvent(ev){
-      const rect = canvas.getBoundingClientRect();
-      const dpr = canvas.width / rect.width;
-      return {
-        x: (ev.clientX - rect.left) * dpr,
-        y: (ev.clientY - rect.top)  * dpr
+      // Mobile joystick
+      const joy = wrap.querySelector("#dgJoy");
+      const knob= wrap.querySelector("#dgKnob");
+      let joyDown = false;
+
+      function setKnob(nx, ny){
+        const max = 40;
+        const x = Math.max(-max, Math.min(max, nx));
+        const y = Math.max(-max, Math.min(max, ny));
+        knob.style.transform = `translate(${x}px, ${y}px) translate(-50%,-50%)`;
+        joyVec.x = x/max;
+        joyVec.y = y/max;
+      }
+      function joyPos(ev){
+        const rect = joy.getBoundingClientRect();
+        const cx = rect.left + rect.width/2;
+        const cy = rect.top + rect.height/2;
+        return { x: ev.clientX - cx, y: ev.clientY - cy };
+      }
+      function onJoyDown(ev){
+        joyDown = true;
+        joy.setPointerCapture?.(ev.pointerId);
+        const p = joyPos(ev);
+        setKnob(p.x, p.y);
+      }
+      function onJoyMove(ev){
+        if (!joyDown) return;
+        const p = joyPos(ev);
+        setKnob(p.x, p.y);
+      }
+      function onJoyUp(){
+        joyDown = false;
+        setKnob(0,0);
+      }
+
+      // buttons
+      wrap.querySelector("#dgPause").addEventListener("click", togglePause);
+      wrap.querySelector("#dgRestart").addEventListener("click", reset);
+      wrap.querySelector("#dgBoost").addEventListener("click", ()=>{ boost = 0.35; });
+      wrap.querySelector("#dgSlow").addEventListener("click", ()=>{ slow  = 0.45; });
+
+      joy.addEventListener("pointerdown", onJoyDown);
+      joy.addEventListener("pointermove", onJoyMove);
+      joy.addEventListener("pointerup", onJoyUp);
+      joy.addEventListener("pointercancel", onJoyUp);
+
+      let raf = requestAnimationFrame(loop);
+      window.addEventListener("keydown", onKeyDown);
+      window.addEventListener("keyup", onKeyUp);
+      window.addEventListener("resize", safeFitCanvas);
+
+      // 👈 חשוב: מאתחלים אחרי פריים כדי שהפאנל כבר "נפתח" והקנבס לא יהיה 0
+      requestAnimationFrame(()=>reset());
+
+      return function cleanup(){
+        cancelAnimationFrame(raf);
+        window.removeEventListener("keydown", onKeyDown);
+        window.removeEventListener("keyup", onKeyUp);
+        window.removeEventListener("resize", safeFitCanvas);
+        joy.removeEventListener("pointerdown", onJoyDown);
+        joy.removeEventListener("pointermove", onJoyMove);
+        joy.removeEventListener("pointerup", onJoyUp);
+        joy.removeEventListener("pointercancel", onJoyUp);
+        fsBtn.onclick = null;
       };
     }
 
-    function onPointerDown(ev){
-      pointerDown = true;
-      canvas.setPointerCapture?.(ev.pointerId);
-      const p = canvasPosFromEvent(ev);
-      steer.x = p.x; steer.y = p.y;
-    }
-    function onPointerMove(ev){
-      if (!pointerDown && !isMobile()){
-        // desktop hover steering too
-        const p = canvasPosFromEvent(ev);
-        steer.x = p.x; steer.y = p.y;
-        return;
+    /* ======================
+       Game 5: Snake (FIXED: no-freeze, D-pad on mobile)
+       סיבת הקריסה שלך: לפעמים הקנבס היה 0 רוחב כשהפאנל נפתח => cols/rows=0 => placeFood() לולאה אינסופית.
+    ====================== */
+    function renderSnakeGame(root){
+      const wrap = document.createElement("div");
+      wrap.className = "canvas-wrap";
+
+      wrap.innerHTML = `
+        <div class="gh-card">
+          <div class="gh-row">
+            <span class="gh-pill">ניקוד: <span id="snScore">0</span></span>
+            <span class="gh-pill">שיא: <span id="snBest">0</span></span>
+            <span class="gh-pill">מהירות: <span id="snSpd">1</span>x</span>
+          </div>
+          <div class="gh-help" style="margin-top:10px;">
+            מחשב: <span class="kbd">חצים</span>/<span class="kbd">WASD</span> · מובייל: D-Pad.
+          </div>
+        </div>
+
+        <div class="canvas-box" id="snBox">
+          <canvas class="game-canvas" id="snCanvas" width="860" height="460"></canvas>
+
+          <div class="mcontrols">
+            <div class="pad" aria-label="D-pad">
+              <button type="button" id="snUp">▲</button>
+              <button type="button" disabled style="opacity:.55; cursor:default;">•</button>
+              <button type="button" id="snRestart">↻</button>
+
+              <button type="button" id="snLeft">◀</button>
+              <button type="button" disabled style="opacity:.55; cursor:default;">•</button>
+              <button type="button" id="snRight">▶</button>
+
+              <button type="button" disabled style="opacity:.55; cursor:default;">•</button>
+              <button type="button" id="snDown">▼</button>
+              <button type="button" disabled style="opacity:.55; cursor:default;">•</button>
+            </div>
+            <div class="gh-help" style="max-width:320px; opacity:.8;">טיפ: תכנן פניות. אל תשרוף מסך.</div>
+          </div>
+        </div>
+
+        <div class="gh-card" id="snEnd" style="display:none;">
+          <div style="font-weight:1100;font-size:1.05rem;">נגמר 🐍</div>
+          <div class="gh-help" style="margin-top:8px;">איפוס כדי להתחיל מחדש.</div>
+        </div>
+      `;
+      root.appendChild(wrap);
+
+      const box = wrap.querySelector("#snBox");
+      const canvas = wrap.querySelector("#snCanvas");
+      const ctx = canvas.getContext("2d");
+
+      // fullscreen mobile
+      fsBtn.style.display = isMobile() ? "inline-flex" : "none";
+      fsBtn.onclick = async ()=>{
+        try{
+          if (!document.fullscreenElement) await box.requestFullscreen?.();
+          else await document.exitFullscreen?.();
+        }catch(e){}
+      };
+
+      function safeFitCanvas(){
+        const rect = canvas.getBoundingClientRect();
+        if (!rect.width || rect.width < 80) return; // 👈 שוב: לא לאפשר 0
+        const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+        const targetW = Math.floor(rect.width * dpr);
+        const targetH = Math.floor((rect.width * (460/860)) * dpr);
+        if (targetW < 160 || targetH < 120) return;
+        if (canvas.width !== targetW || canvas.height !== targetH){
+          canvas.width = targetW;
+          canvas.height = targetH;
+        }
       }
-      if (!pointerDown) return;
-      const p = canvasPosFromEvent(ev);
-      steer.x = p.x; steer.y = p.y;
+      safeFitCanvas();
+
+      const scoreEl = wrap.querySelector("#snScore");
+      const bestEl  = wrap.querySelector("#snBest");
+      const spdEl   = wrap.querySelector("#snSpd");
+      const endEl   = wrap.querySelector("#snEnd");
+
+      let best = Number(localStorage.getItem("yaarat_game_snake_best") || "0");
+      bestEl.textContent = String(best);
+
+      let snake, dir, nextDir, food, score, alive;
+      let tickMs = 140;
+      let acc = 0;
+      let last = performance.now();
+      let keys = Object.create(null);
+      let raf = null;
+
+      function reset(){
+        safeFitCanvas();
+
+        const w = canvas.width || 860;
+        const h = canvas.height || 460;
+
+        const cell = isMobile() ? 26 : 22;
+        const cols = Math.max(10, Math.floor(w/cell)); // 👈 מינימום
+        const rows = Math.max(8,  Math.floor(h/cell)); // 👈 מינימום
+
+        wrap.__cell = cell;
+        wrap.__cols = cols;
+        wrap.__rows = rows;
+
+        snake = [{x: Math.floor(cols/2), y: Math.floor(rows/2)}];
+        dir = {x:1,y:0};
+        nextDir = {x:1,y:0};
+        score = 0;
+        alive = true;
+        tickMs = 140;
+        acc = 0;
+        endEl.style.display = "none";
+        placeFood();
+        last = performance.now();
+      }
+
+      function placeFood(){
+        const cols = wrap.__cols, rows = wrap.__rows;
+        if (cols <= 1 || rows <= 1) { food = {x:0,y:0}; return; }
+
+        // guard כדי שלא תהיה לולאה אינסופית
+        for (let guard=0; guard<800; guard++){
+          const f = { x: Math.floor(Math.random()*cols), y: Math.floor(Math.random()*rows) };
+          if (!snake.some(s=>s.x===f.x && s.y===f.y)){ food = f; return; }
+        }
+        // fallback אם איכשהו הכל תפוס
+        food = { x: 0, y: 0 };
+      }
+
+      function setDir(nx,ny){
+        if (!alive) return;
+        if (nx === -dir.x && ny === -dir.y) return;
+        nextDir = {x:nx,y:ny};
+      }
+
+      function step(){
+        if (!alive) return;
+        dir = nextDir;
+
+        const cols = wrap.__cols, rows = wrap.__rows;
+        const head = snake[0];
+        const nh = { x: head.x + dir.x, y: head.y + dir.y };
+
+        if (nh.x < 0 || nh.x >= cols || nh.y < 0 || nh.y >= rows){ die(); return; }
+        if (snake.some((s,i)=> i>0 && s.x===nh.x && s.y===nh.y)){ die(); return; }
+
+        snake.unshift(nh);
+
+        if (nh.x === food.x && nh.y === food.y){
+          score += 10;
+          placeFood();
+          if (tickMs > 72) tickMs -= 3;
+        } else {
+          snake.pop();
+        }
+      }
+
+      function die(){
+        alive = false;
+        endEl.style.display = "block";
+        if (score > best){
+          best = score;
+          localStorage.setItem("yaarat_game_snake_best", String(best));
+        }
+      }
+
+      function draw(){
+        const w = canvas.width, h = canvas.height;
+        if (!w || !h) return;
+
+        const cell = wrap.__cell;
+        const cols = wrap.__cols, rows = wrap.__rows;
+
+        ctx.clearRect(0,0,w,h);
+
+        // grid
+        ctx.globalAlpha = themeIsDark() ? 0.16 : 0.14;
+        ctx.strokeStyle = themeIsDark() ? "#93c5fd" : "#2563eb";
+        for (let x=0;x<=cols;x++){
+          ctx.beginPath(); ctx.moveTo(x*cell,0); ctx.lineTo(x*cell,rows*cell); ctx.stroke();
+        }
+        for (let y=0;y<=rows;y++){
+          ctx.beginPath(); ctx.moveTo(0,y*cell); ctx.lineTo(cols*cell,y*cell); ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+
+        // food
+        ctx.fillStyle = themeIsDark() ? "rgba(239,68,68,.9)" : "rgba(239,68,68,.75)";
+        ctx.fillRect(food.x*cell+3, food.y*cell+3, cell-6, cell-6);
+
+        // snake
+        snake.forEach((s,i)=>{
+          ctx.fillStyle = i===0
+            ? (themeIsDark() ? "rgba(34,197,94,.95)" : "rgba(34,197,94,.82)")
+            : (themeIsDark() ? "rgba(56,189,248,.55)" : "rgba(37,99,235,.30)");
+          ctx.fillRect(s.x*cell+2, s.y*cell+2, cell-4, cell-4);
+        });
+
+        if (!alive){
+          ctx.globalAlpha = 0.85;
+          ctx.fillStyle = themeIsDark() ? "#e5e7eb" : "#0f172a";
+          ctx.font = "1100 22px system-ui, -apple-system, Segoe UI, Arial";
+          ctx.fillText("GAME OVER", 12, 30);
+          ctx.globalAlpha = 1;
+        }
+      }
+
+      function loop(t){
+        const dt = t - last;
+        last = t;
+        acc += dt;
+
+        safeFitCanvas();
+        while (acc >= tickMs){ acc -= tickMs; step(); }
+        draw();
+
+        scoreEl.textContent = String(score);
+        bestEl.textContent = String(best);
+        spdEl.textContent = String(Math.round(140 / tickMs * 10)/10);
+
+        raf = requestAnimationFrame(loop);
+      }
+
+      function onKeyDown(e){
+        keys[e.key] = true;
+        if (e.key==="ArrowLeft" || e.key==="a" || e.key==="A") setDir(-1,0);
+        if (e.key==="ArrowRight"|| e.key==="d" || e.key==="D") setDir(1,0);
+        if (e.key==="ArrowUp"   || e.key==="w" || e.key==="W") setDir(0,-1);
+        if (e.key==="ArrowDown" || e.key==="s" || e.key==="S") setDir(0,1);
+        if (e.key==="r" || e.key==="R") reset();
+      }
+      function onKeyUp(e){ keys[e.key] = false; }
+
+      // D-pad (mobile)
+      wrap.querySelector("#snUp").addEventListener("click", ()=>setDir(0,-1));
+      wrap.querySelector("#snDown").addEventListener("click", ()=>setDir(0,1));
+      wrap.querySelector("#snLeft").addEventListener("click", ()=>setDir(-1,0));
+      wrap.querySelector("#snRight").addEventListener("click", ()=>setDir(1,0));
+      wrap.querySelector("#snRestart").addEventListener("click", reset);
+
+      window.addEventListener("keydown", onKeyDown);
+      window.addEventListener("keyup", onKeyUp);
+      window.addEventListener("resize", safeFitCanvas);
+
+      // 👈 שוב: אתחול אחרי פריים כדי שהקנבס לא יהיה 0
+      requestAnimationFrame(()=>{
+        reset();
+        raf = requestAnimationFrame(loop);
+      });
+
+      return function cleanup(){
+        cancelAnimationFrame(raf);
+        window.removeEventListener("keydown", onKeyDown);
+        window.removeEventListener("keyup", onKeyUp);
+        window.removeEventListener("resize", safeFitCanvas);
+        fsBtn.onclick = null;
+      };
     }
-    function onPointerUp(){
-      pointerDown = false;
+
+    // helpers
+    function shuffle(arr){
+      for (let i=arr.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [arr[i],arr[j]]=[arr[j],arr[i]];
+      }
+      return arr;
+    }
+    function r(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+    function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+    // auto: first chip active on mobile (nice UX)
+    if (isMobile()){
+      const first = document.querySelector(".gchip");
+      if (first){ first.classList.add("active"); }
     }
 
-    window.addEventListener("keydown", onKeyDown);
-    window.addEventListener("keyup", onKeyUp);
-    window.addEventListener("resize", fitCanvas);
-
-    canvas.addEventListener("pointerdown", onPointerDown);
-    canvas.addEventListener("pointermove", onPointerMove);
-    canvas.addEventListener("pointerup", onPointerUp);
-    canvas.addEventListener("pointercancel", onPointerUp);
-    canvas.addEventListener("pointerleave", ()=>{ if(!isMobile()) pointerDown=false; });
-
-    reset();
-    raf = requestAnimationFrame(loop);
-
-    return function cleanup(){
-      cancelAnimationFrame(raf);
-      window.removeEventListener("keydown", onKeyDown);
-      window.removeEventListener("keyup", onKeyUp);
-      window.removeEventListener("resize", fitCanvas);
-      canvas.removeEventListener("pointerdown", onPointerDown);
-      canvas.removeEventListener("pointermove", onPointerMove);
-      canvas.removeEventListener("pointerup", onPointerUp);
-      canvas.removeEventListener("pointercancel", onPointerUp);
-      fsBtn.onclick = null;
-    };
-  }
-
-  // helpers
-  function shuffle(arr){
-    for (let i=arr.length-1;i>0;i--){
-      const j = Math.floor(Math.random()*(i+1));
-      [arr[i],arr[j]]=[arr[j],arr[i]];
-    }
-    return arr;
-  }
-  function r(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
-  function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-
-})();
-</script>
-
+  })();
+  </script>
 </section>
+
 
 
 
