@@ -354,9 +354,10 @@ const GRADES = ["z", "h", "t"];
 // כיתות לכל שכבה
 const CLASS_IDS_BY_GRADE = {
   z: ["z1", "z2", "z3", "z4", "z5"],
-  h: ["h1", "h4", "h5", "h6"],
+  h: ["h1", "h4", "h5", "h6", "amat"],
   t: ["t1", "t2", "t3", "t4", "t5"]
 };
+
 
 let newsData = { z: [], h: [], t: [] };
 let examsData = { z: [], h: [], t: [] };
@@ -401,14 +402,12 @@ function escapeHtml(str) {
 }
 
 // classId -> label
-function classIdToLabel(classId) {
-  const map = {
-    z1: "ז1", z2: "ז2", z3: "ז3", z4: "ז4", z5: "ז5",
-    h1: "ח1/7", h4: "ח4/8", h5: "ח5/9", h6: "ח6/10",
-    t1: "ט1", t2: "ט2", t3: "ט3", t4: "ט4", t5: "ט5"
-  };
-  return map[String(classId || "").toLowerCase()] || "";
-}
+const map = {
+  z1:"ז1", z2:"ז2", z3:"ז3", z4:"ז4", z5:"ז5",
+  h1:"ח1/7", h4:"ח4/8", h5:"ח5/9", h6:"ח6/10", amat:"עמ״ט", // ✅
+  t1:"ט1", t2:"ט2", t3:"ט3", t4:"ט4", t5:"ט5"
+};
+
 
 async function getDocSafe(pathArr, def) {
   const refDoc = doc(db, ...pathArr);

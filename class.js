@@ -4,12 +4,13 @@ import { doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
 // ====== config ======
+// ✅ 1) תשאיר את זה ככה (כבר עשית נכון) — רק בלי רווחים מיותרים
 const CLASS_IDS_BY_GRADE = {
   z: ["z1", "z2", "z3", "z4", "z5"],
-  h: ["h1", "h4", "h5", "h6"],
+  h: ["h1", "h4", "h5", "h6", "amat"],
   t: ["t1", "t2", "t3", "t4", "t5"]
-  
 };
+
 
 const DAYS = [
   { key: "sun", label: "ראשון" },
@@ -135,11 +136,14 @@ function getNowNextForDay(dayKey) {
 // ====== helpers ======
 function classToGrade(classId) {
   const c = String(classId || "").toLowerCase();
+  if (c === "amat") return "h"; // ✅ עמ"ט שייך לשכבת ח
   if (c.startsWith("z")) return "z";
   if (c.startsWith("h")) return "h";
   if (c.startsWith("t")) return "t";
   return null;
 }
+
+
 
 function isKnownClass(classId) {
   const g = classToGrade(classId);
@@ -151,11 +155,13 @@ function classLabel(classId) {
   const c = String(classId || "").toLowerCase();
   const map = {
     z1:"ז1", z2:"ז2", z3:"ז3", z4:"ז4", z5:"ז5",
-    h1:"ח1/7", h4:"ח4/8", h5:"ח5/9", h6:"ח6/10",
+    h1:"ח1/7", h4:"ח4/8", h5:"ח5/9", h6:"ח6/10", amat:'עמ"ט', // ✅
     t1:"ט1", t2:"ט2", t3:"ט3", t4:"ט4", t5:"ט5"
   };
   return map[c] || c.toUpperCase();
 }
+
+
 
 function escapeHtml(str) {
   return String(str || "")

@@ -13,6 +13,7 @@ const CLASS_IDS_BY_GRADE = {
     { id: "h4", label: "ח4/8" },
     { id: "h5", label: "ח5/9" },
     { id: "h6", label: "ח6/10" },
+    { id: "amat", label: "עמ״ט" },
   ],
   t: [
     { id: "t1", label: "ט1" },
