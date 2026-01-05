@@ -3,78 +3,150 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>שכבת ח' – יערת העמק</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>עמוד אינו פעיל</title>
+
+  <!-- SEO -->
+  <meta name="robots" content="noindex, nofollow" />
+
+  <style>
+    :root {
+      --bg: #0b1020;
+      --card: #121735;
+      --text: #eef1ff;
+      --muted: #b8bfdc;
+      --accent: #4da3ff;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(1200px 600px at 50% -10%, #1a235a, var(--bg));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
+    }
+
+    .card {
+      background: linear-gradient(180deg, #161d46, var(--card));
+      border-radius: 22px;
+      padding: 36px 30px;
+      max-width: 520px;
+      width: calc(100% - 32px);
+      text-align: center;
+      box-shadow:
+        0 25px 50px rgba(0,0,0,.45),
+        inset 0 1px 0 rgba(255,255,255,.05);
+    }
+
+    .logo {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 18px;
+    }
+
+    .logo img {
+      height: 72px;
+      width: auto;
+      filter: drop-shadow(0 6px 14px rgba(0,0,0,.35));
+    }
+
+    h1 {
+      margin: 10px 0 12px;
+      font-size: 1.7rem;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+    }
+
+    p {
+      margin: 0 0 26px;
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 1.05rem;
+    }
+
+    .actions {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      appearance: none;
+      border: none;
+      cursor: pointer;
+      padding: 13px 22px;
+      border-radius: 999px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      transition:
+        transform .15s ease,
+        box-shadow .15s ease,
+        background .15s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #6bb7ff, var(--accent));
+      color: #081428;
+      box-shadow: 0 10px 22px rgba(77,163,255,.35);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,.18);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 28px rgba(0,0,0,.4);
+    }
+
+    footer {
+      margin-top: 22px;
+      font-size: 0.85rem;
+      color: var(--muted);
+      opacity: 0.9;
+    }
+  </style>
 </head>
+<body>
 
-<body data-grade="h">
-    <script type="module" src="analytics.js"></script>
+  <div class="card">
 
-<header>
-  <div class="container">
-    <nav class="nav">
-      <div class="nav-left">
-       
-          <div class="school-title-main">שכבת ח'</div>
-          <div class="school-title-sub"><a href="index.html">חזרה לדף הראשי</a></div>
-        </div>
-       <!-- כפתור מצב כהה / בהיר -->
- <button
- id="theme-toggle"
-  class="theme-toggle"
-  type="button"
-  aria-label="החלפת מצב תצוגה">
-  🌙
-</button>
-
-      </div>
-    </nav>
-  </div>
-</header>
-
-<section class="grade-hero">
-  <div class="container">
-    <h1>שכבת ח'</h1>
-    <p>חדשות, לוח מבחנים ולוח מודעות לתלמידי שכבת ח'.</p>
-  </div>
-</section>
-
-<section>
-  <div class="container">
-    <div class="section-header">
-      <h2 class="section-title">חדשות שכבת ח'</h2>
+    <div class="logo">
+      <!-- שנה נתיב/שם אם צריך -->
+      <img src="logo.png" alt="לוגו יערת העמק">
     </div>
-    <div id="grade-news" class="grade-news"></div>
-  </div>
-</section>
 
-<section>
-  <div class="container">
-    <div class="section-header">
-      <h2 class="section-title">לוח מבחנים – ח'</h2>
+    <h1>העמוד אינו פעיל</h1>
+
+    <p>
+      עמוד זה אינו נמצא עוד בשימוש.<br>
+      ייתכן שהתוכן שחיפשת עבר לעמוד אחר באתר.
+    </p>
+
+    <div class="actions">
+      <button class="btn btn-primary" onclick="location.href='/'">
+        חזרה לדף הבית
+      </button>
+      <button class="btn btn-secondary" onclick="history.back()">
+        חזרה לעמוד הקודם
+      </button>
     </div>
-    <div id="grade-exams"></div>
-  </div>
-</section>
 
-<section>
-  <div class="container">
-    <div class="section-header">
-      <h2 class="section-title">לוח מודעות</h2>
-    </div>
-    <div id="board-list" class="board-grid"></div>
-  </div>
-</section>
+    <footer>
+      אתר יערת העמק · חטיבת הנעורים
+    </footer>
 
-<footer>
-  <div class="container">
-    © <span id="year"></span> שכבת ח' · יערת העמק
   </div>
-</footer>
-
-<div id="to-top">↑</div>
-<script type="module" src="app.js"></script>
-<script src="accessibility.js"></script>
 
 </body>
 </html>
