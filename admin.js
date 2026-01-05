@@ -407,6 +407,10 @@ const map = {
   h1:"ח1/7", h4:"ח4/8", h5:"ח5/9", h6:"ח6/10", amat:"עמ״ט", // ✅
   t1:"ט1", t2:"ט2", t3:"ט3", t4:"ט4", t5:"ט5"
 };
+function classIdToLabel(classId) {
+  const key = String(classId || "").trim().toLowerCase();
+  return map[key] || key || "";
+}
 
 
 async function getDocSafe(pathArr, def) {
