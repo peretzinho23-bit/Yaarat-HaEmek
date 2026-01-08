@@ -965,8 +965,8 @@ html[data-theme="light"] body.admin-page .login-links a{
           <a href="#grades" class="admin-btn">השכבות</a>
           <a href="#exams" class="admin-btn">מבחנים</a>
           <a href="#board" class="admin-btn">מודעות</a>
-          <a href="adminapps.html" class="admin-btn">כלי עריכה</a>
-          <a href="#contact" class="admin-btn">יצירת קשר</a>
+          
+          
         </div>
 
         <div class="admin-nav-right">
@@ -978,8 +978,8 @@ html[data-theme="light"] body.admin-page .login-links a{
           <a href="#grades" class="admin-btn">השכבות</a>
           <a href="#exams" class="admin-btn">מבחנים</a>
           <a href="#board" class="admin-btn">מודעות</a>
-          <a href="adminapps.html" class="admin-btn">כלי עריכה</a>
-          <a href="#contact" class="admin-btn">יצירת קשר</a>
+          
+          
         </div>
 
       </div>
@@ -1028,15 +1028,9 @@ html[data-theme="light"] body.admin-page .login-links a{
       <div id="admin-section" class="admin-layout" style="display:none;">
         <button id="logout-btn" class="btn-outline">התנתקות</button>
 
-        <div class="section-header" id="contact">
+        <div class="section-header">
           <h2 class="section-title">ניהול חדשות, מבחנים, מודעות ותוכן האתר</h2>
           <p class="section-subtitle">כל שינוי נשמר אוטומטית ונראה באתר התלמידים.</p>
-        </div>
-
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;">
-          <a href="adminapps.html" target="_blank" class="btn-outline" style="display:inline-block;padding:8px 16px;border-radius:999px;">
-            כלי עריכה נוספים 🛠️ קוד כניסה - 1992
-          </a>
         </div>
 
         <!-- NEWS -->
@@ -1337,116 +1331,6 @@ html[data-theme="light"] body.admin-page .login-links a{
         </div>
 
         <br><br>
-
-        <!-- SITE CONTENT -->
-        <div id="sitecontent"></div>
-        <h3 class="section-title" style="font-size:1.2rem;margin-bottom:10px;">ניהול תוכן האתר</h3>
-        <p class="section-subtitle">כל השדות כאן נשמרים במסמך Firestore אחד (siteContent/main) ומוזנים לכל חלקי האתר.</p>
-
-        <div class="admin-columns">
-          <div class="card">
-            <h3>טקסטים כלליים</h3>
-
-            <form id="site-content-form" class="admin-form">
-              <h4>דף בית – אזור הירו (המשפטים הגדולים למעלה)</h4>
-              <label>כותרת ראשית בהירו</label>
-              <input name="homeHeroTitle" placeholder="ברוכים הבאים ליערת העמק" />
-              <label>תת־כותרת בהירו</label>
-              <input name="homeHeroSubtitle" placeholder="סביבת למידה בטוחה, תומכת ומובילה..." />
-
-              <h4 style="margin-top:16px;">תיבת "מידע מהיר" בהירו</h4>
-              <label>כותרת התיבה</label>
-              <input name="heroSideTitle" placeholder="מידע מהיר" />
-              <label>שורות 'מידע מהיר' (כל שורה – שורה בנפרד ברשימה)</label>
-              <textarea name="heroSideList" rows="3"
-                placeholder="📍 מגדל העמק&#10;🧑‍🎓 שכבות ז'–ט'&#10;👩‍🏫 צוות חינוכי מסור&#10;🤝 שיתופי פעולה קהילתיים"></textarea>
-
-              <h4 style="margin-top:16px;">אודות בית הספר</h4>
-              <label>כותרת אודות</label>
-              <input name="aboutTitle" placeholder="אודות בית הספר יערת העמק" />
-              <label>טקסט אודות</label>
-              <textarea name="aboutBody" rows="4" placeholder="כמה משפטים על בית הספר, הערכים, האווירה..."></textarea>
-
-              <h4 style="margin-top:16px;">מדור "חשוב לדעת"</h4>
-              <label>כותרת המדור</label>
-              <input name="importantTitle" placeholder="חשוב לדעת" />
-              <label>תת־כותרת המדור</label>
-              <input name="importantSubtitle" placeholder="כמה דברים שימושיים לתלמידים – לפני שממשיכים לגלול." />
-
-              <h5 style="margin-top:10px;">כרטיס 1</h5>
-              <label>כותרת כרטיס 1</label>
-              <input name="importantCard1Title" placeholder="לדוגמה: 💻 סביבת למידה דיגיטלית" />
-              <label>טקסט כרטיס 1</label>
-              <textarea name="importantCard1Body" rows="2"></textarea>
-
-              <h5 style="margin-top:10px;">כרטיס 2</h5>
-              <label>כותרת כרטיס 2</label>
-              <input name="importantCard2Title" placeholder="לדוגמה: 🤝 עם מי מדברים?" />
-              <label>טקסט כרטיס 2</label>
-              <textarea name="importantCard2Body" rows="2"></textarea>
-
-              <h5 style="margin-top:10px;">כרטיס 3</h5>
-              <label>כותרת כרטיס 3</label>
-              <input name="importantCard3Title" placeholder="לדוגמה: 📌 טיפ נוסף" />
-              <label>טקסט כרטיס 3</label>
-              <textarea name="importantCard3Body" rows="2"></textarea>
-
-              <h4 style="margin-top:16px;">כותרות למדורי דף הבית</h4>
-              <label>כותרת מדור חדשות</label>
-              <input name="homeNewsTitle" placeholder="חדשות אחרונות" />
-              <label>תת־כותרת מדור חדשות</label>
-              <input name="homeNewsSubtitle" placeholder="שלושת העדכונים האחרונים מכל שכבה – ישר מול העיניים של התלמידים." />
-              <label>כותרת מדור לוח מודעות</label>
-              <input name="boardTitle" placeholder="לוח מודעות" />
-              <label>תת־כותרת מדור לוח מודעות</label>
-              <input name="boardSubtitle" placeholder="הודעות חשובות, פעילויות ואירועים לבית הספר." />
-              <label>כותרת מדור מבחנים</label>
-              <input name="homeExamsTitle" placeholder="מבחנים קרובים" />
-              <label>תת־כותרת מדור מבחנים</label>
-              <input name="homeExamsSubtitle" placeholder="תאריכים, מקצועות ונושאים – כדי שאף אחד לא יפספס." />
-
-              <h4 style="margin-top:16px;">מדור "היכרות עם השכבות"</h4>
-              <label>כותרת המדור</label>
-              <input name="gradesSectionTitle" placeholder="היכרות עם השכבות" />
-              <label>תת־כותרת המדור</label>
-              <input name="gradesSectionSubtitle" placeholder="בחר שכבה כדי לראות חדשות, מבחנים ועדכונים שמתאימים אליך." />
-
-              <h5 style="margin-top:10px;">תיאור שכבות</h5>
-              <label>תיאור שכבת ז'</label>
-              <textarea name="zDescription" rows="2" placeholder="משפט על שכבת ז'..."></textarea>
-              <label>תיאור שכבת ח'</label>
-              <textarea name="hDescription" rows="2" placeholder="משפט על שכבת ח'..."></textarea>
-              <label>תיאור שכבת ט'</label>
-              <textarea name="tDescription" rows="2" placeholder="משפט על שכבת ט'..."></textarea>
-
-              <h4 style="margin-top:16px;">תיבת בקשות</h4>
-              <label>כותרת המדור</label>
-              <input name="requestsTitle" placeholder="תיבת בקשות" />
-              <label>תת־כותרת</label>
-              <input name="requestsSubtitle" placeholder="רוצים לבקש משהו? יש רעיון?" />
-              <label>טקסט מעל הכפתור</label>
-              <textarea name="requestsBody" rows="2" placeholder="למילוי טופס הבקשות – לחצו כאן:"></textarea>
-
-              <h4 style="margin-top:16px;">יצירת קשר</h4>
-              <label>כותרת המדור</label>
-              <input name="contactSectionTitle" placeholder="יצירת קשר" />
-              <label>תת־כותרת המדור</label>
-              <input name="contactSectionSubtitle" placeholder="ניתן לפנות אלינו בכל שאלה, בקשה או התייעצות." />
-              <label>טלפון</label>
-              <input name="contactPhone" placeholder="04-XXXXXXX" />
-              <label>אימייל</label>
-              <input name="contactEmail" placeholder="school@example.com" />
-              <label>כתובת</label>
-              <input name="contactAddress" placeholder="רחוב..., מגדל העמק" />
-
-              <h4 style="margin-top:16px;">פוטר</h4>
-              <label>טקסט תחתון (פוטר)</label>
-              <input name="footerText" placeholder="© כל הזכויות שמורות לבית ספר יערת העמק" />
-
-              <button type="submit" style="margin-top:16px;">שמור תוכן אתר</button>
-            </form>
-          </div>
-        </div>
 
         <footer>
           © כל הזכויות שמורות לבית ספר יערת העמק ·
