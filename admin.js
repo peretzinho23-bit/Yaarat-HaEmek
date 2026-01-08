@@ -365,6 +365,9 @@ let boardData = [];
 let siteContent = {};
 let pollsData = [];
 
+// ===== Editing states =====
+let boardEditIndex = null; // index in boardData when editing an existing board item
+
 // קולקציה של סקרים
 const pollsCollectionRef = collection(db, "polls");
 
@@ -1098,7 +1101,10 @@ function renderBoardAdmin() {
           </div>
           <div class="admin-item-body">${escapeHtml(b.body)}</div>
           ${imgs.join("")}
-          <button class="admin-remove" data-type="board" data-index="${i}">מחיקה</button>
+          <div class="admin-item-actions">
+            <button class="admin-edit" data-type="board" data-index="${i}">עריכה</button>
+            <button class="admin-remove" data-type="board" data-index="${i}">מחיקה</button>
+          </div>
         </div>
       `;
     })
@@ -1113,6 +1119,34 @@ async function saveBoard() {
 function setupBoardForm() {
   const form = document.getElementById("board-form");
   if (!form) return;
+
+  const submitBtn = form.querySelector('button[type="submit"]');
+
+  // add (or reuse) a cancel-edit button
+  let cancelBtn = form.querySelector(".cancel-board-edit");
+  if (!cancelBtn) {
+    cancelBtn = document.createElement("button");
+    cancelBtn.type = "button";
+    cancelBtn.className = "btn secondary cancel-board-edit";
+    cancelBtn.textContent = "בטל עריכה";
+    cancelBtn.style.display = "none";
+    if (submitBtn && submitBtn.parentElement) {
+      submitBtn.parentElement.appendChild(cancelBtn);
+    } else {
+      form.appendChild(cancelBtn);
+    }
+  }
+
+  function setBoardEditMode(index) {
+    boardEditIndex = typeof index === "number" ? index : null;
+    if (submitBtn) submitBtn.textContent = boardEditIndex === null ? "פרסם מודעה" : "עדכן מודעה";
+    cancelBtn.style.display = boardEditIndex === null ? "none" : "inline-flex";
+  }
+
+  cancelBtn.addEventListener("click", () => {
+    setBoardEditMode(null);
+    form.reset();
+  });
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -1134,7 +1168,9 @@ function setupBoardForm() {
     }
 
     try {
-      let finalImageUrl = manualImageUrl;
+      // If editing and no new image provided, keep the existing one.
+      const existing = boardEditIndex !== null ? boardData[boardEditIndex] : null;
+      let finalImageUrl = manualImageUrl || (existing && existing.imageUrl) || "";
 
       if (file) {
         const filePath = `board/${Date.now()}_${file.name}`;
@@ -1143,25 +1179,46 @@ function setupBoardForm() {
         finalImageUrl = await getDownloadURL(fileRef);
       }
 
-      const newBoardItem = { title, meta, body, imageUrl: finalImageUrl, color };
-      boardData.push(newBoardItem);
+      const nextItem = { title, meta, body, imageUrl: finalImageUrl, color };
+
+      const isEdit = boardEditIndex !== null;
+      if (isEdit) {
+        boardData[boardEditIndex] = nextItem;
+      } else {
+        boardData.push(nextItem);
+      }
 
       form.reset();
+      setBoardEditMode(null);
       renderBoardAdmin();
       await saveBoard();
 
-      await logSystemChange("create", "board", {
-        subject: newBoardItem.title,
-        topic: newBoardItem.body,
+      await logSystemChange(isEdit ? "update" : "create", "board", {
+        subject: nextItem.title,
+        topic: nextItem.body,
         itemsCount: boardData.length
       });
 
-      alert("המודעה נשמרה.");
+      alert(isEdit ? "המודעה עודכנה." : "המודעה נשמרה.");
     } catch (err) {
       console.error("שגיאה בהעלאת תמונה/שמירת מודעה:", err);
       alert("הייתה שגיאה בשמירת המודעה. נסו שוב.");
     }
   });
+
+  // expose helper on window so the list can trigger edit mode
+  window.__startBoardEdit = (index) => {
+    const item = boardData[index];
+    if (!item) return;
+    form.title.value = item.title || "";
+    form.meta.value = item.meta || "";
+    form.body.value = item.body || "";
+    if (form.imageUrl) form.imageUrl.value = item.imageUrl || "";
+    if (form.color) form.color.value = item.color || "#ffffff";
+    // file input intentionally not set
+    setBoardEditMode(index);
+    form.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 }
 
 /* ------------ SITE CONTENT ------------ */
@@ -1223,6 +1280,17 @@ function setupSiteContentForm() {
 
 function setupDeleteHandler() {
   document.addEventListener("click", async (e) => {
+    const editBtn = e.target.closest(".admin-edit");
+    if (editBtn) {
+      const type = editBtn.dataset.type;
+      const index = Number(editBtn.dataset.index);
+      if (type === "board" && window.__startBoardEdit) {
+        window.__startBoardEdit(index);
+      }
+      // (עריכת חדשות מטופלת ב-handler נפרד אם קיים)
+      return;
+    }
+
     const toggleBtn = e.target.closest(".admin-toggle-poll");
     if (toggleBtn) {
       const pollId = toggleBtn.dataset.id;
