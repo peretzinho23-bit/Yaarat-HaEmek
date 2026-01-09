@@ -3,72 +3,45 @@ import {
   signInWithEmailAndPassword,
   onAuthStateChanged,
   signOut,
-  getAuth,
-  createUserWithEmailAndPassword
+  getAuth
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
 import {
   collection,
   doc,
-  getDocs,
   getDoc,
+  getDocs,
   setDoc,
   updateDoc,
   deleteDoc,
   serverTimestamp,
-  onSnapshot
+  onSnapshot,
+  addDoc,
+  query,
+  orderBy,
+  limit
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
 
 /* =============================
-   DEV הגדרות
-============================= */
-const DEV_EMAILS = ["nadavp1119@gmail.com", "peretzinho23@gmail.com"].map(e => e.toLowerCase());
-const ALL_GRADES = ["z", "h", "t"];
+   DEV HUB – Nadav only
+   =============================
+   Notes:
+   - Access guard is strict: only DEV_EMAILS OR role=dev in adminUsers.
+   - Pages manager uses Firestore collection: pages
+   - Classes manager uses Firestore collection: classes
+   - Logs use Firestore collection: logs
+*/
 
-// מי מורשה להיכנס ל-DEV PANEL (תפקידים)
-const ALLOWED_ROLES_FOR_DEV_PANEL = ["dev", "principal", "gradelead"];
+const DEV_EMAILS = ["nadavp1119@gmail.com", "peretzinho23@gmail.com"].map(x => x.toLowerCase());
+const ALLOWED_ROLES = ["dev"]; // only you
+const ALL_GRADES = ["z","h","t"];
 
 /* =============================
    Helpers
 ============================= */
-function norm(email) {
-  return String(email || "").trim().toLowerCase();
-}
-
-function normalizeRole(role) {
-  const r = String(role || "").trim().toLowerCase();
-
-  // תומך גם בגרסאות ישנות / עברית
-  if (r === "teacherpanel" || r === "teacher_panel" || r === "פאנל מורים") return "teacherpanel";
-  if (r === "gradelead" || r === "grade_lead" || r === "אחראי שכבה") return "gradelead";
-  if (r === "principal" || r === "מנהל" || r === "מנהלת") return "principal";
-  if (r === "counselor" || r === "יועץ" || r === "יועצת") return "counselor";
-  if (r === "teacher" || r === "מורה") return "teacher";
-  if (r === "dev") return "dev";
-
-  return r || "teacher";
-}
-
-function roleLabel(role) {
-  const r = normalizeRole(role);
-  switch (r) {
-    case "teacherpanel": return "פאנל מורים";
-    case "teacher": return "מורה";
-    case "gradelead": return "אחראי שכבה";
-    case "counselor": return "יועץ";
-    case "principal": return "מנהל";
-    case "dev": return "DEV";
-    default: return r || "-";
-  }
-}
-
-function gradesLabel(grades) {
-  const g = Array.isArray(grades) ? grades : [];
-  const map = { z: "ז׳", h: "ח׳", t: "ט׳" };
-  return g.map(x => map[x] || x).join(" , ") || "-";
-}
+const norm = (s) => String(s || "").trim().toLowerCase();
 
 function escapeHtml(str) {
   return String(str || "")
@@ -79,13 +52,44 @@ function escapeHtml(str) {
     .replace(/'/g, "&#039;");
 }
 
-function formatTime(ts) {
+function fmtTime(ts) {
   try {
     if (!ts) return "-";
     const d = ts?.toDate ? ts.toDate() : new Date(ts);
     return d.toLocaleString("he-IL");
   } catch {
     return "-";
+  }
+}
+
+function slugify(input) {
+  const s = String(input || "").trim().toLowerCase();
+  // keep a-z 0-9 - _
+  const cleaned = s
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9\-_]/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+  return cleaned || "";
+}
+
+function getUrlParam(name) {
+  try { return new URLSearchParams(location.search).get(name); } catch { return null; }
+}
+
+async function log(action, entity, entityId, meta = {}) {
+  try {
+    const by = auth.currentUser?.email || "";
+    await addDoc(collection(db, "logs"), {
+      action,
+      entity,
+      entityId: entityId || "",
+      meta: meta || {},
+      by,
+      at: serverTimestamp()
+    });
+  } catch (e) {
+    console.warn("log failed:", e);
   }
 }
 
@@ -103,100 +107,115 @@ const reqBody = document.getElementById("requests-body");
 const reqEmpty = document.getElementById("requests-empty");
 const usersList = document.getElementById("users-list");
 const usersEmpty = document.getElementById("users-empty");
-
-/* =============================
-   Theme toggle (לא חובה)
-============================= */
+const btnRefreshRequests = document.getElementById("btn-refresh-requests");
+const btnRefreshUsers = document.getElementById("btn-refresh-users");
 const themeBtn = document.getElementById("theme-toggle");
-if (themeBtn) {
+
+/* Tabs */
+const tabBtns = Array.from(document.querySelectorAll(".tab[data-tab]"));
+const panels = {
+  pages: document.getElementById("panel-pages"),
+  classes: document.getElementById("panel-classes"),
+  logs: document.getElementById("panel-logs"),
+  quick: document.getElementById("panel-quick"),
+  access: document.getElementById("panel-access"),
+};
+
+/* Pages Manager */
+const pagesList = document.getElementById("pages-list");
+const pagesEmpty = document.getElementById("pages-empty");
+const pagesSearch = document.getElementById("pages-search");
+const btnNewPage = document.getElementById("btn-new-page");
+const btnOpenPages = document.getElementById("open-pages");
+
+/* Classes */
+const clsGrade = document.getElementById("cls-grade");
+const clsName = document.getElementById("cls-name");
+const btnCreateClass = document.getElementById("btn-create-class");
+const classesList = document.getElementById("classes-list");
+const classesEmpty = document.getElementById("classes-empty");
+
+/* Logs */
+const logsList = document.getElementById("logs-list");
+const logsEmpty = document.getElementById("logs-empty");
+const logsFilter = document.getElementById("logs-filter");
+const btnRefreshLogs = document.getElementById("btn-refresh-logs");
+const btnOpenLogs = document.getElementById("open-logs");
+
+/* Quick */
+const btnOpenSite = document.getElementById("btn-open-site");
+const btnOpenClass = document.getElementById("btn-open-class");
+const btnOpenPage = document.getElementById("btn-open-page");
+const quickSlug = document.getElementById("quick-slug");
+
+/* Modal */
+const modal = document.getElementById("page-modal");
+const pmClose = document.getElementById("pm-close");
+const pmTitle = document.getElementById("pm-title");
+const pmSlug = document.getElementById("pm-slug");
+const pmPageTitle = document.getElementById("pm-page-title");
+const pmStatus = document.getElementById("pm-status");
+const pmVisibility = document.getElementById("pm-visibility");
+const pmBlocks = document.getElementById("pm-blocks");
+const pmPreview = document.getElementById("pm-preview");
+const pmSave = document.getElementById("pm-save");
+const pmDelete = document.getElementById("pm-delete");
+const pmMsg = document.getElementById("pm-msg");
+
+let currentUser = null;
+let currentRole = null;
+
+/* =============================
+   Theme toggle
+============================= */
+(function initTheme(){
+  if (!themeBtn) return;
+
+  function apply(theme){
+    document.documentElement.setAttribute("data-theme", theme);
+    themeBtn.textContent = theme === "dark" ? "🌙" : "☀️";
+    try { localStorage.setItem("theme", theme); } catch {}
+  }
+
+  let saved = "dark";
+  try { saved = localStorage.getItem("theme") || "dark"; } catch {}
+  apply(saved);
+
   themeBtn.addEventListener("click", () => {
-    const root = document.documentElement;
-    const cur = root.getAttribute("data-theme") || "dark";
-    const next = cur === "dark" ? "light" : "dark";
-    root.setAttribute("data-theme", next);
-    themeBtn.textContent = next === "dark" ? "🌙" : "☀️";
-    try { localStorage.setItem("theme", next); } catch {}
+    const cur = document.documentElement.getAttribute("data-theme") || "dark";
+    apply(cur === "dark" ? "light" : "dark");
   });
-  try {
-    const saved = localStorage.getItem("theme");
-    if (saved) {
-      document.documentElement.setAttribute("data-theme", saved);
-      themeBtn.textContent = saved === "dark" ? "🌙" : "☀️";
-    }
-  } catch {}
-}
+})();
 
 /* =============================
-   Secondary Auth (ליצור משתמש בלי להעיף DEV)
+   Tabs
 ============================= */
-function getSecondaryAuth() {
-  const existing = getApps().find(a => a.name === "secondary");
-  const secondaryApp = existing || initializeApp(app.options, "secondary");
-  return getAuth(secondaryApp);
+function setTab(name){
+  tabBtns.forEach(b => b.classList.toggle("active", b.dataset.tab === name));
+  Object.entries(panels).forEach(([k, el]) => el?.classList.toggle("active", k === name));
+
+  // Access realtime only when needed
+  if (name === "access") {
+    try { startAccessRealtime(); } catch {}
+    try { refreshAccess(); } catch {}
+  } else {
+    try { stopAccessRealtime(); } catch {}
+  }
 }
+tabBtns.forEach(btn => btn.addEventListener("click", () => setTab(btn.dataset.tab)));
+
+btnOpenPages?.addEventListener("click", () => { setTab("pages"); window.scrollTo({top:0,behavior:"smooth"}); });
+btnOpenLogs?.addEventListener("click", () => { setTab("logs"); window.scrollTo({top:0,behavior:"smooth"}); });
 
 /* =============================
-   🔥 REALTIME PERMISSION GUARD
+   Login / Logout
 ============================= */
-let unsubPerm = null;
-
-function stopRealtime() {
-  try { if (unsubReq) unsubReq(); } catch {}
-  try { if (unsubUsers) unsubUsers(); } catch {}
-  unsubReq = null;
-  unsubUsers = null;
-}
-
-function kick(msg = "אין לך יותר גישה") {
-  alert(msg);
-  try { if (unsubPerm) unsubPerm(); } catch {}
-  unsubPerm = null;
-
-  stopRealtime();
-
-  signOut(auth).finally(() => {
-    window.location.href = "dev.html";
-  });
-}
-
-function stopPermWatcher() {
-  try { if (unsubPerm) unsubPerm(); } catch {}
-  unsubPerm = null;
-}
-
-function startPermWatcher(user) {
-  stopPermWatcher();
-  if (!user) return;
-
-  const refDoc = doc(db, "adminUsers", user.uid);
-
-  unsubPerm = onSnapshot(refDoc, (snap) => {
-    if (!snap.exists()) return kick("הגישה שלך בוטלה");
-
-    const data = snap.data() || {};
-    const role = normalizeRole(data.role);
-
-    if (!ALLOWED_ROLES_FOR_DEV_PANEL.includes(role)) {
-      return kick("אין לך גישה לדף DEV (מותר רק מנהל / אחראי שכבה / DEV)");
-    }
-  }, (err) => {
-    console.error("perm snapshot error:", err);
-    kick("שגיאת הרשאות (בדוק חוקים/קונסול)");
-  });
-}
-
-/* =============================
-   Login
-============================= */
-console.log("✅ DEV.JS LOADED");
-
 if (elLoginForm) {
   elLoginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     if (elLoginMsg) elLoginMsg.textContent = "";
     const email = document.getElementById("dev-email")?.value?.trim() || "";
     const password = document.getElementById("dev-password")?.value || "";
-
     try {
       await signInWithEmailAndPassword(auth, email, password);
     } catch (err) {
@@ -213,15 +232,57 @@ if (elLogout) {
 }
 
 /* =============================
-   ensure DEV exists in adminUsers
+   Permission guard (realtime)
 ============================= */
-async function ensureDevAdminUserDoc(user) {
+let unsubPerm = null;
+
+function kick(msg="אין לך גישה לדף DEV"){
+  alert(msg);
+  try { if (unsubPerm) unsubPerm(); } catch {}
+  unsubPerm = null;
+  signOut(auth).finally(() => location.href = "dev.html");
+}
+
+function stopPermWatcher(){
+  try { if (unsubPerm) unsubPerm(); } catch {}
+  unsubPerm = null;
+}
+
+function normalizeRole(role){
+  return String(role || "").trim().toLowerCase();
+}
+
+function startPermWatcher(user){
+  stopPermWatcher();
+  if (!user) return;
+
+  const ref = doc(db, "adminUsers", user.uid);
+  unsubPerm = onSnapshot(ref, (snap) => {
+    const email = norm(user.email);
+    const isDevEmail = DEV_EMAILS.includes(email);
+
+    if (isDevEmail) return; // still ok, no need doc
+    if (!snap.exists()) return kick("אין הרשאות (adminUsers לא קיים)");
+
+    const r = normalizeRole(snap.data()?.role);
+    if (!ALLOWED_ROLES.includes(r)) return kick("הרשאות בוטלו (רק DEV)");
+  }, (err) => {
+    console.error("perm snapshot error:", err);
+    kick("שגיאת הרשאות (בדוק חוקים/קונסול)");
+  });
+}
+
+async function ensureDevDoc(user){
+  const email = norm(user?.email);
+  if (!DEV_EMAILS.includes(email)) return;
+
+  // make sure adminUsers exists (role dev) so rules can use it if you want
   try {
-    const refDoc = doc(db, "adminUsers", user.uid);
-    const snap = await getDoc(refDoc);
+    const ref = doc(db, "adminUsers", user.uid);
+    const snap = await getDoc(ref);
     if (snap.exists()) return;
 
-    await setDoc(refDoc, {
+    await setDoc(ref, {
       email: user.email,
       fullName: "DEV",
       role: "dev",
@@ -230,7 +291,7 @@ async function ensureDevAdminUserDoc(user) {
       createdBy: user.email
     });
   } catch (e) {
-    console.error("ensureDevAdminUserDoc error:", e);
+    console.warn("ensureDevDoc failed:", e);
   }
 }
 
@@ -238,106 +299,529 @@ async function ensureDevAdminUserDoc(user) {
    Auth state
 ============================= */
 onAuthStateChanged(auth, async (user) => {
-  console.log("onAuthStateChanged:", user?.email || null);
+  currentUser = user || null;
 
   if (!user) {
     stopPermWatcher();
-    stopRealtime();
-
     if (elStatus) elStatus.textContent = "לא מחובר";
     if (elLogin) elLogin.style.display = "block";
     if (elContent) elContent.style.display = "none";
+    if (elLogout) elLogout.style.display = "none";
     return;
   }
 
   const email = norm(user.email);
-  const isDevByEmail = DEV_EMAILS.includes(email);
+  const isDevEmail = DEV_EMAILS.includes(email);
+  if (isDevEmail) await ensureDevDoc(user);
 
-  if (isDevByEmail) {
-    await ensureDevAdminUserDoc(user);
-  }
-
+  // load role
   let role = null;
-  try {
-    const snap = await getDoc(doc(db, "adminUsers", user.uid));
-    role = snap.exists() ? normalizeRole(snap.data()?.role) : null;
-  } catch (e) {
-    console.error("Failed reading adminUsers role:", e);
-  }
+  if (!isDevEmail){
+    try {
+      const snap = await getDoc(doc(db, "adminUsers", user.uid));
+      role = snap.exists() ? normalizeRole(snap.data()?.role) : null;
+    } catch (e) {
+      console.error("Failed reading adminUsers role:", e);
+    }
+  } else role = "dev";
 
-  if (!role && !isDevByEmail) {
+  currentRole = role;
+
+  if (!isDevEmail && !ALLOWED_ROLES.includes(role || "")) {
     if (elStatus) elStatus.textContent = "אין לך גישה";
-    alert("אין לך גישה לדף DEV (חסר מסמך הרשאות)");
-    await signOut(auth);
-    return;
-  }
-
-  if (!isDevByEmail && !ALLOWED_ROLES_FOR_DEV_PANEL.includes(role)) {
-    if (elStatus) elStatus.textContent = "אין לך גישה (מותר רק מנהל/אחראי שכבה/DEV)";
-    alert("אין לך גישה לדף DEV (מותר רק מנהל / אחראי שכבה / DEV)");
-    await signOut(auth);
+    kick("אין לך גישה לדף DEV (רק DEV)");
     return;
   }
 
   startPermWatcher(user);
 
-  if (elStatus) {
-    elStatus.textContent =
-      `מחובר: ${user.email} · תפקיד: ${roleLabel(role || (isDevByEmail ? "dev" : ""))}`;
-  }
+  if (elStatus) elStatus.textContent = `מחובר: ${user.email} · role: ${role || "-"}`;
   if (elLogin) elLogin.style.display = "none";
   if (elContent) elContent.style.display = "block";
+  if (elLogout) elLogout.style.display = "inline-flex";
 
-  startRealtime();
+  // init tools
+  initLauncher();
+  await refreshPages();
+  await refreshClasses();
+  await refreshLogs();
+
+  // If dev.html?edit=slug -> open editor directly
+  const editSlug = getUrlParam("edit");
+  if (editSlug) {
+    setTab("pages");
+    await openPageEditorBySlug(editSlug);
+  }
 });
 
 /* =============================
-   REALTIME subscriptions (טבלאות)
+   Launcher (open links in new tab)
 ============================= */
-let unsubReq = null;
-let unsubUsers = null;
-
-function startRealtime() {
-  stopRealtime();
-
-  // adminRequests realtime
-  try {
-    unsubReq = onSnapshot(collection(db, "adminRequests"), (snap) => {
-      const arr = [];
-      snap.forEach(d => arr.push({ id: d.id, ...d.data() }));
-      renderRequestsFromArray(arr);
-    }, (err) => {
-      console.error("onSnapshot adminRequests error:", err);
-      refreshAll();
+function initLauncher(){
+  document.querySelectorAll("[data-open]").forEach(a => {
+    a.addEventListener("click", (e) => {
+      // open in new tab for speed
+      e.preventDefault();
+      window.open(a.getAttribute("href"), "_blank", "noopener,noreferrer");
     });
-  } catch (e) {
-    console.error("startRealtime adminRequests failed:", e);
-  }
-
-  // adminUsers realtime
-  try {
-    unsubUsers = onSnapshot(collection(db, "adminUsers"), (snap) => {
-      const arr = [];
-      snap.forEach(d => arr.push({ id: d.id, ...d.data() }));
-      renderUsersFromArray(arr);
-    }, (err) => {
-      console.error("onSnapshot adminUsers error:", err);
-      refreshAll();
-    });
-  } catch (e) {
-    console.error("startRealtime adminUsers failed:", e);
-  }
-
-  refreshAll();
-}
-
-async function refreshAll() {
-  await Promise.all([renderRequests(), renderUsers()]);
+  });
 }
 
 /* =============================
-   Requests (adminRequests)
+   Pages Manager
 ============================= */
+let pagesCache = [];
+
+function safeBlocksExample(){
+  return [
+    { "type":"hero", "title":"כותרת", "subtitle":"טקסט קצר", "icon":"✨" },
+    { "type":"text", "text":"כאן כותבים פסקה/הסבר." },
+    { "type":"button", "text":"כפתור לדוגמה", "href":"https://example.com", "style":"primary" },
+    { "type":"image", "src":"https://picsum.photos/1200/650", "alt":"תמונה" },
+    { "type":"links", "title":"קישורים", "items":[{"text":"דוגמה","href":"https://example.com"}] }
+  ];
+}
+
+function openModal(){
+  modal?.classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+function closeModal(){
+  modal?.classList.remove("open");
+  document.body.style.overflow = "";
+  pmMsg && (pmMsg.textContent = "");
+}
+
+pmClose?.addEventListener("click", closeModal);
+modal?.addEventListener("click", (e) => {
+  if (e.target === modal) closeModal();
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeModal();
+});
+
+btnNewPage?.addEventListener("click", () => {
+  openPageEditor({ mode: "new" });
+});
+
+pagesSearch?.addEventListener("input", () => renderPages());
+
+async function refreshPages(){
+  if (!pagesList) return;
+  try {
+    const qy = query(collection(db, "pages"), orderBy("updatedAt", "desc"));
+    const snap = await getDocs(qy);
+    const arr = [];
+    snap.forEach(d => arr.push({ id: d.id, ...d.data() }));
+    pagesCache = arr;
+  } catch (e) {
+    console.error("refreshPages error:", e);
+    pagesCache = [];
+  }
+  renderPages();
+}
+
+function renderPages(){
+  if (!pagesList) return;
+  pagesList.innerHTML = "";
+
+  const q = norm(pagesSearch?.value || "");
+  const filtered = pagesCache.filter(p => {
+    const s = norm(p.slug) + " " + norm(p.title) + " " + norm(p.status) + " " + norm(p.visibility);
+    return !q || s.includes(q);
+  });
+
+  if (filtered.length === 0) {
+    if (pagesEmpty) pagesEmpty.style.display = "block";
+    return;
+  }
+  if (pagesEmpty) pagesEmpty.style.display = "none";
+
+  filtered.forEach(p => pagesList.appendChild(renderPageCard(p)));
+}
+
+function renderPageCard(p){
+  const el = document.createElement("div");
+  el.className = "item";
+
+  const status = String(p.status || "draft");
+  const vis = String(p.visibility || "public");
+  const title = p.title || "(בלי כותרת)";
+  const slug = p.slug || p.id;
+
+  el.innerHTML = `
+    <div class="item-top">
+      <div>
+        <div class="item-title">${escapeHtml(title)}</div>
+        <div class="meta">
+          <span class="badge">${escapeHtml(status)}</span>
+          <span class="badge">${escapeHtml(vis)}</span>
+          <span class="badge mono">${escapeHtml(slug)}</span>
+        </div>
+        <div class="meta">עודכן: ${escapeHtml(fmtTime(p.updatedAt || p.createdAt))} · ע״י: ${escapeHtml(p.updatedBy || p.createdBy || "-")}</div>
+      </div>
+
+      <div class="actions">
+        <button class="btn" type="button" data-act="preview">Preview</button>
+        <button class="btn btn-primary" type="button" data-act="edit">Edit</button>
+      </div>
+    </div>
+  `;
+
+  el.querySelector('[data-act="preview"]').addEventListener("click", () => {
+    window.open(`page.html?p=${encodeURIComponent(slug)}`, "_blank", "noopener,noreferrer");
+  });
+
+  el.querySelector('[data-act="edit"]').addEventListener("click", () => {
+    openPageEditor({ mode: "edit", page: p });
+  });
+
+  return el;
+}
+
+async function openPageEditorBySlug(slug){
+  const s = slugify(slug);
+  if (!s) return;
+
+  // try cache first
+  const cached = pagesCache.find(p => norm(p.slug) === norm(s));
+  if (cached) return openPageEditor({ mode:"edit", page: cached });
+
+  // fetch directly
+  try {
+    const ref = doc(db, "pages", s);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return alert("לא נמצא דף עם slug=" + s);
+    openPageEditor({ mode:"edit", page: { id: snap.id, ...snap.data() } });
+  } catch (e) {
+    console.error(e);
+    alert("שגיאה בטעינת דף");
+  }
+}
+
+function openPageEditor({mode, page}){
+  const isNew = mode === "new";
+  const data = page || {};
+
+  pmTitle.textContent = isNew ? "➕ דף חדש (Pages Manager)" : "✏️ עריכת דף";
+  pmSlug.value = data.slug || data.id || "";
+  pmPageTitle.value = data.title || "";
+  pmStatus.value = data.status || "draft";
+  pmVisibility.value = data.visibility || "dev";
+
+  // blocks
+  const blocks = Array.isArray(data.contentBlocks) ? data.contentBlocks : safeBlocksExample();
+  pmBlocks.value = JSON.stringify(blocks, null, 2);
+
+  // slug locking? allow editing but warn
+  pmSlug.disabled = !isNew; // keep doc id stable
+  pmDelete.style.display = isNew ? "none" : "inline-flex";
+  pmPreview.style.display = isNew ? "none" : "inline-flex";
+
+  pmMsg.textContent = isNew ? "טיפ: slug נהיה ה־Document ID. אחרי יצירה, משנים דרך “שכפול” (בפיתוח עתידי)." : "";
+
+  // events
+  pmSave.onclick = () => savePage(isNew);
+  pmDelete.onclick = () => deletePage(pmSlug.value);
+  pmPreview.onclick = () => window.open(`page.html?p=${encodeURIComponent(pmSlug.value)}`, "_blank", "noopener,noreferrer");
+
+  openModal();
+}
+
+async function savePage(isNew){
+  const slugRaw = pmSlug.value;
+  const slug = slugify(slugRaw);
+  if (!slug) { alert("חייבים slug תקין (a-z/0-9/-)"); return; }
+
+  const title = pmPageTitle.value.trim();
+  const status = pmStatus.value;
+  const visibility = pmVisibility.value;
+
+  let blocks;
+  try {
+    blocks = JSON.parse(pmBlocks.value || "[]");
+    if (!Array.isArray(blocks)) throw new Error("contentBlocks חייב להיות מערך");
+  } catch (e) {
+    alert("JSON לא תקין ב-contentBlocks: " + (e?.message || e));
+    return;
+  }
+
+  const nowUser = auth.currentUser?.email || "";
+
+  pmMsg.textContent = "שומר...";
+  try {
+    const ref = doc(db, "pages", slug);
+
+    if (isNew){
+      await setDoc(ref, {
+        slug,
+        title,
+        status,
+        visibility,
+        contentBlocks: blocks,
+        createdAt: serverTimestamp(),
+        createdBy: nowUser,
+        updatedAt: serverTimestamp(),
+        updatedBy: nowUser
+      });
+      await log("create", "pages", slug, { title, status, visibility });
+    } else {
+      await updateDoc(ref, {
+        title,
+        status,
+        visibility,
+        contentBlocks: blocks,
+        updatedAt: serverTimestamp(),
+        updatedBy: nowUser
+      });
+      await log("update", "pages", slug, { title, status, visibility });
+    }
+
+    pmMsg.textContent = "נשמר ✅";
+    await refreshPages();
+
+    // if it was new: enable preview/delete and lock slug
+    if (isNew){
+      pmSlug.disabled = true;
+      pmDelete.style.display = "inline-flex";
+      pmPreview.style.display = "inline-flex";
+      pmSave.onclick = () => savePage(false);
+    }
+  } catch (e) {
+    console.error(e);
+    pmMsg.textContent = "שגיאה: " + (e?.message || e);
+  }
+}
+
+async function deletePage(slugRaw){
+  const slug = slugify(slugRaw);
+  if (!slug) return;
+  if (!confirm("למחוק את הדף הזה?")) return;
+
+  pmMsg.textContent = "מוחק...";
+  try {
+    await deleteDoc(doc(db, "pages", slug));
+    await log("delete", "pages", slug, {});
+    pmMsg.textContent = "נמחק ✅";
+    closeModal();
+    await refreshPages();
+  } catch (e) {
+    console.error(e);
+    pmMsg.textContent = "שגיאה: " + (e?.message || e);
+  }
+}
+
+/* =============================
+   Classes Manager
+============================= */
+let classesCache = [];
+
+btnCreateClass?.addEventListener("click", createClass);
+
+async function refreshClasses(){
+  try {
+    const snap = await getDocs(collection(db, "classes"));
+    const arr = [];
+    snap.forEach(d => arr.push({ id: d.id, ...d.data() }));
+    classesCache = arr;
+  } catch (e) {
+    console.error("refreshClasses error:", e);
+    classesCache = [];
+  }
+  renderClasses();
+}
+
+function renderClasses(){
+  if (!classesList) return;
+  classesList.innerHTML = "";
+
+  const sorted = [...classesCache].sort((a,b)=> (String(a.grade||"").localeCompare(String(b.grade||"")) || String(a.name||"").localeCompare(String(b.name||""))));
+  if (sorted.length === 0){
+    if (classesEmpty) classesEmpty.style.display = "block";
+    return;
+  }
+  if (classesEmpty) classesEmpty.style.display = "none";
+
+  sorted.forEach(c => classesList.appendChild(renderClassCard(c)));
+}
+
+function renderClassCard(c){
+  const el = document.createElement("div");
+  el.className = "item";
+
+  const grade = c.grade || "-";
+  const name = c.name || "-";
+  const id = c.id;
+
+  el.innerHTML = `
+    <div class="item-top">
+      <div>
+        <div class="item-title">כיתה: ${escapeHtml(grade)} · ${escapeHtml(name)}</div>
+        <div class="meta mono">${escapeHtml(id)}</div>
+        <div class="meta">נוצר: ${escapeHtml(fmtTime(c.createdAt))} · ע״י: ${escapeHtml(c.createdBy || "-")}</div>
+      </div>
+      <div class="actions">
+        <button class="btn" type="button" data-act="open">פתח דף כיתה</button>
+        <button class="btn btn-danger" type="button" data-act="del">מחק</button>
+      </div>
+    </div>
+  `;
+
+  el.querySelector('[data-act="open"]').addEventListener("click", () => {
+    // Your class page path might differ; keep it simple:
+    window.open(`class.html?grade=${encodeURIComponent(grade)}&class=${encodeURIComponent(name)}`, "_blank", "noopener,noreferrer");
+  });
+
+  el.querySelector('[data-act="del"]').addEventListener("click", async () => {
+    if (!confirm("למחוק כיתה מהרשימה? (זה לא מוחק חדשות/מבחנים אם הם במקום אחר)")) return;
+    try {
+      await deleteDoc(doc(db, "classes", id));
+      await log("delete", "classes", id, { grade, name });
+      await refreshClasses();
+    } catch (e) {
+      console.error(e);
+      alert("שגיאה במחיקה: " + (e?.message || e));
+    }
+  });
+
+  return el;
+}
+
+async function createClass(){
+  const grade = String(clsGrade?.value || "z");
+  const nameRaw = String(clsName?.value || "").trim();
+  if (!nameRaw) { alert("חייבים שם כיתה"); return; }
+
+  const name = nameRaw;
+  const id = slugify(`${grade}-${name}`) || `${grade}-${Date.now()}`;
+
+  try {
+    await setDoc(doc(db, "classes", id), {
+      grade,
+      name,
+      createdAt: serverTimestamp(),
+      createdBy: auth.currentUser?.email || ""
+    });
+    await log("create", "classes", id, { grade, name });
+    clsName.value = "";
+    await refreshClasses();
+  } catch (e) {
+    console.error(e);
+    alert("שגיאה ביצירת כיתה: " + (e?.message || e));
+  }
+}
+
+/* =============================
+   Logs viewer
+============================= */
+async function refreshLogs(){
+  if (!logsList) return;
+  logsList.innerHTML = "";
+  if (logsEmpty) logsEmpty.style.display = "none";
+
+  try {
+    const qy = query(collection(db, "logs"), orderBy("at", "desc"), limit(40));
+    const snap = await getDocs(qy);
+    const arr = [];
+    snap.forEach(d => arr.push({ id: d.id, ...d.data() }));
+
+    renderLogs(arr);
+  } catch (e) {
+    console.error("refreshLogs error:", e);
+    renderLogs([]);
+  }
+}
+
+function renderLogs(arr){
+  if (!logsList) return;
+  logsList.innerHTML = "";
+
+  const filter = String(logsFilter?.value || "");
+  const list = (arr || []).filter(x => !filter || String(x.entity || "") === filter);
+
+  if (list.length === 0){
+    if (logsEmpty) logsEmpty.style.display = "block";
+    return;
+  }
+  if (logsEmpty) logsEmpty.style.display = "none";
+
+  list.forEach(l => logsList.appendChild(renderLogCard(l)));
+}
+
+function renderLogCard(l){
+  const el = document.createElement("div");
+  el.className = "item";
+  el.innerHTML = `
+    <div class="item-top">
+      <div>
+        <div class="item-title">${escapeHtml(String(l.action || "action"))} · ${escapeHtml(String(l.entity || "entity"))}</div>
+        <div class="meta">מזהה: <span class="mono">${escapeHtml(String(l.entityId || ""))}</span></div>
+        <div class="meta">מתי: ${escapeHtml(fmtTime(l.at))} · מי: ${escapeHtml(l.by || "-")}</div>
+      </div>
+      <div class="actions">
+        <button class="btn" type="button" data-act="copy">העתק</button>
+      </div>
+    </div>
+    <div class="meta mono">${escapeHtml(JSON.stringify(l.meta || {}, null, 0))}</div>
+  `;
+  el.querySelector('[data-act="copy"]').addEventListener("click", async () => {
+    const txt = JSON.stringify(l, null, 2);
+    try { await navigator.clipboard.writeText(txt); alert("הועתק"); }
+    catch { alert("לא הצלחתי להעתיק"); }
+  });
+  return el;
+}
+
+btnRefreshLogs?.addEventListener("click", refreshLogs);
+logsFilter?.addEventListener("change", refreshLogs);
+
+/* =============================
+   Quick actions
+============================= */
+btnOpenSite?.addEventListener("click", () => window.open("index.html", "_blank", "noopener,noreferrer"));
+btnOpenClass?.addEventListener("click", () => window.open("class.html", "_blank", "noopener,noreferrer"));
+btnOpenPage?.addEventListener("click", () => {
+  const slug = slugify(quickSlug?.value || "");
+  if (!slug) return alert("תכתוב slug");
+  window.open(`page.html?p=${encodeURIComponent(slug)}`, "_blank", "noopener,noreferrer");
+});
+
+
+
+/* =============================
+   🔐 Access Requests + Users
+   (adminRequests + adminUsers)
+============================= */
+
+// Only DEV emails can approve / manage users
+function isDevEmailCurrent() {
+  return DEV_EMAILS.includes(norm(auth.currentUser?.email));
+}
+
+/* Secondary Auth (create user without kicking DEV) */
+function getSecondaryAuth() {
+  const existing = getApps().find(a => a.name === "secondary");
+  const secondaryApp = existing || initializeApp(app.options, "secondary");
+  return getAuth(secondaryApp);
+}
+
+let unsubReq = null;
+let unsubUsers = null;
+
+function stopAccessRealtime() {
+  try { if (unsubReq) unsubReq(); } catch {}
+  try { if (unsubUsers) unsubUsers(); } catch {}
+  unsubReq = null;
+  unsubUsers = null;
+}
+
+async function refreshAccess() {
+  await Promise.all([renderRequests(), renderUsers()]);
+}
+
+if (btnRefreshRequests) btnRefreshRequests.addEventListener("click", refreshAccess);
+if (btnRefreshUsers) btnRefreshUsers.addEventListener("click", refreshAccess);
+
 async function renderRequests() {
   if (!reqBody) return;
 
@@ -398,20 +882,23 @@ function renderRequestRow(r) {
   tr.className = "row";
 
   const tdEmail = document.createElement("td");
+  tdEmail.style.padding = "10px 8px";
   tdEmail.innerHTML = `
     <div><b>${escapeHtml(r.email || "")}</b></div>
     <div class="small">${escapeHtml(r.fullName || "")}</div>
   `;
 
   const tdInfo = document.createElement("td");
+  tdInfo.style.padding = "10px 8px";
   tdInfo.innerHTML = `
-    <div class="small">תפקיד שהזין: <b>${escapeHtml(r.role || "-")}</b></div>
+    <div class="small">תפקיד שביקש: <b>${escapeHtml(r.role || "-")}</b></div>
     <div class="small">סיבה: <b>${escapeHtml(r.reason || "-")}</b></div>
     <div class="small">הודעה: ${escapeHtml(r.message || "-")}</div>
     <div class="small muted">נשלח: ${formatTime(r.createdAt)}</div>
   `;
 
   const tdPerm = document.createElement("td");
+  tdPerm.style.padding = "10px 8px";
 
   const roleSel = document.createElement("select");
   roleSel.className = "select";
@@ -425,21 +912,26 @@ function renderRequestRow(r) {
 
   const chkWrap = document.createElement("div");
   chkWrap.className = "chkline";
+  chkWrap.style.display = "flex";
+  chkWrap.style.gap = "10px";
+  chkWrap.style.flexWrap = "wrap";
+  chkWrap.style.marginTop = "8px";
   chkWrap.innerHTML = `
-    <label><input type="checkbox" value="z" checked> ז׳</label>
-    <label><input type="checkbox" value="h" checked> ח׳</label>
-    <label><input type="checkbox" value="t" checked> ט׳</label>
+    <label class="small"><input type="checkbox" value="z" checked> ז׳</label>
+    <label class="small"><input type="checkbox" value="h" checked> ח׳</label>
+    <label class="small"><input type="checkbox" value="t" checked> ט׳</label>
   `;
 
   tdPerm.appendChild(roleSel);
   tdPerm.appendChild(chkWrap);
 
   const tdAct = document.createElement("td");
+  tdAct.style.padding = "10px 8px";
   const act = document.createElement("div");
   act.className = "actions";
 
   const btnApprove = document.createElement("button");
-  btnApprove.className = "btn";
+  btnApprove.className = "btn btn-primary";
   btnApprove.type = "button";
   btnApprove.textContent = "אשר + צור משתמש";
 
@@ -476,6 +968,11 @@ function renderRequestRow(r) {
   syncReqGradesUI();
 
   btnApprove.addEventListener("click", async () => {
+    if (!isDevEmailCurrent()) {
+      alert("רק DEV יכול לאשר בקשות כאן.");
+      return;
+    }
+
     const role = normalizeRole(roleSel.value);
 
     let grades = [];
@@ -540,17 +1037,9 @@ function renderRequestRow(r) {
 }
 
 async function approveRequest(r, role, grades) {
-  const meUid = auth.currentUser?.uid;
   const meEmail = norm(auth.currentUser?.email);
   const isDev = DEV_EMAILS.includes(meEmail);
-
-  if (!isDev) {
-    const snap = await getDoc(doc(db, "adminUsers", meUid));
-    const myRole = snap.exists() ? normalizeRole(snap.data()?.role) : "";
-    if (!["principal", "gradelead", "dev"].includes(myRole)) {
-      throw new Error("אין לך הרשאה לאשר בקשות (רק מנהל/אחראי שכבה/DEV)");
-    }
-  }
+  if (!isDev) throw new Error("אין הרשאה לאשר בקשות (רק DEV).");
 
   const email = String(r.email || "").trim();
   const password = String(r.password || "").trim();
@@ -563,7 +1052,7 @@ async function approveRequest(r, role, grades) {
     cred = await createUserWithEmailAndPassword(secondaryAuth, email, password);
   } catch (e) {
     if (String(e?.code || "").includes("auth/email-already-in-use")) {
-      throw new Error("האימייל הזה כבר קיים ב-Auth. אם זה משתמש ישן — תיצור לו הרשאות ידנית דרך Users (צריך UID).");
+      throw new Error("האימייל הזה כבר קיים ב-Auth. אם זה משתמש ישן — צריך להוסיף לו adminUsers לפי UID.");
     }
     throw e;
   } finally {
@@ -599,9 +1088,6 @@ async function approveRequest(r, role, grades) {
   });
 }
 
-/* =============================
-   Users (adminUsers)
-============================= */
 async function renderUsers() {
   if (!usersList) return;
 
@@ -646,40 +1132,34 @@ function createRoleSelect(currentRole) {
   const sel = document.createElement("select");
   sel.className = "select";
 
-  const canSeeDev = DEV_EMAILS.includes(norm(auth.currentUser?.email));
-
   sel.innerHTML = `
     <option value="teacherpanel">פאנל מורים</option>
     <option value="teacher">מורה</option>
     <option value="gradelead">אחראי שכבה</option>
     <option value="counselor">יועץ</option>
     <option value="principal">מנהל</option>
-    ${canSeeDev ? `<option value="dev">DEV</option>` : ``}
+    <option value="dev">DEV</option>
   `;
 
   const normalized = normalizeRole(currentRole || "teacher");
-  sel.value = (!canSeeDev && normalized === "dev") ? "principal" : normalized;
+  sel.value = normalized;
 
   return sel;
 }
 
 function renderUserCard(u) {
   const wrap = document.createElement("div");
-  wrap.className = "row";
-  wrap.style.padding = "12px";
+  wrap.className = "item";
 
   const top = document.createElement("div");
-  top.style.display = "flex";
-  top.style.justifyContent = "space-between";
-  top.style.gap = "10px";
-  top.style.flexWrap = "wrap";
+  top.className = "item-top";
 
   const info = document.createElement("div");
   info.innerHTML = `
-    <div><b>${escapeHtml(u.email || "")}</b></div>
-    <div class="small">${escapeHtml(u.fullName || "")}</div>
-    <div class="small">תפקיד: <b class="role-text">${escapeHtml(roleLabel(u.role))}</b></div>
-    <div class="small">שכבות: <b class="grades-text">${escapeHtml(gradesLabel(u.allowedGrades))}</b></div>
+    <div class="item-title">${escapeHtml(u.email || "")}</div>
+    <div class="meta">${escapeHtml(u.fullName || "")}</div>
+    <div class="meta">תפקיד: <b class="role-text">${escapeHtml(roleLabel(u.role))}</b></div>
+    <div class="meta">שכבות: <b class="grades-text">${escapeHtml(gradesLabel(u.allowedGrades))}</b></div>
   `;
 
   const controls = document.createElement("div");
@@ -691,12 +1171,12 @@ function renderUserCard(u) {
   btnEdit.textContent = "ערוך הרשאות";
 
   const btnRemove = document.createElement("button");
-  btnRemove.className = "btn";
+  btnRemove.className = "btn btn-danger";
   btnRemove.type = "button";
   btnRemove.textContent = "בטל גישה";
 
   const msg = document.createElement("div");
-  msg.className = "small";
+  msg.className = "meta";
   msg.style.marginTop = "6px";
 
   controls.appendChild(btnEdit);
@@ -708,21 +1188,14 @@ function renderUserCard(u) {
   wrap.appendChild(top);
 
   const editor = document.createElement("div");
-  editor.style.marginTop = "10px";
-  editor.style.padding = "10px";
-  editor.style.borderRadius = "14px";
-  editor.style.border = "1px solid rgba(148,163,184,0.35)";
-  editor.style.background = "rgba(255,255,255,0.7)";
+  editor.style.marginTop = "8px";
   editor.style.display = "none";
 
   const roleRow = document.createElement("div");
-  roleRow.style.display = "flex";
-  roleRow.style.gap = "10px";
-  roleRow.style.flexWrap = "wrap";
-  roleRow.style.alignItems = "center";
+  roleRow.className = "row";
 
   const roleLabelEl = document.createElement("div");
-  roleLabelEl.className = "small";
+  roleLabelEl.className = "meta";
   roleLabelEl.innerHTML = "<b>תפקיד:</b>";
 
   const roleSel = createRoleSelect(u.role || "teacher");
@@ -731,25 +1204,21 @@ function renderUserCard(u) {
   roleRow.appendChild(roleSel);
 
   const gradesRow = document.createElement("div");
-  gradesRow.style.display = "flex";
-  gradesRow.style.gap = "12px";
-  gradesRow.style.flexWrap = "wrap";
-  gradesRow.style.alignItems = "center";
-  gradesRow.style.marginTop = "10px";
+  gradesRow.className = "row";
+  gradesRow.style.marginTop = "8px";
 
   const gradesLabelEl = document.createElement("div");
-  gradesLabelEl.className = "small";
+  gradesLabelEl.className = "meta";
   gradesLabelEl.innerHTML = "<b>שכבות:</b>";
 
   const chkWrap = document.createElement("div");
-  chkWrap.style.display = "flex";
+  chkWrap.className = "row";
   chkWrap.style.gap = "10px";
-  chkWrap.style.flexWrap = "wrap";
 
   chkWrap.innerHTML = `
-    <label class="small"><input type="checkbox" value="z"> ז׳</label>
-    <label class="small"><input type="checkbox" value="h"> ח׳</label>
-    <label class="small"><input type="checkbox" value="t"> ט׳</label>
+    <label class="meta"><input type="checkbox" value="z"> ז׳</label>
+    <label class="meta"><input type="checkbox" value="h"> ח׳</label>
+    <label class="meta"><input type="checkbox" value="t"> ט׳</label>
   `;
 
   const currentGrades = Array.isArray(u.allowedGrades) ? u.allowedGrades : [];
@@ -761,13 +1230,11 @@ function renderUserCard(u) {
   gradesRow.appendChild(chkWrap);
 
   const actionRow = document.createElement("div");
-  actionRow.style.display = "flex";
-  actionRow.style.gap = "10px";
-  actionRow.style.flexWrap = "wrap";
-  actionRow.style.marginTop = "12px";
+  actionRow.className = "actions";
+  actionRow.style.marginTop = "10px";
 
   const btnSave = document.createElement("button");
-  btnSave.className = "btn";
+  btnSave.className = "btn btn-primary";
   btnSave.type = "button";
   btnSave.textContent = "שמור";
 
@@ -826,6 +1293,11 @@ function renderUserCard(u) {
   });
 
   btnSave.addEventListener("click", async () => {
+    if (!isDevEmailCurrent()) {
+      alert("רק DEV יכול לערוך משתמשים כאן.");
+      return;
+    }
+
     const newRole = normalizeRole(roleSel.value);
 
     let newGrades = [];
@@ -866,6 +1338,11 @@ function renderUserCard(u) {
   });
 
   btnRemove.addEventListener("click", async () => {
+    if (!isDevEmailCurrent()) {
+      alert("רק DEV יכול לבטל גישה כאן.");
+      return;
+    }
+
     const me = norm(auth.currentUser?.email);
     if (norm(u.email) === me) {
       alert("לא מוחקים את עצמנו 😅");
@@ -877,7 +1354,7 @@ function renderUserCard(u) {
     try {
       await deleteDoc(doc(db, "adminUsers", u.id));
       msg.textContent = "בוטל ✅";
-      await refreshAll();
+      await renderUsers();
     } catch (e) {
       console.error(e);
       msg.textContent = "שגיאה: " + (e?.message || e);
@@ -886,3 +1363,38 @@ function renderUserCard(u) {
 
   return wrap;
 }
+
+function startAccessRealtime() {
+  stopAccessRealtime();
+
+  try {
+    unsubReq = onSnapshot(collection(db, "adminRequests"), (snap) => {
+      const arr = [];
+      snap.forEach(d => arr.push({ id: d.id, ...d.data() }));
+      renderRequestsFromArray(arr);
+    }, (err) => {
+      console.error("onSnapshot adminRequests error:", err);
+      renderRequests();
+    });
+  } catch (e) {
+    console.error("startAccessRealtime adminRequests failed:", e);
+  }
+
+  try {
+    unsubUsers = onSnapshot(collection(db, "adminUsers"), (snap) => {
+      const arr = [];
+      snap.forEach(d => arr.push({ id: d.id, ...d.data() }));
+      renderUsersFromArray(arr);
+    }, (err) => {
+      console.error("onSnapshot adminUsers error:", err);
+      renderUsers();
+    });
+  } catch (e) {
+    console.error("startAccessRealtime adminUsers failed:", e);
+  }
+}
+document.querySelectorAll('a[data-open]').forEach(a => {
+  a.setAttribute('target', '_blank');
+  a.setAttribute('rel', 'noopener');
+});
+

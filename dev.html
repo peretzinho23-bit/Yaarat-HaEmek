@@ -1,110 +1,467 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="he" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DEV · ניהול הרשאות</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>DEV Hub – יערת העמק</title>
 
-  <link rel="icon" href="logo.png" />
+  <!-- Keep your global site style if exists -->
   <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="admin.css" />
 
   <style>
-    .dev-wrap{max-width:1100px;margin:0 auto;}
-    .dev-grid{display:grid;grid-template-columns:1fr;gap:16px;}
-    @media (min-width: 980px){.dev-grid{grid-template-columns:1.2fr 0.8fr;}}
-    .pill{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;border:1px solid rgba(148,163,184,.45);background:rgba(255,255,255,.8);font-size:.85rem;}
-    html[data-theme="dark"] .pill{background:rgba(2,6,23,.55);}
-    .table{width:100%;border-collapse:separate;border-spacing:0 10px;}
-    .table th{font-size:.82rem;color:#64748b;text-align:right;padding:0 10px;}
-    .row{background:rgba(255,255,255,.92);border:1px solid rgba(148,163,184,.35);box-shadow:0 10px 25px rgba(15,23,42,.08);border-radius:16px;overflow:hidden;}
-    html[data-theme="dark"] .row{background:rgba(15,23,42,.7);border-color:rgba(148,163,184,.25);}
-    .row td{padding:10px;vertical-align:top;}
-    .small{font-size:.85rem;color:#475569;}
-    html[data-theme="dark"] .small{color:#cbd5e1;}
-    .actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-start;}
-    .select{width:100%;padding:10px;border-radius:12px;border:1px solid rgba(148,163,184,.45);background:rgba(255,255,255,.85);}
-    html[data-theme="dark"] .select{background:rgba(2,6,23,.55);color:#e5e7eb;}
-    .chkline{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:8px;}
-    .chkline label{display:flex;align-items:center;gap:6px;font-size:.9rem;}
-    .muted{color:#94a3b8;}
+    :root{
+      --card: rgba(255,255,255,.08);
+      --card2: rgba(255,255,255,.06);
+      --border: rgba(148,163,184,.28);
+      --shadow: 0 18px 55px rgba(0,0,0,.18);
+      --radius: 18px;
+    }
+    html[data-theme="dark"]{
+      color-scheme: dark;
+    }
+
+    .wrap{max-width:1160px;margin:0 auto;padding:18px}
+    .topbar{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+      margin: 6px 0 16px;
+    }
+    .pill{
+      display:inline-flex;align-items:center;gap:10px;
+      padding:8px 14px;border-radius:999px;
+      border:1px solid var(--border);
+      background: var(--card);
+    }
+    .btn{
+      cursor:pointer;
+      padding:10px 14px;border-radius:14px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.10);
+      color: inherit;
+      font-weight:900;
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn:active{transform:none}
+    .btn-outline{
+      cursor:pointer;
+      padding:10px 14px;border-radius:14px;
+      border:1px solid var(--border);
+      background: transparent;
+      color: inherit;
+      font-weight:900;
+    }
+    .btn-danger{
+      border-color: rgba(239,68,68,.35);
+      background: rgba(239,68,68,.12);
+    }
+    .btn-primary{
+      border-color: rgba(37,99,235,.35);
+      background: rgba(37,99,235,.14);
+    }
+
+    .card{
+      border-radius: var(--radius);
+      border:1px solid var(--border);
+      background: var(--card);
+      box-shadow: var(--shadow);
+      padding: 14px;
+    }
+    .muted{opacity:.78}
+    .h1{font-size:1.35rem;margin:0}
+    .h2{font-size:1.05rem;margin:0 0 10px;font-weight:1000}
+    .grid{display:grid;gap:12px}
+    @media (min-width: 980px){ .grid{grid-template-columns: 1.25fr .75fr;} }
+
+    /* Launcher */
+    .launcher{display:grid;gap:12px;grid-template-columns:1fr}
+    @media (min-width: 860px){ .launcher{grid-template-columns:repeat(3, 1fr);} }
+    .launch{
+      border-radius: 18px;
+      border:1px solid var(--border);
+      background: var(--card2);
+      padding: 14px;
+      display:flex;flex-direction:column;gap:10px;
+      min-height: 108px;
+      cursor:pointer;
+      text-decoration:none;color:inherit;
+      transition: transform .14s ease, box-shadow .18s ease, background .18s ease;
+    }
+    .launch:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 22px 80px rgba(0,0,0,.25);
+      background: rgba(255,255,255,.09);
+    }
+    .launch .k{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .launch .title{font-weight:1000}
+    .launch .desc{opacity:.8;line-height:1.5}
+    .badge{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:6px 10px;border-radius:999px;
+      border:1px solid rgba(148,163,184,.24);
+      background: rgba(255,255,255,.08);
+      font-weight:900;font-size:.82rem;
+    }
+
+    /* Tabs */
+    .tabs{display:flex;gap:8px;flex-wrap:wrap}
+    .tab{
+      cursor:pointer;
+      padding:8px 12px;border-radius:999px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.07);
+      font-weight:950;
+    }
+    .tab.active{
+      background: rgba(34,197,94,.12);
+      border-color: rgba(34,197,94,.35);
+    }
+    .panel{display:none;margin-top:12px}
+    .panel.active{display:block}
+
+    /* Forms */
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    label{font-weight:900;font-size:.9rem}
+    input, select, textarea{
+      padding:10px 12px;border-radius:14px;
+      border:1px solid rgba(148,163,184,.30);
+      background: rgba(0,0,0,.18);
+      color: inherit;
+      min-width: 220px;
+    }
+    textarea{width:100%;min-height:140px;resize:vertical}
+    .hint{font-size:.9rem;opacity:.8;line-height:1.5}
+
+    /* Tables/List */
+    .list{display:grid;gap:10px}
+    .item{
+      border-radius:16px;
+      border:1px solid rgba(148,163,184,.22);
+      background: rgba(255,255,255,.06);
+      padding: 12px;
+      display:grid;gap:10px;
+    }
+    .item-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    .item-title{font-weight:1000}
+    .meta{font-size:.88rem;opacity:.78}
+    .actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
+
+    /* Modal */
+    .overlay{
+      position:fixed;inset:0;display:none;align-items:center;justify-content:center;
+      z-index:99999;padding:18px;
+      background: rgba(2,6,23,.72);backdrop-filter: blur(10px);
+    }
+    .overlay.open{display:flex}
+    .modal{
+      width: min(920px, 96vw);
+      max-height: 92vh;
+      overflow:auto;
+      border-radius: 18px;
+      border:1px solid rgba(148,163,184,.25);
+      background: rgba(2,6,23,.70);
+      box-shadow: 0 30px 90px rgba(0,0,0,.55);
+      padding: 14px;
+    }
+    .modal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+    .modal-title{font-weight:1000}
+    .modal-close{
+      width:44px;height:44px;border-radius:999px;
+      border:1px solid rgba(148,163,184,.25);
+      background: rgba(255,255,255,.06);
+      color:inherit;font-size:20px;font-weight:1000;
+      cursor:pointer;
+    }
+
+    /* Light mode */
+    html[data-theme="light"] body{color:#0f172a}
+    html[data-theme="light"] .card,
+    html[data-theme="light"] .pill,
+    html[data-theme="light"] .launch,
+    html[data-theme="light"] .item{
+      background: rgba(255,255,255,.92);
+      border-color: rgba(15,23,42,.12);
+      box-shadow: 0 18px 55px rgba(15,23,42,.10);
+    }
+    html[data-theme="light"] input,
+    html[data-theme="light"] select,
+    html[data-theme="light"] textarea{
+      background: rgba(255,255,255,.92);
+      color:#0f172a;
+      border-color: rgba(15,23,42,.12);
+    }
+    html[data-theme="light"] .overlay{background: rgba(15,23,42,.55)}
+    html[data-theme="light"] .modal{background: rgba(255,255,255,.97);color:#0f172a}
   </style>
 </head>
 
-<body data-page="dev">
+<body data-page="dev-hub">
+  <main class="wrap">
+    <div class="topbar">
+      <div class="row">
+        <div class="pill"><span class="mono">DEV HUB</span> · <span class="muted">Launcher + Tools</span></div>
+        <div class="pill" id="dev-status">טוען…</div>
+      </div>
 
-  <header class="header-main">
-    <div class="container">
-      <nav class="nav" style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
-        <a href="index.html" class="logo-circle" aria-label="דף הבית">
-          <img src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png" alt="סמל יערת העמק" class="logo-img" />
-        </a>
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-          <span id="dev-status" class="pill">טוען...</span>
-          <button id="theme-toggle" class="theme-toggle-btn" type="button" aria-label="מצב כהה/בהיר">🌙</button>
-          <a class="btn-outline" href="admin.html">חזרה לאדמין</a>
-          <button id="dev-logout" class="btn" type="button">התנתקות</button>
-        </div>
-      </nav>
+      <div class="row">
+        <button id="theme-toggle" class="btn-outline" type="button" aria-label="מצב כהה/בהיר">🌙</button>
+        <button id="dev-logout" class="btn btn-danger" type="button" style="display:none;">התנתק</button>
+      </div>
     </div>
-  </header>
-
-  <main class="container dev-wrap" style="padding-top:18px;">
 
     <!-- LOGIN -->
-    <section id="dev-login" class="card" style="max-width:520px;margin:0 auto;">
-      <h2 style="margin-bottom:8px;">כניסה ל-DEV</h2>
-      <p class="muted" style="margin-top:0;">רק לחשבונות DEV.</p>
+    <section class="card" id="dev-login" style="display:none;">
+      <h1 class="h1">כניסה ל־DEV </h1>
+      <p class="hint">זה דף פרטי שמיועד רק לך. אם אין הרשאה — יוצאים אוטומטית.</p>
 
-      <form id="dev-login-form" class="form">
-        <label>אימייל</label>
-        <input id="dev-email" type="email" required placeholder="dev@email.com" />
-
-        <label style="margin-top:10px;">סיסמה</label>
-        <input id="dev-password" type="password" required placeholder="••••••••" />
-
-        <button class="btn" type="submit" style="margin-top:14px; width:100%;">כניסה</button>
+      <form id="dev-login-form" class="row" style="margin-top:10px;">
+        <div>
+          <label>אימייל</label><br>
+          <input id="dev-email" type="email" placeholder="you@..." autocomplete="email" required />
+        </div>
+        <div>
+          <label>סיסמה</label><br>
+          <input id="dev-password" type="password" placeholder="••••••••" autocomplete="current-password" required />
+        </div>
+        <div style="align-self:end;">
+          <button class="btn btn-primary" type="submit">כניסה</button>
+        </div>
+        <div id="dev-login-msg" class="hint" style="width:100%;"></div>
       </form>
-      <p id="dev-login-msg" class="small" style="margin-top:10px;"></p>
     </section>
 
     <!-- CONTENT -->
     <section id="dev-content" style="display:none;">
-      <div class="dev-grid">
-
-        <div class="card">
-          <h2 style="margin-top:0;">בקשות הרשמה לאדמין</h2>
-          <p class="small">כאן אתה מאשר / דוחה בקשות מ-<b>register</b>. אישור יוצר משתמש Authentication ושומר הרשאות.</p>
-          <div id="requests-empty" class="small" style="display:none;">אין בקשות ממתינות 🎉</div>
-          <div style="overflow:auto;">
-            <table class="table" aria-label="בקשות הרשמה">
-              <thead>
-                <tr>
-                  <th>אימייל</th>
-                  <th>פרטים</th>
-                  <th>הרשאות</th>
-                  <th>פעולות</th>
-                </tr>
-              </thead>
-              <tbody id="requests-body"></tbody>
-            </table>
+      <div class="grid">
+        <!-- LEFT: Launcher -->
+        <section class="card">
+          <div class="row" style="justify-content:space-between;">
+            <h2 class="h2">🚀 Launcher</h2>
+            <span class="badge">קיצור דרך לכל הניהול</span>
           </div>
-        </div>
 
-        <div class="card">
-          <h2 style="margin-top:0;">משתמשים עם גישה</h2>
-          <p class="small">מחיקה כאן <b>מבטלת גישה</b> (מוחקת הרשאות), לא מוחקת את המשתמש מ-Auth.</p>
-          <div id="users-empty" class="small" style="display:none;">אין משתמשים (חוץ ממך) עדיין.</div>
-          <div id="users-list" style="display:flex;flex-direction:column;gap:10px;"></div>
-        </div>
+          <div class="launcher" style="margin-top:10px;">
+            <a class="launch" href="admin.html" data-open>
+              <div class="k">
+                <div class="title">📰 News Admin</div>
+                <span class="badge">admin.html</span>
+              </div>
+              <div class="desc">עריכת חדשות לפי שכבה/כיתה, תמונות וקישורים.</div>
+<a class="launch" href="reqishorim.html">
+  <div class="k">
+    <div class="title">🔐 אישורי כניסה (Requests)</div>
+    <span class="badge">reqishorim.html</span>
+  </div>
+  <div class="desc">אישור/דחייה בקשות + יצירת משתמשים.</div>
+</a>
 
+
+            <a class="launch" href="exams-admin.html" data-open>
+              <div class="k">
+                <div class="title">📝 Exams Admin</div>
+                <span class="badge">exams-admin</span>
+              </div>
+              <div class="desc">יצירה/עריכה של מבחנים, נושאים, תאריך/שעה.</div>
+            </a>
+
+            <a class="launch" href="timetable-admin.html" data-open>
+              <div class="k">
+                <div class="title">📅 Timetable Admin</div>
+                <span class="badge">timetable</span>
+              </div>
+              <div class="desc">ניהול מערכת שעות לכל כיתה. עדכון מיידי לתלמידים.</div>
+            </a>
+
+            <a class="launch" href="polls-admin.html" data-open>
+              <div class="k">
+                <div class="title">🗳️ Polls Admin</div>
+                <span class="badge">polls</span>
+              </div>
+              <div class="desc">סקרים, פתיחה/סגירה, תוצאות בזמן אמת.</div>
+            </a>
+
+            <button class="launch" type="button" id="open-pages">
+              <div class="k">
+                <div class="title">🧱 Pages Manager</div>
+                <span class="badge">Firestore/pages</span>
+              </div>
+              <div class="desc">צור דף זמני/קבוע מה־DB (draft/published) בלי ליצור HTML חדש.</div>
+            </button>
+
+            <button class="launch" type="button" id="open-logs">
+              <div class="k">
+                <div class="title">🧾 Logs / Debug</div>
+                <span class="badge">Firestore/logs</span>
+              </div>
+              <div class="desc">רואה מה השתנה, מי ערך, ומה נשבר (אחרון־אחרון).</div>
+            </button>
+
+
+            <button class="launch" type="button" id="open-access">
+              <div class="k">
+                <div class="title">🔐 Access / Requests</div>
+                <span class="badge">adminRequests</span>
+              </div>
+              <div class="desc">אישור בקשות כניסה + ניהול משתמשי adminUsers (רק DEV).</div>
+            </button>
+
+          </div>
+        </section>
+
+        <!-- RIGHT: Tools -->
+        <section class="card">
+          <div class="row" style="justify-content:space-between;">
+            <h2 class="h2">🛠️ Tools</h2>
+            <span class="badge">רק לך</span>
+          </div>
+
+          <div class="tabs" style="margin-top:10px;">
+            <button class="tab active" data-tab="pages">Pages</button>
+            <button class="tab" data-tab="classes">Classes</button>
+            <button class="tab" data-tab="logs">Logs</button>
+            <button class="tab" data-tab="quick">Quick</button>
+            <button class="tab" data-tab="access">Access</button>
+          </div>
+
+          <!-- Pages -->
+          <div class="panel active" id="panel-pages">
+            <div class="row" style="justify-content:space-between;align-items:flex-end;">
+              <div>
+                <div class="muted">pages collection</div>
+                <div class="hint">דפים דינמיים נטענים דרך <span class="mono">page.html?p=slug</span>.</div>
+              </div>
+              <div class="row">
+                <input id="pages-search" placeholder="חיפוש (slug/title)..." />
+                <button class="btn btn-primary" id="btn-new-page" type="button">➕ דף חדש</button>
+              </div>
+            </div>
+
+            <div class="list" id="pages-list" style="margin-top:12px;"></div>
+            <div class="hint" id="pages-empty" style="display:none;">אין עדיין דפים.</div>
+          </div>
+
+          <!-- Classes -->
+          <div class="panel" id="panel-classes">
+            <div class="muted">classes collection</div>
+            <p class="hint">מנהל רשימת כיתות כדי שהאתר יידע “מה קיימת”. זה לא מוחק עיצוב/דפים – רק נתונים.</p>
+
+            <div class="row" style="margin-top:8px;">
+              <div>
+                <label>שכבה</label><br>
+                <select id="cls-grade">
+                  <option value="z">ז׳</option>
+                  <option value="h">ח׳</option>
+                  <option value="t">ט׳</option>
+                </select>
+              </div>
+              <div>
+                <label>שם כיתה</label><br>
+                <input id="cls-name" placeholder='לדוגמה: 1 / א / "ח2"' />
+              </div>
+              <div style="align-self:end;">
+                <button class="btn btn-primary" id="btn-create-class" type="button">➕ צור כיתה</button>
+              </div>
+            </div>
+
+            <div class="list" id="classes-list" style="margin-top:12px;"></div>
+            <div class="hint" id="classes-empty" style="display:none;">אין כיתות רשומות עדיין.</div>
+          </div>
+
+          <!-- Logs -->
+          <div class="panel" id="panel-logs">
+            <div class="row" style="justify-content:space-between;">
+              <div>
+                <div class="muted">logs collection</div>
+                <div class="hint">רואה פעולות אחרונות (נוצר/עודכן/נמחק) + מי ביצע.</div>
+              </div>
+              <div class="row">
+                <select id="logs-filter">
+                  <option value="">הכל</option>
+                  <option value="pages">pages</option>
+                  <option value="classes">classes</option>
+                </select>
+                <button class="btn" id="btn-refresh-logs" type="button">רענן</button>
+              </div>
+            </div>
+
+            <div class="list" id="logs-list" style="margin-top:12px;"></div>
+            <div class="hint" id="logs-empty" style="display:none;">אין לוגים להצגה.</div>
+          </div>
+
+          <!-- Quick -->
+          <div class="panel" id="panel-quick">
+            <div class="muted">Quick actions</div>
+            <div class="hint">קטן אבל שימושי.</div>
+
+            <div class="row" style="margin-top:10px;">
+              <button class="btn" id="btn-open-site" type="button">פתח אתר (index)</button>
+              <button class="btn" id="btn-open-class" type="button">פתח דף כיתה (class)</button>
+              <button class="btn" id="btn-open-page" type="button">פתח page.html?p=...</button>
+            </div>
+
+            <div class="row" style="margin-top:10px;">
+              <input id="quick-slug" placeholder="slug לדוגמה: temp-event-jan" />
+            </div>
+
+            <div class="hint">טיפ: אם תוסיף בכל דף כפתור “ערוך” ל־Dev Hub עם <span class="mono">dev.html?edit=SLUG</span> — זה יקפוץ לך ישר לעורך.</div>
+          </div>
+        </section>
       </div>
     </section>
-
   </main>
 
-  <script type="module" src="dev.js"></script>
-<script type="module" src="/analytics.js"></script>
+  <!-- MODAL: Page Editor -->
+  <div class="overlay" id="page-modal">
+    <div class="modal">
+      <div class="modal-head">
+        <div class="modal-title" id="pm-title">עריכת דף</div>
+        <button class="modal-close" type="button" id="pm-close">✕</button>
+      </div>
 
+      <div class="row">
+        <div style="flex:1;min-width:240px">
+          <label>slug (ייחודי)</label><br>
+          <input id="pm-slug" class="mono" placeholder="temp-event-jan" />
+        </div>
+        <div style="flex:1;min-width:240px">
+          <label>כותרת</label><br>
+          <input id="pm-page-title" placeholder="כותרת הדף" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <div>
+          <label>סטטוס</label><br>
+          <select id="pm-status">
+            <option value="draft">draft</option>
+            <option value="published">published</option>
+            <option value="archived">archived</option>
+          </select>
+        </div>
+        <div>
+          <label>Visibility</label><br>
+          <select id="pm-visibility">
+            <option value="public">public</option>
+            <option value="staff">staff</option>
+            <option value="dev">dev</option>
+          </select>
+        </div>
+        <div style="align-self:end" class="row">
+          <button class="btn" id="pm-preview" type="button">👁️ Preview</button>
+          <button class="btn btn-primary" id="pm-save" type="button">💾 שמור</button>
+          <button class="btn btn-danger" id="pm-delete" type="button">🗑️ מחק</button>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;">
+        <label>contentBlocks (JSON)</label>
+        <div class="hint">זה “העורך החכם והמהיר”: אתה שולט בבלוקים. בהמשך אפשר להפוך לעורך Drag & Drop.</div>
+        <textarea id="pm-blocks" class="mono" spellcheck="false"></textarea>
+      </div>
+
+      <div class="hint" id="pm-msg" style="margin-top:10px;"></div>
+    </div>
+  </div>
+
+  <script type="module" src="dev.js?v=999"></script>
 </body>
 </html>
