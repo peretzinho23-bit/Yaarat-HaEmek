@@ -2,7 +2,6 @@
 import { db, auth } from "./firebase-config.js";
 import { doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
-import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
 // ====== config ======
 // ✅ 1) תשאיר את זה ככה (כבר עשית נכון) — רק בלי רווחים מיותרים
@@ -774,7 +773,7 @@ async function loadExamsOnce(classId) {
     const items = snap.exists() ? (snap.data()?.items || []) : [];
 
     const arr = items
-.filter(x => String(x.classId || "").trim() === classId)
+      .filter(x => String(x.classId || "").toLowerCase() === classId)
       .map(x => ({ ...x, _d: parseDate(x.date) }))
       .filter(x => !x._d || x._d.getTime() >= todayMidnight())
       .sort((a,b) => {
@@ -1024,7 +1023,7 @@ async function openClass(classId) {
 
 // ====== boot ======
 const qs = new URLSearchParams(location.search);
-const classId = (params.get("class") || "").trim();
+const classId = (qs.get("class") || "").trim().toLowerCase();
 
 // ✅ refresh every 1s (בשביל ספירה לאחור + עכשיו/הבא)
 setInterval(() => {
