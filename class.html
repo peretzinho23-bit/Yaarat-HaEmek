@@ -1494,6 +1494,350 @@ html[data-theme="dark"] #ex .exam-countdown.is-soon{
     });
   })();
 </script>
+<style>
+/* =========================
+   EXAM ACTIONS (⭐ + 📅) — CLEAN
+   Put this at the END of the page CSS
+   ========================= */
+
+.exam-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  margin-top:10px;
+}
+
+.exam-action-btn{
+  all:unset;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+  border-radius:999px;
+  font-weight:900;
+  font-size:.85rem;
+  letter-spacing:.2px;
+
+  border:1px solid rgba(148,163,184,.26);
+  background: rgba(255,255,255,.78);
+  box-shadow: 0 10px 26px rgba(15,23,42,.08);
+  color:#0f172a;
+
+  transition: transform .15s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+  user-select:none;
+}
+
+.exam-action-btn:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 14px 34px rgba(15,23,42,.12);
+  border-color: rgba(37,99,235,.22);
+}
+
+html[data-theme="dark"] .exam-action-btn{
+  background: rgba(2,6,23,.38);
+  border-color: rgba(148,163,184,.18);
+  color:#e5e7eb;
+  box-shadow: 0 14px 40px rgba(0,0,0,.28);
+}
+
+.exam-action-btn .ico{
+  width:18px;height:18px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size:1.05rem;
+}
+
+/* ⭐ starred state */
+.exam-action-btn.starred{
+  background: linear-gradient(135deg, rgba(250,204,21,.30), rgba(56,189,248,.18));
+  border-color: rgba(250,204,21,.35);
+}
+html[data-theme="dark"] .exam-action-btn.starred{
+  background: linear-gradient(135deg, rgba(250,204,21,.18), rgba(56,189,248,.14));
+  border-color: rgba(250,204,21,.30);
+}
+
+/* tiny helper text under title if you want (optional) */
+.exam-star-tag{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:4px 10px;
+  border-radius:999px;
+  font-size:.78rem;
+  font-weight:950;
+  background: rgba(250,204,21,.22);
+  border:1px solid rgba(250,204,21,.28);
+  color:#7c2d12;
+}
+html[data-theme="dark"] .exam-star-tag{
+  background: rgba(250,204,21,.14);
+  border-color: rgba(250,204,21,.22);
+  color:#fff7ed;
+}
+</style>
+
+<script>
+/* =========================
+   EXAM ACTIONS (⭐ + 📅)
+   Works by scanning #ex .item and injecting buttons
+   ========================= */
+(function(){
+  const EXAMS_ROOT_SELECTOR = "#ex";
+  const ITEM_SELECTOR = ".item";
+
+  // storage keys
+  const STAR_KEY = "yaar_starred_exams_v1";
+
+  function readStarMap(){
+    try { return JSON.parse(localStorage.getItem(STAR_KEY) || "{}"); }
+    catch { return {}; }
+  }
+  function writeStarMap(map){
+    try { localStorage.setItem(STAR_KEY, JSON.stringify(map)); } catch {}
+  }
+
+  // --- utils ---
+  function normalize(str){ return String(str || "").trim(); }
+
+  // Extract subject/date/time/topic from the DOM your JS already renders
+  function extractExamData(itemEl){
+    // Subject: first bold/strong in the card
+    const titleEl = itemEl.querySelector("b, strong");
+    const subject = normalize(titleEl ? titleEl.textContent : "");
+
+    // Try to find date/time in known places:
+    // 1) .exam-date (if you have it)
+    // 2) .meta (many of your cards use .meta)
+    // 3) fallback: search text pattern DD/MM/YY or DD/MM/YYYY
+    let metaText = "";
+    const dateEl = itemEl.querySelector(".exam-date");
+    const metaEl = itemEl.querySelector(".meta");
+    if (dateEl) metaText = normalize(dateEl.textContent);
+    else if (metaEl) metaText = normalize(metaEl.textContent);
+    else metaText = normalize(itemEl.textContent);
+
+    // Extract date
+    const dateMatch =
+      metaText.match(/\b(\d{1,2})[\/.](\d{1,2})[\/.](\d{2,4})\b/) ||
+      metaText.match(/\b(\d{1,2})-(\d{1,2})-(\d{2,4})\b/);
+
+    let day="", month="", year="";
+    if (dateMatch){
+      day = dateMatch[1].padStart(2,"0");
+      month = dateMatch[2].padStart(2,"0");
+      year = dateMatch[3];
+      if (year.length === 2) year = "20" + year;
+    }
+
+    // Extract time (HH:MM)
+    const timeMatch = metaText.match(/\b([01]?\d|2[0-3]):([0-5]\d)\b/);
+    const time = timeMatch ? `${timeMatch[1].padStart(2,"0")}:${timeMatch[2]}` : "";
+
+    // Topic/body (if exists)
+    const bodyEl = itemEl.querySelector(".body");
+    const topic = normalize(bodyEl ? bodyEl.textContent : "");
+
+    return { subject, day, month, year, time, topic };
+  }
+
+  function makeIdFromData(d){
+    // stable enough: subject + date + time + first 40 chars from topic
+    const base = [
+      d.subject, `${d.year}-${d.month}-${d.day}`, d.time,
+      (d.topic || "").slice(0,40)
+    ].join("|");
+    // lightweight hash
+    let h=0; for (let i=0;i<base.length;i++){ h=((h<<5)-h)+base.charCodeAt(i); h|=0; }
+    return "ex_" + Math.abs(h);
+  }
+
+  function buildGoogleCalUrl({subject, year, month, day, time, topic}){
+    // If no date → can't create event
+    if (!year || !month || !day) return "";
+
+    // Default duration: 90 minutes
+    const start = toIcsDateTime(year, month, day, time || "10:00");
+    const end   = addMinutesToIcs(start, 90);
+
+    const text = encodeURIComponent(subject || "מבחן");
+    const details = encodeURIComponent(topic || "");
+    const dates = encodeURIComponent(start + "/" + end);
+
+    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${text}&details=${details}&dates=${dates}`;
+  }
+
+  // ICS datetime: YYYYMMDDTHHMMSSZ (we’ll use UTC-ish simple; works fine for personal add)
+  function toIcsDateTime(year, month, day, time){
+    const [hh, mm] = (time || "10:00").split(":");
+    // we won’t convert timezone; most calendar apps still import correctly and you can edit
+    return `${year}${month}${day}T${hh}${mm}00`;
+  }
+
+  function addMinutesToIcs(icsStart, minutes){
+    // icsStart: YYYYMMDDTHHMMSS
+    const y = parseInt(icsStart.slice(0,4),10);
+    const m = parseInt(icsStart.slice(4,6),10)-1;
+    const d = parseInt(icsStart.slice(6,8),10);
+    const hh = parseInt(icsStart.slice(9,11),10);
+    const mm = parseInt(icsStart.slice(11,13),10);
+
+    const dt = new Date(y, m, d, hh, mm, 0);
+    dt.setMinutes(dt.getMinutes() + minutes);
+
+    const YY = String(dt.getFullYear());
+    const MM = String(dt.getMonth()+1).padStart(2,"0");
+    const DD = String(dt.getDate()).padStart(2,"0");
+    const H = String(dt.getHours()).padStart(2,"0");
+    const M = String(dt.getMinutes()).padStart(2,"0");
+
+    return `${YY}${MM}${DD}T${H}${M}00`;
+  }
+
+  function downloadIcs({subject, year, month, day, time, topic}){
+    if (!year || !month || !day) return;
+
+    const dtStart = toIcsDateTime(year, month, day, time || "10:00");
+    const dtEnd   = addMinutesToIcs(dtStart, 90);
+
+    const uid = `yaar-${Date.now()}@school`;
+    const now = new Date();
+    const stamp = [
+      now.getUTCFullYear(),
+      String(now.getUTCMonth()+1).padStart(2,"0"),
+      String(now.getUTCDate()).padStart(2,"0"),
+      "T",
+      String(now.getUTCHours()).padStart(2,"0"),
+      String(now.getUTCMinutes()).padStart(2,"0"),
+      String(now.getUTCSeconds()).padStart(2,"0"),
+      "Z"
+    ].join("");
+
+    const safeTitle = (subject || "מבחן").replace(/\n/g," ").trim();
+    const safeDesc = (topic || "").replace(/\n/g,"\\n").trim();
+
+    const ics =
+`BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//YaarHaEmek//Exams//HE
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:${uid}
+DTSTAMP:${stamp}
+SUMMARY:${safeTitle}
+DESCRIPTION:${safeDesc}
+DTSTART:${dtStart}
+DTEND:${dtEnd}
+END:VEVENT
+END:VCALENDAR`;
+
+    const blob = new Blob([ics], {type:"text/calendar;charset=utf-8"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `${safeTitle}.ics`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 1500);
+  }
+
+  function ensureActionsForItem(itemEl){
+    if (itemEl.querySelector(".exam-actions")) return;
+
+    const data = extractExamData(itemEl);
+    const id = makeIdFromData(data);
+
+    // Only add if it really looks like an exam item
+    if (!data.subject) return;
+
+    const starMap = readStarMap();
+    const isStarred = !!starMap[id];
+
+    // container
+    const actions = document.createElement("div");
+    actions.className = "exam-actions";
+
+    // STAR button
+    const starBtn = document.createElement("button");
+    starBtn.type = "button";
+    starBtn.className = "exam-action-btn" + (isStarred ? " starred" : "");
+    starBtn.innerHTML = `<span class="ico">${isStarred ? "⭐" : "☆"}</span><span>${isStarred ? "חשוב" : "סמן חשוב"}</span>`;
+
+    function setStarUI(on){
+      starBtn.classList.toggle("starred", on);
+      starBtn.innerHTML = `<span class="ico">${on ? "⭐" : "⭐"}</span><span>${on ? "חשוב" : "סמן חשוב"}</span>`;
+
+      // optional tag under title
+      const titleEl = itemEl.querySelector("b, strong");
+      if (!titleEl) return;
+
+      let tag = itemEl.querySelector(".exam-star-tag");
+      if (on && !tag){
+        tag = document.createElement("span");
+        tag.className = "exam-star-tag";
+        tag.textContent = "⭐ חשוב";
+        // insert after title
+        titleEl.insertAdjacentElement("afterend", tag);
+      }
+      if (!on && tag) tag.remove();
+    }
+
+    setStarUI(isStarred);
+
+    starBtn.addEventListener("click", () => {
+      const map = readStarMap();
+      const next = !map[id];
+      if (next) map[id] = { at: Date.now(), data };
+      else delete map[id];
+      writeStarMap(map);
+      setStarUI(next);
+    });
+
+    // CAL button (Google Calendar + ICS fallback)
+    const calBtn = document.createElement("button");
+    calBtn.type = "button";
+    calBtn.className = "exam-action-btn";
+    calBtn.innerHTML = `<span class="ico">📅</span><span>הוסף ליומן</span>`;
+
+    calBtn.addEventListener("click", () => {
+      // If we have a good date -> open Google Calendar template (nice UX)
+      const gUrl = buildGoogleCalUrl(data);
+      if (gUrl){
+        window.open(gUrl, "_blank", "noopener,noreferrer");
+        // and also allow ICS if they want (comment if you don’t want downloads):
+        // downloadIcs(data);
+        return;
+      }
+      // fallback: just download ICS if date parse failed (won’t happen usually)
+      downloadIcs(data);
+    });
+
+    actions.appendChild(starBtn);
+    actions.appendChild(calBtn);
+
+    // Put actions at the bottom of the card
+    itemEl.appendChild(actions);
+  }
+
+  function scan(){
+    const root = document.querySelector(EXAMS_ROOT_SELECTOR);
+    if (!root) return;
+    root.querySelectorAll(ITEM_SELECTOR).forEach(ensureActionsForItem);
+  }
+
+  // initial scan
+  scan();
+
+  // watch for async render updates
+  const root = document.querySelector(EXAMS_ROOT_SELECTOR);
+  if (root){
+    const obs = new MutationObserver(() => scan());
+    obs.observe(root, { childList:true, subtree:true });
+  }
+})();
+</script>
 
 <script type="module" src="class.js?v=2"></script>
 <script type="module" src="/analytics.js"></script>

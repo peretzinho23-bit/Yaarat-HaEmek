@@ -1,0 +1,824 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>חיפוש + חשובים – יערת העמק</title>
+
+  <style>
+    :root{
+      --bg:#0b1020;
+      --card:rgba(15,23,42,.75);
+      --card2:rgba(2,6,23,.45);
+      --stroke:rgba(148,163,184,.18);
+      --text:#e5e7eb;
+      --muted:rgba(229,231,235,.72);
+      --blue:#38bdf8;
+      --blue2:#2563eb;
+      --green:#22c55e;
+      --shadow:0 18px 55px rgba(0,0,0,.35);
+      --r:18px;
+      --r2:24px;
+    }
+    html[data-theme="light"]{
+      --bg:#f5f7fb;
+      --card:#ffffff;
+      --card2:#f8fafc;
+      --stroke:rgba(15,23,42,.10);
+      --text:#0f172a;
+      --muted:rgba(15,23,42,.62);
+      --shadow:0 18px 55px rgba(15,23,42,.10);
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background: radial-gradient(circle at 20% 0%, rgba(56,189,248,.14), transparent 45%),
+                  radial-gradient(circle at 90% 10%, rgba(37,99,235,.14), transparent 48%),
+                  var(--bg);
+      color:var(--text);
+      min-height:100vh;
+    }
+    .wrap{max-width:1100px;margin:0 auto;padding:18px}
+    .top{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+      margin:10px 0 14px;
+    }
+    .brand{
+      display:flex;align-items:center;gap:10px;
+      padding:10px 12px;border-radius:999px;
+      background:linear-gradient(135deg, rgba(56,189,248,.16), rgba(37,99,235,.12));
+      border:1px solid var(--stroke);
+    }
+    .brand b{font-weight:1000;letter-spacing:.2px}
+    .chip{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:9px 12px;border-radius:999px;
+      background:var(--card2);
+      border:1px solid var(--stroke);
+      color:var(--text);
+      box-shadow: 0 10px 28px rgba(0,0,0,.06);
+    }
+    .muted{color:var(--muted)}
+    .btn{
+      cursor:pointer;
+      border-radius:999px;
+      padding:10px 14px;
+      border:1px solid var(--stroke);
+      background:var(--card);
+      color:var(--text);
+      font-weight:900;
+      transition:transform .15s ease, box-shadow .2s ease, background .2s ease;
+      box-shadow: 0 10px 28px rgba(0,0,0,.10);
+    }
+    .btn:hover{transform:translateY(-1px); box-shadow: var(--shadow);}
+    .btn.primary{
+      border:none;
+      background: linear-gradient(135deg, var(--blue2), var(--blue));
+      color:white;
+    }
+    .btn.ghost{
+      background:transparent;
+      border:1px solid var(--stroke);
+      box-shadow:none;
+    }
+    .grid{
+      display:grid;grid-template-columns:1fr;gap:14px;
+    }
+    @media(min-width:980px){ .grid{grid-template-columns: 1.2fr .8fr;} }
+
+    .card{
+      border:1px solid var(--stroke);
+      background:var(--card);
+      border-radius: var(--r2);
+      padding:14px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card h2{
+      margin:0 0 10px;
+      font-size:1.05rem;
+      font-weight:1000;
+      letter-spacing:.2px;
+    }
+
+    .searchbar{
+      display:flex;gap:10px;flex-wrap:wrap;align-items:center;
+      padding:12px;border-radius: var(--r2);
+      background:linear-gradient(135deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
+      border:1px solid var(--stroke);
+    }
+    html[data-theme="light"] .searchbar{
+      background:linear-gradient(135deg, rgba(2,6,23,.03), rgba(2,6,23,.01));
+    }
+    .searchbar input{
+      flex:1; min-width:220px;
+      padding:12px 14px;
+      border-radius: 16px;
+      border:1px solid var(--stroke);
+      background: var(--card2);
+      color:var(--text);
+      font-size:1rem;
+      outline:none;
+    }
+    .searchbar select{
+      min-width:140px;
+      padding:12px 12px;
+      border-radius: 16px;
+      border:1px solid var(--stroke);
+      background: var(--card2);
+      color:var(--text);
+      outline:none;
+      font-weight:800;
+    }
+
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .hint{
+      font-size:.9rem;
+      color:var(--muted);
+      margin-top:10px;
+      line-height:1.45;
+    }
+
+    .list{display:grid;gap:10px;margin-top:12px}
+    .item{
+      border:1px solid var(--stroke);
+      border-radius: var(--r);
+      background: rgba(255,255,255,.06);
+      padding:12px;
+      display:grid;
+      gap:10px;
+    }
+    html[data-theme="light"] .item{background:#fff}
+    .itemTop{
+      display:flex;justify-content:space-between;align-items:flex-start;gap:10px;
+    }
+    .title{
+      font-weight:1000;
+      font-size:1.02rem;
+      line-height:1.25;
+      margin:0;
+    }
+    .tags{
+      display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;
+    }
+    .tag{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--stroke);
+      background: rgba(2,6,23,.18);
+      font-weight:900;
+      font-size:.82rem;
+      color:var(--text);
+      white-space:nowrap;
+    }
+    html[data-theme="light"] .tag{background: rgba(2,6,23,.04);}
+
+    .body{
+      white-space:pre-wrap;
+      color:var(--muted);
+      line-height:1.6;
+      border-radius: 16px;
+      padding:10px 12px;
+      background: rgba(2,6,23,.14);
+      border:1px solid var(--stroke);
+    }
+    html[data-theme="light"] .body{background: rgba(2,6,23,.03);}
+
+    .actions{
+      display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:flex-start;
+    }
+    .iconBtn{
+      cursor:pointer;
+      border-radius: 999px;
+      padding:9px 12px;
+      border:1px solid var(--stroke);
+      background: var(--card2);
+      color:var(--text);
+      font-weight:1000;
+    }
+    .iconBtn:hover{filter:brightness(1.06)}
+    .star.on{
+      background: linear-gradient(135deg, rgba(250,204,21,.25), rgba(245,158,11,.18));
+      border-color: rgba(245,158,11,.35);
+    }
+    .openLink{
+      text-decoration:none;
+      color:white;
+      background: linear-gradient(135deg, var(--blue2), var(--blue));
+      border:none;
+    }
+    .calendarBtn{
+      background: linear-gradient(135deg, rgba(34,197,94,.22), rgba(56,189,248,.18));
+      border-color: rgba(34,197,94,.30);
+    }
+    .danger{ color:#fecaca; }
+    html[data-theme="light"] .danger{ color:#991b1b; }
+
+    .sideBox{
+      border:1px solid var(--stroke);
+      border-radius: var(--r2);
+      padding:12px;
+      background: rgba(255,255,255,.06);
+    }
+    html[data-theme="light"] .sideBox{background:#fff}
+    .savedHead{display:flex;justify-content:space-between;align-items:center;gap:10px}
+    .small{font-size:.9rem;color:var(--muted)}
+    .empty{
+      text-align:center;
+      padding:16px;
+      color:var(--muted);
+      border-radius: var(--r);
+      border:1px dashed var(--stroke);
+      background: rgba(2,6,23,.10);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">
+        <span>✨</span>
+        <b>חיפוש גלובלי + חשובים</b>
+        <span class="muted">יערְת העמק</span>
+      </div>
+
+      <div class="row">
+        <span class="chip" id="gradeChip">שכבה: —</span>
+        <button class="btn ghost" id="themeBtn" type="button">🌙</button>
+        <a class="btn ghost" href="index.html">← דף הבית</a>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- MAIN -->
+      <div class="card">
+        <h2>🔎 חיפוש</h2>
+
+        <div class="searchbar">
+          <input id="q" placeholder="חפש מקצוע / נושא / כיתה / מילים מתוך חדשות..." />
+          <select id="scope">
+            <option value="all">הכל</option>
+            <option value="exams">מבחנים</option>
+            <option value="news">חדשות</option>
+            <option value="board">לוח מודעות</option>
+          </select>
+          <button class="btn primary" id="refreshBtn" type="button">טען + חפש</button>
+        </div>
+
+        <div class="hint">
+          עובד לפי <b>localStorage.current_grade</b> (z/h/t).  
+          אם אין — תבחר שכבה פה בצד.
+        </div>
+
+        <div class="list" id="results"></div>
+      </div>
+
+      <!-- SIDE -->
+      <div class="card">
+        <div class="sideBox">
+          <div class="savedHead">
+            <h2 style="margin:0;">⭐ חשובים</h2>
+            <button class="btn" id="clearSavedBtn" type="button">נקה</button>
+          </div>
+          <div class="small">נשמר מקומית (localStorage) – לא צריך התחברות.</div>
+          <div class="list" id="savedList" style="margin-top:12px;"></div>
+        </div>
+
+        <div class="sideBox" style="margin-top:12px;">
+          <h2 style="margin:0 0 10px;">⚙️ שכבה</h2>
+          <div class="row">
+            <button class="btn" data-grade="z" type="button">ז׳</button>
+            <button class="btn" data-grade="h" type="button">ח׳</button>
+            <button class="btn" data-grade="t" type="button">ט׳</button>
+          </div>
+          <div class="hint">לחיצה משנה את <b>localStorage.current_grade</b> ומרעננת.</div>
+        </div>
+
+        <div class="hint danger" id="errBox" style="display:none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { db } from "./firebase-config.js";
+    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+    /* =========================
+       SETTINGS / STORAGE
+    ========================= */
+    const THEME_KEY = "yaar_theme";
+    const GRADE_KEY = "current_grade";
+    const SAVED_KEY = "yaar_saved_v1";
+
+    const GRADE_LABEL = { z:"ז׳", h:"ח׳", t:"ט׳" };
+
+    const $ = (id) => document.getElementById(id);
+
+    function setErr(msg){
+      const box = $("errBox");
+      box.style.display = msg ? "block" : "none";
+      box.textContent = msg || "";
+    }
+
+    function escapeHtml(str){
+      return String(str ?? "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;");
+    }
+
+    function norm(s){
+      return String(s ?? "")
+        .toLowerCase()
+        .replace(/\s+/g," ")
+        .trim();
+    }
+
+    /* =========================
+       THEME
+    ========================= */
+    function applyTheme(theme){
+      document.documentElement.setAttribute("data-theme", theme);
+      $("themeBtn").textContent = theme === "dark" ? "🌙" : "☀️";
+      try{ localStorage.setItem(THEME_KEY, theme); }catch{}
+    }
+    (function initTheme(){
+      let saved = "dark";
+      try{
+        saved = localStorage.getItem(THEME_KEY) || "dark";
+      }catch{}
+      applyTheme(saved);
+      $("themeBtn").addEventListener("click", ()=>{
+        const cur = document.documentElement.getAttribute("data-theme") || "dark";
+        applyTheme(cur === "dark" ? "light" : "dark");
+      });
+    })();
+
+    /* =========================
+       GRADE
+    ========================= */
+    function getGrade(){
+      try{
+        const g = localStorage.getItem(GRADE_KEY);
+        return (g === "z" || g === "h" || g === "t") ? g : "";
+      }catch{
+        return "";
+      }
+    }
+    function setGrade(g){
+      try{ localStorage.setItem(GRADE_KEY, g); }catch{}
+      renderGradeChip();
+    }
+    function renderGradeChip(){
+      const g = getGrade();
+      $("gradeChip").innerHTML = `שכבה: <b>${g ? GRADE_LABEL[g] : "—"}</b>`;
+    }
+    renderGradeChip();
+
+    document.querySelectorAll("[data-grade]").forEach(btn=>{
+      btn.addEventListener("click", async ()=>{
+        setErr("");
+        setGrade(btn.getAttribute("data-grade"));
+        await refreshAndSearch();
+      });
+    });
+
+    /* =========================
+       SAVED (⭐)
+    ========================= */
+    function loadSaved(){
+      try{
+        const raw = localStorage.getItem(SAVED_KEY);
+        const arr = raw ? JSON.parse(raw) : [];
+        return Array.isArray(arr) ? arr : [];
+      }catch{
+        return [];
+      }
+    }
+    function saveSaved(arr){
+      try{ localStorage.setItem(SAVED_KEY, JSON.stringify(arr)); }catch{}
+    }
+    function isSaved(key){
+      return loadSaved().some(x => x && x.key === key);
+    }
+    function toggleSaved(item){
+      const arr = loadSaved();
+      const i = arr.findIndex(x => x && x.key === item.key);
+      if(i >= 0) arr.splice(i,1);
+      else arr.unshift(item);
+      saveSaved(arr.slice(0,80)); // limit
+      renderSaved();
+    }
+    function clearSaved(){
+      saveSaved([]);
+      renderSaved();
+    }
+
+    $("clearSavedBtn").addEventListener("click", clearSaved);
+
+    function renderSaved(){
+      const list = $("savedList");
+      const arr = loadSaved();
+      if(!arr.length){
+        list.innerHTML = `<div class="empty">אין עדיין פריטים חשובים ⭐</div>`;
+        return;
+      }
+      list.innerHTML = arr.map(x => savedCardHtml(x)).join("");
+      list.querySelectorAll("[data-open]").forEach(a=>{
+        a.addEventListener("click", (e)=>{
+          // normal link
+        });
+      });
+      list.querySelectorAll("[data-unsave]").forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          toggleSaved({key: btn.getAttribute("data-unsave")});
+        });
+      });
+    }
+
+    function savedCardHtml(x){
+      const title = escapeHtml(x.title || "ללא כותרת");
+      const meta  = escapeHtml(x.meta || "");
+      const type  = escapeHtml(x.type || "");
+      const url   = escapeHtml(x.url || "#");
+
+      return `
+        <div class="item">
+          <div class="itemTop">
+            <div>
+              <div class="title">${title}</div>
+              <div class="tags">
+                ${type ? `<span class="tag">⭐ ${type}</span>` : ""}
+                ${meta ? `<span class="tag">${meta}</span>` : ""}
+              </div>
+            </div>
+          </div>
+          <div class="actions">
+            <a class="iconBtn openLink" data-open href="${url}">פתח</a>
+            <button class="iconBtn star on" data-unsave="${escapeHtml(x.key)}" type="button">הסר ⭐</button>
+          </div>
+        </div>
+      `;
+    }
+
+    renderSaved();
+
+    /* =========================
+       FIRESTORE LOAD
+       - exams:  /exams/{grade}  => { items: [...] }
+       - news:   /news/{grade}   => { items: [...] }
+       - board:  /board/general  => { items: [...] }
+    ========================= */
+    async function getItems(collectionName, docId){
+      const snap = await getDoc(doc(db, collectionName, docId));
+      if(!snap.exists()) return [];
+      const data = snap.data() || {};
+      const items = Array.isArray(data.items) ? data.items : [];
+      return items;
+    }
+
+    /* =========================
+       DATE HELPERS (for calendar)
+    ========================= */
+    function parseDateTime(dateStr, timeStr){
+      // accepts: "31/12/25" or "31/12/2025" or "31.12.25"
+      const d = String(dateStr || "").replace(/\./g,"/").trim();
+      const t = String(timeStr || "").trim();
+
+      const m = d.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/);
+      if(!m) return null;
+
+      let day = parseInt(m[1],10);
+      let mon = parseInt(m[2],10);
+      let year = parseInt(m[3],10);
+      if(year < 100) year = 2000 + year;
+
+      let hh = 10, mm = 0; // default
+      const tm = t.match(/^(\d{1,2}):(\d{2})$/);
+      if(tm){
+        hh = parseInt(tm[1],10);
+        mm = parseInt(tm[2],10);
+      }
+
+      const dt = new Date(year, mon-1, day, hh, mm, 0, 0);
+      if(isNaN(dt.getTime())) return null;
+      return dt;
+    }
+
+    function pad2(n){ return String(n).padStart(2,"0"); }
+
+    function toICSDate(dt){
+      // local -> floating time (works fine for school calendar)
+      return `${dt.getFullYear()}${pad2(dt.getMonth()+1)}${pad2(dt.getDate())}T${pad2(dt.getHours())}${pad2(dt.getMinutes())}00`;
+    }
+
+    function downloadICS({title, details, start, end}){
+      const uid = `yaar-${Math.random().toString(16).slice(2)}@yaar`;
+      const now = new Date();
+      const ics =
+`BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Yaar HaEmek//Exams//HE
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:${uid}
+DTSTAMP:${toICSDate(now)}
+DTSTART:${toICSDate(start)}
+DTEND:${toICSDate(end)}
+SUMMARY:${(title||"מבחן").replace(/\n/g," ")}
+DESCRIPTION:${(details||"").replace(/\n/g,"\\n")}
+END:VEVENT
+END:VCALENDAR`;
+
+      const blob = new Blob([ics], {type:"text/calendar;charset=utf-8"});
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `${(title||"exam").replace(/[^\w\u0590-\u05FF]+/g,"_")}.ics`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+    }
+
+    function googleCalLink({title, details, start, end}){
+      // Google expects UTC-ish; we’ll pass local ISO but formatted
+      function fmt(dt){
+        // Convert to UTC string format YYYYMMDDTHHMMSSZ
+        const z = new Date(dt.getTime() - dt.getTimezoneOffset()*60000);
+        const s = z.toISOString().replace(/[-:]/g,"").replace(/\.\d{3}Z$/,"Z");
+        return s;
+      }
+      const params = new URLSearchParams({
+        action:"TEMPLATE",
+        text: title || "מבחן",
+        details: details || "",
+        dates: `${fmt(start)}/${fmt(end)}`
+      });
+      return `https://calendar.google.com/calendar/render?${params.toString()}`;
+    }
+
+    /* =========================
+       RENDER RESULT CARDS
+    ========================= */
+    function buildKey(type, grade, index){
+      return `${type}:${grade || "general"}:${index}`;
+    }
+
+    function articleUrl(type, grade, index){
+      // אם יש לך article.html כבר, זה יפתח את הפריט
+      if(type === "board") return `article.html?type=board&index=${index}`;
+      if(type === "news")  return `article.html?type=news&grade=${grade}&index=${index}`;
+      if(type === "exams") return `all-exams.html?grade=${grade}#ex-${index}`; // fallback
+      return "#";
+    }
+
+    function resultCardHtml({type, grade, index, title, body, meta, dateStr, timeStr, classId}){
+      const key = buildKey(type, grade, index);
+      const saved = isSaved(key);
+
+      const tLabel =
+        type === "exams" ? "מבחן" :
+        type === "news"  ? "חדשות" :
+        "לוח מודעות";
+
+      const url = articleUrl(type, grade, index);
+
+      const tags = [
+        `<span class="tag">${tLabel}</span>`,
+        grade ? `<span class="tag">שכבה ${GRADE_LABEL[grade] || grade}</span>` : "",
+        classId ? `<span class="tag">כיתה ${escapeHtml(classId)}</span>` : "",
+        meta ? `<span class="tag">${escapeHtml(meta)}</span>` : "",
+        (dateStr || timeStr) ? `<span class="tag">📅 ${escapeHtml([dateStr,timeStr].filter(Boolean).join(" · "))}</span>` : ""
+      ].filter(Boolean).join("");
+
+      // calendar only for exams that have date
+      const hasCal = (type === "exams") && dateStr;
+
+      return `
+        <div class="item" data-key="${escapeHtml(key)}">
+          <div class="itemTop">
+            <div>
+              <div class="title">${escapeHtml(title || "ללא כותרת")}</div>
+              <div class="tags">${tags}</div>
+            </div>
+          </div>
+
+          ${body ? `<div class="body">${escapeHtml(body)}</div>` : ""}
+
+          <div class="actions">
+            <a class="iconBtn openLink" href="${escapeHtml(url)}" target="_blank" rel="noopener">פתח</a>
+
+            <button class="iconBtn star ${saved ? "on" : ""}" data-star="${escapeHtml(key)}" type="button">
+              ${saved ? "⭐ שמור" : "☆ שמור"}
+            </button>
+
+            ${hasCal ? `
+              <button class="iconBtn calendarBtn" data-cal="${escapeHtml(key)}" type="button">הוסף ליומן</button>
+            ` : ""}
+          </div>
+        </div>
+      `;
+    }
+
+    function bindResultActions(itemsMap){
+      // STAR
+      document.querySelectorAll("[data-star]").forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          const key = btn.getAttribute("data-star");
+          const item = itemsMap.get(key);
+          if(!item) return;
+
+          toggleSaved({
+            key,
+            type: item.typeLabel,
+            title: item.title,
+            meta: item.metaLine,
+            url: item.url
+          });
+
+          // update button text
+          const nowSaved = isSaved(key);
+          btn.classList.toggle("on", nowSaved);
+          btn.textContent = nowSaved ? "⭐ שמור" : "☆ שמור";
+        });
+      });
+
+      // CALENDAR
+      document.querySelectorAll("[data-cal]").forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          const key = btn.getAttribute("data-cal");
+          const item = itemsMap.get(key);
+          if(!item) return;
+
+          const start = parseDateTime(item.dateStr, item.timeStr);
+          if(!start){
+            alert("אין תאריך/שעה תקינים בשביל יומן.");
+            return;
+          }
+          const end = new Date(start.getTime() + 60*60*1000); // שעה
+          const title = `מבחן: ${item.title || "ללא מקצוע"}`;
+          const details = [
+            item.metaLine ? `כיתה/שכבה: ${item.metaLine}` : "",
+            item.body ? `נושא: ${item.body}` : ""
+          ].filter(Boolean).join("\n");
+
+          // פותח גוגל קלנדר בטאב חדש + מוריד ICS (הכי חזק)
+          window.open(googleCalLink({title, details, start, end}), "_blank", "noopener");
+          downloadICS({title, details, start, end});
+        });
+      });
+    }
+
+    /* =========================
+       SEARCH PIPELINE
+    ========================= */
+    async function refreshAndSearch(){
+      setErr("");
+      const grade = getGrade();
+      const q = norm($("q").value);
+      const scope = $("scope").value;
+
+      if(!grade){
+        $("results").innerHTML = `<div class="empty">בחר שכבה בצד (ז׳/ח׳/ט׳) כדי לטעון נתונים.</div>`;
+        return;
+      }
+
+      $("results").innerHTML = `<div class="empty">טוען נתונים…</div>`;
+
+      try{
+        const wantExams = (scope === "all" || scope === "exams");
+        const wantNews  = (scope === "all" || scope === "news");
+        const wantBoard = (scope === "all" || scope === "board");
+
+        const [exams, news, board] = await Promise.all([
+          wantExams ? getItems("exams", grade) : Promise.resolve([]),
+          wantNews  ? getItems("news", grade)  : Promise.resolve([]),
+          wantBoard ? getItems("board", "general") : Promise.resolve([])
+        ]);
+
+        // normalize + build searchable list
+        const all = [];
+
+        exams.forEach((x, i)=>{
+          all.push({
+            type:"exams",
+            grade,
+            index:i,
+            title: x.subject || x.title || "מבחן",
+            body: x.topic || x.body || "",
+            meta: x.classId ? `כיתה ${x.classId}` : "",
+            classId: x.classId || "",
+            dateStr: x.date || "",
+            timeStr: x.time || ""
+          });
+        });
+
+        news.forEach((x, i)=>{
+          all.push({
+            type:"news",
+            grade,
+            index:i,
+            title: x.title || "ידיעה",
+            body: x.body || "",
+            meta: x.classId ? `כיתה ${x.classId}` : "",
+            classId: x.classId || "",
+            dateStr: x.date || "",
+            timeStr: x.time || ""
+          });
+        });
+
+        board.forEach((x, i)=>{
+          all.push({
+            type:"board",
+            grade:"",
+            index:i,
+            title: x.title || "מודעה",
+            body: x.body || "",
+            meta: x.meta || "",
+            classId: x.classId || "",
+            dateStr: x.date || "",
+            timeStr: x.time || ""
+          });
+        });
+
+        // filter by query
+        const filtered = !q ? all : all.filter(it=>{
+          const hay = norm([
+            it.title, it.body, it.meta, it.classId, it.dateStr, it.timeStr,
+            it.type === "board" ? "board לוח מודעות" :
+            it.type === "news" ? "news חדשות" : "exams מבחנים"
+          ].join(" "));
+          return hay.includes(q);
+        });
+
+        // sort: exams by date first, others keep order
+        filtered.sort((a,b)=>{
+          if(a.type === "exams" && b.type === "exams"){
+            const da = parseDateTime(a.dateStr, a.timeStr)?.getTime() ?? 9e18;
+            const db = parseDateTime(b.dateStr, b.timeStr)?.getTime() ?? 9e18;
+            return da - db;
+          }
+          return 0;
+        });
+
+        if(!filtered.length){
+          $("results").innerHTML = `<div class="empty">לא מצאתי תוצאות 😅</div>`;
+          return;
+        }
+
+        // map for actions
+        const itemsMap = new Map();
+
+        $("results").innerHTML = filtered.slice(0, 120).map(it=>{
+          const key = buildKey(it.type, it.grade, it.index);
+          const url = articleUrl(it.type, it.grade, it.index);
+
+          itemsMap.set(key, {
+            key,
+            typeLabel: it.type === "exams" ? "מבחן" : it.type === "news" ? "חדשות" : "לוח מודעות",
+            title: it.title,
+            body: it.body,
+            dateStr: it.dateStr,
+            timeStr: it.timeStr,
+            metaLine: it.meta || (it.grade ? `שכבה ${GRADE_LABEL[it.grade]}` : ""),
+            url
+          });
+
+          return resultCardHtml({
+            type: it.type,
+            grade: it.grade,
+            index: it.index,
+            title: it.title,
+            body: it.body,
+            meta: it.meta,
+            dateStr: it.dateStr,
+            timeStr: it.timeStr,
+            classId: it.classId
+          });
+        }).join("");
+
+        bindResultActions(itemsMap);
+        renderSaved();
+      }catch(e){
+        console.error(e);
+        setErr("שגיאה בטעינת נתונים. בדוק שהקולקשנים/מסלולים נכונים: exams/{grade}, news/{grade}, board/general");
+        $("results").innerHTML = `<div class="empty">נפל. תראה שגיאה בצד.</div>`;
+      }
+    }
+
+    $("refreshBtn").addEventListener("click", refreshAndSearch);
+    $("q").addEventListener("keydown", (e)=>{
+      if(e.key === "Enter") refreshAndSearch();
+    });
+
+    // Auto-load once
+    refreshAndSearch();
+  </script>
+</body>
+</html>

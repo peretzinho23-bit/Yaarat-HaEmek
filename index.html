@@ -1944,6 +1944,7 @@ html[data-theme="dark"] .hero-latest-title{
 </header>
 
 
+
   <section class="hero hero-home">
     <div class="hero-slides">
       <div class="hero-slide"></div>
@@ -3898,6 +3899,81 @@ html[data-theme="dark"] .hero-latest-title{
         .catch(err => console.error('SW registration failed:', err));
     }
   </script>
+<script>
+(() => {
+  const input = document.getElementById("globalSearchInput");
+  const resBox = document.getElementById("globalSearchResults");
+  const clearBtn = document.getElementById("globalSearchClear");
+  if(!input || !resBox) return;
+
+  const candidates = () => {
+    // תתאים בקלות: לוקח כותרות + כרטיסים נפוצים
+    const nodes = Array.from(document.querySelectorAll(
+      "h1,h2,h3,.home-board-item,.home-exam-item,.grade-card,.card,.news-card,a[href]"
+    ));
+
+    // מסנן כפילויות ומחזיר “אובייקטים”
+    const out = [];
+    const seen = new Set();
+    nodes.forEach(n => {
+      const text = (n.innerText || n.textContent || "").trim();
+      if(text.length < 3) return;
+
+      let target = n.closest("section") || n.closest("[id]") || n;
+      const id = target.id || n.id || "";
+      if(!id) return;
+
+      const key = id + "::" + text.slice(0,40);
+      if(seen.has(key)) return;
+      seen.add(key);
+
+      out.push({ text, id });
+    });
+    return out;
+  };
+
+  const data = candidates();
+
+  function render(q){
+    q = q.trim().toLowerCase();
+    if(!q){
+      resBox.hidden = true;
+      resBox.innerHTML = "";
+      return;
+    }
+
+    const hits = data
+      .filter(x => x.text.toLowerCase().includes(q))
+      .slice(0, 8);
+
+    if(!hits.length){
+      resBox.hidden = false;
+      resBox.innerHTML = `<div class="gs-item"><div class="gs-title">לא מצאתי כלום 😅</div><div class="gs-meta">נסה מילה אחרת</div></div>`;
+      return;
+    }
+
+    resBox.hidden = false;
+    resBox.innerHTML = hits.map(h => `
+      <a class="gs-item" href="#${h.id}">
+        <div class="gs-title">${escapeHtml(h.text.slice(0,60))}</div>
+        <div class="gs-meta">פתח</div>
+      </a>
+    `).join("");
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+
+  input.addEventListener("input", () => render(input.value));
+  clearBtn.addEventListener("click", () => { input.value=""; render(""); input.focus(); });
+
+  document.addEventListener("click", (e) => {
+    if(resBox.contains(e.target) || input.contains(e.target)) return;
+    resBox.hidden = true;
+  });
+})();
+</script>
 
 <script type="module" src="firebase-config.js"></script>
 <script src="accessibility.js"></script>
