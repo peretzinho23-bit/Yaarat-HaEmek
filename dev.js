@@ -1,9 +1,11 @@
 import { app, auth, db } from "./firebase-config.js";
 import {
   signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
   onAuthStateChanged,
   signOut,
   getAuth
+  
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
 import {
@@ -20,6 +22,7 @@ import {
   query,
   orderBy,
   limit
+  
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
@@ -669,7 +672,7 @@ function renderClassCard(c){
 
   el.querySelector('[data-act="open"]').addEventListener("click", () => {
     // Your class page path might differ; keep it simple:
-    window.open(`class.html?grade=${encodeURIComponent(grade)}&class=${encodeURIComponent(name)}`, "_blank", "noopener,noreferrer");
+window.open(`class.html?grade=${encodeURIComponent(grade)}&class=${encodeURIComponent(id)}`, "_blank");
   });
 
   el.querySelector('[data-act="del"]').addEventListener("click", async () => {
@@ -693,7 +696,8 @@ async function createClass(){
   if (!nameRaw) { alert("חייבים שם כיתה"); return; }
 
   const name = nameRaw;
-  const id = slugify(`${grade}-${name}`) || `${grade}-${Date.now()}`;
+const safeName = name.replaceAll("/", "-").trim();
+const id = `${grade}-${safeName}`;
 
   try {
     await setDoc(doc(db, "classes", id), {
@@ -794,9 +798,12 @@ btnOpenPage?.addEventListener("click", () => {
 ============================= */
 
 // Only DEV emails can approve / manage users
-function isDevEmailCurrent() {
-  return DEV_EMAILS.includes(norm(auth.currentUser?.email));
+function isDevEmailCurrent(){
+  const me = norm(auth.currentUser?.email);
+  return DEV_EMAILS.includes(me);
 }
+
+
 
 /* Secondary Auth (create user without kicking DEV) */
 function getSecondaryAuth() {
@@ -894,7 +901,7 @@ function renderRequestRow(r) {
     <div class="small">תפקיד שביקש: <b>${escapeHtml(r.role || "-")}</b></div>
     <div class="small">סיבה: <b>${escapeHtml(r.reason || "-")}</b></div>
     <div class="small">הודעה: ${escapeHtml(r.message || "-")}</div>
-    <div class="small muted">נשלח: ${formatTime(r.createdAt)}</div>
+<div class="small muted">נשלח: ${fmtTime(r.createdAt)}</div>
   `;
 
   const tdPerm = document.createElement("td");
