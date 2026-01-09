@@ -1577,6 +1577,139 @@ html[data-theme="dark"] .exam-star-tag{
   border-color: rgba(250,204,21,.22);
   color:#fff7ed;
 }
+/* =========================
+   EXAM ACTION BUTTONS — FIX
+   (כפתורי "חשוב" + "הוסף ליומן")
+   ========================= */
+
+/* העטיפה של הכפתורים */
+.exam-actions{
+  display:flex !important;
+  justify-content:flex-end !important;
+  gap:10px !important;
+  flex-wrap:wrap !important;
+  margin-top:12px !important;
+}
+
+/* אם אצלך זה a ולא button — זה יתפוס גם */
+.exam-actions button,
+.exam-actions a{
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* הכפתור עצמו (גלולה קטנה) */
+.exam-action-btn{
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+
+  padding:8px 12px;
+  border-radius:999px;
+
+  font-weight:900;
+  font-size:.88rem;
+  line-height:1;
+
+  border:1px solid rgba(148,163,184,.28);
+  background: rgba(255,255,255,.78);
+  color:#0f172a;
+
+  box-shadow: 0 10px 24px rgba(15,23,42,.08);
+  transition: transform .15s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+}
+
+.exam-action-btn:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 14px 34px rgba(15,23,42,.12);
+  border-color: rgba(37,99,235,.22);
+  background: rgba(255,255,255,.92);
+}
+
+/* האייקון */
+.exam-action-btn .ico{
+  width:22px;
+  height:22px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:999px;
+  background: rgba(37,99,235,.10);
+  border:1px solid rgba(37,99,235,.16);
+  font-size:1rem;
+}
+
+/* וריאציה: "הוסף ליומן" */
+.exam-action-btn.calendar .ico{
+  background: rgba(59,130,246,.12);
+  border-color: rgba(59,130,246,.18);
+}
+
+/* וריאציה: "חשוב" */
+.exam-action-btn.star .ico{
+  background: rgba(250,204,21,.16);
+  border-color: rgba(250,204,21,.22);
+}
+
+/* מצב מסומן כחשוב */
+.exam-action-btn.star.is-starred{
+  border-color: rgba(250,204,21,.35);
+  background: linear-gradient(135deg, rgba(250,204,21,.18), rgba(56,189,248,.10));
+}
+.exam-action-btn.star.is-starred .ico{
+  background: rgba(250,204,21,.22);
+  border-color: rgba(250,204,21,.32);
+}
+
+/* disabled */
+.exam-action-btn[disabled],
+.exam-action-btn.is-disabled{
+  cursor:not-allowed;
+  opacity:.45;
+  transform:none !important;
+  box-shadow:none !important;
+}
+
+/* ===== DARK MODE ===== */
+html[data-theme="dark"] .exam-action-btn{
+  background: rgba(2,6,23,.35);
+  border-color: rgba(148,163,184,.18);
+  color:#e5e7eb;
+  box-shadow: 0 14px 40px rgba(0,0,0,.28);
+}
+html[data-theme="dark"] .exam-action-btn:hover{
+  background: rgba(2,6,23,.48);
+  border-color: rgba(56,189,248,.22);
+  box-shadow: 0 18px 55px rgba(0,0,0,.38);
+}
+html[data-theme="dark"] .exam-action-btn .ico{
+  background: rgba(56,189,248,.12);
+  border-color: rgba(56,189,248,.16);
+}
+html[data-theme="dark"] .exam-action-btn.star .ico{
+  background: rgba(250,204,21,.14);
+  border-color: rgba(250,204,21,.22);
+}
+/* FORCE actions to be ONE ROW */
+.exam-actions{
+  display:flex !important;
+  flex-direction:row !important;
+  flex-wrap:nowrap !important;   /* ❗ לא לרדת שורה */
+  gap:8px;
+  align-items:center;
+}
+
+/* FORCE buttons to NOT take full width */
+.exam-action-btn{
+  width:auto !important;
+  max-width:unset !important;
+  display:inline-flex !important;
+  white-space:nowrap !important; /* ❗ טקסט לא נשבר */
+}
+
 </style>
 
 <script>
