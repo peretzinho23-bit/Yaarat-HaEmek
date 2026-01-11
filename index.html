@@ -3364,24 +3364,20 @@ html[data-theme="dark"] .hero-latest-title{
     }
 
 function renderSnakeGame(root){
-  // ===== DINO RUN · ULTRA (clean + no CSS conflicts) =====
   const ID = "dnx-ultra-v1";
   const STYLE_ID = "dnx-ultra-style";
 
-  // wipe old if rerender
   root.innerHTML = "";
 
-  // ✅ kill previous instance on same root (prevents random double listeners)
   if (root.__dnxCleanup){
     try { root.__dnxCleanup(); } catch(e){}
     root.__dnxCleanup = null;
   }
 
-  // inject CSS once
   if (!document.getElementById(STYLE_ID)){
     const st = document.createElement("style");
     st.id = STYLE_ID;
-    st.textContent = `/* ===== DINO ULTRA – isolated CSS ===== */
+    st.textContent = `
 :root{
   --dnx-bg: rgba(255,255,255,.80);
   --dnx-bg2: rgba(248,250,252,.72);
@@ -3403,37 +3399,14 @@ function renderSnakeGame(root){
   --dnx-accBorder: rgba(56,189,248,.50);
   --dnx-accGlow: 0 18px 55px rgba(56,189,248,.22);
 }
+
 .dnx-stage, .dnx-mobile, .dnx-btn, .dnx-canvas {
   touch-action: none;
   -webkit-user-select: none;
   user-select: none;
 }
-.dnx-mobile{
-  display:none;
-  gap:10px;
-  width:100%;
-  justify-content:space-between;
-  padding:0 2px;
-}
-@media (max-width:760px){
-  .dnx-mobile{
-    display:flex !important;
-    position: static;
-    width: 100%;
-    padding: 0 2px;
-    margin-top: 10px;
-    gap: 10px;
-    justify-content: space-between;
-  }
-  .dnx-mobile .dnx-btn{
-    flex: 1;
-    padding: 14px 12px;
-    border-radius: 16px;
-    font-size: 1rem;
-  }
-}
 
-
+/* dark theme vars */
 html[data-theme="dark"]{
   --dnx-bg: rgba(2,6,23,.62);
   --dnx-bg2: rgba(15,23,42,.52);
@@ -3524,29 +3497,6 @@ html[data-theme="dark"]{
   touch-action: none;
 }
 
-
-.dnx-mobile{
-  display:none;
-  gap:10px;
-  width:100%;
-  justify-content:space-between;
-  padding:0 2px;
-}
-@media (max-width:760px){
-  .dnx-mobile{
-    display:flex !important;
-    margin-top:10px;
-  }
-  .dnx-mobile .dnx-btn{
-    flex:1;
-    padding:14px 12px;
-    border-radius:16px;
-    font-size:1rem;
-  }
-}
-.dnx-wrap{ gap: 10px; }
-.dnx-mobile{ margin-bottom: 6px; }
-
 .dnx-btn{
   padding:10px 12px;
   border-radius:14px;
@@ -3559,7 +3509,7 @@ html[data-theme="dark"]{
   user-select:none;
   transition: transform .08s ease, filter .12s ease;
   font-family: system-ui, -apple-system, Segoe UI, Arial;
-touch-action: none;
+  touch-action:none;
 }
 .dnx-btn:hover{filter:brightness(1.03)}
 .dnx-btn:active{transform:translateY(1px)}
@@ -3570,7 +3520,7 @@ touch-action: none;
   box-shadow: var(--dnx-accGlow);
 }
 
-/* ✅ Overlay לא חוסם טאצ' */
+/* Overlay */
 .dnx-overlay{
   position:absolute;
   inset:0;
@@ -3605,14 +3555,11 @@ touch-action: none;
   color: var(--dnx-text);
   font-family: system-ui, -apple-system, Segoe UI, Arial;
 }
-
 .dnx-title{font-weight:1150; font-size:1.12rem}
 .dnx-sub{opacity:.92; margin-top:6px; color:var(--dnx-muted); font-weight:900; line-height:1.35}
 .dnx-row{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px}
 
-/* =========================
-   🎮 Mobile Joystick (PRO)
-   ========================= */
+/* Joystick (exists, but hidden on mobile) */
 .dnx-joywrap{
   position:absolute;
   left:12px;
@@ -3623,7 +3570,6 @@ touch-action: none;
   gap:10px;
   pointer-events:auto;
 }
-
 .dnx-joy{
   width:112px;
   height:112px;
@@ -3637,11 +3583,9 @@ touch-action: none;
   touch-action: none;
   user-select:none;
 }
-
 html[data-theme="dark"] .dnx-joy{
   background: linear-gradient(135deg, rgba(2,6,23,.38), rgba(15,23,42,.20));
 }
-
 .dnx-joy::after{
   content:"";
   position:absolute;
@@ -3651,7 +3595,6 @@ html[data-theme="dark"] .dnx-joy{
   opacity:.9;
   pointer-events:none;
 }
-
 .dnx-joy-knob{
   width:44px;
   height:44px;
@@ -3666,93 +3609,114 @@ html[data-theme="dark"] .dnx-joy{
   pointer-events:none;
 }
 
-.dnx-joyhint{
-  font-family: system-ui, -apple-system, Segoe UI, Arial;
-  color: var(--dnx-text);
-  font-weight: 1000;
-  font-size: .88rem;
-  opacity: .9;
-  background: linear-gradient(135deg, var(--dnx-bg), var(--dnx-bg2));
-  border:1px solid var(--dnx-border);
-  border-radius: 14px;
-  padding:10px 12px;
-  box-shadow: var(--dnx-shadow2);
-  backdrop-filter: var(--dnx-glass);
-  -webkit-backdrop-filter: var(--dnx-glass);
-  pointer-events:none;
+/* ✅ Mobile buttons OUTSIDE stage (one definition only) */
+.dnx-mobile{
+  display:none;
+  gap:10px;
+  width:100%;
+  justify-content:space-between;
+  padding:0 2px;
+  margin-bottom: 6px;
 }
-
-.dnx-actions{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-}
-.dnx-actions .dnx-btn{ min-width: 56px; padding:10px 12px; }
-
 @media (max-width:760px){
   .dnx-tip{display:none}
-
-  /* HUD יותר נקי */
   .dnx-hud{padding:10px 10px; gap:8px}
   .dnx-left{gap:6px}
   .dnx-pill{padding:6px 10px; font-size:.9rem}
-
-  /* חשוב: למנוע גלילה/זום בזמן משחק */
   .dnx-stage{ border-radius:16px; aspect-ratio: 16 / 10; touch-action:none; }
   .dnx-canvas{ touch-action:none; }
 
-  /* ❌ להסתיר ג'ויסטיק במובייל */
   .dnx-joywrap{ display:none !important; }
 
-  /* ✅ להפעיל 2 כפתורים גדולים נקיים */
   .dnx-mobile{
     display:flex !important;
-    left:12px;
-    right:12px;
-    bottom:12px;
-    width: calc(100% - 24px);
+    position: static;
+    width: 100%;
+    padding: 0 2px;
+    margin-top: 10px;
+    gap: 10px;
     justify-content: space-between;
-    gap:10px;
   }
-
   .dnx-mobile .dnx-btn{
     flex: 1;
-    padding:14px 12px;
-    border-radius:16px;
-    font-size:1rem;
+    padding: 14px 12px;
+    border-radius: 16px;
+    font-size: 1rem;
   }
 }
-
-}`;
+`;
     document.head.appendChild(st);
   }
 
-  // build UI
   const wrap = document.createElement("div");
   wrap.className = "dnx-wrap";
   wrap.id = ID;
 
-wrap.innerHTML = `
-  <div class="dnx-hud" dir="rtl"> ... </div>
-
-  <div class="dnx-stage" dir="rtl">
-    <canvas id="dnxCanvas" class="dnx-canvas" width="960" height="560"></canvas>
-
-    <div class="dnx-joywrap" aria-label="פקדי מובייל"> ... </div>
-
-    <div class="dnx-overlay" id="dnxOverlay"> ... </div>
+  wrap.innerHTML = `
+<div class="dnx-hud" dir="rtl">
+  <div class="dnx-left">
+    <div class="dnx-pill dnx-pill-acc">Dino 🦖</div>
+    <div class="dnx-pill">ניקוד: <span id="dnxScore">0</span></div>
+    <div class="dnx-pill">שיא: <span id="dnxBest">0</span></div>
+    <div class="dnx-pill">מהירות: <span id="dnxSpd">1</span>x</div>
+    <div class="dnx-pill">מצב: <span id="dnxMode">יום</span></div>
   </div>
 
-  <!-- ✅ mobile buttons OUTSIDE stage -->
-  <div class="dnx-mobile" aria-label="פקדים למובייל">
-    <button type="button" id="dnxJump" class="dnx-btn dnx-btn-acc">קפיצה</button>
-    <button type="button" id="dnxDuck" class="dnx-btn">התכופף</button>
+  <div class="dnx-left">
+    <div class="dnx-tip">מחשב: WASD/חצים · מובייל: כפתורים</div>
+    <button type="button" id="dnxMute" class="dnx-btn" aria-label="Mute">🔈</button>
+    <button type="button" id="dnxRestart" class="dnx-btn" aria-label="Restart">איפוס</button>
+    <button type="button" id="dnxPause" class="dnx-btn dnx-btn-acc" aria-label="Pause">עצירה</button>
   </div>
+</div>
+
+<div class="dnx-stage" dir="rtl">
+  <canvas id="dnxCanvas" class="dnx-canvas" width="960" height="560"></canvas>
+
+  <div class="dnx-joywrap" aria-label="פקדי מובייל">
+    <div id="dnxJoy" class="dnx-joy" aria-label="Joystick">
+      <div id="dnxJoyKnob" class="dnx-joy-knob"></div>
+    </div>
+  </div>
+
+  <div class="dnx-overlay" id="dnxOverlay">
+    <div class="dnx-card" id="dnxStartCard">
+      <div class="dnx-title">Dino 🦖</div>
+      <div class="dnx-sub">מחשב: רווח/חץ למעלה לקפיצה · חץ למטה להתכופף · P עצירה · R איפוס · M השתקה</div>
+      <div class="dnx-row">
+        <button type="button" id="dnxStart" class="dnx-btn dnx-btn-acc">התחל</button>
+        <button type="button" id="dnxStartMute" class="dnx-btn">התחל בשקט</button>
+      </div>
+    </div>
+
+    <div class="dnx-card" id="dnxOverCard" style="display:none">
+      <div class="dnx-title">נפסלת</div>
+      <div class="dnx-sub">לחץ "איפוס" או נסה שוב</div>
+      <div class="dnx-row">
+        <button type="button" id="dnxOverRestart" class="dnx-btn dnx-btn-acc">נסה שוב</button>
+        <button type="button" id="dnxOverMute" class="dnx-btn">🔈</button>
+      </div>
+    </div>
+
+    <div class="dnx-card" id="dnxPausedCard" style="display:none">
+      <div class="dnx-title">מושהה</div>
+      <div class="dnx-sub">המשך או שנה קול</div>
+      <div class="dnx-row">
+        <button type="button" id="dnxResume" class="dnx-btn dnx-btn-acc">המשך</button>
+        <button type="button" id="dnxPauseMute" class="dnx-btn">🔈</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="dnx-mobile" aria-label="פקדים למובייל">
+  <button type="button" id="dnxJump" class="dnx-btn dnx-btn-acc">קפיצה</button>
+  <button type="button" id="dnxDuck" class="dnx-btn">התכופף</button>
+</div>
 `;
 
   root.appendChild(wrap);
 
-  // ===== Grab elements
   const canvas = wrap.querySelector("#dnxCanvas");
   const ctx = canvas.getContext("2d");
 
@@ -3784,7 +3748,6 @@ wrap.innerHTML = `
   const joyEl = wrap.querySelector("#dnxJoy");
   const joyKnob = wrap.querySelector("#dnxJoyKnob");
 
-  // ===== Brand
   function pickBrand(){
     const cs = getComputedStyle(document.documentElement);
     const vars = ["--accent","--primary","--brand","--color-primary","--main","--theme"];
@@ -3813,7 +3776,6 @@ wrap.innerHTML = `
     return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
   };
 
-  // ===== Audio
   let audio = null;
   let muted = false;
 
@@ -3858,12 +3820,11 @@ wrap.innerHTML = `
   function setMuted(v){
     muted = !!v;
     const icon = muted ? "🔇" : "🔈";
-    muteBtn.textContent = icon;
-    overMuteBtn.textContent = icon;
-    pauseMuteBtn.textContent = icon;
+    if (muteBtn) muteBtn.textContent = icon;
+    if (overMuteBtn) overMuteBtn.textContent = icon;
+    if (pauseMuteBtn) pauseMuteBtn.textContent = icon;
   }
 
-  // ===== Canvas fit
   function fitCanvas(){
     const rect = canvas.getBoundingClientRect();
     if (!rect.width || rect.width < 120) return;
@@ -3877,7 +3838,6 @@ wrap.innerHTML = `
   }
   const groundY = () => Math.floor(canvas.height * 0.80);
 
-  // ===== Game tuning
   const NIGHT_EVERY = 260;
   const BASE_SPEED  = 360;
   const MAX_SPEED   = 880;
@@ -3885,9 +3845,8 @@ wrap.innerHTML = `
   const PASS_BONUS  = 12;
 
   let best = Number(localStorage.getItem("yaarat_game_dino_best") || "0");
-  bestEl.textContent = String(best);
+  if (bestEl) bestEl.textContent = String(best);
 
-  // ===== State
   let alive = false;
   let paused = false;
   let startedOnce = false;
@@ -3933,12 +3892,13 @@ wrap.innerHTML = `
   function lerp(a,b,t){ return a + (b-a)*t; }
 
   function showOverlay(which){
+    if (!overlay) return;
     overlay.style.display = "flex";
-    startCard.style.display = (which==="start") ? "block" : "none";
-    overCard.style.display = (which==="over") ? "block" : "none";
-    pausedCard.style.display = (which==="paused") ? "block" : "none";
+    if (startCard) startCard.style.display = (which==="start") ? "block" : "none";
+    if (overCard) overCard.style.display = (which==="over") ? "block" : "none";
+    if (pausedCard) pausedCard.style.display = (which==="paused") ? "block" : "none";
   }
-  function hideOverlay(){ overlay.style.display = "none"; }
+  function hideOverlay(){ if (overlay) overlay.style.display = "none"; }
 
   function mkCloud(x,y){ return { x, y, r:rnd(14,30), vx:rnd(10,26), k:rnd(0.85,1.35) }; }
   function mkStar(){ return { x: Math.random(), y: Math.random(), a:rnd(0.25,0.95), s:rnd(0.6,1.8) }; }
@@ -4005,17 +3965,7 @@ wrap.innerHTML = `
       try { if (!muted) sfx.ui(); } catch(e) {}
 
       hideOverlay();
-
-      try{ resetWorld(); }
-      catch(e){
-        fitCanvas();
-        score = 0; dist = 0; speed = BASE_SPEED;
-        player.x = Math.max(64, Math.floor(canvas.width * 0.12));
-        player.y = groundY() - player.h;
-        obstacles = [];
-        spawnT = 0; nextSpawn = 0.9;
-        lastT = performance.now();
-      }
+      resetWorld();
 
       alive = true;
       paused = false;
@@ -4038,7 +3988,7 @@ wrap.innerHTML = `
     if (s > best){
       best = s;
       localStorage.setItem("yaarat_game_dino_best", String(best));
-      bestEl.textContent = String(best);
+      if (bestEl) bestEl.textContent = String(best);
     }
     showOverlay("over");
   }
@@ -4309,7 +4259,6 @@ wrap.innerHTML = `
     ctx.fillStyle = sky;
     ctx.fillRect(-40,-40,w+80,h+80);
 
-    // sun/moon
     const orbY = h*0.18;
     const orbX = w*0.78;
 
@@ -4336,7 +4285,6 @@ wrap.innerHTML = `
       ctx.globalAlpha = 1;
     }
 
-    // clouds
     ctx.globalAlpha = lerp(0.35, 0.16, night);
     ctx.fillStyle = night > 0.5 ? "rgba(203,213,225,.85)" : "rgba(100,116,139,.55)";
     clouds.forEach(c=>{
@@ -4348,7 +4296,6 @@ wrap.innerHTML = `
     });
     ctx.globalAlpha = 1;
 
-    // hills
     ctx.globalAlpha = 0.9;
     hills.forEach((m, idx)=>{
       const x = m.x*w;
@@ -4369,7 +4316,6 @@ wrap.innerHTML = `
     });
     ctx.globalAlpha = 1;
 
-    // ground
     const grd = ctx.createLinearGradient(0, gy, 0, h);
     if (night > 0.35){
       grd.addColorStop(0, "rgba(15,23,42,.82)");
@@ -4393,7 +4339,6 @@ wrap.innerHTML = `
     ctx.lineWidth = Math.max(2, Math.round(w/430));
     ctx.beginPath(); ctx.moveTo(-20, gy); ctx.lineTo(w+20, gy); ctx.stroke();
 
-    // particles
     for (const p of dust){
       ctx.globalAlpha = p.a * 0.9;
       ctx.fillStyle = night > 0.5 ? "rgba(148,163,184,.95)" : "rgba(51,65,85,.55)";
@@ -4406,7 +4351,6 @@ wrap.innerHTML = `
     }
     ctx.globalAlpha = 1;
 
-    // obstacles (same as your code)
     obstacles.forEach(o=>{
       if (o.type === "cactus"){
         const fill = night > 0.45 ? "rgba(34,197,94,.92)" : "rgba(22,163,74,.80)";
@@ -4481,7 +4425,6 @@ wrap.innerHTML = `
       }
     });
 
-    // dino (same as your code)
     const body = (night > 0.45) ? "rgba(226,232,240,.96)" : "rgba(15,23,42,.82)";
     const sq = player.squash;
     const scaleY = 1 - sq*0.10;
@@ -4540,7 +4483,7 @@ wrap.innerHTML = `
     }
 
     ctx.restore();
-    modeEl.textContent = night > 0.5 ? "לילה" : "יום";
+    if (modeEl) modeEl.textContent = night > 0.5 ? "לילה" : "יום";
   }
 
   function loop(t){
@@ -4551,9 +4494,9 @@ wrap.innerHTML = `
     if (alive && !paused) step(dt);
     draw();
 
-    scoreEl.textContent = String(Math.floor(score));
-    bestEl.textContent  = String(best);
-    spdEl.textContent   = String(Math.round((speed/BASE_SPEED)*10)/10);
+    if (scoreEl) scoreEl.textContent = String(Math.floor(score));
+    if (bestEl)  bestEl.textContent  = String(best);
+    if (spdEl)   spdEl.textContent   = String(Math.round((speed/BASE_SPEED)*10)/10);
 
     raf = requestAnimationFrame(loop);
   }
@@ -4565,7 +4508,6 @@ wrap.innerHTML = `
     resetWorld();
   }
 
-  // ===== Keyboard
   function onKeyDown(e){
     const k = e.key;
 
@@ -4589,110 +4531,98 @@ wrap.innerHTML = `
     if (k === "ArrowDown" || k === "s" || k === "S") setDuck(false);
   }
 
-  // ===== Buttons / touch
-// ===== ✅ Buttons / touch (WORKS EVERYWHERE)
-function bindTap(el, fn) {
-  if (!el) return () => {};
-  let lastTouch = 0;
+  function bindTap(el, fn) {
+    if (!el) return () => {};
+    let lastTouch = 0;
 
-  const fire = (e) => {
-    try { if (e && e.cancelable) e.preventDefault(); } catch {}
-    try { e.stopPropagation(); } catch {}
-    warm();
-    fn(e);
-  };
+    const fire = (e) => {
+      try { if (e && e.cancelable) e.preventDefault(); } catch {}
+      try { e.stopPropagation(); } catch {}
+      warm();
+      fn(e);
+    };
 
-  const onPointerDown = (e) => fire(e);
-  const onTouchStart = (e) => { lastTouch = Date.now(); fire(e); };
-  const onClick = (e) => {
-    // block ghost click after touch
-    if (Date.now() - lastTouch < 450) return;
-    fire(e);
-  };
+    const onPointerDown = (e) => fire(e);
+    const onTouchStart = (e) => { lastTouch = Date.now(); fire(e); };
+    const onClick = (e) => {
+      if (Date.now() - lastTouch < 450) return;
+      fire(e);
+    };
 
-  el.addEventListener("pointerdown", onPointerDown, { passive:false, capture:true });
-  el.addEventListener("touchstart", onTouchStart, { passive:false, capture:true });
-  el.addEventListener("click", onClick, { passive:false, capture:true });
+    el.addEventListener("pointerdown", onPointerDown, { passive:false, capture:true });
+    el.addEventListener("touchstart", onTouchStart, { passive:false, capture:true });
+    el.addEventListener("click", onClick, { passive:false, capture:true });
 
-  return () => {
-    el.removeEventListener("pointerdown", onPointerDown, { capture:true });
-    el.removeEventListener("touchstart", onTouchStart, { capture:true });
-    el.removeEventListener("click", onClick, { capture:true });
-  };
-}
+    return () => {
+      el.removeEventListener("pointerdown", onPointerDown, { capture:true });
+      el.removeEventListener("touchstart", onTouchStart, { capture:true });
+      el.removeEventListener("click", onClick, { capture:true });
+    };
+  }
 
-function bindHold(el, onDown, onUp) {
-  if (!el) return () => {};
-  let down = false;
+  function bindHold(el, onDown, onUp) {
+    if (!el) return () => {};
+    let down = false;
 
-  const start = (e) => {
-    down = true;
-    try { if (e && e.cancelable) e.preventDefault(); } catch {}
-    try { e.stopPropagation(); } catch {}
-    warm();
-    onDown(e);
-  };
+    const start = (e) => {
+      down = true;
+      try { if (e && e.cancelable) e.preventDefault(); } catch {}
+      try { e.stopPropagation(); } catch {}
+      warm();
+      onDown(e);
+    };
 
-  const end = (e) => {
-    if (!down) return;
-    down = false;
-    onUp(e);
-  };
+    const end = (e) => {
+      if (!down) return;
+      down = false;
+      onUp(e);
+    };
 
-  el.addEventListener("pointerdown", start, { passive:false, capture:true });
-  el.addEventListener("touchstart", start, { passive:false, capture:true });
+    el.addEventListener("pointerdown", start, { passive:false, capture:true });
+    el.addEventListener("touchstart", start, { passive:false, capture:true });
 
-  window.addEventListener("pointerup", end, { passive:false, capture:true });
-  window.addEventListener("pointercancel", end, { passive:false, capture:true });
-  window.addEventListener("touchend", end, { passive:false, capture:true });
-  window.addEventListener("touchcancel", end, { passive:false, capture:true });
+    window.addEventListener("pointerup", end, { passive:false, capture:true });
+    window.addEventListener("pointercancel", end, { passive:false, capture:true });
+    window.addEventListener("touchend", end, { passive:false, capture:true });
+    window.addEventListener("touchcancel", end, { passive:false, capture:true });
 
-  return () => {
-    el.removeEventListener("pointerdown", start, { capture:true });
-    el.removeEventListener("touchstart", start, { capture:true });
+    return () => {
+      el.removeEventListener("pointerdown", start, { capture:true });
+      el.removeEventListener("touchstart", start, { capture:true });
 
-    window.removeEventListener("pointerup", end, { capture:true });
-    window.removeEventListener("pointercancel", end, { capture:true });
-    window.removeEventListener("touchend", end, { capture:true });
-    window.removeEventListener("touchcancel", end, { capture:true });
-  };
-}
+      window.removeEventListener("pointerup", end, { capture:true });
+      window.removeEventListener("pointercancel", end, { capture:true });
+      window.removeEventListener("touchend", end, { capture:true });
+      window.removeEventListener("touchcancel", end, { capture:true });
+    };
+  }
 
-// Start buttons
-const unStart1 = bindTap(btnStart, () => { setMuted(false); hardStart(false); lastT = performance.now(); });
-const unStart2 = bindTap(btnStartMute, () => { setMuted(true); hardStart(true); lastT = performance.now(); });
+  const unStart1 = bindTap(btnStart, () => { setMuted(false); hardStart(false); lastT = performance.now(); });
+  const unStart2 = bindTap(btnStartMute, () => { setMuted(true); hardStart(true); lastT = performance.now(); });
 
-// Overlay buttons
-const unOverRestart = bindTap(overRestartBtn, () => hardRestart());
-const unResume      = bindTap(resumeBtn, () => togglePause());
+  const unOverRestart = bindTap(overRestartBtn, () => hardRestart());
+  const unResume      = bindTap(resumeBtn, () => togglePause());
 
-// Mute buttons
-const unMute1 = bindTap(muteBtn, () => { setMuted(!muted); if (!muted) sfx.ui(); });
-const unMute2 = bindTap(overMuteBtn, () => { setMuted(!muted); if (!muted) sfx.ui(); });
-const unMute3 = bindTap(pauseMuteBtn, () => { setMuted(!muted); if (!muted) sfx.ui(); });
+  const unMute1 = bindTap(muteBtn, () => { setMuted(!muted); if (!muted) sfx.ui(); });
+  const unMute2 = bindTap(overMuteBtn, () => { setMuted(!muted); if (!muted) sfx.ui(); });
+  const unMute3 = bindTap(pauseMuteBtn, () => { setMuted(!muted); if (!muted) sfx.ui(); });
 
-// Top bar buttons
-const unPause   = bindTap(pauseBtn, () => togglePause());
-const unRestart = bindTap(restartBtn, () => hardRestart());
+  const unPause   = bindTap(pauseBtn, () => togglePause());
+  const unRestart = bindTap(restartBtn, () => hardRestart());
 
-// Mobile controls
-const unJump = bindTap(jumpBtn, () => { if (!startedOnce) hardStart(false); else jump(); });
+  const unJump = bindTap(jumpBtn, () => { if (!startedOnce) hardStart(false); else jump(); });
 
-const unDuck = bindHold(
-  duckBtn,
-  () => { if (!startedOnce) hardStart(false); else setDuck(true); },
-  () => { if (startedOnce) setDuck(false); }
-);
+  const unDuck = bindHold(
+    duckBtn,
+    () => { if (!startedOnce) hardStart(false); else setDuck(true); },
+    () => { if (startedOnce) setDuck(false); }
+  );
 
-// Canvas tap = start/jump
-const unCanvas = bindTap(canvas, () => {
-  if (!startedOnce) { hardStart(false); return; }
-  if (!paused) jump();
-});
+  const unCanvas = bindTap(canvas, () => {
+    if (!startedOnce) { hardStart(false); return; }
+    if (!paused) jump();
+  });
 
-
-
-  // ===== 🎮 Joystick logic (single system only)
   let joyActive = false;
   let joyPid = null;
   let joyCenter = { x:0, y:0 };
@@ -4701,7 +4631,7 @@ const unCanvas = bindTap(canvas, () => {
   const JUMP_TH = 18;
   let joyJumpArmed = true;
 
-  joyEl.style.touchAction = "none";
+  const HAS_POINTER = "PointerEvent" in window;
 
   function updateCenter(){
     const r = joyEl.getBoundingClientRect();
@@ -4743,9 +4673,6 @@ const unCanvas = bindTap(canvas, () => {
     joyJumpArmed = true;
   }
 
-  // Pointer events (preferred)
-  const HAS_POINTER = "PointerEvent" in window;
-
   function joyOnPointerDown(e){
     warm();
     e.preventDefault();
@@ -4767,7 +4694,6 @@ const unCanvas = bindTap(canvas, () => {
     joyReset();
   }
 
-  // Touch fallback (iOS older)
   function joyOnTouchStart(e){
     warm();
     e.preventDefault();
@@ -4790,20 +4716,36 @@ const unCanvas = bindTap(canvas, () => {
     joyReset();
   }
 
-  if (HAS_POINTER){
-    joyEl.addEventListener("pointerdown", joyOnPointerDown, { passive:false });
-    joyEl.addEventListener("pointermove", joyOnPointerMove, { passive:false });
-    joyEl.addEventListener("pointerup", joyOnPointerUp, { passive:false });
-    joyEl.addEventListener("pointercancel", joyOnPointerUp, { passive:false });
-    joyEl.addEventListener("lostpointercapture", joyReset, { passive:true });
-  } else {
-    joyEl.addEventListener("touchstart", joyOnTouchStart, { passive:false });
-    joyEl.addEventListener("touchmove", joyOnTouchMove, { passive:false });
-    joyEl.addEventListener("touchend", joyOnTouchEnd, { passive:false });
-    joyEl.addEventListener("touchcancel", joyOnTouchEnd, { passive:false });
+  let unJoy = () => {};
+  if (joyEl && joyKnob){
+    joyEl.style.touchAction = "none";
+    if (HAS_POINTER){
+      joyEl.addEventListener("pointerdown", joyOnPointerDown, { passive:false });
+      joyEl.addEventListener("pointermove", joyOnPointerMove, { passive:false });
+      joyEl.addEventListener("pointerup", joyOnPointerUp, { passive:false });
+      joyEl.addEventListener("pointercancel", joyOnPointerUp, { passive:false });
+      joyEl.addEventListener("lostpointercapture", joyReset, { passive:true });
+      unJoy = () => {
+        joyEl.removeEventListener("pointerdown", joyOnPointerDown);
+        joyEl.removeEventListener("pointermove", joyOnPointerMove);
+        joyEl.removeEventListener("pointerup", joyOnPointerUp);
+        joyEl.removeEventListener("pointercancel", joyOnPointerUp);
+        joyEl.removeEventListener("lostpointercapture", joyReset);
+      };
+    } else {
+      joyEl.addEventListener("touchstart", joyOnTouchStart, { passive:false });
+      joyEl.addEventListener("touchmove", joyOnTouchMove, { passive:false });
+      joyEl.addEventListener("touchend", joyOnTouchEnd, { passive:false });
+      joyEl.addEventListener("touchcancel", joyOnTouchEnd, { passive:false });
+      unJoy = () => {
+        joyEl.removeEventListener("touchstart", joyOnTouchStart);
+        joyEl.removeEventListener("touchmove", joyOnTouchMove);
+        joyEl.removeEventListener("touchend", joyOnTouchEnd);
+        joyEl.removeEventListener("touchcancel", joyOnTouchEnd);
+      };
+    }
   }
 
-  // ===== global listeners (use constants so removeEventListener works)
   const OPT_KEYDOWN = { passive:false, capture:true };
   const OPT_KEYUP   = { capture:true };
   const OPT_RESIZE  = false;
@@ -4812,55 +4754,38 @@ const unCanvas = bindTap(canvas, () => {
   window.addEventListener("keyup", onKeyUp, OPT_KEYUP);
   window.addEventListener("resize", fitCanvas, OPT_RESIZE);
 
-  // init
   fitCanvas();
   showOverlay("start");
   lastT = performance.now();
   raf = requestAnimationFrame(loop);
 
-function cleanup(){
-  if (raf) cancelAnimationFrame(raf);
-  raf = null;
+  function cleanup(){
+    if (raf) cancelAnimationFrame(raf);
+    raf = null;
 
-  window.removeEventListener("keydown", onKeyDown, OPT_KEYDOWN);
-  window.removeEventListener("keyup", onKeyUp, OPT_KEYUP);
-  window.removeEventListener("resize", fitCanvas, OPT_RESIZE);
+    window.removeEventListener("keydown", onKeyDown, OPT_KEYDOWN);
+    window.removeEventListener("keyup", onKeyUp, OPT_KEYUP);
+    window.removeEventListener("resize", fitCanvas, OPT_RESIZE);
 
-  // ✅ remove UI listeners
-  try { unStart1(); } catch {}
-  try { unStart2(); } catch {}
-  try { unOverRestart(); } catch {}
-  try { unResume(); } catch {}
-  try { unMute1(); } catch {}
-  try { unMute2(); } catch {}
-  try { unMute3(); } catch {}
-  try { unPause(); } catch {}
-  try { unRestart(); } catch {}
-  try { unJump(); } catch {}
-  try { unDuck(); } catch {}
-  try { unCanvas(); } catch {}
-
-  // remove joystick listeners
-  if (HAS_POINTER){
-    joyEl.removeEventListener("pointerdown", joyOnPointerDown);
-    joyEl.removeEventListener("pointermove", joyOnPointerMove);
-    joyEl.removeEventListener("pointerup", joyOnPointerUp);
-    joyEl.removeEventListener("pointercancel", joyOnPointerUp);
-    joyEl.removeEventListener("lostpointercapture", joyReset);
-  } else {
-    joyEl.removeEventListener("touchstart", joyOnTouchStart);
-    joyEl.removeEventListener("touchmove", joyOnTouchMove);
-    joyEl.removeEventListener("touchend", joyOnTouchEnd);
-    joyEl.removeEventListener("touchcancel", joyOnTouchEnd);
+    try { unStart1(); } catch {}
+    try { unStart2(); } catch {}
+    try { unOverRestart(); } catch {}
+    try { unResume(); } catch {}
+    try { unMute1(); } catch {}
+    try { unMute2(); } catch {}
+    try { unMute3(); } catch {}
+    try { unPause(); } catch {}
+    try { unRestart(); } catch {}
+    try { unJump(); } catch {}
+    try { unDuck(); } catch {}
+    try { unCanvas(); } catch {}
+    try { unJoy(); } catch {}
   }
-}
 
-
-  // ✅ IMPORTANT: store cleanup for next render
   root.__dnxCleanup = cleanup;
-
   return cleanup;
 }
+
 
 
 
