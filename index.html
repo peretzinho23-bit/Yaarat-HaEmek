@@ -3408,6 +3408,31 @@ function renderSnakeGame(root){
   -webkit-user-select: none;
   user-select: none;
 }
+.dnx-mobile{
+  display:none;
+  gap:10px;
+  width:100%;
+  justify-content:space-between;
+  padding:0 2px;
+}
+@media (max-width:760px){
+  .dnx-mobile{
+    display:flex !important;
+    position: static;
+    width: 100%;
+    padding: 0 2px;
+    margin-top: 10px;
+    gap: 10px;
+    justify-content: space-between;
+  }
+  .dnx-mobile .dnx-btn{
+    flex: 1;
+    padding: 14px 12px;
+    border-radius: 16px;
+    font-size: 1rem;
+  }
+}
+
 
 html[data-theme="dark"]{
   --dnx-bg: rgba(2,6,23,.62);
@@ -3501,14 +3526,26 @@ html[data-theme="dark"]{
 
 
 .dnx-mobile{
-  position:absolute;
-  left:12px;
-  bottom:12px;
   display:none;
-  gap:8px;
-  flex-wrap:wrap;
-  z-index:6;
+  gap:10px;
+  width:100%;
+  justify-content:space-between;
+  padding:0 2px;
 }
+@media (max-width:760px){
+  .dnx-mobile{
+    display:flex !important;
+    margin-top:10px;
+  }
+  .dnx-mobile .dnx-btn{
+    flex:1;
+    padding:14px 12px;
+    border-radius:16px;
+    font-size:1rem;
+  }
+}
+.dnx-wrap{ gap: 10px; }
+.dnx-mobile{ margin-bottom: 6px; }
 
 .dnx-btn{
   padding:10px 12px;
@@ -3695,77 +3732,24 @@ html[data-theme="dark"] .dnx-joy{
   wrap.className = "dnx-wrap";
   wrap.id = ID;
 
-  wrap.innerHTML = `
-    <div class="dnx-hud" dir="rtl">
-      <div class="dnx-left">
-        <span class="dnx-pill">שיא <span id="dnxBest">0</span></span>
-        <span class="dnx-pill dnx-pill-acc">ניקוד <span id="dnxScore">0</span></span>
-        <span class="dnx-pill">מהירות <span id="dnxSpd">1.0</span>x</span>
-        <span class="dnx-pill">מצב <span id="dnxMode">יום</span></span>
-      </div>
-      <div class="dnx-tip">רווח/↑ קפיצה · ↓ התכופפות · R איפוס · P השהיה · M השתק</div>
-    </div>
+wrap.innerHTML = `
+  <div class="dnx-hud" dir="rtl"> ... </div>
 
-    <div class="dnx-stage" dir="rtl">
-      <canvas id="dnxCanvas" class="dnx-canvas" width="960" height="560"></canvas>
+  <div class="dnx-stage" dir="rtl">
+    <canvas id="dnxCanvas" class="dnx-canvas" width="960" height="560"></canvas>
 
-      <div class="dnx-joywrap" aria-label="פקדי מובייל">
-        <div style="display:flex; gap:10px; align-items:flex-end">
-          <div class="dnx-joy" id="dnxJoy" aria-label="Joystick">
-            <div class="dnx-joy-knob" id="dnxJoyKnob"></div>
-          </div>
-          <div class="dnx-joyhint">למעלה: קפיצה<br>למטה: התכופפות</div>
-        </div>
+    <div class="dnx-joywrap" aria-label="פקדי מובייל"> ... </div>
 
-        <div class="dnx-actions" aria-label="פעולות">
-          <button type="button" id="dnxPause" class="dnx-btn">⏸</button>
-          <button type="button" id="dnxRestart" class="dnx-btn">↻</button>
-          <button type="button" id="dnxMute" class="dnx-btn">🔈</button>
-        </div>
-      </div>
-<div class="dnx-stage" dir="rtl">
-  <canvas id="dnxCanvas" class="dnx-canvas" width="960" height="560"></canvas>
-  ...
-  <div class="dnx-overlay" id="dnxOverlay"> ... </div>
-</div>
+    <div class="dnx-overlay" id="dnxOverlay"> ... </div>
+  </div>
 
-<!-- ✅ moved outside stage -->
-<div class="dnx-mobile" aria-label="פקדים למובייל">
-  <button type="button" id="dnxJump" class="dnx-btn dnx-btn-acc">קפיצה</button>
-  <button type="button" id="dnxDuck" class="dnx-btn">התכופף</button>
-</div>
+  <!-- ✅ mobile buttons OUTSIDE stage -->
+  <div class="dnx-mobile" aria-label="פקדים למובייל">
+    <button type="button" id="dnxJump" class="dnx-btn dnx-btn-acc">קפיצה</button>
+    <button type="button" id="dnxDuck" class="dnx-btn">התכופף</button>
+  </div>
+`;
 
-
-      <div class="dnx-overlay" id="dnxOverlay">
-        <div class="dnx-card" id="dnxStartCard">
-          <div class="dnx-title">Dino Run</div>
-          <div class="dnx-sub">מטרה: לשרוד הכי הרבה. קפיצה מדויקת > ספאם קפיצות.<br>טיפ: תכופף מתחת לציפור.</div>
-          <div class="dnx-row">
-            <button type="button" id="dnxStart" class="dnx-btn dnx-btn-acc">התחל</button>
-            <button type="button" id="dnxStartMute" class="dnx-btn">התחל בלי סאונד</button>
-          </div>
-        </div>
-
-        <div class="dnx-card" id="dnxOverCard" style="display:none;">
-          <div class="dnx-title">נגמר המשחק</div>
-          <div class="dnx-sub">לחץ R או “התחל מחדש”.</div>
-          <div class="dnx-row">
-            <button type="button" id="dnxOverRestart" class="dnx-btn dnx-btn-acc">התחל מחדש</button>
-            <button type="button" id="dnxOverMute" class="dnx-btn">🔈</button>
-          </div>
-        </div>
-
-        <div class="dnx-card" id="dnxPausedCard" style="display:none;">
-          <div class="dnx-title">מושהה</div>
-          <div class="dnx-sub">לחץ P כדי להמשיך.</div>
-          <div class="dnx-row">
-            <button type="button" id="dnxResume" class="dnx-btn dnx-btn-acc">המשך</button>
-            <button type="button" id="dnxPauseMute" class="dnx-btn">🔈</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
   root.appendChild(wrap);
 
   // ===== Grab elements
