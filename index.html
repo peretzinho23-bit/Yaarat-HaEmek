@@ -3374,7 +3374,8 @@ function renderSnakeGame(root){
     root.__dnxCleanup = null;
   }
 
-  if (!document.getElementById(STYLE_ID)){
+document.getElementById(STYLE_ID)?.remove();
+{
     const st = document.createElement("style");
     st.id = STYLE_ID;
     st.textContent = `
@@ -3628,10 +3629,19 @@ html[data-theme="dark"] .dnx-joy{
 
   .dnx-joywrap{ display:none !important; }
 
-/* mobile buttons */
+/* ✅ Mobile buttons (inside stage, bottom overlay) */
 .dnx-mobile{ display:none; }
 
 @media (max-width:760px){
+  .dnx-tip{display:none}
+  .dnx-hud{padding:10px 10px; gap:8px}
+  .dnx-left{gap:6px}
+  .dnx-pill{padding:6px 10px; font-size:.9rem}
+  .dnx-stage{ border-radius:16px; aspect-ratio: 16 / 10; touch-action:none; }
+  .dnx-canvas{ touch-action:none; }
+
+  .dnx-joywrap{ display:none !important; }
+
   .dnx-mobile{
     display:flex !important;
     position:absolute;
@@ -3652,8 +3662,17 @@ html[data-theme="dark"] .dnx-joy{
     padding:14px 12px;
     border-radius:16px;
     font-size:1rem;
+
+    background: rgba(255,255,255,.55);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  html[data-theme="dark"] .dnx-mobile .dnx-btn{
+    background: rgba(2,6,23,.40);
   }
 }
+
 
 @media (max-width:760px){
   .dnx-mobile .dnx-btn{
@@ -3683,7 +3702,7 @@ html[data-theme="dark"] .dnx-joy{
   wrap.className = "dnx-wrap";
   wrap.id = ID;
 
-  wrap.innerHTML = `
+wrap.innerHTML = `
 <div class="dnx-hud" dir="rtl">
   <div class="dnx-left">
     <div class="dnx-pill dnx-pill-acc">Dino 🦖</div>
@@ -3704,11 +3723,11 @@ html[data-theme="dark"] .dnx-joy{
 <div class="dnx-stage" dir="rtl">
   <canvas id="dnxCanvas" class="dnx-canvas" width="960" height="560"></canvas>
 
-  <!-- ✅ mobile buttons INSIDE stage (overlay bottom) -->
+  <!-- ✅ mobile buttons INSIDE stage -->
   <div class="dnx-mobile" aria-label="פקדים למובייל">
     <button type="button" id="dnxJump" class="dnx-btn dnx-btn-acc">קפיצה</button>
     <button type="button" id="dnxDuck" class="dnx-btn">התכופף</button>
-  <div class="dnx-overlay" id="dnxOverlay">
+  </div>
 
   <div class="dnx-overlay" id="dnxOverlay">
     <div class="dnx-card" id="dnxStartCard">
@@ -3738,8 +3757,9 @@ html[data-theme="dark"] .dnx-joy{
       </div>
     </div>
   </div>
-
+</div>
 `;
+
 
   root.appendChild(wrap);
 
