@@ -3371,12 +3371,17 @@ function renderSnakeGame(root){
   // wipe old if rerender
   root.innerHTML = "";
 
+  // ✅ kill previous instance on same root (prevents random double listeners)
+  if (root.__dnxCleanup){
+    try { root.__dnxCleanup(); } catch(e){}
+    root.__dnxCleanup = null;
+  }
+
   // inject CSS once
   if (!document.getElementById(STYLE_ID)){
     const st = document.createElement("style");
     st.id = STYLE_ID;
-    st.textContent = `
-/* ===== DINO ULTRA – isolated CSS (no gh- / canvas- collisions) ===== */
+    st.textContent = `/* ===== DINO ULTRA – isolated CSS ===== */
 :root{
   --dnx-bg: rgba(255,255,255,.80);
   --dnx-bg2: rgba(248,250,252,.72);
@@ -3393,7 +3398,6 @@ function renderSnakeGame(root){
 
   --dnx-glass: blur(14px);
   --dnx-radius: 18px;
-  --dnx-radius2: 16px;
 
   --dnx-acc: #38bdf8;
   --dnx-accBorder: rgba(56,189,248,.50);
@@ -3426,27 +3430,23 @@ html[data-theme="dark"]{
     --dnx-border2: rgba(148,163,184,.14);
     --dnx-text: rgba(226,232,240,.92);
     --dnx-muted: rgba(226,232,240,.78);
+
     --dnx-pill: rgba(255,255,255,.06);
     --dnx-pill2: rgba(255,255,255,.04);
+
     --dnx-shadow: 0 22px 65px rgba(0,0,0,.28);
     --dnx-shadow2: 0 12px 26px rgba(0,0,0,.18);
+
     --dnx-accBorder: rgba(56,189,248,.55);
     --dnx-accGlow: 0 18px 60px rgba(56,189,248,.26);
   }
 }
 
-.dnx-wrap{
-  width: 100%;
-  display: grid;
-  gap: 12px;
-}
+.dnx-wrap{ width:100%; display:grid; gap:12px; }
 
 .dnx-hud{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  flex-wrap:wrap;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:10px; flex-wrap:wrap;
   padding:12px 14px;
   border-radius: var(--dnx-radius);
   border:1px solid var(--dnx-border);
@@ -3461,16 +3461,12 @@ html[data-theme="dark"]{
 .dnx-left{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
 
 .dnx-pill{
-  display:flex;
-  gap:8px;
-  align-items:center;
-  padding:8px 12px;
-  border-radius:999px;
+  display:flex; gap:8px; align-items:center;
+  padding:8px 12px; border-radius:999px;
   border:1px solid var(--dnx-border2);
   background: linear-gradient(135deg, var(--dnx-pill), var(--dnx-pill2));
   color: var(--dnx-text);
   font-weight:1000;
-  font-family: system-ui, -apple-system, Segoe UI, Arial;
 }
 
 .dnx-pill-acc{
@@ -3479,13 +3475,7 @@ html[data-theme="dark"]{
   box-shadow: var(--dnx-accGlow);
 }
 
-.dnx-tip{
-  opacity:.92;
-  color: var(--dnx-muted);
-  font-weight:900;
-  font-size:.92rem;
-  font-family: system-ui, -apple-system, Segoe UI, Arial;
-}
+.dnx-tip{ opacity:.92; color: var(--dnx-muted); font-weight:900; font-size:.92rem; }
 
 .dnx-stage{
   position:relative;
@@ -3498,9 +3488,10 @@ html[data-theme="dark"]{
 }
 
 .dnx-canvas{
-  width: 100%;
-  height: 100%;
+  width:100%;
+  height:100%;
   display:block;
+  touch-action: manipulation;
 }
 
 .dnx-mobile{
@@ -3510,12 +3501,12 @@ html[data-theme="dark"]{
   display:none;
   gap:8px;
   flex-wrap:wrap;
-  z-index: 6;
+  z-index:6;
 }
 
 .dnx-btn{
   padding:10px 12px;
-  border-radius: 14px;
+  border-radius:14px;
   border:1px solid var(--dnx-border);
   background: linear-gradient(135deg, var(--dnx-bg), var(--dnx-bg2));
   color: var(--dnx-text);
@@ -3525,9 +3516,10 @@ html[data-theme="dark"]{
   user-select:none;
   transition: transform .08s ease, filter .12s ease;
   font-family: system-ui, -apple-system, Segoe UI, Arial;
+  touch-action: manipulation;
 }
-.dnx-btn:hover{filter: brightness(1.03)}
-.dnx-btn:active{transform: translateY(1px)}
+.dnx-btn:hover{filter:brightness(1.03)}
+.dnx-btn:active{transform:translateY(1px)}
 
 .dnx-btn-acc{
   border-color: var(--dnx-accBorder);
@@ -3535,27 +3527,30 @@ html[data-theme="dark"]{
   box-shadow: var(--dnx-accGlow);
 }
 
+/* ✅ Overlay לא חוסם טאצ' */
 .dnx-overlay{
   position:absolute;
   inset:0;
   display:flex;
   align-items:center;
   justify-content:center;
-  z-index: 7;
-  pointer-events:auto;
+  z-index:7;
+  pointer-events:none;
 }
 #dnxOverlay::before{
   content:"";
   position:absolute;
   inset:0;
+  pointer-events:none;
+  background: rgba(0,0,0,0.08);
 }
 #dnxStartCard, #dnxOverCard, #dnxPausedCard{
   position:relative;
   z-index:1;
+  pointer-events:auto;
 }
 
 .dnx-card{
-  pointer-events:auto;
   min-width:min(560px, calc(100% - 28px));
   padding:14px 14px;
   border-radius: var(--dnx-radius);
@@ -3569,14 +3564,102 @@ html[data-theme="dark"]{
 }
 
 .dnx-title{font-weight:1150; font-size:1.12rem}
-.dnx-sub{opacity:.92; margin-top:6px; color: var(--dnx-muted); font-weight:900; line-height:1.35}
+.dnx-sub{opacity:.92; margin-top:6px; color:var(--dnx-muted); font-weight:900; line-height:1.35}
 .dnx-row{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px}
 
-@media (max-width: 760px){
-  .dnx-tip{display:none}
-  .dnx-mobile{display:flex}
+/* =========================
+   🎮 Mobile Joystick (PRO)
+   ========================= */
+.dnx-joywrap{
+  position:absolute;
+  left:12px;
+  bottom:12px;
+  z-index: 6;
+  display:none;
+  align-items:flex-end;
+  gap:10px;
+  pointer-events:auto;
 }
-    `;
+
+.dnx-joy{
+  width:112px;
+  height:112px;
+  border-radius: 999px;
+  border: 1px solid var(--dnx-border);
+  background: linear-gradient(135deg, rgba(255,255,255,.16), rgba(255,255,255,.06));
+  box-shadow: var(--dnx-shadow2);
+  backdrop-filter: var(--dnx-glass);
+  -webkit-backdrop-filter: var(--dnx-glass);
+  position:relative;
+  touch-action: none;
+  user-select:none;
+}
+
+html[data-theme="dark"] .dnx-joy{
+  background: linear-gradient(135deg, rgba(2,6,23,.38), rgba(15,23,42,.20));
+}
+
+.dnx-joy::after{
+  content:"";
+  position:absolute;
+  inset:10px;
+  border-radius: 999px;
+  border: 1px dashed rgba(148,163,184,.28);
+  opacity:.9;
+  pointer-events:none;
+}
+
+.dnx-joy-knob{
+  width:44px;
+  height:44px;
+  border-radius:999px;
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform: translate(-50%,-50%);
+  border: 1px solid var(--dnx-accBorder);
+  background: linear-gradient(135deg, rgba(56,189,248,.30), rgba(34,197,94,.10));
+  box-shadow: var(--dnx-accGlow);
+  pointer-events:none;
+}
+
+.dnx-joyhint{
+  font-family: system-ui, -apple-system, Segoe UI, Arial;
+  color: var(--dnx-text);
+  font-weight: 1000;
+  font-size: .88rem;
+  opacity: .9;
+  background: linear-gradient(135deg, var(--dnx-bg), var(--dnx-bg2));
+  border:1px solid var(--dnx-border);
+  border-radius: 14px;
+  padding:10px 12px;
+  box-shadow: var(--dnx-shadow2);
+  backdrop-filter: var(--dnx-glass);
+  -webkit-backdrop-filter: var(--dnx-glass);
+  pointer-events:none;
+}
+
+.dnx-actions{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.dnx-actions .dnx-btn{ min-width: 56px; padding:10px 12px; }
+
+@media (max-width:760px){
+  .dnx-tip{display:none}
+  .dnx-hud{padding:10px 10px; gap:8px}
+  .dnx-pill{padding:6px 10px; font-size:.9rem}
+  .dnx-stage{ border-radius:16px; aspect-ratio: 16 / 10; }
+  .dnx-mobile{ display:none; }
+  .dnx-joywrap{ display:flex; }
+  .dnx-joywrap{
+    left:12px;
+    right:12px;
+    width: calc(100% - 24px);
+    justify-content: space-between;
+  }
+}`;
     document.head.appendChild(st);
   }
 
@@ -3597,19 +3680,31 @@ html[data-theme="dark"]{
     </div>
 
     <div class="dnx-stage" dir="rtl">
-      <canvas id="dnxCanvas" class="dnx-canvas" width="860" height="460"></canvas>
+      <canvas id="dnxCanvas" class="dnx-canvas" width="960" height="560"></canvas>
 
-      <div class="dnx-mobile" aria-label="פקדים למובייל">
+      <div class="dnx-joywrap" aria-label="פקדי מובייל">
+        <div style="display:flex; gap:10px; align-items:flex-end">
+          <div class="dnx-joy" id="dnxJoy" aria-label="Joystick">
+            <div class="dnx-joy-knob" id="dnxJoyKnob"></div>
+          </div>
+          <div class="dnx-joyhint">למעלה: קפיצה<br>למטה: התכופפות</div>
+        </div>
+
+        <div class="dnx-actions" aria-label="פעולות">
+          <button type="button" id="dnxPause" class="dnx-btn">⏸</button>
+          <button type="button" id="dnxRestart" class="dnx-btn">↻</button>
+          <button type="button" id="dnxMute" class="dnx-btn">🔈</button>
+        </div>
+      </div>
+
+      <div class="dnx-mobile" aria-label="פקדים למובייל (ישן)">
         <button type="button" id="dnxJump" class="dnx-btn dnx-btn-acc">קפיצה</button>
         <button type="button" id="dnxDuck" class="dnx-btn">התכופף</button>
-        <button type="button" id="dnxPause" class="dnx-btn">⏸</button>
-        <button type="button" id="dnxRestart" class="dnx-btn">↻</button>
-        <button type="button" id="dnxMute" class="dnx-btn">🔈</button>
       </div>
 
       <div class="dnx-overlay" id="dnxOverlay">
         <div class="dnx-card" id="dnxStartCard">
-          <div class="dnx-title">Dino Run · ULTRA</div>
+          <div class="dnx-title">Dino Run</div>
           <div class="dnx-sub">מטרה: לשרוד הכי הרבה. קפיצה מדויקת > ספאם קפיצות.<br>טיפ: תכופף מתחת לציפור.</div>
           <div class="dnx-row">
             <button type="button" id="dnxStart" class="dnx-btn dnx-btn-acc">התחל</button>
@@ -3658,6 +3753,7 @@ html[data-theme="dark"]{
 
   const jumpBtn = wrap.querySelector("#dnxJump");
   const duckBtn = wrap.querySelector("#dnxDuck");
+
   const pauseBtn = wrap.querySelector("#dnxPause");
   const restartBtn = wrap.querySelector("#dnxRestart");
   const muteBtn = wrap.querySelector("#dnxMute");
@@ -3667,7 +3763,10 @@ html[data-theme="dark"]{
   const resumeBtn = wrap.querySelector("#dnxResume");
   const pauseMuteBtn = wrap.querySelector("#dnxPauseMute");
 
-  // ===== Brand (steal from site if exists)
+  const joyEl = wrap.querySelector("#dnxJoy");
+  const joyKnob = wrap.querySelector("#dnxJoyKnob");
+
+  // ===== Brand
   function pickBrand(){
     const cs = getComputedStyle(document.documentElement);
     const vars = ["--accent","--primary","--brand","--color-primary","--main","--theme"];
@@ -3678,7 +3777,6 @@ html[data-theme="dark"]{
     const meta = document.querySelector('meta[name="theme-color"]')?.getAttribute("content");
     return (meta && meta.trim()) ? meta.trim() : "#38bdf8";
   }
-
   function hexToRgb(hex){
     const h = (hex||"").trim();
     const m = h.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
@@ -3688,7 +3786,6 @@ html[data-theme="dark"]{
     const n = parseInt(s,16);
     return { r:(n>>16)&255, g:(n>>8)&255, b:n&255 };
   }
-
   const BRAND = pickBrand();
   const brandRGB = hexToRgb(BRAND);
 
@@ -3698,7 +3795,7 @@ html[data-theme="dark"]{
     return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
   };
 
-  // ===== Audio (small + not annoying)
+  // ===== Audio
   let audio = null;
   let muted = false;
 
@@ -3711,11 +3808,7 @@ html[data-theme="dark"]{
       return audio;
     }catch(e){ return null; }
   }
-
-  // ✅ FIX: warm MUST be in outer scope (not inside bindStartButton)
-  function warm(){
-    try { ensureAudio(); } catch(e) {}
-  }
+  function warm(){ try{ ensureAudio(); }catch(e){} }
 
   function tone(freq=440, dur=0.055, vol=0.045, type="sine"){
     if (muted) return;
@@ -3752,7 +3845,7 @@ html[data-theme="dark"]{
     pauseMuteBtn.textContent = icon;
   }
 
-  // ===== Canvas fit (never 0)
+  // ===== Canvas fit
   function fitCanvas(){
     const rect = canvas.getBoundingClientRect();
     if (!rect.width || rect.width < 120) return;
@@ -3829,22 +3922,13 @@ html[data-theme="dark"]{
   }
   function hideOverlay(){ overlay.style.display = "none"; }
 
-  function mkCloud(x,y){
-    return { x, y, r:rnd(14,30), vx:rnd(10,26), k:rnd(0.85,1.35) };
-  }
-  function mkStar(){
-    return { x: Math.random(), y: Math.random(), a:rnd(0.25,0.95), s:rnd(0.6,1.8) };
-  }
-  function mkHill(){
-    return { x: Math.random(), h: rnd(0.08, 0.20), w: rnd(0.18, 0.40), v: rnd(0.08, 0.16) };
-  }
-  function mkGroundDot(){
-    return { x: Math.random(), s: rnd(1,3), a:rnd(0.18,0.55) };
-  }
+  function mkCloud(x,y){ return { x, y, r:rnd(14,30), vx:rnd(10,26), k:rnd(0.85,1.35) }; }
+  function mkStar(){ return { x: Math.random(), y: Math.random(), a:rnd(0.25,0.95), s:rnd(0.6,1.8) }; }
+  function mkHill(){ return { x: Math.random(), h: rnd(0.08, 0.20), w: rnd(0.18, 0.40), v: rnd(0.08, 0.16) }; }
+  function mkGroundDot(){ return { x: Math.random(), s: rnd(1,3), a:rnd(0.18,0.55) }; }
 
   function resetWorld(){
     fitCanvas();
-
     alive = true;
     paused = false;
 
@@ -3894,46 +3978,33 @@ html[data-theme="dark"]{
   }
 
   function hardStart(withMute){
-    // סטארט "קשוח" שלא יכול להיתקע
     try{
       startedOnce = true;
       paused = false;
-      alive = false; // נרים אותו רק אחרי reset מוצלח
+      alive = false;
 
       setMuted(!!withMute);
-
-      // אל תיתן לסאונד להפיל סטארט
-      try { ensureAudio(); } catch(e) {}
       try { if (!muted) sfx.ui(); } catch(e) {}
 
       hideOverlay();
 
-      // אם resetWorld נופל על משהו – עדיין נרים משחק בסיסי
-      try{
-        resetWorld();
-      }catch(e){
-        // fallback minimal start
+      try{ resetWorld(); }
+      catch(e){
         fitCanvas();
-        score = 0;
-        dist = 0;
-        speed = BASE_SPEED;
+        score = 0; dist = 0; speed = BASE_SPEED;
         player.x = Math.max(64, Math.floor(canvas.width * 0.12));
         player.y = groundY() - player.h;
         obstacles = [];
-        spawnT = 0;
-        nextSpawn = 0.9;
+        spawnT = 0; nextSpawn = 0.9;
         lastT = performance.now();
       }
 
-      // FORCE RUN
       alive = true;
       paused = false;
       lastT = performance.now();
 
-      // ✅ FIX: make sure loop is running even if something canceled raf earlier
       if (!raf) raf = requestAnimationFrame(loop);
     }catch(e){
-      // אם משהו ממש נשבר – תחזיר overlay שלא תישאר תקוע
       alive = false;
       paused = false;
       showOverlay("start");
@@ -4001,14 +4072,7 @@ html[data-theme="dark"]{
     if (dist > 12 && roll < 0.24){
       const size = rnd(18, 26);
       const hi = Math.random() < 0.55 ? 0.62 : 0.70;
-      obstacles.push({
-        type: "bird",
-        x: canvas.width + 70,
-        y: Math.floor(canvas.height * hi) - size,
-        w: size*1.45,
-        h: size,
-        passed: false
-      });
+      obstacles.push({ type:"bird", x:canvas.width+70, y:Math.floor(canvas.height*hi)-size, w:size*1.45, h:size, passed:false });
       return;
     }
 
@@ -4022,15 +4086,7 @@ html[data-theme="dark"]{
     const tall = Math.random() < 0.36;
     const h = tall ? rnd(70, 104) : rnd(52, 78);
     const w = rnd(16, 24);
-    obstacles.push({
-      type:"cactus",
-      x: canvas.width + 50,
-      y: gy - h,
-      w, h,
-      arms: Math.random() < 0.65,
-      double: Math.random() < 0.22,
-      passed:false
-    });
+    obstacles.push({ type:"cactus", x:canvas.width+50, y:gy-h, w, h, arms:Math.random()<0.65, double:Math.random()<0.22, passed:false });
   }
 
   function collide(ax,ay,aw,ah, bx,by,bw,bh){
@@ -4127,14 +4183,7 @@ html[data-theme="dark"]{
         o.passed = true;
         score += PASS_BONUS;
         for (let k=0;k<6;k++){
-          sparks.push({
-            x: player.x + player.w,
-            y: player.y + player.h*0.35,
-            vx: rnd(80, 240),
-            vy: rnd(-160, 60),
-            a: 1,
-            life: rnd(0.12, 0.22)
-          });
+          sparks.push({ x: player.x + player.w, y: player.y + player.h*0.35, vx: rnd(80,240), vy:rnd(-160,60), a:1, life:rnd(0.12,0.22) });
         }
         if (Math.random() < 0.35) sfx.score();
       }
@@ -4242,6 +4291,7 @@ html[data-theme="dark"]{
     ctx.fillStyle = sky;
     ctx.fillRect(-40,-40,w+80,h+80);
 
+    // sun/moon
     const orbY = h*0.18;
     const orbX = w*0.78;
 
@@ -4268,6 +4318,7 @@ html[data-theme="dark"]{
       ctx.globalAlpha = 1;
     }
 
+    // clouds
     ctx.globalAlpha = lerp(0.35, 0.16, night);
     ctx.fillStyle = night > 0.5 ? "rgba(203,213,225,.85)" : "rgba(100,116,139,.55)";
     clouds.forEach(c=>{
@@ -4279,6 +4330,7 @@ html[data-theme="dark"]{
     });
     ctx.globalAlpha = 1;
 
+    // hills
     ctx.globalAlpha = 0.9;
     hills.forEach((m, idx)=>{
       const x = m.x*w;
@@ -4299,6 +4351,7 @@ html[data-theme="dark"]{
     });
     ctx.globalAlpha = 1;
 
+    // ground
     const grd = ctx.createLinearGradient(0, gy, 0, h);
     if (night > 0.35){
       grd.addColorStop(0, "rgba(15,23,42,.82)");
@@ -4322,6 +4375,7 @@ html[data-theme="dark"]{
     ctx.lineWidth = Math.max(2, Math.round(w/430));
     ctx.beginPath(); ctx.moveTo(-20, gy); ctx.lineTo(w+20, gy); ctx.stroke();
 
+    // particles
     for (const p of dust){
       ctx.globalAlpha = p.a * 0.9;
       ctx.fillStyle = night > 0.5 ? "rgba(148,163,184,.95)" : "rgba(51,65,85,.55)";
@@ -4334,9 +4388,8 @@ html[data-theme="dark"]{
     }
     ctx.globalAlpha = 1;
 
-    // obstacles...
+    // obstacles (same as your code)
     obstacles.forEach(o=>{
-      // (same as your code)
       if (o.type === "cactus"){
         const fill = night > 0.45 ? "rgba(34,197,94,.92)" : "rgba(22,163,74,.80)";
         const stroke = night > 0.45 ? "rgba(134,239,172,.26)" : "rgba(20,83,45,.18)";
@@ -4410,7 +4463,7 @@ html[data-theme="dark"]{
       }
     });
 
-    // dino...
+    // dino (same as your code)
     const body = (night > 0.45) ? "rgba(226,232,240,.96)" : "rgba(15,23,42,.82)";
     const sq = player.squash;
     const scaleY = 1 - sq*0.10;
@@ -4469,7 +4522,6 @@ html[data-theme="dark"]{
     }
 
     ctx.restore();
-
     modeEl.textContent = night > 0.5 ? "לילה" : "יום";
   }
 
@@ -4478,7 +4530,6 @@ html[data-theme="dark"]{
     lastT = t;
 
     fitCanvas();
-
     if (alive && !paused) step(dt);
     draw();
 
@@ -4496,45 +4547,23 @@ html[data-theme="dark"]{
     resetWorld();
   }
 
-  // ===== Input (capture so site doesn't steal it)
+  // ===== Keyboard
   function onKeyDown(e){
     const k = e.key;
 
-    if (k === "r" || k === "R"){
-      e.preventDefault();
-      hardRestart();
-      return;
-    }
-    if (k === "m" || k === "M"){
-      e.preventDefault();
-      setMuted(!muted);
-      if (!muted) sfx.ui();
-      return;
-    }
-    if (k === "p" || k === "P"){
-      e.preventDefault();
-      togglePause();
-      return;
-    }
+    if (k === "r" || k === "R"){ e.preventDefault(); hardRestart(); return; }
+    if (k === "m" || k === "M"){ e.preventDefault(); setMuted(!muted); if (!muted) sfx.ui(); return; }
+    if (k === "p" || k === "P"){ e.preventDefault(); togglePause(); return; }
 
     if (!startedOnce){
-      if (k === " " || k === "Enter" || k === "ArrowUp"){
-        e.preventDefault();
-        hardStart(false);
-      }
+      if (k === " " || k === "Enter" || k === "ArrowUp"){ e.preventDefault(); hardStart(false); }
       return;
     }
 
     if (!alive || paused) return;
 
-    if (k === " " || k === "ArrowUp" || k === "w" || k === "W"){
-      e.preventDefault();
-      jump();
-    }
-    if (k === "ArrowDown" || k === "s" || k === "S"){
-      e.preventDefault();
-      setDuck(true);
-    }
+    if (k === " " || k === "ArrowUp" || k === "w" || k === "W"){ e.preventDefault(); jump(); }
+    if (k === "ArrowDown" || k === "s" || k === "S"){ e.preventDefault(); setDuck(true); }
   }
 
   function onKeyUp(e){
@@ -4548,13 +4577,9 @@ html[data-theme="dark"]{
       e.preventDefault();
       e.stopPropagation();
       e.stopImmediatePropagation();
-
       warm();
       if (withMute) setMuted(true);
-
       hardStart(!!withMute);
-
-      // FORCE: לפעמים יש מצב שהלולאה “חיה” אבל הזמן תקוע
       lastT = performance.now();
     }, { passive:false, capture:true });
   }
@@ -4562,26 +4587,31 @@ html[data-theme="dark"]{
   bindStartButton(btnStart, false);
   bindStartButton(btnStartMute, true);
 
-  overRestartBtn.onclick = ()=>{ warm(); hardRestart(); };
-  resumeBtn.onclick = ()=>{ warm(); togglePause(); };
+  overRestartBtn.addEventListener("pointerdown", (e)=>{ e.preventDefault(); warm(); hardRestart(); }, {passive:false});
+  resumeBtn.addEventListener("pointerdown", (e)=>{ e.preventDefault(); warm(); togglePause(); }, {passive:false});
 
-  function toggleMuteUI(){
+  function toggleMuteUI(e){
+    if (e) e.preventDefault();
     warm();
     setMuted(!muted);
     if (!muted) sfx.ui();
   }
-  muteBtn.onclick = toggleMuteUI;
-  overMuteBtn.onclick = toggleMuteUI;
-  pauseMuteBtn.onclick = toggleMuteUI;
+  muteBtn.addEventListener("pointerdown", toggleMuteUI, {passive:false});
+  overMuteBtn.addEventListener("pointerdown", toggleMuteUI, {passive:false});
+  pauseMuteBtn.addEventListener("pointerdown", toggleMuteUI, {passive:false});
 
-  jumpBtn.addEventListener("click", ()=>{ warm(); if (!startedOnce) hardStart(false); else jump(); });
-  pauseBtn.addEventListener("click", ()=>{ warm(); togglePause(); });
-  restartBtn.addEventListener("click", ()=>{ warm(); hardRestart(); });
+  pauseBtn.addEventListener("pointerdown", (e)=>{ e.preventDefault(); warm(); togglePause(); }, {passive:false});
+  restartBtn.addEventListener("pointerdown", (e)=>{ e.preventDefault(); warm(); hardRestart(); }, {passive:false});
 
-  duckBtn.addEventListener("pointerdown", ()=>{ warm(); if (!startedOnce) hardStart(false); else setDuck(true); });
-  duckBtn.addEventListener("pointerup", ()=>setDuck(false));
-  duckBtn.addEventListener("pointercancel", ()=>setDuck(false));
-  duckBtn.addEventListener("pointerleave", ()=>setDuck(false));
+  if (jumpBtn){
+    jumpBtn.addEventListener("pointerdown", (e)=>{ e.preventDefault(); warm(); if (!startedOnce) hardStart(false); else jump(); }, {passive:false});
+  }
+  if (duckBtn){
+    duckBtn.addEventListener("pointerdown", (e)=>{ e.preventDefault(); warm(); if (!startedOnce) hardStart(false); else setDuck(true); }, {passive:false});
+    duckBtn.addEventListener("pointerup", ()=>setDuck(false));
+    duckBtn.addEventListener("pointercancel", ()=>setDuck(false));
+    duckBtn.addEventListener("pointerleave", ()=>setDuck(false));
+  }
 
   canvas.addEventListener("pointerdown", ()=>{
     warm();
@@ -4589,9 +4619,125 @@ html[data-theme="dark"]{
     if (!paused) jump();
   }, { passive:true });
 
-  window.addEventListener("keydown", onKeyDown, { passive:false, capture:true });
-  window.addEventListener("keyup", onKeyUp, { capture:true });
-  window.addEventListener("resize", fitCanvas);
+  // ===== 🎮 Joystick logic (single system only)
+  let joyActive = false;
+  let joyPid = null;
+  let joyCenter = { x:0, y:0 };
+  const JOY_RADIUS = 44;
+  const DUCK_TH = 18;
+  const JUMP_TH = 18;
+  let joyJumpArmed = true;
+
+  joyEl.style.touchAction = "none";
+
+  function updateCenter(){
+    const r = joyEl.getBoundingClientRect();
+    joyCenter.x = r.left + r.width/2;
+    joyCenter.y = r.top + r.height/2;
+  }
+
+  function setKnob(dx, dy){
+    const len = Math.hypot(dx, dy);
+    const m = (len > JOY_RADIUS) ? (JOY_RADIUS / len) : 1;
+    const x = dx * m;
+    const y = dy * m;
+
+    joyKnob.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+
+    if (y < -JUMP_TH){
+      if (joyJumpArmed){
+        joyJumpArmed = false;
+        if (!startedOnce) hardStart(false);
+        else jump();
+      }
+    } else {
+      joyJumpArmed = true;
+    }
+
+    if (y > DUCK_TH){
+      if (!startedOnce) hardStart(false);
+      else setDuck(true);
+    } else {
+      if (startedOnce) setDuck(false);
+    }
+  }
+
+  function joyReset(){
+    joyKnob.style.transform = "translate(-50%,-50%)";
+    if (startedOnce) setDuck(false);
+    joyActive = false;
+    joyPid = null;
+    joyJumpArmed = true;
+  }
+
+  // Pointer events (preferred)
+  const HAS_POINTER = "PointerEvent" in window;
+
+  function joyOnPointerDown(e){
+    warm();
+    e.preventDefault();
+    joyActive = true;
+    joyPid = e.pointerId;
+    updateCenter();
+    try { joyEl.setPointerCapture(joyPid); } catch(_) {}
+    setKnob(e.clientX - joyCenter.x, e.clientY - joyCenter.y);
+  }
+  function joyOnPointerMove(e){
+    if (!joyActive || e.pointerId !== joyPid) return;
+    e.preventDefault();
+    setKnob(e.clientX - joyCenter.x, e.clientY - joyCenter.y);
+  }
+  function joyOnPointerUp(e){
+    if (!joyActive || e.pointerId !== joyPid) return;
+    e.preventDefault();
+    try { joyEl.releasePointerCapture(joyPid); } catch(_) {}
+    joyReset();
+  }
+
+  // Touch fallback (iOS older)
+  function joyOnTouchStart(e){
+    warm();
+    e.preventDefault();
+    joyActive = true;
+    updateCenter();
+    const t = e.changedTouches[0];
+    if (!t) return;
+    setKnob(t.clientX - joyCenter.x, t.clientY - joyCenter.y);
+  }
+  function joyOnTouchMove(e){
+    if (!joyActive) return;
+    e.preventDefault();
+    const t = e.changedTouches[0];
+    if (!t) return;
+    setKnob(t.clientX - joyCenter.x, t.clientY - joyCenter.y);
+  }
+  function joyOnTouchEnd(e){
+    if (!joyActive) return;
+    e.preventDefault();
+    joyReset();
+  }
+
+  if (HAS_POINTER){
+    joyEl.addEventListener("pointerdown", joyOnPointerDown, { passive:false });
+    joyEl.addEventListener("pointermove", joyOnPointerMove, { passive:false });
+    joyEl.addEventListener("pointerup", joyOnPointerUp, { passive:false });
+    joyEl.addEventListener("pointercancel", joyOnPointerUp, { passive:false });
+    joyEl.addEventListener("lostpointercapture", joyReset, { passive:true });
+  } else {
+    joyEl.addEventListener("touchstart", joyOnTouchStart, { passive:false });
+    joyEl.addEventListener("touchmove", joyOnTouchMove, { passive:false });
+    joyEl.addEventListener("touchend", joyOnTouchEnd, { passive:false });
+    joyEl.addEventListener("touchcancel", joyOnTouchEnd, { passive:false });
+  }
+
+  // ===== global listeners (use constants so removeEventListener works)
+  const OPT_KEYDOWN = { passive:false, capture:true };
+  const OPT_KEYUP   = { capture:true };
+  const OPT_RESIZE  = false;
+
+  window.addEventListener("keydown", onKeyDown, OPT_KEYDOWN);
+  window.addEventListener("keyup", onKeyUp, OPT_KEYUP);
+  window.addEventListener("resize", fitCanvas, OPT_RESIZE);
 
   // init
   fitCanvas();
@@ -4599,14 +4745,35 @@ html[data-theme="dark"]{
   lastT = performance.now();
   raf = requestAnimationFrame(loop);
 
-  return function cleanup(){
-    cancelAnimationFrame(raf);
-    raf = null; // ✅ so hardStart can re-kick if needed
-    window.removeEventListener("keydown", onKeyDown, { capture:true });
-    window.removeEventListener("keyup", onKeyUp, { capture:true });
-    window.removeEventListener("resize", fitCanvas);
-  };
+  function cleanup(){
+    if (raf) cancelAnimationFrame(raf);
+    raf = null;
+
+    window.removeEventListener("keydown", onKeyDown, OPT_KEYDOWN);
+    window.removeEventListener("keyup", onKeyUp, OPT_KEYUP);
+    window.removeEventListener("resize", fitCanvas, OPT_RESIZE);
+
+    if (HAS_POINTER){
+      joyEl.removeEventListener("pointerdown", joyOnPointerDown);
+      joyEl.removeEventListener("pointermove", joyOnPointerMove);
+      joyEl.removeEventListener("pointerup", joyOnPointerUp);
+      joyEl.removeEventListener("pointercancel", joyOnPointerUp);
+      joyEl.removeEventListener("lostpointercapture", joyReset);
+    } else {
+      joyEl.removeEventListener("touchstart", joyOnTouchStart);
+      joyEl.removeEventListener("touchmove", joyOnTouchMove);
+      joyEl.removeEventListener("touchend", joyOnTouchEnd);
+      joyEl.removeEventListener("touchcancel", joyOnTouchEnd);
+    }
+  }
+
+  // ✅ IMPORTANT: store cleanup for next render
+  root.__dnxCleanup = cleanup;
+
+  return cleanup;
 }
+
+
 
 
 
