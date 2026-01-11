@@ -3403,6 +3403,11 @@ function renderSnakeGame(root){
   --dnx-accBorder: rgba(56,189,248,.50);
   --dnx-accGlow: 0 18px 55px rgba(56,189,248,.22);
 }
+.dnx-stage, .dnx-mobile, .dnx-btn, .dnx-canvas {
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
 
 html[data-theme="dark"]{
   --dnx-bg: rgba(2,6,23,.62);
@@ -3517,7 +3522,7 @@ html[data-theme="dark"]{
   user-select:none;
   transition: transform .08s ease, filter .12s ease;
   font-family: system-ui, -apple-system, Segoe UI, Arial;
-  touch-action: manipulation;
+touch-action: none;
 }
 .dnx-btn:hover{filter:brightness(1.03)}
 .dnx-btn:active{transform:translateY(1px)}
@@ -4594,53 +4599,106 @@ html[data-theme="dark"] .dnx-joy{
   }
 
   // ===== Buttons / touch
-  function bindStartButton(btn, withMute){
-    btn.addEventListener("pointerdown", (e)=>{
-      e.preventDefault();
-      e.stopPropagation();
-      e.stopImmediatePropagation();
-      warm();
-      if (withMute) setMuted(true);
-      hardStart(!!withMute);
-      lastT = performance.now();
-    }, { passive:false, capture:true });
-  }
+// ===== ✅ Buttons / touch (WORKS EVERYWHERE)
+function bindTap(el, fn) {
+  if (!el) return () => {};
+  let lastTouch = 0;
 
-  bindStartButton(btnStart, false);
-  bindStartButton(btnStartMute, true);
-
-  overRestartBtn.addEventListener("pointerdown", (e)=>{ e.preventDefault(); warm(); hardRestart(); }, {passive:false});
-  resumeBtn.addEventListener("pointerdown", (e)=>{ e.preventDefault(); warm(); togglePause(); }, {passive:false});
-
-  function toggleMuteUI(e){
-    if (e) e.preventDefault();
+  const fire = (e) => {
+    try { if (e && e.cancelable) e.preventDefault(); } catch {}
+    try { e.stopPropagation(); } catch {}
     warm();
-    setMuted(!muted);
-    if (!muted) sfx.ui();
-  }
-  muteBtn.addEventListener("pointerdown", toggleMuteUI, {passive:false});
-  overMuteBtn.addEventListener("pointerdown", toggleMuteUI, {passive:false});
-  pauseMuteBtn.addEventListener("pointerdown", toggleMuteUI, {passive:false});
+    fn(e);
+  };
 
-  pauseBtn.addEventListener("pointerdown", (e)=>{ e.preventDefault(); warm(); togglePause(); }, {passive:false});
-  restartBtn.addEventListener("pointerdown", (e)=>{ e.preventDefault(); warm(); hardRestart(); }, {passive:false});
+  const onPointerDown = (e) => fire(e);
+  const onTouchStart = (e) => { lastTouch = Date.now(); fire(e); };
+  const onClick = (e) => {
+    // block ghost click after touch
+    if (Date.now() - lastTouch < 450) return;
+    fire(e);
+  };
 
-  if (jumpBtn){
-    jumpBtn.addEventListener("pointerdown", (e)=>{ e.preventDefault(); warm(); if (!startedOnce) hardStart(false); else jump(); }, {passive:false});
-  }
-  if (duckBtn){
-    duckBtn.addEventListener("pointerdown", (e)=>{ e.preventDefault(); warm(); if (!startedOnce) hardStart(false); else setDuck(true); }, {passive:false});
-    duckBtn.addEventListener("pointerup", ()=>setDuck(false));
-    duckBtn.addEventListener("pointercancel", ()=>setDuck(false));
-    duckBtn.addEventListener("pointerleave", ()=>setDuck(false));
-  }
+  el.addEventListener("pointerdown", onPointerDown, { passive:false, capture:true });
+  el.addEventListener("touchstart", onTouchStart, { passive:false, capture:true });
+  el.addEventListener("click", onClick, { passive:false, capture:true });
 
-canvas.addEventListener("pointerdown", (e)=>{
-  e.preventDefault();
-  warm();
+  return () => {
+    el.removeEventListener("pointerdown", onPointerDown, { capture:true });
+    el.removeEventListener("touchstart", onTouchStart, { capture:true });
+    el.removeEventListener("click", onClick, { capture:true });
+  };
+}
+
+function bindHold(el, onDown, onUp) {
+  if (!el) return () => {};
+  let down = false;
+
+  const start = (e) => {
+    down = true;
+    try { if (e && e.cancelable) e.preventDefault(); } catch {}
+    try { e.stopPropagation(); } catch {}
+    warm();
+    onDown(e);
+  };
+
+  const end = (e) => {
+    if (!down) return;
+    down = false;
+    onUp(e);
+  };
+
+  el.addEventListener("pointerdown", start, { passive:false, capture:true });
+  el.addEventListener("touchstart", start, { passive:false, capture:true });
+
+  window.addEventListener("pointerup", end, { passive:false, capture:true });
+  window.addEventListener("pointercancel", end, { passive:false, capture:true });
+  window.addEventListener("touchend", end, { passive:false, capture:true });
+  window.addEventListener("touchcancel", end, { passive:false, capture:true });
+
+  return () => {
+    el.removeEventListener("pointerdown", start, { capture:true });
+    el.removeEventListener("touchstart", start, { capture:true });
+
+    window.removeEventListener("pointerup", end, { capture:true });
+    window.removeEventListener("pointercancel", end, { capture:true });
+    window.removeEventListener("touchend", end, { capture:true });
+    window.removeEventListener("touchcancel", end, { capture:true });
+  };
+}
+
+// Start buttons
+const unStart1 = bindTap(btnStart, () => { setMuted(false); hardStart(false); lastT = performance.now(); });
+const unStart2 = bindTap(btnStartMute, () => { setMuted(true); hardStart(true); lastT = performance.now(); });
+
+// Overlay buttons
+const unOverRestart = bindTap(overRestartBtn, () => hardRestart());
+const unResume      = bindTap(resumeBtn, () => togglePause());
+
+// Mute buttons
+const unMute1 = bindTap(muteBtn, () => { setMuted(!muted); if (!muted) sfx.ui(); });
+const unMute2 = bindTap(overMuteBtn, () => { setMuted(!muted); if (!muted) sfx.ui(); });
+const unMute3 = bindTap(pauseMuteBtn, () => { setMuted(!muted); if (!muted) sfx.ui(); });
+
+// Top bar buttons
+const unPause   = bindTap(pauseBtn, () => togglePause());
+const unRestart = bindTap(restartBtn, () => hardRestart());
+
+// Mobile controls
+const unJump = bindTap(jumpBtn, () => { if (!startedOnce) hardStart(false); else jump(); });
+
+const unDuck = bindHold(
+  duckBtn,
+  () => { if (!startedOnce) hardStart(false); else setDuck(true); },
+  () => { if (startedOnce) setDuck(false); }
+);
+
+// Canvas tap = start/jump
+const unCanvas = bindTap(canvas, () => {
   if (!startedOnce) { hardStart(false); return; }
   if (!paused) jump();
-}, { passive:false });
+});
+
 
 
   // ===== 🎮 Joystick logic (single system only)
@@ -4769,27 +4827,43 @@ canvas.addEventListener("pointerdown", (e)=>{
   lastT = performance.now();
   raf = requestAnimationFrame(loop);
 
-  function cleanup(){
-    if (raf) cancelAnimationFrame(raf);
-    raf = null;
+function cleanup(){
+  if (raf) cancelAnimationFrame(raf);
+  raf = null;
 
-    window.removeEventListener("keydown", onKeyDown, OPT_KEYDOWN);
-    window.removeEventListener("keyup", onKeyUp, OPT_KEYUP);
-    window.removeEventListener("resize", fitCanvas, OPT_RESIZE);
+  window.removeEventListener("keydown", onKeyDown, OPT_KEYDOWN);
+  window.removeEventListener("keyup", onKeyUp, OPT_KEYUP);
+  window.removeEventListener("resize", fitCanvas, OPT_RESIZE);
 
-    if (HAS_POINTER){
-      joyEl.removeEventListener("pointerdown", joyOnPointerDown);
-      joyEl.removeEventListener("pointermove", joyOnPointerMove);
-      joyEl.removeEventListener("pointerup", joyOnPointerUp);
-      joyEl.removeEventListener("pointercancel", joyOnPointerUp);
-      joyEl.removeEventListener("lostpointercapture", joyReset);
-    } else {
-      joyEl.removeEventListener("touchstart", joyOnTouchStart);
-      joyEl.removeEventListener("touchmove", joyOnTouchMove);
-      joyEl.removeEventListener("touchend", joyOnTouchEnd);
-      joyEl.removeEventListener("touchcancel", joyOnTouchEnd);
-    }
+  // ✅ remove UI listeners
+  try { unStart1(); } catch {}
+  try { unStart2(); } catch {}
+  try { unOverRestart(); } catch {}
+  try { unResume(); } catch {}
+  try { unMute1(); } catch {}
+  try { unMute2(); } catch {}
+  try { unMute3(); } catch {}
+  try { unPause(); } catch {}
+  try { unRestart(); } catch {}
+  try { unJump(); } catch {}
+  try { unDuck(); } catch {}
+  try { unCanvas(); } catch {}
+
+  // remove joystick listeners
+  if (HAS_POINTER){
+    joyEl.removeEventListener("pointerdown", joyOnPointerDown);
+    joyEl.removeEventListener("pointermove", joyOnPointerMove);
+    joyEl.removeEventListener("pointerup", joyOnPointerUp);
+    joyEl.removeEventListener("pointercancel", joyOnPointerUp);
+    joyEl.removeEventListener("lostpointercapture", joyReset);
+  } else {
+    joyEl.removeEventListener("touchstart", joyOnTouchStart);
+    joyEl.removeEventListener("touchmove", joyOnTouchMove);
+    joyEl.removeEventListener("touchend", joyOnTouchEnd);
+    joyEl.removeEventListener("touchcancel", joyOnTouchEnd);
   }
+}
+
 
   // ✅ IMPORTANT: store cleanup for next render
   root.__dnxCleanup = cleanup;
