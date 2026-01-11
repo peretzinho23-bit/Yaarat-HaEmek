@@ -3627,6 +3627,65 @@ html[data-theme="dark"] .dnx-joy{
   box-shadow: var(--dnx-accGlow);
   pointer-events:none;
 }
+/* Overlay */
+.dnx-overlay{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:7;
+  pointer-events:none;
+}
+#dnxOverlay::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background: rgba(0,0,0,0.08);
+}
+#dnxStartCard, #dnxOverCard, #dnxPausedCard{
+  position:relative;
+  z-index:1;
+  pointer-events:auto;
+}
+
+/* ✅ Mobile buttons BELOW the stage (ONE definition only) */
+.dnx-mobile{ display:none; }
+
+@media (max-width:760px){
+  .dnx-tip{ display:none; }
+  .dnx-hud{ padding:10px 10px; gap:8px; }
+  .dnx-left{ gap:6px; }
+  .dnx-pill{ padding:6px 10px; font-size:.9rem; }
+  .dnx-stage{ border-radius:16px; aspect-ratio: 16 / 10; touch-action:none; }
+  .dnx-canvas{ touch-action:none; }
+
+  .dnx-joywrap{ display:none !important; }
+
+  .dnx-mobile{
+    display:flex !important;
+    gap:10px;
+    margin-top:10px;
+    padding: 0 8px calc(10px + env(safe-area-inset-bottom));
+    width:100%;
+  }
+
+  .dnx-mobile .dnx-btn{
+    flex:1;
+    padding:14px 12px;
+    border-radius:16px;
+    font-size:1rem;
+
+    background: rgba(255,255,255,.70);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  html[data-theme="dark"] .dnx-mobile .dnx-btn{
+    background: rgba(2,6,23,.50);
+  }
+}
 
 /* ✅ Mobile buttons OUTSIDE stage (one definition only) */
 .dnx-mobile{
