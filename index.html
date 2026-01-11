@@ -3723,11 +3723,18 @@ html[data-theme="dark"] .dnx-joy{
           <button type="button" id="dnxMute" class="dnx-btn">🔈</button>
         </div>
       </div>
+<div class="dnx-stage" dir="rtl">
+  <canvas id="dnxCanvas" class="dnx-canvas" width="960" height="560"></canvas>
+  ...
+  <div class="dnx-overlay" id="dnxOverlay"> ... </div>
+</div>
 
-      <div class="dnx-mobile" aria-label="פקדים למובייל (ישן)">
-        <button type="button" id="dnxJump" class="dnx-btn dnx-btn-acc">קפיצה</button>
-        <button type="button" id="dnxDuck" class="dnx-btn">התכופף</button>
-      </div>
+<!-- ✅ moved outside stage -->
+<div class="dnx-mobile" aria-label="פקדים למובייל">
+  <button type="button" id="dnxJump" class="dnx-btn dnx-btn-acc">קפיצה</button>
+  <button type="button" id="dnxDuck" class="dnx-btn">התכופף</button>
+</div>
+
 
       <div class="dnx-overlay" id="dnxOverlay">
         <div class="dnx-card" id="dnxStartCard">
