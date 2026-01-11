@@ -35,7 +35,7 @@ console.log("🔥 ADMIN.JS LOADED");
 ============================= */
 
 // DEV שמותר לו הכל + גישה לדף dev.html
-const DEV_EMAILS = ["nadavp1119@gmail.com", "peretzinho23@gmail.com"].map((e) => e.toLowerCase());
+const DEV_EMAILS = ["nadavp1119@gmail.com", "peretzinho23@gmail.com", "yaaranihol@gmail.com"].map((e) => e.toLowerCase());
 // מי רשאי להיכנס ל-admin.html (דף הניהול)
 const ADMIN_ROLES = ["teacher", "gradelead", "counselor", "principal", "dev", "admin"];
 
