@@ -228,20 +228,38 @@ const css = `
     opacity: 1;
   }
 }
-/* ✅ דסקטופ: נשאר כמו שהיה (למעלה בצד) */
-@media (min-width: 801px){
+@media (max-width: 800px){
+
+  /* FAB באזור ההירו (כמו הצהוב בתמונה) */
   #lu-fab{
+    top: calc(env(safe-area-inset-top, 0px) + 86px) !important; /* יורד מתחת ללוגו */
     bottom: auto !important;
-    top: 140px !important;
+
+    left: 12px !important;
+    right: auto !important;
+
+    z-index: 999999 !important;
   }
-  #lu-panel{
-    position: absolute;
-    top: 6vh;
-    bottom: auto;
-    opacity: 1;
-    transform: none;
+
+  /* קומפקטי ולא מסתיר */
+  #lu-fab button{
+    padding: 8px 10px !important;
+    gap: 8px !important;
+    border-radius: 999px !important;
+    font-size: 13px !important;
+    box-shadow: 0 8px 18px rgba(0,0,0,.12) !important;
+    background: rgba(255,255,255,.78) !important;
+    backdrop-filter: blur(10px) !important;
+  }
+
+  #lu-badge{
+    min-width: 20px !important;
+    height: 20px !important;
+    padding: 0 6px !important;
+    font-size: 12px !important;
   }
 }
+
 
 
 /* ✅ אם התפריט הצדדי פתוח והוא מכסה: תוכל להפעיל body.menu-open ואז זה יחביא */
