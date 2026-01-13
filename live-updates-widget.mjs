@@ -189,60 +189,12 @@ const css = `
 }
 #lu-add:hover{filter:brightness(.98);}
 
-/* ✅ מובייל: FAB נשאר למטה + הפאנל נפתח מלמטה (לא למעלה) */
-@media (max-width: 800px){
-
-  /* FAB */
-  #lu-fab{
-    top: auto !important;
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 16px) !important;
-
-    /* אם CFG.position = left זה יהיה שמאל, אם right זה יהיה ימין */
-    left: auto !important;
-    right: auto !important;
-    ${CFG.position}: 12px !important;
-  }
-
-  /* מודאל + פאנל */
-  @media (max-width: 800px){
-
-  /* הפאנל ייפתח מלמעלה כמו שצריך */
-  #lu-panel{
-    top: calc(env(safe-area-inset-top, 0px) + 10px) !important;
-    left: 10px !important;
-    right: 10px !important;
-    width: auto !important;
-
-    height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 20px) !important;
-    max-height: none !important;
-    border-radius: 18px !important;
-  }
-
-  /* שהרשימה לא תיכנס מתחת לפוטר */
-  #lu-list{
-    padding-bottom: 90px !important;
-  }
-
-  /* פוטר נשאר תמיד למטה בתוך הפאנל */
-  #lu-footer{
-    position: sticky !important;
-    bottom: 0 !important;
-    z-index: 2 !important;
-  }
-}
-
-
-  /* כשהמודאל פתוח – להחליק למעלה */
-  #lu-modal[open] #lu-panel{
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
+/* ✅ מובייל: FAB באזור ההירו + מודאל נפתח נכון מלמעלה */
 @media (max-width: 800px){
 
   /* FAB באזור ההירו (כמו הצהוב בתמונה) */
   #lu-fab{
-    top: calc(env(safe-area-inset-top, 0px) + 86px) !important; /* יורד מתחת ללוגו */
+    top: calc(env(safe-area-inset-top, 0px) + 86px) !important;
     bottom: auto !important;
 
     left: 12px !important;
@@ -268,7 +220,27 @@ const css = `
     padding: 0 6px !important;
     font-size: 12px !important;
   }
+
+  /* הפאנל נפתח מלמעלה ולא נדחף למטה */
+  #lu-panel{
+    top: calc(env(safe-area-inset-top, 0px) + 10px) !important;
+    left: 10px !important;
+    right: 10px !important;
+    width: auto !important;
+
+    height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 20px) !important;
+    max-height: none !important;
+    border-radius: 18px !important;
+  }
+
+  /* פוטר תקין */
+  #lu-footer{
+    position: sticky !important;
+    bottom: 0 !important;
+    z-index: 2 !important;
+  }
 }
+
 
 
 
@@ -288,18 +260,28 @@ body.menu-open #lu-fab{display:none !important;}
 
   let state = { user: null, tab: "live", unsub: null, badgeUnsub: null };
 
-const ensureAnonAuth = async () => {
-  // אם כבר מחובר (אדמין/גוגל/אימייל) — אל תדרוס
-  if (auth.currentUser) {
-    state.user = auth.currentUser;
-    return state.user;
-  }
+const waitForAuthOnce = () =>
+  new Promise((resolve) => {
+    const unsub = onAuthStateChanged(auth, (u) => {
+      try { unsub(); } catch {}
+      resolve(u || null);
+    });
+  });
 
-  // רק אם אין משתמש בכלל — תעשה אנונימי
+const ensureAnonAuth = async () => {
+  if (state.user) return state.user;
+
+  // ✅ חכה רגע לשחזור התחברות (email user)
+  const u = auth.currentUser || (await waitForAuthOnce());
+  if (u) { state.user = u; return u; }
+
+  // ✅ אם באמת אין אף אחד — anonymous
   await signInAnonymously(auth);
   state.user = auth.currentUser;
   return state.user;
 };
+
+
 
 
   const setBadge = (n) => {
@@ -422,7 +404,11 @@ const addBtn = el("button", {
   onclick: () => (location.href = "/add-update.html"),
 }, ["✍️ הוסף עדכון"]);
 
-const footer = el("div", { id: "lu-footer" }, [refreshBtn, editBtn]);
+const footer = el("div", { id: "lu-footer" }, [
+  refreshBtn,
+  el("div", { style: "flex:1" }), // spacer
+  editBtn
+]);
 
     const panel = el("div", { id: "lu-panel" }, [head, list, footer]);
     const modal = el("div", { id: "lu-modal" }, [overlay, panel]);
