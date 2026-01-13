@@ -8,7 +8,6 @@
     body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:0;background:#f6f7fb}
     .wrap{max-width:760px;margin:24px auto;padding:16px}
 
-    /* header */
     .topbar{display:flex;align-items:center;gap:12px;margin-bottom:12px}
     .logoLink{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit}
     .logoImg{
@@ -40,7 +39,6 @@
 <body>
   <div class="wrap">
 
-    <!-- ✅ Logo (clickable) -->
     <div class="topbar">
       <a class="logoLink" href="/" title="חזרה לדף הבית">
         <img class="logoImg" src="/favicon-192x192.png" alt="לוגו" onerror="this.style.display='none'">
@@ -63,10 +61,18 @@
       <div id="formArea" class="hide">
         <div class="row">
           <div class="field">
+            <label>שם מפרסם (יופיע בעדכון)</label>
+            <input id="authorNameInput" maxlength="60" placeholder="למשל: דסק החינוך / רכזת שכבה ח׳" />
+            <div class="muted">לא יופיע אימייל. מומלץ שם תפקיד/שם פרטי.</div>
+          </div>
+
+          <div class="field">
             <label>כותרת</label>
             <input id="title" maxlength="120" placeholder="למשל: שינוי במערכת / הודעה חשובה" />
           </div>
+        </div>
 
+        <div class="row">
           <div class="field">
             <label>למי לשלוח</label>
             <select id="audienceType">
@@ -74,6 +80,11 @@
               <option value="grade">שכבה</option>
               <option value="class">כיתה</option>
             </select>
+          </div>
+
+          <div class="field">
+            <label class="muted">טיפ</label>
+            <div class="muted" style="padding:10px 0">אם בחרת שכבה/כיתה, מלא למטה.</div>
           </div>
         </div>
 
@@ -110,26 +121,30 @@
     </div>
   </div>
 
-  <!-- ✅ Firebase v11 module code -->
- <!-- שים את זה במקום כל בלוק ה-script הישן -->
 <script type="module">
   import { db, auth, storage } from "./firebase-config.js";
 
   import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
-  import {
-    doc, getDoc, collection, writeBatch, serverTimestamp, Timestamp
-  } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
-  import {
-    ref as sRef, uploadBytes, getDownloadURL
-  } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-storage.js";
+  import { doc, getDoc, collection, writeBatch, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+  import { ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-storage.js";
 
   const $ = (id) => document.getElementById(id);
+  const NAME_KEY = "lu_author_name";
 
   function setStatus(html, cls="muted"){
     const s = $("status");
     s.className = cls;
     s.innerHTML = html;
   }
+
+  $("goHome").addEventListener("click", () => (location.href = "/"));
+  $("goLogin").addEventListener("click", () => (location.href = "/admin.html"));
+  $("back").addEventListener("click", () => history.back());
+
+  window.addEventListener("load", () => {
+    const saved = localStorage.getItem(NAME_KEY) || "";
+    if (saved) $("authorNameInput").value = saved;
+  });
 
   async function isTeacherUser(user){
     try{
@@ -188,19 +203,22 @@
 
       const audience = getAudience();
 
+      const authorNameInput = $("authorNameInput").value.trim();
+      const safeAuthorName = authorNameInput || "צוות בית הספר";
+      localStorage.setItem(NAME_KEY, safeAuthorName);
+
       const postId = doc(collection(db, "liveUpdates")).id;
       const imageUrls = await uploadImageIfAny(postId);
 
-      const now = Date.now();
-      const expiresAt = Timestamp.fromDate(new Date(now + 24*60*60*1000));
+      const expiresAt = Timestamp.fromDate(new Date(Date.now() + 24*60*60*1000));
 
       const base = {
         title: title || "",
         text,
         audience,
-        imageUrls,              // ✅ array
+        imageUrls,
         authorUid: user.uid,
-        authorName: user.email || user.displayName || "צוות בית הספר",
+        authorName: safeAuthorName,
         authorPhoto: user.photoURL || "",
         createdAt: serverTimestamp(),
         expiresAt,
@@ -227,19 +245,23 @@
   }
 
   $("publish").addEventListener("click", publish);
-  $("back").addEventListener("click", () => history.back());
 
   onAuthStateChanged(auth, async (user) => {
     if(!user){
       setStatus("אתה לא מחובר. תתחבר דרך האתר ואז תחזור לכאן.", "danger");
+      $("loginHint").classList.remove("hide");
       return;
     }
+
     const ok = await isTeacherUser(user);
     if(!ok){
       setStatus("אין לך הרשאה לפרסם עדכונים.", "danger");
       return;
     }
+
     setStatus("מחובר ומורשה לפרסום ✅", "ok");
     $("formArea").classList.remove("hide");
   });
 </script>
+</body>
+</html>
