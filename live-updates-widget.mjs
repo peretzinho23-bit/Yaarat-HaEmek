@@ -103,6 +103,28 @@ const css = `
   display:flex;
   flex-direction:column;
 }
+/* ✅ כפתור מעבר לעריכה (כולם רואים) */
+#lu-edit{
+  border:1px solid rgba(2,6,23,.14);
+  background:rgba(2,6,23,.06);
+  color:rgba(2,6,23,.92);
+  border-radius:12px;
+  padding:8px 10px;
+  cursor:pointer;
+  font-weight:900;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  white-space:nowrap;
+  transition:transform .06s ease, filter .12s ease, background .12s ease;
+}
+#lu-edit:hover{
+  background:rgba(2,6,23,.09);
+  filter:brightness(.99);
+}
+#lu-edit:active{
+  transform:translateY(1px);
+}
 
 #lu-head{padding:12px 12px 10px;background:linear-gradient(180deg,rgba(248,250,252,.9),rgba(255,255,255,.9));border-bottom:1px solid rgba(0,0,0,.08);}
 #lu-toprow{display:flex;align-items:center;justify-content:space-between;gap:10px;}
@@ -319,7 +341,12 @@ el("div", { id: "lu-title" }, [
 
     const list = el("div", { id: "lu-list" }, [el("div", { class: "lu-muted" }, ["טוען..."])]);
     const refreshBtn = el("button", { id: "lu-refresh", type: "button", onclick: () => reloadCurrentTab() }, ["רענן"]);
-    const note = el("div", { id: "lu-note" }, ["לייקים מופיעים רק בלייב"]);
+const editBtn = el("button", {
+  id: "lu-edit",
+  type: "button",
+  onclick: () => (location.href = "/add-update.html"),
+  title: "מעבר לעמוד עריכה / הוספת עדכון",
+}, ["✍️ עריכה / הוספת עדכון"]);
 const addBtn = el("button", {
   id: "lu-add",
   type: "button",
@@ -327,7 +354,7 @@ const addBtn = el("button", {
   onclick: () => (location.href = "/add-update.html"),
 }, ["✍️ הוסף עדכון"]);
 
-const footer = el("div", { id: "lu-footer" }, [refreshBtn, note, addBtn]);
+const footer = el("div", { id: "lu-footer" }, [refreshBtn, editBtn]);
 
     const panel = el("div", { id: "lu-panel" }, [head, list, footer]);
     const modal = el("div", { id: "lu-modal" }, [overlay, panel]);
