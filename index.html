@@ -2037,6 +2037,29 @@ html[data-theme="dark"] .hero-latest-title{
     </div>
   </section>
   <div id="urgent-wrap" class="urgent-wrap" style="display:none;"></div>
+<!-- Firebase (Compat) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<script>
+  firebase.initializeApp({
+    apiKey: "…",
+    authDomain: "…",
+    projectId: "…",
+  });
+</script>
+
+<script src="live-updates-widget.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => initLiveUpdatesWidget());
+</script>
+
+<script src="live-updates-widget.js"></script>
+<script>
+  initLiveUpdatesWidget();
+</script>
+
 
    <section id="home-class-picker" class="section-light reveal-on-scroll">
   <div class="container">
