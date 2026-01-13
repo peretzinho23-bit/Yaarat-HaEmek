@@ -742,7 +742,7 @@ html[data-theme="light"] .toast{
   </style>
 </head>
 
-<body data-page="adminapps">
+<body data-page="adminaps">
   <script type="module" src="analytics.js"></script>
 
   <header class="header-main">
@@ -881,18 +881,45 @@ html[data-theme="light"] .toast{
   <script src="accessibility.js"></script>
   <script type="module" src="app.js"></script>
 
+<script>
+  /* =========================
+     DATA
+     ========================= */
+  const apps = [
+    // ===== מרכזים =====
+    { title:"דף האדמין הראשי", desc:"מרכז האדמין הקיים (חדשות/מבחנים/לוח/תוכן/סקרים).", href:"admin.html", icon:"⚙️", chip:{text:"חשוב", cls:"chip-hot"}, group:"hot", keywords:"admin ניהול panel מרכז" },
+    { title:"Admin Apps (הדף הזה)", desc:"כל הקיצורים במקום אחד.", href:"admin-apps.html", icon:"🧠", chip:{text:"מרכז", cls:""}, group:"all", keywords:"apps קיצורים adminapps" },
+
+    // ===== תוכן / בית ספר =====
+    { title:"עריכת מערכת שעות", desc:"עדכון שעות לכל שכבה / כיתות.", href:"timetable-admin.html", icon:"🗓️", chip:{text:"חשוב", cls:"chip-hot"}, group:"hot", keywords:"מערכת שעות timetable schedule" },
+    { title:"עריכת עדכונים חיים", desc:"עמוד הוספה/עריכה לעדכונים חיים.", href:"add-update.html", icon:"📰", chip:{text:"חשוב", cls:"chip-hot"}, group:"hot", keywords:"עדכונים חיים live updates add-update" },
+
+    { title:"ניהול סקרים (Admin)", desc:"יצירה/מחיקה/הפעלה/כיבוי ותוצאות.", href:"polls-admin.html", icon:"📊", chip:{text:"חשוב", cls:"chip-hot"}, group:"hot", keywords:"סקרים polls admin votes תוצאות" },
+    { title:"עמוד סקרים (לציבור)", desc:"העמוד הציבורי של הסקרים.", href:"polls.html", icon:"🗳️", chip:{text:"תוכן", cls:"chip-ai"}, group:"content", keywords:"polls סקרים" },
+
+    { title:"דף אודות (עריכה)", desc:"נפתח עם edit=1 ומנסה לשמור ל-Firestore.", href:"about.html?edit=1", icon:"✏️", chip:{text:"תוכן", cls:"chip-ai"}, group:"content", keywords:"אודות about edit content" },
+    { title:"דף אודות (צפייה)", desc:"אודות רגיל (ללא עריכה).", href:"about.html", icon:"ℹ️", chip:{text:"תוכן", cls:"chip-ai"}, group:"content", keywords:"אודות about" },
+
+    { title:"דף יצירת קשר", desc:"צפייה/בדיקה (מובייל/מפה/טלפון).", href:"index.html#contact", icon:"☎️", chip:{text:"תוכן", cls:"chip-ai"}, group:"content", keywords:"contact יצירת קשר מפה טלפון" },
+
+    // ===== לוגים/מעקב =====
+    { title:"יומן שינויים", desc:"מעקב מה השתנה באתר ומתי (audit).", href:"logs.html", icon:"🧾", chip:{text:"לוגים", cls:"chip-danger"}, group:"danger", keywords:"לוגים logs שינויים audit" },
+    { title:"סטטיסטיקות / אנליטיקס", desc:"בדיקת pageViews וכו׳ (אם יש לך דף כזה).", href:"analytics.html", icon:"📈", chip:{text:"לוגים", cls:"chip-danger"}, group:"danger", keywords:"analytics סטטיסטיקה pageviews" },
+
+    // ===== אבטחה / הרשאות =====
+    { title:"DEV – ניהול משתמשי Admin", desc:"הרשאות/תפקידים/גישה (adminUsers).", href:"dev.html", icon:"🛡️", chip:{text:"אבטחה", cls:"chip-sec"}, group:"sec", keywords:"dev adminUsers הרשאות role" },
+    { title:"דף התחברות אדמין", desc:"מסך login לאדמין (במידה ורוצים לבדוק גישה).", href:"admin.html", icon:"🔑", chip:{text:"אבטחה", cls:"chip-sec"}, group:"sec", keywords:"login admin auth" },
+
+    // ===== שירותים/כלים =====
+    { title:"מרחב אישי (Redirect)", desc:"קיצור למרחב האישי.", href:"redirect-edu.html", icon:"🎒", chip:{text:"חשוב", cls:"chip-hot"}, group:"hot", keywords:"מרחב אישי redirect edu" },
+
+    // ===== קיצורי עוגנים בדף הבית =====
+    { title:"דף הבית – חדשות", desc:"קפיצה ישר לחדשות בדף הבית.", href:"index.html#home-news", icon:"🧷", chip:{text:"תוכן", cls:"chip-ai"}, group:"content", keywords:"home news חדשות עוגן" },
+    { title:"דף הבית – מבחנים", desc:"קפיצה ישר למבחנים בדף הבית.", href:"index.html#home-exams", icon:"🧷", chip:{text:"תוכן", cls:"chip-ai"}, group:"content", keywords:"home exams מבחנים עוגן" },
+    { title:"דף הבית – שכבות", desc:"קפיצה ישר לשכבות.", href:"index.html#grades", icon:"🧷", chip:{text:"תוכן", cls:"chip-ai"}, group:"content", keywords:"grades שכבות עוגן" },
+  ];
+</script>
   <script>
-    /* =========================
-       DATA
-       ========================= */
-    const apps = [
-      { title:"דף עריכת מערכת שעות", desc:"עדכון שעות לכל שכבה / כיתות. הכי ביום-יום.", href:"timetable-admin.html", icon:"🗓️", chip:{text:"חשוב", cls:"chip-hot"}, group:"hot", keywords:"מערכת שעות timetable schedule" },
-      { title:"ניהול סקרים", desc:"יצירה, עריכה, פתיחה/סגירה ותוצאות. שליטה מלאה.", href:"polls-admin.html", icon:"📊", chip:{text:"חשוב", cls:"chip-hot"}, group:"hot", keywords:"סקרים polls votes תוצאות" },
-      { title:"עריכת מלל בדף האודות", desc:"העורך נפתח רק עם edit=1 ומנסה לשמור ל-Firestore.", href:"about.html?edit=1", icon:"✏️", chip:{text:"תוכן", cls:"chip-ai"}, group:"content", keywords:"אודות about edit content מלל" },
-      { title:"ניהול משתמשי Admin", desc:"עמוד הרשאות / משתמשי אדמין (רשאות).", href:"dev.html", icon:"👤", chip:{text:"אבטחה", cls:"chip-sec"}, group:"sec", keywords:"admin משתמשים הרשאות users" },
-      { title:"דף האדמין הראשי", desc:"מרכז האדמין הקיים (עוד כלים).", href:"admin.html", icon:"🧩", chip:{text:"מרכז", cls:""}, group:"all", keywords:"admin פאנל ניהול panel" },
-      { title:"יומן שינויים", desc:"מעקב מה השתנה באתר ומתי.", href:"logs.html", icon:"🧾", chip:{text:"לוגים", cls:"chip-danger"}, group:"danger", keywords:"לוגים logs שינויים audit" }
-    ];
 
     /* =========================
        UI refs
@@ -1163,7 +1190,6 @@ html[data-theme="light"] .toast{
       }
     });
   </script>
-    <script type="module" src="analytics.js"></script>
 
 </body>
 </html>
