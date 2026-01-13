@@ -189,20 +189,60 @@ const css = `
 }
 #lu-add:hover{filter:brightness(.98);}
 
-/* ✅ מובייל: הכפתור יורד למטה ולא נתקע למעלה */
+/* ✅ מובייל: FAB נשאר למטה + הפאנל נפתח מלמטה (לא למעלה) */
 @media (max-width: 800px){
+
+  /* FAB */
   #lu-fab{
-    top:auto !important;
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 88px) !important;
-    left: 12px !important;
+    top: auto !important;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 16px) !important;
+
+    /* אם CFG.position = left זה יהיה שמאל, אם right זה יהיה ימין */
+    left: auto !important;
     right: auto !important;
+    ${CFG.position}: 12px !important;
   }
+
+  /* מודאל + פאנל */
   #lu-panel{
+    position: fixed !important;
+
+    top: auto !important;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 12px) !important;
+
     left: 12px !important;
     right: 12px !important;
     width: auto !important;
+
+    height: min(78vh, 620px) !important;
+    border-radius: 18px !important;
+
+    transform: translateY(20px);
+    opacity: 0;
+    transition: transform .18s ease, opacity .18s ease;
+  }
+
+  /* כשהמודאל פתוח – להחליק למעלה */
+  #lu-modal[open] #lu-panel{
+    transform: translateY(0);
+    opacity: 1;
   }
 }
+/* ✅ דסקטופ: נשאר כמו שהיה (למעלה בצד) */
+@media (min-width: 801px){
+  #lu-fab{
+    bottom: auto !important;
+    top: 140px !important;
+  }
+  #lu-panel{
+    position: absolute;
+    top: 6vh;
+    bottom: auto;
+    opacity: 1;
+    transform: none;
+  }
+}
+
 
 /* ✅ אם התפריט הצדדי פתוח והוא מכסה: תוכל להפעיל body.menu-open ואז זה יחביא */
 body.menu-open #lu-fab{display:none !important;}
