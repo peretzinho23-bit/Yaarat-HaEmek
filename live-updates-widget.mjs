@@ -8,7 +8,10 @@ import {
   collection, query, orderBy, limit, onSnapshot, doc, getDoc,
   runTransaction, serverTimestamp, increment, updateDoc
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
-import { signInAnonymously } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+import {
+  signInAnonymously,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
 (function () {
   const CFG = {
@@ -195,13 +198,19 @@ body.menu-open #lu-fab{display:none !important;}
 
   let state = { user: null, tab: "live", unsub: null, badgeUnsub: null };
 
-  const ensureAnonAuth = async () => {
-    if (state.user) return state.user;
-    if (auth.currentUser) { state.user = auth.currentUser; return state.user; }
-    await signInAnonymously(auth);
+const ensureAnonAuth = async () => {
+  // אם כבר מחובר (אדמין/גוגל/אימייל) — אל תדרוס
+  if (auth.currentUser) {
     state.user = auth.currentUser;
     return state.user;
-  };
+  }
+
+  // רק אם אין משתמש בכלל — תעשה אנונימי
+  await signInAnonymously(auth);
+  state.user = auth.currentUser;
+  return state.user;
+};
+
 
   const setBadge = (n) => {
     const b = document.getElementById("lu-badge");
@@ -267,6 +276,18 @@ const isTeacherUser = async (user) => {
     return false;
   }
 };
+const updateAddButtonUI = async () => {
+  const btn = document.getElementById("lu-add");
+  if (!btn) return;
+
+  try {
+    const user = auth.currentUser;
+    const ok = await isTeacherUser(user);
+    btn.style.display = ok ? "" : "none";
+  } catch {
+    btn.style.display = "none";
+  }
+};
 
   const buildWidget = () => {
     if (document.getElementById("lu-fab")) return;
@@ -313,15 +334,7 @@ const footer = el("div", { id: "lu-footer" }, [refreshBtn, note, addBtn]);
 
     document.body.appendChild(fab);
     document.body.appendChild(modal);
-// ✅ להראות "הוסף עדכון" רק לצוות
-(async () => {
-  try{
-    await ensureAnonAuth();
-    const ok = await isTeacherUser(auth.currentUser);
-    const btn = document.getElementById("lu-add");
-    if (btn && ok) btn.style.display = "";
-  }catch{}
-})();
+
 
     window.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
   };
@@ -469,17 +482,37 @@ const authorName = rawAuthor.includes("@") ? "צוות בית הספר" : rawAut
     }, () => setListHtml(el("div", { class: "lu-muted" }, ["שגיאה בטעינת ארכיון."])));
   };
 
-  async function initLiveUpdatesWidget() {
-    injectStyles();
-    buildWidget();
-    try { await ensureAnonAuth(); } catch {}
-    try { state.badgeUnsub = listenBadgeLiveCount(); } catch {}
+async function initLiveUpdatesWidget() {
+  injectStyles();
+  buildWidget();
 
-    window.__liveUpdatesCleanup = () => {
-      try { state.badgeUnsub && state.badgeUnsub(); } catch {}
-      try { state.unsub && state.unsub(); } catch {}
-    };
-  }
+  // מאזין לשינוי התחברות — זה מה שעושה את הכפתור יציב
+  onAuthStateChanged(auth, async (user) => {
+    state.user = user || null;
+    await updateAddButtonUI();
+  });
+
+  // אם אין משתמש מחובר (תלמיד) — תן לו אנונימי
+  try { await ensureAnonAuth(); } catch {}
+
+  // אחרי האנונימי/משתמש, עדכן שוב את הכפתור
+  await updateAddButtonUI();
+
+  try { state.badgeUnsub = listenBadgeLiveCount(); } catch {}
+// ✅ כפתור הוספת עדכון רק לצוות (אחרי שה-auth התייצב)
+try{
+  const ok = await isTeacherUser(auth.currentUser);
+  const btn = document.getElementById("lu-add");
+  if (btn) btn.style.display = ok ? "" : "none";
+}catch{}
+
+  window.__liveUpdatesCleanup = () => {
+    try { state.badgeUnsub && state.badgeUnsub(); } catch {}
+    try { state.unsub && state.unsub(); } catch {}
+    
+  };
+}
+
 
   window.initLiveUpdatesWidget = initLiveUpdatesWidget;
 })();
