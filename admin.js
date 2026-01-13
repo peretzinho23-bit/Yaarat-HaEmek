@@ -14,11 +14,6 @@ import {
   updateDoc,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
-import { setPersistence, browserLocalPersistence } 
-from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
-
-// לפני ההתחברות:
-await setPersistence(auth, browserLocalPersistence);
 
 import {
   signInWithEmailAndPassword,
@@ -33,7 +28,7 @@ import {
   getDownloadURL
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-storage.js";
 
-console.log("🔥 ADMIN.JS LOADED");
+console.log("🔥 ADMIN.JS LOADED Powerd By PTZ");
 
 /* =============================
    הרשאות אדמין (RBAC)
