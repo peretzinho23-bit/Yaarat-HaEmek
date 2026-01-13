@@ -204,23 +204,33 @@ const css = `
   }
 
   /* מודאל + פאנל */
+  @media (max-width: 800px){
+
+  /* הפאנל ייפתח מלמעלה כמו שצריך */
   #lu-panel{
-    position: fixed !important;
-
-    top: auto !important;
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 12px) !important;
-
-    left: 12px !important;
-    right: 12px !important;
+    top: calc(env(safe-area-inset-top, 0px) + 10px) !important;
+    left: 10px !important;
+    right: 10px !important;
     width: auto !important;
 
-    height: min(78vh, 620px) !important;
+    height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 20px) !important;
+    max-height: none !important;
     border-radius: 18px !important;
-
-    transform: translateY(20px);
-    opacity: 0;
-    transition: transform .18s ease, opacity .18s ease;
   }
+
+  /* שהרשימה לא תיכנס מתחת לפוטר */
+  #lu-list{
+    padding-bottom: 90px !important;
+  }
+
+  /* פוטר נשאר תמיד למטה בתוך הפאנל */
+  #lu-footer{
+    position: sticky !important;
+    bottom: 0 !important;
+    z-index: 2 !important;
+  }
+}
+
 
   /* כשהמודאל פתוח – להחליק למעלה */
   #lu-modal[open] #lu-panel{
