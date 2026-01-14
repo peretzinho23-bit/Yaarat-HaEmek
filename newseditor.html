@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>לוח ניהול חדשות – יערת העמק</title>
+
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="admin.css" />
+  <link rel="stylesheet" href="admin-login-pretty.css" />
+
+  <!-- ADMIN THEME (ONLY ADMIN) -->
+  <script>
+    (function () {
+      try {
+        const key = "admin_theme";
+        const saved = localStorage.getItem(key);
+        const theme = saved || "dark";
+        document.documentElement.setAttribute("data-theme", theme);
+      } catch {}
+    })();
+  </script>
+
+  <style>
+/* =========================
+   ADMIN – THEME TOKENS
+   ========================= */
+:root{
+  --admin-bg: #020617;
+  --admin-text: #e3f2fd;
+  --admin-header-bg: rgba(2,6,23,.75);
+  --admin-border: rgba(148,163,184,.18);
+  --admin-card: rgba(15,23,42,.55);
+  --admin-card2: rgba(15,23,42,.35);
+  --admin-btn-bg: rgba(15,23,42,.55);
+  --admin-btn-text: #e5e7eb;
+  --admin-btn-border: rgba(148,163,184,.28);
+  --admin-shadow: 0 10px 26px rgba(0,0,0,.25);
+  --admin-shadow2: 0 14px 34px rgba(0,0,0,.35);
+  --admin-accent1: #2563eb;
+  --admin-accent2: #38bdf8;
+}
+
+/* LIGHT THEME */
+html[data-theme="light"]{
+  --admin-bg: #f3f6ff;
+  --admin-text: #0b1020;
+  --admin-header-bg: rgba(255,255,255,.70);
+  --admin-border: rgba(15,23,42,.12);
+  --admin-card: rgba(255,255,255,.78);
+  --admin-card2: rgba(255,255,255,.55);
+  --admin-btn-bg: rgba(255,255,255,.70);
+  --admin-btn-text: #0b1020;
+  --admin-btn-border: rgba(15,23,42,.14);
+  --admin-shadow: 0 10px 24px rgba(2,6,23,.10);
+  --admin-shadow2: 0 14px 34px rgba(2,6,23,.14);
+}
+
+/* =========================
+   ADMIN – CLEAN TOP BAR
+   ========================= */
+
+/* רקע עמוד אדמין */
+body.admin-page{
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgba(56,189,248,.18), transparent 60%),
+    linear-gradient(180deg, var(--admin-bg), var(--admin-bg));
+  color: var(--admin-text);
+}
+
+/* container רחב */
+body.admin-page .container{
+  max-width: 1400px !important;
+  width: min(1400px, calc(100% - 40px)) !important;
+  margin-inline: auto !important;
+}
+
+/* HEADER */
+body.admin-page .header-main{
+  position: sticky;
+  top: 0;
+  z-index: 9999;
+  background: var(--admin-header-bg);
+  border-bottom: 1px solid var(--admin-border);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+/* NAV STRUCTURE */
+body.admin-page .admin-nav{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 12px 0;
+}
+
+/* LEFT = LOGO */
+body.admin-page .admin-nav-left{
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+body.admin-page .logo-circle{
+  width: 54px;
+  height: 54px;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 2px solid rgba(56,189,248,.35);
+  background: var(--admin-card2);
+  box-shadow: 0 10px 26px rgba(0,0,0,.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+body.admin-page .logo-img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* RIGHT = BUTTONS */
+body.admin-page .admin-nav-right{
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* BUTTON LOOK */
+body.admin-page .admin-btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 8px 16px;
+  border-radius: 999px;
+
+  font-size: .95rem;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+
+  color: var(--admin-btn-text);
+  background: var(--admin-btn-bg);
+  border: 1px solid var(--admin-btn-border);
+
+  box-shadow: var(--admin-shadow);
+  transition: transform .15s ease, box-shadow .15s ease, background .2s ease, border-color .2s ease;
+}
+
+body.admin-page .admin-btn:hover{
+  transform: translateY(-1px);
+  background: var(--admin-card);
+  border-color: rgba(96,165,250,.55);
+  box-shadow: var(--admin-shadow2);
+}
+
+/* ACTIVE */
+body.admin-page .admin-btn.active{
+  background: linear-gradient(135deg,var(--admin-accent1),var(--admin-accent2));
+  color: #fff;
+  border-color: rgba(56,189,248,.55);
+  box-shadow: 0 14px 42px rgba(37,99,235,.55);
+}
+
+/* THEME BUTTON */
+body.admin-page .admin-theme-btn{
+  width: 46px;
+  padding: 8px 0;
+  font-size: 1.05rem;
+}
+
+/* ✅ המרחק שאתה רוצה: כפתורים רחוקים מהלוגו */
+body.admin-page .admin-nav-right{
+  margin-inline-start: 42px; /* ב-RTL זה יוצר רווח מהלוגו */
+}
+
+/* MOBILE */
+@media (max-width: 900px){
+  body.admin-page .admin-nav{
+    gap: 12px;
+  }
+  body.admin-page .logo-circle{
+    width: 48px;
+    height: 48px;
+  }
+  body.admin-page .admin-btn{
+    padding: 8px 12px;
+    font-size: .9rem;
+  }
+  body.admin-page .admin-nav-right{
+    margin-inline-start: 18px;
+  }
+}
+
+/* =========================
+   Admin cards / forms - make them respect theme
+   ========================= */
+body.admin-page .card{
+  background: var(--admin-card) !important;
+  border: 1px solid var(--admin-border) !important;
+  box-shadow: var(--admin-shadow) !important;
+  color: var(--admin-text) !important;
+}
+body.admin-page input,
+body.admin-page textarea,
+body.admin-page select{
+  background: rgba(255,255,255,.08);
+  color: var(--admin-text);
+  border: 1px solid rgba(148,163,184,.25);
+}
+html[data-theme="light"] body.admin-page input,
+html[data-theme="light"] body.admin-page textarea,
+html[data-theme="light"] body.admin-page select{
+  background: rgba(2,6,23,.04);
+  border: 1px solid rgba(2,6,23,.12);
+  color: var(--admin-text);
+}
+body.admin-page input::placeholder,
+body.admin-page textarea::placeholder{
+  opacity: .7;
+}
+
+/* =========================
+   ADMIN COLUMNS (כמו שהיה)
+   ========================= */
+.admin-columns{
+  display: grid !important;
+  gap: 18px;
+  align-items: start;
+  margin-top: 10px;
+}
+@media (min-width: 1100px){
+  .admin-columns{ grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+}
+@media (min-width: 700px) and (max-width: 1099px){
+  .admin-columns{ grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+}
+@media (max-width: 699px){
+  .admin-columns{ grid-template-columns: 1fr !important; }
+}
+.admin-grade-section,
+.admin-columns > section,
+.admin-columns > .card{
+  min-width: 0 !important;
+}
+
+/* LIST/IMAGES */
+.admin-list .admin-item{
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  border-radius: 12px;
+}
+.admin-images-row{
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+.admin-image-wrapper{
+  width: 90px;
+  height: 70px;
+  flex: 0 0 auto;
+  overflow: hidden;
+  border-radius: 8px;
+}
+.admin-image-wrapper img.admin-image{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.admin-item-body{
+  font-size: 0.9rem;
+  line-height: 1.45;
+  max-height: 6.5em;
+  overflow-y: auto;
+}
+.admin-class-title{
+  font-size: 0.95rem;
+  margin-top: 10px;
+  margin-bottom: 4px;
+  opacity: 0.9;
+}
+.admin-exam-item{
+  border-radius: 10px;
+  padding: 6px 8px;
+  margin-bottom: 6px;
+}
+
+/* =========================
+   LOGIN LINKS
+   ========================= */
+.login-links{
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #93c5fd;
+}
+html[data-theme="light"] .login-links{ color: rgba(2,6,23,.55); }
+
+.login-links a{
+  color: #38bdf8;
+  text-decoration: none;
+  position: relative;
+  transition: color .15s ease, text-shadow .15s ease;
+}
+html[data-theme="light"] .login-links a{ color: #2563eb; }
+
+.login-links a::after{
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -2px;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg,#38bdf8,#2563eb);
+  border-radius: 2px;
+  transform: translateX(-50%);
+  transition: width .2s ease;
+}
+.login-links a:hover{
+  color: #7dd3fc;
+  text-shadow: 0 0 6px rgba(56,189,248,.55);
+}
+html[data-theme="light"] .login-links a:hover{
+  color: #1d4ed8;
+  text-shadow: none;
+}
+.login-links a:hover::after{ width: 100%; }
+.login-links .dot{
+  color: #60a5fa;
+  font-weight: 900;
+  opacity: 0.8;
+  cursor: default;
+}
+
+/* =========================
+   MOBILE LAYOUT: prevent horizontal mess
+   ========================= */
+body.admin-page,
+body.admin-page .container,
+body.admin-page .card{
+  overflow-x: hidden;
+}
+
+/* =========================================================
+   ✅ FINAL MOBILE OVERRIDES (PUT LAST): 
+   left hamburger | center logo | right grades
+   Works with: admin-mobile-toggle/admin-mobile-menu + admin-grade-switcher
+   ========================================================= */
+@media (max-width: 900px){
+
+  /* header becomes positioning context */
+  body.admin-page .header-main{ position: sticky; top:0; z-index: 20000; }
+  body.admin-page .header-main .container{ position: relative; }
+  body.admin-page .admin-nav{ position: relative; min-height: 72px; padding: 10px 0; }
+
+  /* hide desktop nav buttons */
+  body.admin-page .admin-nav-right{ display:none !important; }
+
+  /* center logo */
+  body.admin-page .admin-nav-left{
+    display:flex !important;
+    position:absolute !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: 20002 !important;
+  }
+
+  /* hamburger left */
+  body.admin-page .admin-mobile-toggle{
+    display:flex !important;
+    position:absolute !important;
+    left: 12px !important;
+    right: auto !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 20003 !important;
+
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 14px !important;
+    border: 1px solid rgba(148,163,184,.25) !important;
+    background: var(--admin-header-bg) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:4px !important;
+  }
+  body.admin-page .admin-mobile-toggle span{
+    display:block !important;
+    width: 20px !important;
+    height: 2px !important;
+    background: rgba(226,232,240,.92) !important;
+    border-radius: 3px !important;
+  }
+  html[data-theme="light"] body.admin-page .admin-mobile-toggle span{
+    background: rgba(2,6,23,.75) !important;
+  }
+
+  /* mobile menu: fixed, opens from left under header */
+  body.admin-page .admin-mobile-menu{
+    position: fixed !important;
+    top: 76px !important;
+    left: 12px !important;
+    right: auto !important;
+
+    width: min(280px, calc(100vw - 24px)) !important;
+    max-height: min(60vh, 520px) !important;
+    overflow: auto !important;
+
+    padding: 12px !important;
+    border-radius: 18px !important;
+    background: rgba(2,6,23,.92) !important;
+    border: 1px solid rgba(148,163,184,.18) !important;
+    box-shadow: 0 22px 55px rgba(0,0,0,.55) !important;
+    backdrop-filter: blur(14px) !important;
+    -webkit-backdrop-filter: blur(14px) !important;
+
+    display:none !important;
+    z-index: 20010 !important;
+  }
+  html[data-theme="light"] body.admin-page .admin-mobile-menu{
+    background: rgba(255,255,255,.92) !important;
+    border: 1px solid rgba(2,6,23,.12) !important;
+    box-shadow: 0 22px 55px rgba(2,6,23,.16) !important;
+  }
+  body.admin-page .admin-mobile-menu.open{ display:block !important; }
+
+  body.admin-page .admin-mobile-menu a.admin-btn,
+  body.admin-page .admin-mobile-menu button.admin-btn{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:flex-start !important;
+    width:100% !important;
+
+    padding: 12px 12px !important;
+    margin: 8px 0 !important;
+
+    border-radius: 14px !important;
+    font-weight: 900 !important;
+    font-size: 1rem !important;
+    text-decoration:none !important;
+
+    background: var(--admin-btn-bg) !important;
+    border: 1px solid rgba(148,163,184,.16) !important;
+    box-shadow: none !important;
+    color: var(--admin-btn-text) !important;
+  }
+  body.admin-page .admin-mobile-menu a.admin-btn.active{
+    background: linear-gradient(135deg,var(--admin-accent1),var(--admin-accent2)) !important;
+    border-color: rgba(56,189,248,.45) !important;
+    color:#fff !important;
+  }
+
+  /* grades right (small, scrollable) */
+  body.admin-page .admin-grade-switcher{
+    position: absolute !important;
+    right: 12px !important;
+    left: auto !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 20003 !important;
+
+    display:flex !important;
+    align-items:center !important;
+    gap: 8px !important;
+
+    max-width: 46vw !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+  body.admin-page .admin-grade-switcher::-webkit-scrollbar{ display:none; }
+
+  body.admin-page .admin-grade-switcher .grade-filter-btn{
+    all: unset;
+    box-sizing: border-box;
+
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+
+    padding: 7px 10px !important;
+    border-radius: 999px !important;
+    font-size: .82rem !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    cursor: pointer !important;
+
+    background: var(--admin-btn-bg) !important;
+    color: var(--admin-btn-text) !important;
+    border: 1px solid rgba(148,163,184,.22) !important;
+  }
+  body.admin-page .admin-grade-switcher .grade-filter-btn.active{
+    background: linear-gradient(135deg,#22c55e,var(--admin-accent2)) !important;
+    color: #06121f !important;
+    border-color: rgba(56,189,248,.45) !important;
+  }
+}
+
+/* תזוזה קטנה למעלה, שלא "ישב" באמצע ההדר */
+@media (max-width: 600px){
+  body.admin-page .admin-grade-switcher{
+    top: 18px !important;
+    transform: none !important;
+  }
+}
+
+/* כשמציגים שכבה אחת בלבד – שתרחיב לרוחב מלא */
+.admin-columns.one-visible{
+  grid-template-columns: 1fr !important;
+}
+.admin-columns.one-visible > .admin-grade-section{
+  grid-column: 1 / -1 !important;
+}
+
+/* ✅ FIX: הכפתורי שכבות לא יכסו את הסמל */
+@media (max-width: 900px){
+
+  /* הלוגו מעל הכל */
+  body.admin-page .admin-nav-left{
+    z-index: 30000 !important;
+  }
+
+  /* השכבות מתחת ללוגו + קצת יותר ימינה/מטה */
+  body.admin-page .admin-grade-switcher{
+    top: 56px !important;
+    transform: none !important;
+    max-width: 92vw !important;
+    padding-inline-start: 62px !important;
+    padding-inline-end: 12px !important;
+  }
+}
+
+/* במסכים ממש קטנים עוד טיפה למטה */
+@media (max-width: 420px){
+  body.admin-page .admin-grade-switcher{
+    top: 60px !important;
+  }
+}
+
+/* ✅ MOBILE: הכל לרוחב מלא, בלי רווח שחור בצד */
+@media (max-width: 900px){
+
+  body.admin-page .container{
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 12px !important;
+    margin: 0 auto !important;
+  }
+
+  body.admin-page .admin-columns{
+    grid-template-columns: 1fr !important;
+    width: 100% !important;
+  }
+
+  body.admin-page .admin-grade-section,
+  body.admin-page .admin-columns > section,
+  body.admin-page .card{
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  body.admin-page *{
+    max-width: 100%;
+  }
+}
+
+/* ✅ MOBILE TOPBAR: left hamburger | center logo | right grades (LOCK) */
+@media (max-width: 900px){
+
+  body.admin-page .header-main{ position: sticky; top:0; z-index: 30000; }
+  body.admin-page .admin-nav{
+    position: relative !important;
+    min-height: 72px !important;
+    padding: 10px 0 !important;
+  }
+
+  body.admin-page .admin-mobile-toggle{
+    display:flex !important;
+    position:absolute !important;
+    left: 12px !important;
+    right: auto !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 30003 !important;
+  }
+
+  body.admin-page .admin-nav-left{
+    display:flex !important;
+    position:absolute !important;
+    left: 50% !important;
+    right: auto !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: 30002 !important;
+  }
+
+  body.admin-page .admin-grade-switcher{
+    position:absolute !important;
+    right: 12px !important;
+    left: auto !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 30003 !important;
+
+    display:flex !important;
+    gap: 8px !important;
+    max-width: 46vw !important;
+    overflow-x: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+
+  body.admin-page .admin-nav-right{ display:none !important; }
+
+  body.admin-page .admin-mobile-menu{
+    position: fixed !important;
+    top: 76px !important;
+    left: 12px !important;
+    right: auto !important;
+    z-index: 30010 !important;
+  }
+}
+
+/* FOOTER look */
+body.admin-page footer{
+  margin-top: 28px;
+  padding: 18px 0;
+  text-align: center;
+  border-top: 1px solid var(--admin-border);
+  opacity: .95;
+}
+body.admin-page footer a.footer-devlink{
+  color: var(--admin-accent2);
+  font-weight: 900;
+  text-decoration: none;
+}
+html[data-theme="light"] body.admin-page footer a.footer-devlink{
+  color: var(--admin-accent1);
+}
+/* =========================================================
+   ✅ ADMIN LIGHT MODE OVERRIDES
+   Paste at the VERY END of admin.css
+   Works with: <html data-theme="light">
+   ========================================================= */
+
+html[data-theme="light"] body.admin-page{
+  background: radial-gradient(1200px 600px at 50% -10%, rgba(37,99,235,.12), transparent 60%),
+              linear-gradient(180deg, #f6f8ff, #eef2ff) !important;
+  color: #0f172a !important;
+}
+
+/* header */
+html[data-theme="light"] body.admin-page .header-main{
+  background: rgba(255,255,255,.78) !important;
+  border-bottom: 1px solid rgba(15,23,42,.10) !important;
+}
+
+/* titles/subtitles */
+html[data-theme="light"] body.admin-page .section-title,
+html[data-theme="light"] body.admin-page h1,
+html[data-theme="light"] body.admin-page h2,
+html[data-theme="light"] body.admin-page h3{
+  color: #0b1220 !important;
+  text-shadow: none !important;
+}
+
+html[data-theme="light"] body.admin-page .section-subtitle,
+html[data-theme="light"] body.admin-page p{
+  color: rgba(15,23,42,.70) !important;
+}
+
+/* cards */
+html[data-theme="light"] body.admin-page .card,
+html[data-theme="light"] body.admin-page .admin-grade-section .card{
+  background: rgba(255,255,255,.90) !important;
+  border: 1px solid rgba(15,23,42,.10) !important;
+  box-shadow: 0 18px 50px rgba(2,6,23,.10) !important;
+  color: #0f172a !important;
+}
+
+/* buttons */
+html[data-theme="light"] body.admin-page .admin-btn{
+  background: rgba(255,255,255,.85) !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(15,23,42,.14) !important;
+  box-shadow: 0 10px 26px rgba(2,6,23,.10) !important;
+}
+
+html[data-theme="light"] body.admin-page .admin-btn:hover{
+  background: rgba(255,255,255,.95) !important;
+  border-color: rgba(37,99,235,.35) !important;
+}
+
+html[data-theme="light"] body.admin-page .admin-btn.active{
+  background: linear-gradient(135deg,#2563eb,#38bdf8) !important;
+  color: #fff !important;
+  border-color: rgba(37,99,235,.45) !important;
+}
+
+/* grade switcher */
+html[data-theme="light"] body.admin-page .grade-filter-btn{
+  background: rgba(255,255,255,.85) !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(15,23,42,.14) !important;
+}
+
+html[data-theme="light"] body.admin-page .grade-filter-btn.active{
+  background: linear-gradient(135deg,#22c55e,#38bdf8) !important;
+  color: #06121f !important;
+}
+
+/* inputs */
+html[data-theme="light"] body.admin-page label{
+  color: rgba(15,23,42,.85) !important;
+}
+
+html[data-theme="light"] body.admin-page input,
+html[data-theme="light"] body.admin-page textarea,
+html[data-theme="light"] body.admin-page select{
+  background: rgba(255,255,255,.95) !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(15,23,42,.18) !important;
+}
+
+html[data-theme="light"] body.admin-page input::placeholder,
+html[data-theme="light"] body.admin-page textarea::placeholder{
+  color: rgba(15,23,42,.45) !important;
+}
+
+html[data-theme="light"] body.admin-page input:focus,
+html[data-theme="light"] body.admin-page textarea:focus,
+html[data-theme="light"] body.admin-page select:focus{
+  border-color: rgba(37,99,235,.55) !important;
+  box-shadow: 0 0 0 4px rgba(37,99,235,.15) !important;
+}
+
+/* lists/items */
+html[data-theme="light"] body.admin-page .admin-list .admin-item{
+  background: rgba(2,6,23,.03) !important;
+  border: 1px solid rgba(15,23,42,.08) !important;
+  color: #0f172a !important;
+}
+
+/* mobile menu */
+html[data-theme="light"] body.admin-page .admin-mobile-toggle{
+  background: rgba(255,255,255,.75) !important;
+  border: 1px solid rgba(15,23,42,.12) !important;
+}
+
+html[data-theme="light"] body.admin-page .admin-mobile-toggle span{
+  background: rgba(15,23,42,.85) !important;
+}
+
+html[data-theme="light"] body.admin-page .admin-mobile-menu{
+  background: rgba(255,255,255,.92) !important;
+  border: 1px solid rgba(15,23,42,.12) !important;
+  box-shadow: 0 22px 55px rgba(2,6,23,.18) !important;
+}
+
+html[data-theme="light"] body.admin-page .admin-mobile-menu a.admin-btn{
+  background: rgba(255,255,255,.92) !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(15,23,42,.12) !important;
+}
+
+/* footer */
+html[data-theme="light"] body.admin-page footer{
+  color: rgba(15,23,42,.65) !important;
+}
+/* =========================
+   FILE INPUT (RTL) – FIX
+   ========================= */
+
+/* בסיס */
+body.admin-page input[type="file"]{
+  width: 100%;
+  max-width: 100%;
+  font: inherit;
+  direction: rtl;
+  border-radius: 14px;
+  padding: 10px 12px;
+  border: 1px solid rgba(148,163,184,.22);
+  background: rgba(15,23,42,.35);
+  color: #e5e7eb;
+  box-sizing: border-box;
+}
+
+/* הכפתור "בחירת קובץ" */
+body.admin-page input[type="file"]::file-selector-button{
+  font: inherit;
+  font-weight: 900;
+  border: 1px solid rgba(148,163,184,.28);
+  border-radius: 999px;
+  padding: 8px 14px;
+  margin-inline-end: 10px; /* ב-RTL זה יושב מימין לטקסט */
+  cursor: pointer;
+  background: rgba(15,23,42,.65);
+  color: #e5e7eb;
+  transition: transform .12s ease, background .15s ease, border-color .15s ease;
+}
+
+body.admin-page input[type="file"]::file-selector-button:hover{
+  transform: translateY(-1px);
+  background: rgba(15,23,42,.85);
+  border-color: rgba(96,165,250,.55);
+}
+
+/* ✅ LIGHT MODE */
+html[data-theme="light"] body.admin-page input[type="file"]{
+  background: rgba(255,255,255,.95) !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(15,23,42,.14) !important;
+}
+
+html[data-theme="light"] body.admin-page input[type="file"]::file-selector-button{
+  background: rgba(255,255,255,.92) !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(15,23,42,.18) !important;
+  box-shadow: 0 10px 26px rgba(2,6,23,.08) !important;
+}
+
+html[data-theme="light"] body.admin-page input[type="file"]::file-selector-button:hover{
+  background: rgba(255,255,255,1) !important;
+  border-color: rgba(37,99,235,.35) !important;
+}
+/* =========================
+   ADMIN LOGIN – LIGHT MODE FIX
+   (put LAST)
+   ========================= */
+
+html[data-theme="light"] body.admin-page{
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgba(37,99,235,.12), transparent 60%),
+    linear-gradient(180deg, #eef3ff, #e9f0ff) !important;
+  color: #0f172a !important;
+}
+
+/* הכרטיס של ההתחברות */
+html[data-theme="light"] body.admin-page #login-section,
+html[data-theme="light"] body.admin-page .login-card,
+html[data-theme="light"] body.admin-page .card{
+  background: rgba(255,255,255,.92) !important;
+  border: 1px solid rgba(15,23,42,.10) !important;
+  box-shadow: 0 24px 70px rgba(2,6,23,.18) !important;
+  color: #0f172a !important;
+}
+
+/* כותרות/טקסטים בכרטיס */
+html[data-theme="light"] body.admin-page .section-title,
+html[data-theme="light"] body.admin-page h1,
+html[data-theme="light"] body.admin-page h2,
+html[data-theme="light"] body.admin-page h3{
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] body.admin-page .section-subtitle,
+html[data-theme="light"] body.admin-page #auth-status{
+  color: rgba(15,23,42,.72) !important;
+}
+
+/* תוויות */
+html[data-theme="light"] body.admin-page label{
+  color: rgba(15,23,42,.80) !important;
+  font-weight: 800 !important;
+}
+
+/* אינפוטים/טקסטאריה/סלקט */
+html[data-theme="light"] body.admin-page input,
+html[data-theme="light"] body.admin-page textarea,
+html[data-theme="light"] body.admin-page select{
+  background: rgba(255,255,255,.98) !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(15,23,42,.14) !important;
+  box-shadow: 0 10px 26px rgba(2,6,23,.06) !important;
+}
+
+html[data-theme="light"] body.admin-page input::placeholder,
+html[data-theme="light"] body.admin-page textarea::placeholder{
+  color: rgba(15,23,42,.45) !important;
+}
+
+/* כפתור כניסה */
+html[data-theme="light"] body.admin-page #login-form button,
+html[data-theme="light"] body.admin-page button[type="submit"]{
+  color: #0b1020 !important;
+  border: 1px solid rgba(37,99,235,.25) !important;
+  box-shadow: 0 16px 40px rgba(37,99,235,.18) !important;
+}
+
+/* לינקים מתחת */
+html[data-theme="light"] body.admin-page .login-links{
+  color: rgba(15,23,42,.70) !important;
+}
+html[data-theme="light"] body.admin-page .login-links a{
+  color: #2563eb !important;
+}
+/* =========================
+   MOBILE: move grade switcher below header
+   ========================= */
+@media (max-width: 900px){
+  body.admin-page .admin-grade-switcher{
+    position: static !important;
+    margin-top: 12px !important;
+    padding: 0 12px !important;
+    max-width: 100% !important;
+    justify-content: center !important;
+  }
+}
+
+  </style>
+</head>
+
+<body class="admin-page" data-page="admin">
+
+  <script type="module" src="analytics.js"></script>
+
+  <!-- ✅ HEADER -->
+  <header class="header-main">
+    <div class="container">
+      <div class="admin-nav">
+
+        <div class="admin-nav-left">
+          <a href="index.html" class="logo-circle" aria-label="דף הבית">
+            <img src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png" class="logo-img" alt="סמל יערת העמק">
+          </a>
+        </div>
+
+        <button class="admin-mobile-toggle" id="adminMobileToggle" aria-label="תפריט" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+
+        <div class="admin-mobile-menu" id="adminMobileMenu">
+          <!-- ✅ THEME BUTTON (MOBILE MENU) -->
+          <a href="admin.html" class="admin-btn active">Admin</a>
+          <a href="#news" class="admin-btn">חדשות</a>
+          <a href="#grades" class="admin-btn">השכבות</a>
+          <a href="#exams" class="admin-btn">מבחנים</a>
+          <a href="#board" class="admin-btn">מודעות</a>
+          <a href="adminapps.html" class="admin-btn">כלי עריכה</a>
+          <a href="#contact" class="admin-btn">יצירת קשר</a>
+        </div>
+
+        <div class="admin-nav-right">
+          <!-- ✅ THEME BUTTON (DESKTOP TOPBAR) -->
+          <button class="admin-btn admin-theme-btn" id="admin-theme-toggle" type="button" aria-label="שינוי מצב תצוגה">🌙</button>
+
+          <a href="admin.html" class="admin-btn active">Admin</a>
+          <a href="#news" class="admin-btn">חדשות</a>
+          <a href="#grades" class="admin-btn">השכבות</a>
+          <a href="#exams" class="admin-btn">מבחנים</a>
+          <a href="#board" class="admin-btn">מודעות</a>
+          <a href="adminapps.html" class="admin-btn">כלי עריכה</a>
+          <a href="#contact" class="admin-btn">יצירת קשר</a>
+        </div>
+
+      </div>
+
+      <!-- ✅ כפתורי שכבות בתוך ההדר (כדי שיעבוד ימין למעלה במובייל) -->
+      <div class="admin-grade-switcher">
+        <button class="grade-filter-btn active" data-grade="all">כל השכבות</button>
+        <button class="grade-filter-btn" data-grade="z">שכבת ז'</button>
+        <button class="grade-filter-btn" data-grade="h">שכבת ח'</button>
+        <button class="grade-filter-btn" data-grade="t">שכבת ט'</button>
+      </div>
+
+    </div>
+  </header>
+
+  <section>
+    <div class="container">
+
+      <p id="auth-status" class="section-subtitle">בודק התחברות...</p>
+
+      <!-- LOGIN -->
+      <div id="login-section">
+        <div class="section-header">
+          <h2 class="section-title">התחברות אדמין</h2>
+          <p class="section-subtitle">כניסה למנהלי המערכת בלבד</p>
+        </div>
+
+        <form id="login-form" autocomplete="off" novalidate>
+          <label>אימייל</label>
+          <input type="email" name="email" required />
+
+          <label>סיסמה</label>
+          <input type="password" name="password" required />
+
+          <button type="submit" style="width:100%;margin-top:10px;">כניסה</button>
+        </form>
+
+        <div class="login-links">
+          <a class="login-link" href="reset-password.html">שכחתי סיסמה?</a>
+          <span class="dot" aria-hidden="true">•</span>
+          <a class="login-link" href="register.html">בקשת הרשמה</a>
+        </div>
+      </div>
+
+      <!-- ADMIN PANEL -->
+      <div id="admin-section" class="admin-layout" style="display:none;">
+        <button id="logout-btn" class="btn-outline">התנתקות</button>
+
+        <div class="section-header">
+          <h2 class="section-title">ניהול חדשות, מבחנים, מודעות ותוכן האתר</h2>
+          <p class="section-subtitle">כל שינוי נשמר אוטומטית ונראה באתר התלמידים.</p>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;">
+          <a href="adminapps.html" target="_blank" class="btn-outline" style="display:inline-block;padding:8px 16px;border-radius:999px;">
+            כלי עריכה נוספים 🛠️ קוד כניסה - 1992
+          </a>
+        </div>
+
+        <!-- NEWS -->
+        <div id="news"></div>
+        <h3 class="section-title" style="font-size:1.2rem;margin-bottom:10px;">חדשות לפי כיתות</h3>
+        <p class="section-subtitle">ניתן להוסיף עד שתי תמונות לידיעה (קישורים או קבצים) + צבע טקסט (אופציונלי).</p>
+
+        <div class="admin-columns" id="grades">
+          <!-- NEWS Z -->
+          <section class="admin-grade-section" data-grade="z">
+            <div class="card">
+              <h3>שכבת ז'</h3>
+              <div id="admin-news-z" class="admin-list"></div>
+
+              <form id="news-form-z">
+                <label>כיתה</label>
+                <select name="classId" required>
+                  <option value="">בחר כיתה</option>
+                  <option value="z1">ז1</option>
+                  <option value="z2">ז2</option>
+                  <option value="z3">ז3</option>
+                  <option value="z4">ז4</option>
+                  <option value="z5">ז5</option>
+                </select>
+
+                <label>כותרת</label>
+                <input name="title" />
+
+                <label>מידע קצר (תאריך/אירוע)</label>
+                <input name="meta" />
+
+                <label>קישור לתמונה 1 (אופציונלי)</label>
+                <input name="imageUrl" placeholder="https://..." />
+
+                <label>תמונה 1 מקובץ (אופציונלי)</label>
+                <input type="file" name="imageFile" accept="image/*" />
+
+                <label>קישור לתמונה 2 (אופציונלי)</label>
+                <input name="imageUrl2" placeholder="https://..." />
+
+                <label>תמונה 2 מקובץ (אופציונלי)</label>
+                <input type="file" name="imageFile2" accept="image/*" />
+
+                <label>צבע הטקסט (אופציונלי)</label>
+                <input type="color" name="color" value="#ffffff" />
+
+                <label>תוכן הידיעה</label>
+                <textarea name="body"></textarea>
+
+                <button type="submit">הוסף חדשות לז'</button>
+              </form>
+            </div>
+          </section>
+
+          <!-- NEWS H -->
+          <section class="admin-grade-section" data-grade="h">
+            <div class="card">
+              <h3>שכבת ח'</h3>
+              <div id="admin-news-h" class="admin-list"></div>
+
+              <form id="news-form-h">
+                <label>כיתה</label>
+                <select name="classId" required>
+                  <option value="">בחר כיתה</option>
+                  <option value="h1">ח1/7</option>
+                  <option value="h4">ח4/8</option>
+                  <option value="h5">ח5/9</option>
+                  <option value="h6">ח6/10</option>
+                  <option value="amat">עמ״ט</option>
+                </select>
+
+                <label>כותרת</label>
+                <input name="title" />
+
+                <label>מידע קצר (תאריך/אירוע)</label>
+                <input name="meta" />
+
+                <label>קישור לתמונה 1 (אופציונלי)</label>
+                <input name="imageUrl" placeholder="https://..." />
+
+                <label>תמונה 1 מקובץ (אופציונלי)</label>
+                <input type="file" name="imageFile" accept="image/*" />
+
+                <label>קישור לתמונה 2 (אופציונלי)</label>
+                <input name="imageUrl2" placeholder="https://..." />
+
+                <label>תמונה 2 מקובץ (אופציונלי)</label>
+                <input type="file" name="imageFile2" accept="image/*" />
+
+                <label>צבע הטקסט (אופציונלי)</label>
+                <input type="color" name="color" value="#ffffff" />
+
+                <label>תוכן הידיעה</label>
+                <textarea name="body"></textarea>
+
+                <button type="submit">הוסף חדשות לח'</button>
+              </form>
+            </div>
+          </section>
+
+          <!-- NEWS T -->
+          <section class="admin-grade-section" data-grade="t">
+            <div class="card">
+              <h3>שכבת ט'</h3>
+              <div id="admin-news-t" class="admin-list"></div>
+
+              <form id="news-form-t">
+                <label>כיתה</label>
+                <select name="classId" required>
+                  <option value="">בחר כיתה</option>
+                  <option value="t1">ט1</option>
+                  <option value="t2">ט2</option>
+                  <option value="t3">ט3</option>
+                  <option value="t4">ט4</option>
+                  <option value="t5">ט5</option>
+                </select>
+
+                <label>כותרת</label>
+                <input name="title" />
+
+                <label>מידע קצר (תאריך/אירוע)</label>
+                <input name="meta" />
+
+                <label>קישור לתמונה 1 (אופציונלי)</label>
+                <input name="imageUrl" placeholder="https://..." />
+
+                <label>תמונה 1 מקובץ (אופציונלי)</label>
+                <input type="file" name="imageFile" accept="image/*" />
+
+                <label>קישור לתמונה 2 (אופציונלי)</label>
+                <input name="imageUrl2" placeholder="https://..." />
+
+                <label>תמונה 2 מקובץ (אופציונלי)</label>
+                <input type="file" name="imageFile2" accept="image/*" />
+
+                <label>צבע הטקסט (אופציונלי)</label>
+                <input type="color" name="color" value="#ffffff" />
+
+                <label>תוכן הידיעה</label>
+                <textarea name="body"></textarea>
+
+                <button type="submit">הוסף חדשות לט'</button>
+              </form>
+            </div>
+          </section>
+        </div>
+
+        <br><br>
+
+
+
+        <br><br>
+
+        <footer>
+          © כל הזכויות שמורות לבית ספר יערת העמק ·
+          Developed By
+          <a
+            class="footer-devlink"
+            href="https://ptzwebsitebuilding.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Peretzinho</a>
+        </footer>
+
+      </div><!-- /#admin-section -->
+
+    </div><!-- /.container -->
+  </section>
+
+  <!-- ✅ THEME + MOBILE NAV (ADMIN ONLY) -->
+  <script>
+document.addEventListener("DOMContentLoaded", () => {
+  const gradeButtons = document.querySelectorAll(".grade-filter-btn");
+  const gradeSections = document.querySelectorAll(".admin-grade-section[data-grade]");
+  const columns = document.querySelector(".admin-columns");
+
+  if (!gradeButtons.length || !gradeSections.length) {
+    console.warn("Grade filter: elements not found");
+    return;
+  }
+
+  function updateOneVisibleClass() {
+    if (!columns) return;
+    const visibleCount = Array.from(gradeSections).filter(
+      (sec) => sec.style.display !== "none"
+    ).length;
+    columns.classList.toggle("one-visible", visibleCount === 1);
+  }
+
+  gradeButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const selected = btn.dataset.grade || "all";
+
+      gradeButtons.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      gradeSections.forEach((sec) => {
+        const g = sec.dataset.grade;
+        sec.style.display = selected === "all" || g === selected ? "" : "none";
+      });
+
+      updateOneVisibleClass();
+    });
+  });
+
+  updateOneVisibleClass();
+});
+
+// ===== MOBILE MENU TOGGLE (admin) =====
+document.addEventListener("DOMContentLoaded", () => {
+  const toggle = document.getElementById("adminMobileToggle");
+  const menu = document.getElementById("adminMobileMenu");
+  if (!toggle || !menu) return;
+
+  const closeMenu = () => {
+    menu.classList.remove("open");
+    toggle.setAttribute("aria-expanded", "false");
+  };
+
+  toggle.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    menu.classList.toggle("open");
+    toggle.setAttribute(
+      "aria-expanded",
+      menu.classList.contains("open") ? "true" : "false"
+    );
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!menu.classList.contains("open")) return;
+    if (menu.contains(e.target) || toggle.contains(e.target)) return;
+    closeMenu();
+  });
+
+  menu.querySelectorAll("a,button").forEach((el) => {
+    el.addEventListener("click", () => closeMenu());
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeMenu();
+  });
+});
+
+// ===== THEME TOGGLE (admin_theme) =====
+(function () {
+  const key = "admin_theme";
+  const btnDesktop = document.getElementById("admin-theme-toggle");
+  const btnMobile = document.getElementById("admin-theme-toggle-mobile");
+
+  function setIcon(theme){
+    const icon = (theme === "dark") ? "🌙" : "☀️";
+    if (btnDesktop) btnDesktop.textContent = icon;
+    if (btnMobile) btnMobile.textContent = icon;
+  }
+
+  function apply(theme){
+    document.documentElement.setAttribute("data-theme", theme);
+    try { localStorage.setItem(key, theme); } catch {}
+    setIcon(theme);
+  }
+
+  const current = document.documentElement.getAttribute("data-theme") || "dark";
+  apply(current);
+
+  function toggleTheme(){
+    const now = document.documentElement.getAttribute("data-theme") || "dark";
+    apply(now === "dark" ? "light" : "dark");
+  }
+
+  if (btnDesktop) btnDesktop.addEventListener("click", toggleTheme);
+  if (btnMobile) btnMobile.addEventListener("click", toggleTheme);
+})();
+  </script>
+
+  <script type="module" src="admin.js?v=7"></script>
+  <script type="module" src="./admin-urgent.js"></script>
+  <script src="accessibility.js"></script>
+</body>
+</html>
