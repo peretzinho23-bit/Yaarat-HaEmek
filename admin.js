@@ -96,66 +96,56 @@ function kickToLogin(msg = "אין לך יותר גישה") {
 }
 
 // realtime guard — אם מוחקים/משנים role בזמן אמת => מעיפים
-function startPermissionWatcher(user) {
+async function startPermissionWatcher(user) {
   stopPermissionWatcher();
   if (!user) return;
 
-  permWatcherArmed = false;
   clearPermKickTimer();
+  permWatcherArmed = false;
+console.log("UID =", auth.currentUser?.uid);
 
   const refDoc = doc(db, "adminUsers", user.uid);
 
-  unsubPerm = onSnapshot(
-    refDoc,
-    { includeMetadataChanges: true },
-    (snap) => {
-      clearPermKickTimer();
+  // נסה כמה פעמים כי לפעמים הטוקן עוד לא התייצב
+  for (let i = 0; i < 5; i++) {
+    try {
+      const snap = await getDoc(refDoc);
 
-      const fromCache = !!snap?.metadata?.fromCache;
-
-      // אם המסמך לא קיים
       if (!snap.exists()) {
-        // אם זה מהקאש – מחכים, לא בועטים
-        if (fromCache) return;
-
-        // השרת אומר שאין מסמך → בעיית הרשאה אמיתית (grace קצר)
-        scheduleKick("הגישה שלך בוטלה");
+        scheduleKick("אין לך הרשאות (אין adminUsers)");
         return;
       }
-
-      // המסמך קיים – אפשר להתחמש
-      permWatcherArmed = true;
 
       const data = snap.data() || {};
       const role = String(data.role || "").trim().toLowerCase();
 
-      // role ריק/לא תקין – grace קצר
-      if (!role) {
+      permWatcherArmed = true;
+
+      if (!role || !ADMIN_ROLES.includes(role)) {
         scheduleKick("אין לך הרשאות");
         return;
       }
 
-      // role לא מורשה
-      if (!ADMIN_ROLES.includes(role)) {
-        scheduleKick("אין לך הרשאות");
-        return;
-      }
-
-      // הכול תקין
       clearPermKickTimer();
-    },
-    (err) => {
-      console.warn("perm snapshot error (no kick):", err?.code || err);
+      return; // ✅ עבר
+    } catch (err) {
+      const code = String(err?.code || "").toLowerCase();
 
-      // בועטים רק על שגיאות הרשאה חד־משמעיות
-      if (shouldKickForSnapshotError(err)) {
-        kickToLogin("שגיאת הרשאות (בדוק חוקים/קונסול)");
+      // אם זו שגיאת הרשאה אמיתית — תבעט (כי זה באמת חסום)
+      if (code === "permission-denied" || code === "unauthenticated") {
+        kickToLogin("אין לך הרשאות (permission-denied)");
+        return;
       }
 
-      // ❌ אין scheduleKick על שגיאות זמניות
+      // שגיאה זמנית → המתן ונסה שוב
+      await new Promise(r => setTimeout(r, 400));
     }
-  );
+  }
+
+  // אחרי כמה ניסיונות עדיין לא הצליח
+  scheduleKick("בעיה זמנית, נסה לרענן");
 }
+
 
 
 function stopPermissionWatcher() {
