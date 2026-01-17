@@ -99,66 +99,41 @@ function kickToLogin(msg = "אין לך יותר גישה") {
 }
 
 // realtime guard — לא מעיפים על permission-denied
-function startPermissionWatcher(user) {
+// ✅ Permission guard בלי realtime (אין onSnapshot בכלל)
+async function startPermissionWatcher(user) {
   stopPermissionWatcher();
   if (!user) return;
 
-  permWatcherArmed = false;
   clearPermKickTimer();
+  permWatcherArmed = false;
 
-  const refDoc = doc(db, "adminUsers", user.uid);
+  try {
+    const refDoc = doc(db, "adminUsers", user.uid);
+    const snap = await getDoc(refDoc);
 
-  unsubPerm = onSnapshot(
-    refDoc,
-    { includeMetadataChanges: true },
-    (snap) => {
-      const fromCache = !!snap?.metadata?.fromCache;
-
-      // אם המסמך לא קיים — רק אם זה מהשרת (לא קאש) ובאמת כבר התחמשנו קודם
-      if (!snap.exists()) {
-        if (fromCache) return; // קאש/אופליין — לא עושים כלום
-        if (permWatcherArmed) {
-          // כאן זה כבר מצב אמיתי: היה קיים ונמחק/בוטל
-          scheduleKick("הגישה שלך בוטלה");
-        }
-        return;
-      }
-
-      permWatcherArmed = true;
-
-      const data = snap.data() || {};
-      const role = String(data.role || "").trim().toLowerCase();
-
-      // אם role ריק — נותנים רגע, לא בעיטה מיידית
-      if (!role) return;
-
-      // אם הרול כבר לא מורשה — אז כן, זו סיבה להעיף (אמיתי)
-      if (!ADMIN_ROLES.includes(role)) {
-        scheduleKick("אין לך הרשאות");
-        return;
-      }
-
-      // הכל תקין
-      clearPermKickTimer();
-    },
-    (err) => {
-      const code = String(err?.code || "").toLowerCase();
-
-      // ✅ הכי חשוב: לא להעיף על permission-denied / unauthenticated מה-watcher
-      // כי זה בדיוק מה שגורם ל”זורק אותי אחרי כמה שניות”.
-      if (code === "permission-denied" || code === "unauthenticated") {
-        console.warn("perm snapshot error (no kick):", code);
-        // פשוט מפסיקים watcher כדי שלא יחפור
-        stopPermissionWatcher();
-        return;
-      }
-
-      // שגיאות אחרות: לא בעיטה ישר, רק grace אם כבר התחמשנו
-      console.warn("perm snapshot error (no kick):", err);
-      if (permWatcherArmed) scheduleKick("בעיה זמנית בחיבור. נסה לרענן.");
+    if (!snap.exists()) {
+      scheduleKick("אין לך הרשאות (אין adminUsers)");
+      return;
     }
-  );
+
+    const data = snap.data() || {};
+    const role = String(data.role || "").trim().toLowerCase();
+
+    permWatcherArmed = true;
+
+    if (!role || !ADMIN_ROLES.includes(role)) {
+      scheduleKick("אין לך הרשאות");
+      return;
+    }
+
+    // ✅ הכל תקין – לא עושים כלום (אין realtime אז גם לא ייפול)
+    clearPermKickTimer();
+  } catch (err) {
+    console.warn("perm check error (no kick):", err?.code || err?.message || err);
+    // ❗ לא מעיפים על שגיאה – רק מודיעים בקונסול
+  }
 }
+
 
 
 
