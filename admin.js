@@ -98,7 +98,6 @@ function kickToLogin(msg = "אין לך יותר גישה") {
   });
 }
 
-// realtime guard — לא מעיפים על permission-denied
 // ✅ Permission guard בלי realtime (אין onSnapshot בכלל)
 async function startPermissionWatcher(user) {
   stopPermissionWatcher();
@@ -126,12 +125,18 @@ async function startPermissionWatcher(user) {
       return;
     }
 
-    // ✅ הכל תקין – לא עושים כלום (אין realtime אז גם לא ייפול)
-    clearPermKickTimer();
+    clearPermKickTimer(); // ✅ הכל תקין
   } catch (err) {
     console.warn("perm check error (no kick):", err?.code || err?.message || err);
-    // ❗ לא מעיפים על שגיאה – רק מודיעים בקונסול
+    // לא מעיפים על שגיאה זמנית
   }
+}
+
+function stopPermissionWatcher() {
+  clearPermKickTimer();
+  permWatcherArmed = false;
+  isKicking = false;
+  unsubPerm = null; // ✅ אין onSnapshot אז אין מה לבטל
 }
 
 
