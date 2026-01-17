@@ -491,7 +491,12 @@ function initAuth() {
         loginSection.style.display = "none";
         adminSection.style.display = "block";
 
-        await loadAllData();
+try {
+  await loadAllData();
+} catch (e) {
+  console.warn("loadAllData failed (no signout):", e?.code || e?.message || e);
+  // לא מעיפים — פשוט משאירים אותך מחובר
+}
       } catch (err) {
         console.error("authState error:", err);
         alert("אין לך הרשאה להיכנס לפאנל הניהול.");
@@ -538,40 +543,21 @@ async function loadAllData() {
 }
 
 /* ------------ realtime ------------ */
+let adminPollTimer = null;
+
 function subscribeRealtimeAdmin() {
-  // NEWS
-  for (const g of GRADES) {
-    onSnapshot(doc(db, "news", g), (snap) => {
-      const data = snap.exists() ? snap.data() : { items: [] };
-      newsData[g] = data.items || [];
-      renderNewsAdmin();
-    });
-  }
-
-  // EXAMS
-  for (const g of GRADES) {
-    onSnapshot(doc(db, "exams", g), (snap) => {
-      const data = snap.exists() ? snap.data() : { items: [] };
-      examsData[g] = data.items || [];
-      renderExamsAdmin();
-    });
-  }
-
-  // BOARD
-  onSnapshot(doc(db, "board", "general"), (snap) => {
-    const data = snap.exists() ? snap.data() : { items: [] };
-    boardData = data.items || [];
-    renderBoardAdmin();
-  });
-
-  // POLLS
-  onSnapshot(pollsCollectionRef, (snap) => {
-    pollsData = [];
-    snap.forEach((docSnap) => {
-      pollsData.push({ id: docSnap.id, ...docSnap.data() });
-    });
-    renderPollsAdmin();
-  });
+  // ❌ לא משתמשים ב-onSnapshot כי זה מפיל עם permission-denied אחרי זמן
+  // ✅ במקום זה: פולינג (רענון) יציב
+  try { if (adminPollTimer) clearInterval(adminPollTimer); } catch {}
+  adminPollTimer = setInterval(async () => {
+    try {
+      await loadAllData(); // טוען מחדש הכל
+      console.log("admin poll refresh ok");
+    } catch (e) {
+      console.warn("admin poll refresh error:", e?.code || e?.message || e);
+      // לא עושים signOut
+    }
+  }, 30000);
 }
 
 /* ------------ NEWS ------------ */
