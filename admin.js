@@ -132,12 +132,7 @@ async function startPermissionWatcher(user) {
   }
 }
 
-function stopPermissionWatcher() {
-  clearPermKickTimer();
-  permWatcherArmed = false;
-  isKicking = false;
-  unsubPerm = null; // ✅ אין onSnapshot אז אין מה לבטל
-}
+
 
 
 
