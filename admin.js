@@ -75,21 +75,9 @@ function scheduleKick(msg) {
 }
 
 function shouldKickForSnapshotError(err) {
-  // ⚠️ רק שגיאות "קשות" מצדיקות בעיטה מיידית
+  // ❗ בועטים רק על שגיאות חד־משמעיות של חוסר הרשאה
   const code = String(err?.code || "").toLowerCase();
-
-  // הרשאות/אימות = באמת אין גישה
-  if (
-    code.includes("permission-denied") ||
-    code.includes("unauthenticated") ||
-    code.includes("auth/") ||
-    code.includes("permission")
-  ) {
-    return true;
-  }
-
-  // שאר השגיאות (network, unavailable וכו') – לא בעיטה מיידית
-  return false;
+  return code === "permission-denied" || code === "unauthenticated";
 }
 
 function kickToLogin(msg = "אין לך יותר גישה") {
@@ -102,7 +90,6 @@ function kickToLogin(msg = "אין לך יותר גישה") {
   try { if (unsubPerm) unsubPerm(); } catch {}
   unsubPerm = null;
 
-  // לא לזרוק אם כבר ב-login section – אבל נשאיר את ההתנהגות שלך (לא נשנה UX)
   signOut(auth).finally(() => {
     window.location.href = "admin.html";
   });
@@ -113,80 +100,63 @@ function startPermissionWatcher(user) {
   stopPermissionWatcher();
   if (!user) return;
 
-  permWatcherArmed = false; // יתממשק אחרי snapshot אמין
+  permWatcherArmed = false;
   clearPermKickTimer();
 
   const refDoc = doc(db, "adminUsers", user.uid);
 
   unsubPerm = onSnapshot(
-    // ✅ includeMetadataChanges כדי לדעת אם זה מהקאש
     refDoc,
     { includeMetadataChanges: true },
     (snap) => {
-      // כל snapshot "טוב" מבטל טיימר בעיטה
-      // (אלא אם באמת נחליט לתזמן בעיטה שוב)
       clearPermKickTimer();
 
       const fromCache = !!snap?.metadata?.fromCache;
 
-      // אם המסמך לא קיים:
+      // אם המסמך לא קיים
       if (!snap.exists()) {
-        // ✅ אם זה מהקאש – יכול להיות שהשרת עוד לא חזר/התחברות עוד מתייצבת
-        if (fromCache) {
-          // לא בועטים, פשוט מחכים לשרת
-          // נשאיר גם טיימר עדין רק אם כבר התחמשנו בעבר
-          if (permWatcherArmed) {
-            scheduleKick("הגישה שלך בוטלה");
-          }
-          return;
-        }
+        // אם זה מהקאש – מחכים, לא בועטים
+        if (fromCache) return;
 
-        // אם זה לא מהקאש (שרת אמר שאין) – זו באמת בעיה
-        // אבל עדיין ניתן grace קצר כדי להימנע מ"גליץ'" ברשת/החלפת משתמש
+        // השרת אומר שאין מסמך → בעיית הרשאה אמיתית (grace קצר)
         scheduleKick("הגישה שלך בוטלה");
         return;
       }
 
-      // כאן המסמך קיים => אפשר להתחמש
+      // המסמך קיים – אפשר להתחמש
       permWatcherArmed = true;
 
       const data = snap.data() || {};
       const role = String(data.role || "").trim().toLowerCase();
 
-      // ✅ אם אין role לרגע (דאטה לא שלם) – לא בעיטה ישר, נחכה
+      // role ריק/לא תקין – grace קצר
       if (!role) {
         scheduleKick("אין לך הרשאות");
         return;
       }
 
-      // roles שמותר להיכנס ל-admin
+      // role לא מורשה
       if (!ADMIN_ROLES.includes(role)) {
         scheduleKick("אין לך הרשאות");
         return;
       }
 
-      // אם הכול תקין – לא לעשות כלום
-      // (וגם לוודא שאין kick timer)
+      // הכול תקין
       clearPermKickTimer();
     },
     (err) => {
-      console.error("perm snapshot error:", err);
+      console.warn("perm snapshot error (no kick):", err?.code || err);
 
-      // ✅ לא בועטים על שגיאות זמניות (unavailable/network וכו')
+      // בועטים רק על שגיאות הרשאה חד־משמעיות
       if (shouldKickForSnapshotError(err)) {
         kickToLogin("שגיאת הרשאות (בדוק חוקים/קונסול)");
-        return;
       }
 
-      // שגיאה זמנית: ניתן הודעה עדינה בקונסול בלבד + ננסה להמשיך בלי בעיטה
-      // (ה-onSnapshot בדרך כלל ינסה להתחבר מחדש לבד)
-      // אם כבר התחמשנו בעבר, נשאיר grace kick רק אם זה חוזר ונשנה:
-      if (permWatcherArmed) {
-        scheduleKick("בעיה זמנית בחיבור/הרשאות. נסה שוב.");
-      }
+      // ❌ אין scheduleKick על שגיאות זמניות
     }
   );
 }
+
 
 function stopPermissionWatcher() {
   clearPermKickTimer();
