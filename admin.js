@@ -75,12 +75,15 @@ function scheduleKick(msg) {
 }
 
 function shouldKickForSnapshotError(err) {
-  // ❗ בועטים רק על שגיאות חד־משמעיות של חוסר הרשאה
-  const code = String(err?.code || "").toLowerCase();
-  return code === "permission-denied" || code === "unauthenticated";
+  // ❗ לא בועטים על permission-denied מה-watcher
+  // כי זה יכול להיות App Check / רשת / טוקן זמני.
+  // הבדיקה האמיתית כבר נעשית ב-loadAdminPermissions בעת התחברות.
+  return false;
 }
 
 function kickToLogin(msg = "אין לך יותר גישה") {
+  // נשאיר את הפונקציה קיימת למקרי קיצון שאתה קורא לה ידנית,
+  // אבל ה-watcher לא ישתמש בה יותר.
   if (isKicking) return;
   isKicking = true;
 
@@ -95,56 +98,68 @@ function kickToLogin(msg = "אין לך יותר גישה") {
   });
 }
 
-// realtime guard — אם מוחקים/משנים role בזמן אמת => מעיפים
-async function startPermissionWatcher(user) {
+// realtime guard — לא מעיפים על permission-denied
+function startPermissionWatcher(user) {
   stopPermissionWatcher();
   if (!user) return;
 
-  clearPermKickTimer();
   permWatcherArmed = false;
-console.log("UID =", auth.currentUser?.uid);
+  clearPermKickTimer();
 
   const refDoc = doc(db, "adminUsers", user.uid);
 
-  // נסה כמה פעמים כי לפעמים הטוקן עוד לא התייצב
-  for (let i = 0; i < 5; i++) {
-    try {
-      const snap = await getDoc(refDoc);
+  unsubPerm = onSnapshot(
+    refDoc,
+    { includeMetadataChanges: true },
+    (snap) => {
+      const fromCache = !!snap?.metadata?.fromCache;
 
+      // אם המסמך לא קיים — רק אם זה מהשרת (לא קאש) ובאמת כבר התחמשנו קודם
       if (!snap.exists()) {
-        scheduleKick("אין לך הרשאות (אין adminUsers)");
+        if (fromCache) return; // קאש/אופליין — לא עושים כלום
+        if (permWatcherArmed) {
+          // כאן זה כבר מצב אמיתי: היה קיים ונמחק/בוטל
+          scheduleKick("הגישה שלך בוטלה");
+        }
         return;
       }
+
+      permWatcherArmed = true;
 
       const data = snap.data() || {};
       const role = String(data.role || "").trim().toLowerCase();
 
-      permWatcherArmed = true;
+      // אם role ריק — נותנים רגע, לא בעיטה מיידית
+      if (!role) return;
 
-      if (!role || !ADMIN_ROLES.includes(role)) {
+      // אם הרול כבר לא מורשה — אז כן, זו סיבה להעיף (אמיתי)
+      if (!ADMIN_ROLES.includes(role)) {
         scheduleKick("אין לך הרשאות");
         return;
       }
 
+      // הכל תקין
       clearPermKickTimer();
-      return; // ✅ עבר
-    } catch (err) {
+    },
+    (err) => {
       const code = String(err?.code || "").toLowerCase();
 
-      // אם זו שגיאת הרשאה אמיתית — תבעט (כי זה באמת חסום)
+      // ✅ הכי חשוב: לא להעיף על permission-denied / unauthenticated מה-watcher
+      // כי זה בדיוק מה שגורם ל”זורק אותי אחרי כמה שניות”.
       if (code === "permission-denied" || code === "unauthenticated") {
-        kickToLogin("אין לך הרשאות (permission-denied)");
+        console.warn("perm snapshot error (no kick):", code);
+        // פשוט מפסיקים watcher כדי שלא יחפור
+        stopPermissionWatcher();
         return;
       }
 
-      // שגיאה זמנית → המתן ונסה שוב
-      await new Promise(r => setTimeout(r, 400));
+      // שגיאות אחרות: לא בעיטה ישר, רק grace אם כבר התחמשנו
+      console.warn("perm snapshot error (no kick):", err);
+      if (permWatcherArmed) scheduleKick("בעיה זמנית בחיבור. נסה לרענן.");
     }
-  }
-
-  // אחרי כמה ניסיונות עדיין לא הצליח
-  scheduleKick("בעיה זמנית, נסה לרענן");
+  );
 }
+
 
 
 
