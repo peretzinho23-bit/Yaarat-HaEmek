@@ -142,11 +142,8 @@ function stopPermissionWatcher() {
   clearPermKickTimer();
   permWatcherArmed = false;
   isKicking = false;
-
-  try { if (unsubPerm) unsubPerm(); } catch {}
   unsubPerm = null;
 }
-
 function buildPermsFromRole(role, allowedGrades = []) {
   const r = String(role || "teacher").toLowerCase();
 
