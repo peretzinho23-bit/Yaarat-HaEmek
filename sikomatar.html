@@ -1,0 +1,1007 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#eef2ff" />
+  <title>סקירה רשמית והצעת תשלום • בית הספר יערת העמק</title>
+
+  <style>
+    :root{
+      --bg0:#f7f9ff;
+      --bg1:#eef2ff;
+      --paper:#ffffff;
+
+      --card:rgba(2,6,23,.055);
+      --line:rgba(2,6,23,.12);
+
+      --txt:rgba(2,6,23,.92);
+      --mut:rgba(2,6,23,.70);
+      --mut2:rgba(2,6,23,.55);
+
+      --acc:#1d4ed8;
+      --acc2:#7c3aed;
+      --acc3:#16a34a;
+
+      --shadow: 0 22px 70px rgba(2,6,23,.16);
+      --shadow2: 0 12px 40px rgba(2,6,23,.12);
+
+      --r:22px;
+      --r2:16px;
+      --max:1120px;
+
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --sans: system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Noto Sans Hebrew", "Heebo", sans-serif;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      background:
+        radial-gradient(1200px 700px at 14% 12%, rgba(29,78,216,.14), transparent 58%),
+        radial-gradient(1100px 760px at 86% 10%, rgba(124,58,237,.12), transparent 56%),
+        radial-gradient(1200px 840px at 45% 96%, rgba(22,163,74,.10), transparent 58%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      overflow-x:hidden;
+    }
+
+    a{color:inherit; text-decoration:none}
+    .wrap{max-width:var(--max); margin:0 auto; padding:22px 16px 70px}
+
+    /* Progress */
+    .progress{position:fixed; top:0; right:0; left:0; height:3px; background:rgba(2,6,23,.08); z-index:9999}
+    .progress > i{display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--acc), var(--acc2))}
+
+    /* Topbar */
+    .topbar{
+      position:sticky; top:0; z-index:80;
+      background:linear-gradient(180deg, rgba(255,255,255,.90), rgba(255,255,255,.60));
+      border-bottom:1px solid rgba(2,6,23,.10);
+    }
+    .topbar .wrap{
+      padding:12px 16px;
+      display:flex; align-items:center; justify-content:space-between; gap:14px;
+    }
+
+    .brand{display:flex; align-items:center; gap:12px; min-width:0}
+    .logoLink{
+      display:inline-flex; align-items:center; justify-content:center;
+      width:46px; height:46px;
+      border-radius:16px;
+      background:rgba(255,255,255,.92);
+      border:1px solid rgba(2,6,23,.10);
+      box-shadow:var(--shadow2);
+      overflow:hidden;
+      transition:transform .15s ease;
+      flex:0 0 auto;
+    }
+    .logoLink:hover{transform:translateY(-1px)}
+    .logoLink img{width:38px; height:38px; object-fit:contain}
+
+    .brandText{min-width:0}
+    .brandText h1{
+      margin:0; font-size:14px;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .brandText p{
+      margin:0; font-size:12px; color:var(--mut);
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+
+    .actions{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end}
+    .btn{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(2,6,23,.12);
+      background:rgba(255,255,255,.85);
+      box-shadow:var(--shadow2);
+      cursor:pointer;
+      user-select:none;
+      transition:transform .15s ease, border-color .15s ease;
+      font-size:12px;
+    }
+    .btn:hover{transform:translateY(-1px); border-color:rgba(29,78,216,.28)}
+    .btn.primary{
+      background:linear-gradient(135deg, rgba(29,78,216,.10), rgba(124,58,237,.08));
+      border-color:rgba(29,78,216,.22);
+    }
+
+    /* Cover */
+    .cover{
+      margin-top:16px;
+      border-radius:calc(var(--r) + 6px);
+      background:rgba(255,255,255,.90);
+      border:1px solid rgba(2,6,23,.10);
+      box-shadow:var(--shadow);
+      padding:22px 18px;
+    }
+    .cover .grid{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:16px;
+      align-items:stretch;
+    }
+    @media (max-width: 900px){ .cover .grid{grid-template-columns:1fr} }
+
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(2,6,23,.12);
+      background:rgba(2,6,23,.03);
+      font-size:12px;
+      color:var(--mut);
+      width:max-content;
+    }
+    .cover h2{margin:10px 0 8px; font-size:28px; line-height:1.12}
+    .shine{
+      background:linear-gradient(90deg, var(--acc), var(--acc2));
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+    }
+    .cover p{margin:0; color:var(--mut); font-size:14px; line-height:1.85}
+
+    .kpis{display:grid; grid-template-columns:1fr 1fr; gap:12px; align-content:start}
+    .kpi{
+      border-radius:18px;
+      background:rgba(2,6,23,.03);
+      border:1px solid rgba(2,6,23,.10);
+      padding:12px;
+      min-height:88px;
+      display:flex; flex-direction:column; justify-content:space-between;
+    }
+    .kpi b{font-size:16px}
+    .kpi span{font-size:12px; color:var(--mut)}
+
+    /* Layout */
+    .layout{
+      display:grid;
+      grid-template-columns: 290px 1fr;
+      gap:16px;
+      margin-top:16px;
+    }
+    @media (max-width: 1000px){
+      .layout{grid-template-columns:1fr}
+    }
+
+    /* TOC */
+    .toc{
+      position:sticky;
+      top:86px;
+      align-self:start;
+      border-radius:var(--r);
+      background:rgba(255,255,255,.92);
+      border:1px solid rgba(2,6,23,.10);
+      box-shadow:var(--shadow2);
+      overflow:hidden;
+    }
+    /* FIX: במובייל לא סטיקי כדי שלא ידרוס */
+    @media (max-width: 1000px){
+      .toc{position:relative; top:auto}
+    }
+
+    .toc .head{
+      padding:14px 14px 10px;
+      border-bottom:1px solid rgba(2,6,23,.10);
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+    }
+    .toc .head b{font-size:13px}
+    .toc .head span{font-size:11px; color:var(--mut)}
+    .toc nav{padding:10px}
+    .toc a{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:10px 10px;
+      border-radius:14px;
+      color:var(--mut);
+      border:1px solid transparent;
+      transition:background .15s ease, border-color .15s ease, transform .15s ease;
+      font-size:13px;
+      gap:10px;
+    }
+    .toc a:hover{
+      transform:translateY(-1px);
+      background:rgba(2,6,23,.04);
+      border-color:rgba(29,78,216,.18);
+      color:var(--txt);
+    }
+    .toc a.active{
+      background:linear-gradient(135deg, rgba(29,78,216,.10), rgba(124,58,237,.08));
+      border-color:rgba(29,78,216,.22);
+      color:var(--txt);
+    }
+    .toc a i{font-style:normal; font-family:var(--mono); font-size:11px; opacity:.85}
+
+    .content{display:flex; flex-direction:column; gap:14px}
+
+    .section{
+      border-radius:var(--r);
+      background:rgba(255,255,255,.92);
+      border:1px solid rgba(2,6,23,.10);
+      box-shadow:var(--shadow2);
+      padding:18px;
+      position:relative;
+      overflow:hidden;
+    }
+    .section:before{
+      content:"";
+      position:absolute; inset:-2px -2px auto -2px;
+      height:2px;
+      background:linear-gradient(90deg, var(--acc), var(--acc2), var(--acc3));
+      opacity:.55;
+    }
+    .section h3{
+      margin:0 0 10px;
+      font-size:16px;
+      display:flex; align-items:center; gap:10px;
+    }
+    .badge{
+      font-size:11px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(2,6,23,.10);
+      background:rgba(2,6,23,.03);
+      color:var(--mut);
+    }
+    .section p{margin:0 0 10px; color:var(--mut); line-height:1.85}
+    .section ul{
+      margin:0;
+      padding-right:20px;
+      padding-left:0;
+      color:var(--txt);
+    }
+    .section li{margin:6px 0; color:var(--mut)}
+    .section li b{color:var(--txt)}
+    .hr{height:1px; background:rgba(2,6,23,.10); margin:14px 0}
+
+    .grid2{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+      margin-top:10px;
+    }
+    @media (max-width: 720px){ .grid2{grid-template-columns:1fr} }
+
+    .mini{
+      border-radius:18px;
+      border:1px solid rgba(2,6,23,.10);
+      background:rgba(2,6,23,.03);
+      padding:12px;
+    }
+    .mini h4{margin:0 0 6px; font-size:13px}
+    .mini p{margin:0; font-size:12px; color:var(--mut); line-height:1.85}
+
+    /* Pricing */
+    .pricing{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      margin-top:10px;
+    }
+    @media (max-width: 900px){ .pricing{grid-template-columns:1fr} }
+@media (max-width: 520px){
+  .plan .head{flex-direction:column; align-items:flex-start;}
+  .price{align-self:flex-start;}
+}
+
+    .plan{
+      border-radius:24px;
+      border:1px solid rgba(2,6,23,.10);
+      background:rgba(255,255,255,.92);
+      box-shadow:var(--shadow);
+      padding:16px;
+      position:relative;
+      overflow:hidden;
+    }
+    .plan .head{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+      margin-bottom:10px;
+    }
+    .plan .head b{font-size:15px}
+    .plan .sub{font-size:12px; color:var(--mut); margin-top:2px}
+    .price{
+      font-family:var(--mono);
+      font-size:15px;
+      color:var(--txt);
+      background:rgba(2,6,23,.03);
+      border:1px solid rgba(2,6,23,.10);
+      padding:8px 10px;
+      border-radius:14px;
+      white-space:nowrap;
+    }
+.ribbon{
+  position:absolute; top:14px; right:14px; left:auto;
+  padding:7px 10px;
+  border-radius:999px;
+  background:rgba(22,163,74,.10);
+  border:1px solid rgba(22,163,74,.22);
+  font-size:11px;
+  color:var(--txt);
+  z-index:2;
+}
+.plan{ position:relative; }
+.plan.hasRibbon{ padding-top: 44px; } /* מקום לריבון */
+
+    .plan ul{margin:0; padding-right:20px; padding-left:0}
+    .plan li{margin:7px 0; color:var(--mut)}
+    .plan .note{margin-top:10px; font-size:11px; color:var(--mut2); line-height:1.7}
+
+    /* Footer */
+    .footer{
+      margin-top:16px;
+      border-radius:calc(var(--r) + 6px);
+      padding:18px;
+      background:rgba(255,255,255,.92);
+      border:1px solid rgba(2,6,23,.10);
+      box-shadow:var(--shadow);
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      flex-wrap:wrap;
+    }
+    .footer b{font-size:14px}
+    .footer span{font-size:12px; color:var(--mut)}
+
+    /* ====== Reveal fix (לא שוברים הדפסה) ====== */
+    .fx{opacity:0; transform:translateY(8px); transition:opacity .45s ease, transform .45s ease}
+    .fx.show{opacity:1; transform:none}
+
+    /* Toast */
+    .toast{
+      position:fixed; bottom:18px; right:18px; z-index:99999;
+      padding:10px 12px; border-radius:14px;
+      background:rgba(2,6,23,.90); color:white; font-size:12px;
+      border:1px solid rgba(255,255,255,.14);
+      box-shadow:0 18px 50px rgba(2,6,23,.22);
+      transform: translateY(8px); opacity:0;
+      transition: opacity .18s ease, transform .18s ease;
+      max-width: 78vw;
+      pointer-events:none;
+    }
+    .toast.show{opacity:1; transform:translateY(0)}
+
+    /* =========================
+       PRINT (A4) — לא ריק!
+       ========================= */
+    @page{ size:A4; margin: 16mm 14mm; }
+    @media print{
+      body{background:white !important}
+      .progress, .actions, .toc, .toast{display:none !important}
+      .topbar{position:static !important; background:white !important; border-bottom:1px solid #ddd !important}
+      .wrap{max-width:100% !important; padding:0 !important}
+
+      /* הכי חשוב: לבטל reveal בהדפסה */
+      .fx{opacity:1 !important; transform:none !important}
+
+      .cover, .section, .plan, .mini, .kpi, .footer{
+        box-shadow:none !important;
+        background:white !important;
+        border:1px solid #d9d9d9 !important;
+      }
+
+      .cover{page-break-after: always;}
+      #pricing{page-break-before: always;}
+      #pitch{page-break-before: always;}
+
+      .section, .plan, .mini{break-inside: avoid; page-break-inside: avoid;}
+      .section p, .section li, .cover p{color:#111 !important}
+    }
+    /* =========================
+   PREMIUM LIGHT OVERLAY
+   הדבק בסוף ה-<style> (בלי לגעת ב-HTML/JS)
+   ========================= */
+
+/* Fonts polish (אם יש לך Heebo/Noto Sans Hebrew זה ישב מדהים) */
+:root{
+  --paper: #fff;
+  --bg0:#f8fbff;
+  --bg1:#eef4ff;
+
+  --txt: rgba(2,6,23,.92);
+  --mut: rgba(2,6,23,.70);
+  --mut2: rgba(2,6,23,.56);
+
+  --line: rgba(2,6,23,.10);
+  --line2: rgba(2,6,23,.08);
+
+  --acc:#1d4ed8;
+  --acc2:#7c3aed;
+  --acc3:#16a34a;
+
+  --shadow: 0 26px 80px rgba(2,6,23,.14);
+  --shadow2: 0 14px 44px rgba(2,6,23,.10);
+}
+
+/* Subtle background upgrade */
+body{
+  background:
+    radial-gradient(1200px 800px at 10% 12%, rgba(29,78,216,.12), transparent 58%),
+    radial-gradient(1100px 760px at 92% 8%, rgba(124,58,237,.10), transparent 56%),
+    radial-gradient(1200px 900px at 48% 110%, rgba(22,163,74,.08), transparent 60%),
+    linear-gradient(180deg, var(--bg0), var(--bg1));
+}
+
+/* Global readability */
+.wrap{ padding-bottom: 84px; }
+p, li{ letter-spacing: .1px; }
+.section p{ max-width: 88ch; }
+
+/* Topbar feels more “document” */
+.topbar{
+  background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.70));
+  backdrop-filter: blur(10px);
+}
+.topbar .wrap{ padding-top: 14px; padding-bottom: 14px; }
+.brandText h1{ font-size: 14px; font-weight: 800; }
+.brandText p{ font-weight: 600; }
+
+/* Buttons: cleaner */
+.btn{
+  border-color: rgba(2,6,23,.10);
+  box-shadow: 0 10px 30px rgba(2,6,23,.10);
+}
+.btn.primary{
+  background: linear-gradient(135deg, rgba(29,78,216,.14), rgba(124,58,237,.10));
+  border-color: rgba(29,78,216,.26);
+}
+
+/* Cover: more premium */
+.cover{
+  border-color: rgba(2,6,23,.09);
+  background: linear-gradient(180deg, rgba(255,255,255,.94), rgba(255,255,255,.88));
+}
+.cover h2{ font-size: 30px; letter-spacing: -.2px; }
+.cover p{ font-size: 14.5px; }
+.pill{
+  background: linear-gradient(135deg, rgba(2,6,23,.03), rgba(29,78,216,.05));
+  border-color: rgba(2,6,23,.10);
+}
+
+/* KPI: make them pop a bit */
+.kpi{
+  background: linear-gradient(180deg, rgba(2,6,23,.028), rgba(2,6,23,.018));
+  border-color: rgba(2,6,23,.10);
+}
+.kpi b{ font-weight: 850; }
+
+/* TOC: nicer + clearer */
+.toc{
+  background: linear-gradient(180deg, rgba(255,255,255,.94), rgba(255,255,255,.88));
+  border-color: rgba(2,6,23,.09);
+}
+.toc .head{
+  background: linear-gradient(180deg, rgba(2,6,23,.02), rgba(2,6,23,.00));
+}
+.toc a{
+  position:relative;
+  padding: 11px 12px;
+  border: 1px solid rgba(2,6,23,.00);
+}
+.toc a::before{
+  content:"";
+  position:absolute;
+  right:8px; top:10px; bottom:10px;
+  width:3px;
+  border-radius: 999px;
+  background: transparent;
+  opacity:.9;
+}
+.toc a.active::before{
+  background: linear-gradient(180deg, var(--acc), var(--acc2));
+}
+.toc a.active{
+  background: linear-gradient(135deg, rgba(29,78,216,.12), rgba(124,58,237,.08));
+  border-color: rgba(29,78,216,.22);
+}
+.toc a i{ opacity:.75; }
+
+/* Sections: better hierarchy + subtle “executive doc” look */
+.section{
+  background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.90));
+  border-color: rgba(2,6,23,.09);
+  padding: 20px 20px;
+}
+.section:before{
+  height:3px;
+  opacity:.65;
+}
+.section h3{
+  font-size: 17px;
+  letter-spacing: -.15px;
+  margin-bottom: 12px;
+}
+.badge{
+  background: linear-gradient(135deg, rgba(2,6,23,.03), rgba(29,78,216,.06));
+  border-color: rgba(2,6,23,.10);
+  font-weight: 700;
+}
+
+/* Lists: more readable bullets */
+.section ul{ padding-right: 22px; }
+.section li{
+  margin: 7px 0;
+  line-height: 1.8;
+}
+.section li::marker{ color: rgba(29,78,216,.55); }
+
+/* Divider nicer */
+.hr{
+  background: linear-gradient(90deg, transparent, rgba(2,6,23,.12), transparent);
+}
+
+/* Mini cards: elevate */
+.mini{
+  background: linear-gradient(180deg, rgba(2,6,23,.028), rgba(2,6,23,.018));
+  border-color: rgba(2,6,23,.10);
+  box-shadow: 0 10px 26px rgba(2,6,23,.06);
+}
+.mini h4{ font-weight: 850; }
+
+/* Pricing cards: more “proposal” */
+.plan{
+  border-color: rgba(2,6,23,.09);
+  background: linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.90));
+}
+.price{
+  background: linear-gradient(135deg, rgba(2,6,23,.02), rgba(29,78,216,.06));
+  border-color: rgba(2,6,23,.10);
+}
+
+/* Footer: clean */
+.footer{
+  background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.90));
+  border-color: rgba(2,6,23,.09);
+}
+
+/* Smoothness: reduce accidental horizontal overflow */
+.cover, .toc, .section, .plan, .footer{ overflow: clip; }
+
+/* Mobile tightening */
+@media (max-width: 520px){
+  .cover{ padding: 18px 14px; }
+  .section{ padding: 16px 14px; }
+  .cover h2{ font-size: 26px; }
+  .wrap{ padding-left: 12px; padding-right: 12px; }
+}
+
+/* Print: keep it crisp & black where needed */
+@media print{
+  .section:before{ opacity:1 !important; }
+  .badge, .pill, .price{
+    background: #fff !important;
+    border: 1px solid #d6d6d6 !important;
+  }
+  .toc{ display:none !important; }
+  .section, .plan, .mini, .kpi, .cover, .footer{
+    border:1px solid #d6d6d6 !important;
+  }
+}
+
+  </style>
+</head>
+
+<body>
+  <div class="progress" aria-hidden="true"><i id="progressBar"></i></div>
+  <div class="toast" id="toast">הועתק</div>
+
+  <header class="topbar">
+    <div class="wrap">
+      <div class="brand">
+        <a class="logoLink" href="index.html" title="למעבר לאתר" aria-label="לוגו יערת העמק">
+          <img src="logo.png" alt="לוגו בית הספר יערת העמק" />
+        </a>
+        <div class="brandText">
+          <h1>סקירה רשמית של אתר יערת העמק</h1>
+          <p id="subline">דף סיכום של אתר יערת העמק</p>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary" id="copyAllBtn" title="העתקת כל המסמך לטקסט">
+          <span style="font-family:var(--mono)">⧉</span><span>העתקת מסמך</span>
+        </button>
+        <button class="btn" id="printBtn" title="הדפסה/שמירה כ-PDF">
+          <span style="font-family:var(--mono)">⎙</span><span>הדפסה / PDF</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <section class="cover fx show" id="cover">
+      <div class="grid">
+        <div>
+          <div class="pill">📌 מסמך רשמי • סקירה + הצעת תשלום</div>
+          <h2><span class="shine">לכבוד הנהלת בית הספר</span> — מערכת ניהול דיגיטלית “יערת העמק”</h2>
+          <p>
+            מסמך זה מציג סקירה מקיפה של המערכת הדיגיטלית שנבנתה עבור בית הספר יערת העמק,
+            לצד הצעת רכישה ותחזוקה. המערכת מרכזת את כלל המידע הבית־ספרי במקום אחד,
+            מאפשרת ניהול תוכן פשוט לצוות, ומספקת עדכון בזמן אמת לכלל המשתמשים — תלמידים, מורים והנהלה.
+          </p>
+          <p style="margin-top:10px"><b>מבנה המסמך:</b> סקירת מערכת + הצעת תשלום/תחזוקה.</p>
+        </div>
+
+        <div class="kpis">
+          <div class="kpi"><b>עדכון בזמן אמת</b><span>שינויים מתעדכנים מיידית ללא רענון</span></div>
+          <div class="kpi"><b>דפי כיתות</b><span>אזור אישי לכל כיתה: חדשות, מבחנים, מערכת</span></div>
+          <div class="kpi"><b>פאנל ניהול לצוות</b><span>עדכון תכנים ללא צורך בידע טכני</span></div>
+          <div class="kpi"><b>נגישות מלאה</b><span>מחשב + מובייל, שימוש יומיומי</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="layout">
+
+      <aside class="toc fx show" aria-label="תוכן עניינים">
+        <div class="head">
+          <div>
+            <b>תוכן עניינים</b><br/>
+            <span>לחיצה לקפיצה לסעיף</span>
+          </div>
+          <span style="font-family:var(--mono); font-size:11px; color:var(--mut)" id="secCount">—</span>
+        </div>
+        <nav id="tocNav"></nav>
+      </aside>
+
+      <div class="content" id="contentRoot">
+
+        <section class="section fx show" id="sikora" data-title="סקירה – אתר יערת העמק" data-num="S0">
+          <h3>סקירה – אתר יערת העמק <span class="badge">סקירת מערכת</span></h3>
+          <p>
+            להלן סקירה מלאה ומובנית של המערכת הדיגיטלית, כולל מטרות, מבנה, רכיבים מרכזיים, תפעול ועדכון שוטף.
+          </p>
+          <div class="grid2">
+            <div class="mini">
+              <h4>הגדרת המוצר</h4>
+              <p>מערכת ניהול דיגיטלית יומיומית לבית הספר — לא אתר תדמית.</p>
+            </div>
+            <div class="mini">
+              <h4>ערך לבית הספר</h4>
+              <p>מקור מידע אחד, מסודר ומעודכן, שמפחית תלות בהודעות מפוזרות וקבוצות וואטסאפ.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section fx show" id="sec1" data-title="1. מבוא כללי" data-num="01">
+          <h3>1. מבוא כללי <span class="badge">הגדרה</span></h3>
+          <p>
+            האתר הדיגיטלי של בית הספר יערת העמק פותח כמערכת ניהול דיגיטלית מרכזית, שמטרתה לנהל ולרכז את כלל המידע הבית־ספרי במקום אחד מסודר, נגיש וברור.
+          </p>
+          <p>המערכת מיועדת לשימוש יומיומי של תלמידים, מורים, צוות חינוכי והנהלה.</p>
+          <div class="hr"></div>
+          <p>
+            האתר אינו משמש כאתר תדמית בלבד, אלא כמערכת עבודה פעילה, שמחליפה ומצמצמת שימוש בהודעות מפוזרות ועדכונים ידניים.
+          </p>
+        </section>
+
+        <section class="section fx show" id="sec2" data-title="2. מטרות המערכת" data-num="02">
+          <h3>2. מטרות המערכת <span class="badge">תועלת ארגונית</span></h3>
+          <ul>
+            <li>יצירת <b>מקור מידע אחד</b> ברור ואמין לכלל בית הספר</li>
+            <li>הפחתת <b>בלבול ועומס מידע</b> בקרב תלמידים והורים</li>
+            <li>שיפור <b>הסדר, הארגון והעדכון השוטף</b></li>
+            <li>מתן <b>שליטה מלאה</b> לצוות החינוכי על התכנים</li>
+            <li>שיפור <b>התקשורת הפנים־בית־ספרית</b></li>
+          </ul>
+        </section>
+
+        <section class="section fx show" id="sec3" data-title="3. עקרונות תכנון ופיתוח" data-num="03">
+          <h3>3. עקרונות תכנון ופיתוח <span class="badge">איכות מערכת</span></h3>
+          <ul>
+            <li><b>פשטות תפעול</b> – גם לצוות ללא רקע טכנולוגי</li>
+            <li><b>יציבות ואמינות</b> – עבודה רציפה</li>
+            <li><b>עדכון בזמן אמת</b> – כל שינוי מופיע מיידית</li>
+            <li><b>נגישות מלאה</b> – מחשב, טאבלט וטלפון</li>
+            <li><b>אפשרות להרחבה</b> – התאמה לצרכים עתידיים</li>
+          </ul>
+        </section>
+
+        <section class="section fx show" id="sec4" data-title="4. מבנה האתר הכללי" data-num="04">
+          <h3>4. מבנה האתר הכללי <span class="badge">ארכיטקטורה</span></h3>
+          <ul>
+            <li>דף בית מרכזי</li>
+            <li>דפי כיתות ייעודיים</li>
+            <li>מערכת חדשות ועדכונים</li>
+            <li>מערכת מבחנים</li>
+            <li>מערכת שעות</li>
+            <li>מערכת סקרים</li>
+            <li>פאנל ניהול לצוות</li>
+            <li>פאנל ניהול לסקרים</li>
+          </ul>
+          <div class="hr"></div>
+          <p>מבנה זה מאפשר עבודה מסודרת, שליטה במידע ותחזוקה קלה.</p>
+        </section>
+
+        <section class="section fx show" id="sec5" data-title="5. דף הבית" data-num="05">
+          <h3>5. דף הבית <span class="badge">כניסה מהירה</span></h3>
+          <ul>
+            <li>ניווט ברור לכל אזורי האתר</li>
+            <li>קישורים מהירים לדפי הכיתות</li>
+            <li>אזור חדשות מרכזי עם העדכונים האחרונים</li>
+            <li>התאמה מלאה לשימוש בטלפון נייד</li>
+            <li>עיצוב נקי וברור ללא עומס מידע</li>
+          </ul>
+        </section>
+
+        <section class="section fx show" id="sec6" data-title="6. דפי כיתות – ליבת המערכת" data-num="06">
+          <h3>6. דפי כיתות – ליבת המערכת <span class="badge">אזור אישי</span></h3>
+          <ul>
+            <li>חדשות והודעות כיתתיות</li>
+            <li>לוח מבחנים</li>
+            <li>מערכת שעות שבועית</li>
+          </ul>
+          <div class="hr"></div>
+          <p>כך לכל תלמיד יש מקום אחד קבוע וברור שבו נמצא כל המידע.</p>
+        </section>
+
+        <section class="section fx show" id="sec7" data-title="7. מערכת חדשות ועדכונים" data-num="07">
+          <h3>7. מערכת חדשות ועדכונים <span class="badge">תקשורת מסודרת</span></h3>
+          <ul>
+            <li>פרסומים כלליים לבית הספר</li>
+            <li>פרסומים לפי שכבה</li>
+            <li>פרסומים לפי כיתה</li>
+            <li>אפשרות לצרף טקסט, קישורים ותמונות</li>
+          </ul>
+        </section>
+
+        <section class="section fx show" id="sec8" data-title="8. מערכת מבחנים" data-num="08">
+          <h3>8. מערכת מבחנים <span class="badge">סדר לתלמידים</span></h3>
+          <ul>
+            <li>הצגת מבחנים עתידיים בלבד</li>
+            <li>סינון לפי כיתה + מיון לפי תאריך</li>
+            <li>הצגת מקצוע, תאריך, שעה ונושא</li>
+            <li>עדכון בזמן אמת ללא צורך ברענון</li>
+          </ul>
+        </section>
+
+        <section class="section fx show" id="sec9" data-title="9. מערכת שעות" data-num="09">
+          <h3>9. מערכת שעות <span class="badge">שגרה ברורה</span></h3>
+          <ul>
+            <li>חלוקה ברורה לימים ושיעורים</li>
+            <li>תמיכה ביום שישי מקוצר</li>
+            <li>התאמה מלאה למחשב ולנייד</li>
+            <li>גלילה אופקית נוחה במובייל</li>
+          </ul>
+        </section>
+
+        <section class="section fx show" id="sec10" data-title="10. מערכת סקרים (Polls)" data-num="10">
+          <h3>10. מערכת סקרים (Polls) <span class="badge">שיתוף והחלטות</span></h3>
+          <div class="grid2">
+            <div class="mini">
+              <h4>לתלמידים</h4>
+              <p>צפייה בסקרים פעילים • הצבעה פשוטה • מניעת הצבעה כפולה</p>
+            </div>
+            <div class="mini">
+              <h4>לצוות</h4>
+              <p>יצירת סקרים • עריכת שאלות • פתיחה/סגירה • תוצאות בזמן אמת</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section fx show" id="sec11" data-title="11. פאנל ניהול לצוות" data-num="11">
+          <h3>11. פאנל ניהול לצוות <span class="badge">ללא ידע טכני</span></h3>
+          <ul>
+            <li>פרסום ועריכת חדשות</li>
+            <li>הזנה ועדכון מבחנים</li>
+            <li>עדכון מערכות שעות</li>
+            <li>ניהול סקרים</li>
+          </ul>
+          <div class="hr"></div>
+          <p>כל שינוי מתעדכן מיידית אצל המשתמשים.</p>
+        </section>
+
+        <section class="section fx show" id="sec12" data-title="12. עדכון בזמן אמת" data-num="12">
+          <h3>12. עדכון בזמן אמת <span class="badge">Realtime</span></h3>
+          <ul>
+            <li>עדכון מיידי של כל תוכן</li>
+            <li>הצגת שינויים ללא רענון</li>
+            <li>יציבות גם בעומסי שימוש</li>
+          </ul>
+        </section>
+
+        <section class="section fx show" id="sec13" data-title="13. אבטחה וניהול הרשאות" data-num="13">
+          <h3>13. אבטחה וניהול הרשאות <span class="badge">גישה מבוקרת</span></h3>
+          <ul>
+            <li>גישה לפאנלי ניהול רק למורשים</li>
+            <li>הפרדה בין משתמש רגיל למנהל</li>
+            <li>מניעת גישה לתכנים רגישים</li>
+          </ul>
+        </section>
+
+        <section class="section fx show" id="sec14" data-title="14. התאמה למחשב ולנייד" data-num="14">
+          <h3>14. התאמה למחשב ולנייד <span class="badge">נגישות</span></h3>
+          <ul>
+            <li>מחשב • טאבלט • טלפון</li>
+            <li>תפריט מותאם • קריאות גבוהה במסכים קטנים</li>
+          </ul>
+        </section>
+
+        <section class="section fx show" id="sec15" data-title="15. סיכום" data-num="15">
+          <h3>15. סיכום <span class="badge">שורה תחתונה</span></h3>
+          <p>
+            מערכת “יערת העמק” מרכזת במקום אחד את כלל המידע הבית־ספרי, משפרת סדר וארגון,
+            ומספקת כלי עבודה ברור, נוח ויעיל לתלמידים, לצוות ולהנהלה — עם עדכון בזמן אמת ונגישות מלאה.
+          </p>
+        </section>
+
+        <section class="section fx show" id="pricing" data-title="הצעה לרכישה ותחזוקה" data-num="₪">
+          <h3>הצעה לרכישה ותחזוקה <span class="badge">תנאי התקשרות</span></h3>
+          <p>
+            האתר פותח כמערכת דיגיטלית מלאה לניהול מידע לימודי וארגוני בבית הספר (דפי כיתות, חדשות, מבחנים, מערכות שעות, סקרים ופאנל ניהול).
+            המערכת מותאמת למחשב ולנייד ופועלת בצורה רציפה ויציבה.
+          </p>
+
+          <div class="pricing">
+            <div class="plan">
+              <div class="head">
+                <div>
+                  <b>אפשרות 1 — רכישת האתר (תשלום חד־פעמי)</b>
+                  <div class="sub">קבלת קוד האתר והעברת זכויות שימוש</div>
+                </div>
+                <div class="price">₪ 3,500–4,000</div>
+              </div>
+              <ul>
+                <li>העברת זכויות השימוש באתר לבית הספר</li>
+                <li>מסירת קוד האתר במצבו הנוכחי</li>
+                <li>חודש תמיכה ראשוני לתקלות בסיסיות</li>
+              </ul>
+              <div class="note">לאחר חודש התמיכה הראשוני, כל שינוי/עדכון/פיתוח יתומחר בנפרד לפי היקף העבודה.</div>
+            </div>
+
+            <div class="plan">
+              <div class="head">
+                <div>
+                  <b>אפשרות 2 — תחזוקה חודשית שוטפת (מומלץ)</b>
+                  <div class="sub">אחריות טכנית וזמינות שוטפת (ללא התחייבות ארוכת טווח)</div>
+                </div>
+                <div class="price">₪ 250–350 / חודש</div>
+              </div>
+              <ul>
+                <li>תחזוקה שוטפת של האתר והמערכת</li>
+                <li>תיקון תקלות ובאגים</li>
+                <li>עדכונים ושיפורים לפי צורך</li>
+                <li>זמינות טכנית במקרה של בעיות</li>
+                <li>שמירה על יציבות, ביצועים ותפקוד תקין</li>
+              </ul>
+              <div class="note">התחזוקה ניתנת ללא התחייבות ארוכת טווח ובהתאם לצורכי בית הספר.</div>
+            </div>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="grid2">
+            <div class="mini">
+              <h4>עלות כתובת אתר (דומיין)</h4>
+              <p>עלות שנתית: <b>200–250 ₪</b> • תשלום שנתי נפרד מעלות רכישה/תחזוקה.</p>
+            </div>
+            <div class="mini">
+              <h4>סיכום ניהולי</h4>
+              <p>תחזוקה חודשית מספקת שקט תפעולי, אחריות טכנית וזמינות — ומבטיחה מערכת יציבה ומעודכנת לאורך זמן.</p>
+            </div>
+          </div>
+        </section>
+
+
+        <section class="footer fx show">
+          <div>
+            <b>מסמך מסכם — סקירה + הצעה</b><br/>
+            <span id="footerDate">עודכן: —</span>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap">
+            <button class="btn primary" id="copyAllBtn2" title="העתקת כל הטקסט למסמך">
+              <span style="font-family:var(--mono)">⧉</span><span>העתקת טקסט מלא</span>
+            </button>
+            <a class="btn" href="#cover" title="חזרה לפנייה להנהלה">
+              <span style="font-family:var(--mono)">↑</span><span>חזרה לראש המסמך</span>
+            </a>
+          </div>
+        </section>
+
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function(){
+      const $ = (s, r=document)=>r.querySelector(s);
+      const $$ = (s, r=document)=>Array.from(r.querySelectorAll(s));
+
+      // Print
+      $("#printBtn").addEventListener("click", ()=>window.print());
+
+      // Progress bar
+      const bar = $("#progressBar");
+      const onScroll = ()=>{
+        const doc = document.documentElement;
+        const scrollTop = doc.scrollTop || document.body.scrollTop;
+        const scrollHeight = doc.scrollHeight - doc.clientHeight;
+        const pct = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+        bar.style.width = pct.toFixed(2) + "%";
+      };
+      window.addEventListener("scroll", onScroll, {passive:true});
+      onScroll();
+
+      // Build TOC
+      const tocNav = $("#tocNav");
+      const secs = $$(".section[data-title]");
+      $("#secCount").textContent = `${secs.length} סעיפים`;
+      tocNav.innerHTML = secs.map(sec=>{
+        const id = sec.id;
+        const title = sec.getAttribute("data-title");
+        const num = sec.getAttribute("data-num") || "";
+        return `<a href="#${id}" data-target="${id}"><span>${title}</span><i>${num}</i></a>`;
+      }).join("");
+
+      // Smooth scroll
+      tocNav.addEventListener("click", (e)=>{
+        const a = e.target.closest("a[data-target]");
+        if(!a) return;
+        e.preventDefault();
+        const id = a.getAttribute("data-target");
+        document.getElementById(id)?.scrollIntoView({behavior:"smooth", block:"start"});
+      });
+
+      // Active section highlight
+      const tocLinks = $$("a[data-target]", tocNav);
+      const mapLink = new Map(tocLinks.map(a=>[a.getAttribute("data-target"), a]));
+      const io = new IntersectionObserver((entries)=>{
+        entries.forEach(en=>{
+          if(en.isIntersecting){
+            tocLinks.forEach(x=>x.classList.remove("active"));
+            const link = mapLink.get(en.target.id);
+            if(link) link.classList.add("active");
+          }
+        });
+      }, {threshold:0.35});
+      secs.forEach(sec=>io.observe(sec));
+
+      // Toast + copy
+      const toast = $("#toast");
+      function showToast(msg){
+        toast.textContent = msg;
+        toast.classList.add("show");
+        setTimeout(()=>toast.classList.remove("show"), 1100);
+      }
+      async function copyText(text){
+        try{
+          await navigator.clipboard.writeText(text);
+          showToast("הטקסט הועתק");
+        }catch(e){
+          const ta = document.createElement("textarea");
+          ta.value = text; ta.style.position="fixed"; ta.style.opacity="0";
+          document.body.appendChild(ta);
+          ta.select(); document.execCommand("copy");
+          ta.remove();
+          showToast("הטקסט הועתק");
+        }
+      }
+
+      function buildPlainText(){
+        const lines = [];
+        lines.push("סקירה רשמית והצעת תשלום — האתר הדיגיטלי של בית הספר יערת העמק");
+        lines.push("============================================================");
+        lines.push("");
+        secs.forEach(sec=>{
+          const title = sec.getAttribute("data-title");
+          if(!title) return;
+          lines.push(title);
+          lines.push("------------------------------------------------------------");
+          lines.push(sec.innerText.replace(/\n{3,}/g, "\n\n").trim());
+          lines.push("");
+        });
+        return lines.join("\n");
+      }
+
+      $("#copyAllBtn").addEventListener("click", ()=>copyText(buildPlainText()));
+      $("#copyAllBtn2").addEventListener("click", ()=>copyText(buildPlainText()));
+
+      // Dates
+      const d = new Date();
+      const dd = String(d.getDate()).padStart(2,"0");
+      const mm = String(d.getMonth()+1).padStart(2,"0");
+      const yy = d.getFullYear();
+      $("#footerDate").textContent = `עודכן: ${dd}/${mm}/${yy}`;
+    })();
+  </script>
+</body>
+</html>
