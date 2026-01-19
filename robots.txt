@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
 
+Disallow: /admin.html
+Disallow: /polls-admin.html
+Disallow: /dev.html
+
 Sitemap: https://yaarathaemek.online/sitemap.xml
