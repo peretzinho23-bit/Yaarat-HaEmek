@@ -698,7 +698,7 @@ html[data-theme="dark"].theme-changing .hero-home-cards .grade-card{
   opacity: 0;
 }
 #hero-main-title {
-  color: #460404;
+  color: #000000;
   text-shadow:
     0 0 6px rgba(96,165,250,0.9),
     0 0 16px rgba(96,165,250,0.7),
@@ -706,9 +706,11 @@ html[data-theme="dark"].theme-changing .hero-home-cards .grade-card{
 }
 
 #hero-main-body {
-  color: #460404;
+  color: #000000;
   text-shadow:
-    3 0 8px rgba(82, 62, 62, 0.6);
+    0 0 6px rgba(96,165,250,0.9),
+    0 0 16px rgba(96,165,250,0.7),
+    0 0 32px rgba(96,165,250,0.5);
 }
 #hero-main-title {
   letter-spacing: 0.01em;
@@ -731,7 +733,7 @@ html[data-theme="dark"].theme-changing .hero-home-cards .grade-card{
   );
 }
 [data-theme="dark"] #hero-main-body {
-  color: #ffffff;
+  color: #000000;
   text-shadow:
     0 2px 4px rgba(3, 2, 2, 0.9),
     0 0 14px rgba(15, 15, 24, 0.6),
@@ -1851,6 +1853,54 @@ html[data-theme="dark"] .hero-council-btn:hover{
 html[data-theme="dark"] .hero-latest-title{
   color:#fff;
 }
+.hero{
+  position: relative;
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 32px;
+  overflow: hidden;
+}
+
+/* שכבת הגנה – זה הקסם */
+.hero-overlay{
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(0,0,0,.55),
+      rgba(0,0,0,.25),
+      rgba(0,0,0,.55)
+    );
+  z-index: 0;
+}
+
+/* טקסט */
+.hero-title,
+.hero-sub{
+  position: relative;
+  z-index: 1;
+  color: #fff;
+}
+
+.hero-title{
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 800;
+  line-height: 1.15;
+  text-shadow:
+    0 2px 10px rgba(0,0,0,.45),
+    0 0 1px rgba(0,0,0,.9);
+}
+
+.hero-sub{
+  margin-top: 10px;
+  max-width: 720px;
+  font-size: clamp(14px, 1.6vw, 18px);
+  color: rgba(255,255,255,.92);
+  text-shadow: 0 2px 6px rgba(0,0,0,.35);
+}
 
   </style>
 </head>
@@ -1959,7 +2009,7 @@ html[data-theme="dark"] .hero-latest-title{
     <div class="container hero-home-inner">
       <div class="hero-home-header">
         <h1 id="hero-main-title">יחד צומחים ביערת העמק</h1>
-        <p id="hero-main-body">
+        <p id="hero-main-title">
           סביבה חינוכית בטוחה, תומכת ומובילה. כל תלמיד ותלמידה – עולם ומלואו.
         </p>
 
@@ -2073,7 +2123,7 @@ html[data-theme="dark"] .hero-latest-title{
             <option value="">בחר כיתה</option>
           </select>
 
-          <button id="home-open-class" class="btn home-class-go" type="button" disabled>
+          <button id="home-open-class" class="btn-outline" type="button" disabled>
             פתח דף כיתה
           </button>
         </div>
@@ -4728,7 +4778,7 @@ const unCanvas = bindTap(canvas, () => {
         <a
           href="https://docs.google.com/forms/d/e/1FAIpQLScisdjJ5h9t7VgSOa8hmnmrJh6H5VSy84uyE32hhOgDQEU05w/viewform?usp=sharing&ouid=106991680453150303010"
           target="_blank"
-          class="btn"
+          class="btn-outline"
         >
           למעבר לטופס הבקשות
         </a>
