@@ -592,7 +592,7 @@ goBtn?.addEventListener("click", () => {
 function showChooser() {
   chooserCard?.classList.remove("hide");
   content?.classList.add("hide");
-  if (elTitle) elTitle.textContent = "דף כיתה";
+  if (elTitle) elTitle.textContent = " כיתה";
   if (elSub) elSub.textContent = "בחר כיתה כדי לראות חדשות, מבחנים ומערכת שעות";
   if (elPill) elPill.textContent = "לא נבחרה כיתה";
 
@@ -606,7 +606,7 @@ function showChooser() {
 function showContentFor(classId) {
   chooserCard?.classList.add("hide");
   content?.classList.remove("hide");
-  if (elTitle) elTitle.textContent = `דף כיתה ${classLabel(classId)}`;
+  if (elTitle) elTitle.textContent = ` כיתה ${classLabel(classId)}`;
   if (elSub) elSub.textContent = "חדשות לכיתה · מבחנים לכיתה · מערכת שעות";
   if (elPill) elPill.textContent = `${classLabel(classId)}`;
 }
