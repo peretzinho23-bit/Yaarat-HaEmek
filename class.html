@@ -1511,11 +1511,11 @@ html[data-theme="dark"] #nextExamTimer{
     <a class="hero-btn ghost" href="news.html">🌐 חדשות בית ספר</a>
   </div>
 
-<div class="hero-stat">
-  <div class="k">⏱️ המבחן הקרוב ביותר</div>
-  <div class="v" id="nextExamTimer">טוען…</div>
-  <div class="muted" id="nextExamName" style="margin-top:6px">—</div>
-</div>
+  <div class="boom-grid">
+    <div class="boom-chip">
+      <div class="boom-k">📝 מבחנים קרובים</div>
+      <div class="boom-v" id="boomExams">—</div>
+    </div>
 
 
   <div class="hero-stat">
@@ -1543,6 +1543,25 @@ html[data-theme="dark"] #nextExamTimer{
 
   function pad2(n){ return String(n).padStart(2,"0"); }
   function normalize(s){ return String(s || "").trim(); }
+function markNearestExam(){
+  const root = document.getElementById("ex");
+  if (!root) return;
+
+  const items = Array.from(root.querySelectorAll(".item"));
+  items.forEach(el => el.classList.remove("is-next-exam"));
+
+  const best = pickNearestExam();
+  if (!best) return;
+
+  for (const el of items){
+    const c = extractExamCandidate(el);
+    if (c && c.ts === best.ts){
+      el.classList.add("is-next-exam");
+      break;
+    }
+  }
+}
+
 
   function parseDateFromText(text){
     // תופס: 23/1/26 או 23/01/2026 או 23-1-26
@@ -1635,6 +1654,7 @@ html[data-theme="dark"] #nextExamTimer{
       if (diff <= 0){
         // נגמר -> בודק מחדש את המבחן הבא
         refresh();
+        
         return;
       }
       t.textContent = formatDiff(diff);
@@ -1653,6 +1673,7 @@ html[data-theme="dark"] #nextExamTimer{
       renderNoExam();
       return;
     }
+    
     // אם המבחן השתנה – מפעילים מחדש
     if (activeTargetMs !== best.ts){
       startTicker(best.ts, best.subject);
@@ -1661,6 +1682,7 @@ html[data-theme="dark"] #nextExamTimer{
 
   // ראשוני
   refresh();
+markNearestExam();
 
   // מתעדכן כשהרנדר של מבחנים משתנה (כשאתה מחליף כיתה / נטען מהפיירבייס)
   const root = EX_ROOT();
