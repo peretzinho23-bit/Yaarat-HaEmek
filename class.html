@@ -13,7 +13,8 @@
     .topbar .left{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
     .pill{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;border:1px solid rgba(148,163,184,.35);background:rgba(255,255,255,.06);text-decoration:none}
     .cardx{border-radius:18px;border:1px solid rgba(148,163,184,.35);background:rgba(255,255,255,.06);padding:14px}
-    .grid{display:grid;grid-template-columns:1fr;gap:12px}
+.grid{display:grid;grid-template-columns:1fr;gap:10px}
+.cardx{padding:14px}
     @media (min-width: 980px){.grid{grid-template-columns:1fr 1fr}}
     .muted{opacity:.75}
     .section-title2{font-size:1.15rem;margin:0 0 10px}
@@ -1278,6 +1279,122 @@ html[data-theme="dark"] #ex .exam-countdown.is-soon{
   color: #fffbeb !important;
   box-shadow: 0 14px 40px rgba(245,158,11,.18) !important;
 }
+/* ===== CLASS HERO ===== */
+.class-hero{
+  background:
+    radial-gradient(circle at 15% 25%, rgba(56,189,248,.18), transparent 40%),
+    radial-gradient(circle at 80% 20%, rgba(167,139,250,.14), transparent 45%),
+    rgba(255,255,255,.06);
+}
+
+html[data-theme="light"] .class-hero{
+  background:
+    radial-gradient(circle at 15% 25%, rgba(56,189,248,.18), transparent 40%),
+    radial-gradient(circle at 80% 20%, rgba(167,139,250,.14), transparent 45%),
+    rgba(255,255,255,.92);
+  border-color: rgba(15,23,42,.12);
+  color:#0f172a;
+}
+
+.class-hero-top{display:flex;flex-direction:column;gap:6px}
+.class-hero-title{font-weight:1000;font-size:1.2rem}
+.class-hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.hero-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  padding:10px 14px;border-radius:999px;text-decoration:none;
+  border:1px solid rgba(148,163,184,.28);
+  background: rgba(255,255,255,.10);
+  color: inherit;
+  font-weight:900;
+}
+html[data-theme="light"] .hero-btn{
+  background: rgba(255,255,255,.98);
+  border-color: rgba(15,23,42,.10);
+  color:#0f172a;
+}
+.hero-btn.ghost{opacity:.9}
+
+.class-hero-stats{
+  margin-top:14px;
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:10px;
+}
+@media (max-width: 900px){
+  .class-hero-stats{grid-template-columns:1fr}
+}
+.hero-stat{
+  border:1px solid rgba(148,163,184,.22);
+  border-radius:16px;
+  padding:12px;
+  background: rgba(255,255,255,.06);
+}
+html[data-theme="light"] .hero-stat{
+  background: rgba(255,255,255,.92);
+  border-color: rgba(15,23,42,.10);
+}
+.hero-stat .k{opacity:.85;font-size:.9rem}
+.hero-stat .v{font-weight:1000;font-size:1.05rem;margin-top:6px}
+/* ===== DASH MINI ROW ===== */
+.dash-row{
+  margin-top:12px;
+  display:grid;
+  grid-template-columns: 1.2fr 1fr 0.8fr;
+  gap:12px;
+}
+@media (max-width: 900px){
+  .dash-row{grid-template-columns:1fr}
+}
+
+.dash-card{
+  border-radius:18px;
+  border:1px solid rgba(148,163,184,.25);
+  background: rgba(255,255,255,.06);
+  padding:14px;
+}
+html[data-theme="light"] .dash-card{
+  background: rgba(255,255,255,.92);
+  border-color: rgba(15,23,42,.10);
+}
+
+.dash-k{font-weight:1000;margin-bottom:10px}
+.dash-v{font-weight:1000;font-size:1.05rem}
+.dash-s{margin-top:6px}
+
+.dash-actions{display:flex;gap:8px;flex-wrap:wrap}
+.dash-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  padding:8px 12px;border-radius:999px;
+  text-decoration:none;
+  border:1px solid rgba(148,163,184,.28);
+  background: rgba(255,255,255,.10);
+  color: inherit;
+  font-weight:900;
+}
+html[data-theme="light"] .dash-btn{
+  background: rgba(255,255,255,.98);
+  border-color: rgba(15,23,42,.10);
+  color:#0f172a;
+}
+/* DASH – make “next” small and clean */
+#dashRow .dash-v{
+  font-size: .95rem !important;
+  font-weight: 900 !important;
+  opacity: .95;
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;   /* לא יתנפח */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+#dashRow .dash-card{
+  padding: 12px !important;
+}
+
+#dashRow .dash-k{
+  margin-bottom: 8px !important;
+}
 
   </style>
 </head>
@@ -1362,55 +1479,135 @@ html[data-theme="dark"] #ex .exam-countdown.is-soon{
   </section>
 
   <section id="content" class="hide">
-<!-- ===== BOOM BAR: הודעה חשובה + מה קורה היום ===== -->
-<div class="cardx" id="boom-wrap" style="margin-top:12px;">
-  <div id="announceBox" class="hide"></div>
-
-  <div class="boom-top">
-    <div class="boom-title">⚡ מה קורה היום?</div>
-    <div class="boom-sub muted" id="boomSub">טוען…</div>
+    <!-- ===== CLASS HERO (fills the empty feeling) ===== -->
+<div class="cardx class-hero" id="classHero" style="margin-top:12px;">
+  <div class="class-hero-top">
+    <div class="class-hero-title">
+      🏫 <span id="heroClassName">כיתה —</span>
+    </div>
+    <div class="class-hero-sub muted" id="heroClassSub">
+      כאן תמצאו את כל העדכונים, המבחנים והחדשות של הכיתה במקום אחד.
+    </div>
   </div>
 
-  <div class="boom-grid">
-    <div class="boom-chip">
-      <div class="boom-k">📝 מבחנים קרובים</div>
-      <div class="boom-v" id="boomExams">—</div>
-    </div>
+  <div class="class-hero-actions">
+    <a class="hero-btn" href="#ex-section">📝 מבחנים</a>
+    <a class="hero-btn" href="#news-section">📰 חדשות / שיעורי בית</a>
+    <a class="hero-btn ghost" href="news.html">🌐 חדשות בית ספר</a>
+  </div>
 
-    <div class="boom-chip">
-      <div class="boom-k">📰 ידיעות לכיתה</div>
-      <div class="boom-v" id="boomNews">—</div>
-    </div>
+  <div class="dash-card">
+    <div class="dash-k">🕒  המבחן הקרוב ביותר </div>
+    <div class="dash-v" id="dashNext">אין כרגע</div>
+  </div>
 
-    <div class="boom-chip">
-      <div class="boom-k">⏰ עכשיו / הבא</div>
-      <div class="boom-v" id="boomNowNext">—</div>
-    </div>
+  <div class="hero-stat">
+    <div class="k">עדכונים חדשים</div>
+    <div class="v" id="heroNewsCount">—</div>
+  </div>
+
+  <div class="hero-stat">
+    <div class="k">עודכן לאחרונה</div>
+    <div class="v" id="heroUpdated">—</div>
+  </div>
+</div>
+<!-- ===== DASH MINI ROW (fills empty space) ===== -->
+
+
+
+  <div class="dash-card">
+    <div class="dash-k">⭐ חשובים</div>
+    <div class="dash-v" id="dashStarred">0</div>
+    <div class="dash-s muted">מבחנים שסימנת כחשובים</div>
   </div>
 </div>
 
-    <div class="grid" style="margin-top:12px;">
-      <div class="cardx" id="tt-section">
-        <h2 class="section-title2">📅 מערכת שעות</h2>
-        <div class="muted" id="ttStatus">טוען…</div>
 
-        <div id="tt"></div>
+<script>
+(function(){
+  function setText(id, val){
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+  }
 
-        <!-- ✅ MOBILE: בחירת יום למערכת שעות -->
-        <div class="tt-mobile" id="tt-mobile">
-          <div class="tt-mobile-top">
-            <label for="daySelect">בחר יום:</label>
-            <select id="daySelect">
-              <option value="sun">ראשון</option>
-              <option value="mon">שני</option>
-              <option value="tue">שלישי</option>
-              <option value="wed">רביעי</option>
-              <option value="thu">חמישי</option>
-              <option value="fri">שישי</option>
-            </select>
-          </div>
-          <div id="daySchedule" class="tt-day-list"></div>
-        </div>
+  function countItems(rootId){
+    const root = document.getElementById(rootId);
+    if (!root) return 0;
+    return root.querySelectorAll(".item").length;
+  }
+
+  function readStarCount(){
+    try {
+      const map = JSON.parse(localStorage.getItem("yaar_starred_exams_v1") || "{}");
+      return Object.keys(map).length;
+    } catch { return 0; }
+  }
+
+  function pickNextText(){
+    // מבחן ראשון (כותרת) אם קיים
+    const exTitle = document.querySelector("#ex .item b, #ex .item strong");
+    if (exTitle) return exTitle.textContent.trim();
+
+    // אחרת – ידיעה ראשונה
+    const newsTitle = document.querySelector("#news .item b, #news .item strong");
+    if (newsTitle) return newsTitle.textContent.trim();
+
+    return "אין כרגע";
+  }
+
+  function updateHero(){
+    const pill = document.getElementById("class-pill");
+    const name = pill && pill.textContent ? pill.textContent.trim() : "כיתה —";
+    setText("heroClassName", name);
+
+    const exC = countItems("ex");
+    const newsC = countItems("news");
+
+    setText("heroExCount", exC ? String(exC) : "אין מבחנים ✅");
+    setText("heroNewsCount", newsC ? String(newsC) : "אין עדכונים ✅");
+    setText("heroUpdated", "היום");
+
+    // DASH
+    setText("dashNext", pickNextText());
+    setText("dashStarred", String(readStarCount()));
+  }
+
+  // מחברים Observers רק כשהאלמנטים באמת קיימים (כי הסקריפט אצלך למעלה)
+  function attach(){
+    updateHero();
+
+    const ex = document.getElementById("ex");
+    const news = document.getElementById("news");
+    const pill = document.getElementById("class-pill");
+
+    // אם עדיין לא קיים — ננסה שוב עוד רגע
+    if (!ex || !news || !pill){
+      requestAnimationFrame(attach);
+      return;
+    }
+
+    const obs = new MutationObserver(() => updateHero());
+    obs.observe(ex, {childList:true, subtree:true});
+    obs.observe(news, {childList:true, subtree:true});
+    obs.observe(pill, {childList:true, subtree:true});
+
+    // עדכון גם כשכוכב משתנה (נעשה טריגר מהסקריפט של הכוכב)
+    window.addEventListener("yaar:starred-change", updateHero);
+  }
+
+  attach();
+})();
+</script>
+
+
+<!-- ===== BOOM BAR: הודעה חשובה + מה קורה היום ===== -->
+
+
+
+
+</div>
+
+
         <!-- ✅ /MOBILE -->
 
       </div>
@@ -1926,6 +2123,8 @@ END:VCALENDAR`;
       else delete map[id];
       writeStarMap(map);
       setStarUI(next);
+      window.dispatchEvent(new Event("yaar:starred-change"));
+
     });
 
     // CAL button (Google Calendar + ICS fallback)

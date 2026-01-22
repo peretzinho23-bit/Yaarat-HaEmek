@@ -607,7 +607,7 @@ function showContentFor(classId) {
   chooserCard?.classList.add("hide");
   content?.classList.remove("hide");
   if (elTitle) elTitle.textContent = ` כיתה ${classLabel(classId)}`;
-  if (elSub) elSub.textContent = "חדשות לכיתה · מבחנים לכיתה · מערכת שעות";
+  if (elSub) elSub.textContent = "חדשות לכיתה · מבחנים לכיתה  ";
   if (elPill) elPill.textContent = `${classLabel(classId)}`;
 }
 
@@ -835,7 +835,7 @@ function renderNewsList(classId, items) {
   updateBoomCounts();
 
   if (!classSpecific.length) {
-    if (newsStatus) newsStatus.textContent = "אין חדשות לכיתה הזאת עדיין.";
+    if (newsStatus) newsStatus.textContent = "📰 אין עדכונים חדשים";
     if (news) news.innerHTML = "";
     return;
   }
@@ -965,7 +965,7 @@ function startRealtime(classId) {
     updateBoomCounts();
 
     if (!arr.length) {
-      if (exStatus) exStatus.textContent = "אין מבחנים קרובים לכיתה הזאת.";
+      if (exStatus) exStatus.textContent = "✅ אין מבחנים קרובים כרגע";
       return;
     }
 
