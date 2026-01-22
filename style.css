@@ -298,7 +298,7 @@ button#theme-toggle:active {
   background-position: center;
   background-repeat: no-repeat;
   opacity: 0;
-  animation: heroFade 30s infinite;
+  animation: heroFade 25s infinite;
 }
 
 .hero-slide:nth-child(1) {
@@ -324,10 +324,6 @@ button#theme-toggle:active {
 .hero-slide:nth-child(5) {
   background-image: url("img/school_aerial.jpg");
   animation-delay: 20s;
-}
-.hero-slide:nth-child(6) {
-  background-image: url("img/new_image.jpg"); /* שנה לשם האמיתי */
-  animation-delay: 25s;
 }
 
 @keyframes heroFade {
@@ -4312,4 +4308,48 @@ input:focus, select:focus, textarea:focus{
 [data-theme="dark"] .exam-topic {
   background: rgba(2,6,23,.55);
   color: #e5e7eb;
+}
+/* HERO עם תמונה + ריבועים + fade למטה */
+.hero {
+  position: relative;
+  min-height: 520px;
+  overflow: hidden;
+}
+
+/* שכבת כהות עדינה על כל התמונה */
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.20) 0%,
+    rgba(0,0,0,0.35) 50%,
+    rgba(0,0,0,0.50) 100%
+  );
+  z-index: 1;
+}
+
+/* FADE למטה – מעבר חלק לרקע האתר */
+.hero::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 160px;
+  background: linear-gradient(
+    to bottom,
+    rgba(246,248,255,0) 0%,
+    rgba(246,248,255,0.85) 65%,
+    rgba(246,248,255,1) 100%
+  );
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* כל התוכן (כותרת + ריבועים) מעל השכבות */
+.heroContent {
+  position: relative;
+  z-index: 3;
 }
