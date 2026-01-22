@@ -330,7 +330,7 @@ function updateBoomCounts() {
   }
 
   if (boomNews) {
-    boomNews.textContent = lastNewsArr?.length ? `${lastNewsArr.length}` : "—";
+    boomNews.textContent = lastNewsArr?.length ? `${lastNewsArr.length}` : "";
   }
 
   if (boomSub) {
