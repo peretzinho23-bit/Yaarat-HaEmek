@@ -1395,6 +1395,21 @@ html[data-theme="light"] .dash-btn{
 #dashRow .dash-k{
   margin-bottom: 8px !important;
 }
+#nextExamTimer{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:6px 12px;
+  border-radius:999px;
+  font-weight:1000;
+  font-size:.92rem;
+  background: rgba(56,189,248,.12);
+  border: 1px solid rgba(56,189,248,.25);
+}
+html[data-theme="dark"] #nextExamTimer{
+  background: rgba(56,189,248,.10);
+  border-color: rgba(56,189,248,.20);
+}
 
   </style>
 </head>
@@ -1496,10 +1511,12 @@ html[data-theme="light"] .dash-btn{
     <a class="hero-btn ghost" href="news.html">🌐 חדשות בית ספר</a>
   </div>
 
-  <div class="dash-card">
-    <div class="dash-k">🕒  המבחן הקרוב ביותר </div>
-    <div class="dash-v" id="dashNext">אין כרגע</div>
-  </div>
+<div class="hero-stat">
+  <div class="k">⏱️ המבחן הקרוב ביותר</div>
+  <div class="v" id="nextExamTimer">טוען…</div>
+  <div class="muted" id="nextExamName" style="margin-top:6px">—</div>
+</div>
+
 
   <div class="hero-stat">
     <div class="k">עדכונים חדשים</div>
@@ -1515,6 +1532,144 @@ html[data-theme="light"] .dash-btn{
 
 
 
+<script>
+(function(){
+  const EX_ROOT = () => document.getElementById("ex");
+  const timerEl = () => document.getElementById("nextExamTimer");
+  const nameEl  = () => document.getElementById("nextExamName");
+
+  let activeTargetMs = null;
+  let tickHandle = null;
+
+  function pad2(n){ return String(n).padStart(2,"0"); }
+  function normalize(s){ return String(s || "").trim(); }
+
+  function parseDateFromText(text){
+    // תופס: 23/1/26 או 23/01/2026 או 23-1-26
+    const m = normalize(text).match(/\b(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2,4})\b/);
+    if (!m) return null;
+
+    const dd = parseInt(m[1],10);
+    const mm = parseInt(m[2],10);
+    let yy = String(m[3]);
+    if (yy.length === 2) yy = "20" + yy;
+    const yyyy = parseInt(yy,10);
+
+    // שעה: 10:00
+    const t = normalize(text).match(/\b([01]?\d|2[0-3]):([0-5]\d)\b/);
+    const hh = t ? parseInt(t[1],10) : 10; // ברירת מחדל 10:00 אם אין שעה
+    const mi = t ? parseInt(t[2],10) : 0;
+
+    const dt = new Date(yyyy, mm-1, dd, hh, mi, 0, 0);
+    if (isNaN(dt.getTime())) return null;
+    return dt;
+  }
+
+  function extractExamCandidate(itemEl){
+    const titleEl = itemEl.querySelector("b,strong");
+    const subject = normalize(titleEl ? titleEl.textContent : "");
+
+    const dateEl = itemEl.querySelector(".exam-date");
+    const metaEl = itemEl.querySelector(".meta");
+    const haystack = normalize(
+      (dateEl && dateEl.textContent) ||
+      (metaEl && metaEl.textContent) ||
+      itemEl.textContent
+    );
+
+    const dt = parseDateFromText(haystack);
+    if (!dt || !subject) return null;
+
+    return { subject, ts: dt.getTime() };
+  }
+
+  function pickNearestExam(){
+    const root = EX_ROOT();
+    if (!root) return null;
+
+    const now = Date.now();
+    const items = Array.from(root.querySelectorAll(".item"));
+
+    let best = null;
+    for (const el of items){
+      const c = extractExamCandidate(el);
+      if (!c) continue;
+      if (c.ts <= now) continue;
+      if (!best || c.ts < best.ts) best = c;
+    }
+    return best;
+  }
+
+  function formatDiff(ms){
+    // פורמט: "עוד 2 ד׳ • 03:14:09"
+    const total = Math.max(0, Math.floor(ms / 1000));
+    const days = Math.floor(total / 86400);
+    const rem = total % 86400;
+    const h = Math.floor(rem / 3600);
+    const m = Math.floor((rem % 3600) / 60);
+    const s = rem % 60;
+
+    if (days > 0) return `עוד ${days} ד׳ • ${pad2(h)}:${pad2(m)}:${pad2(s)}`;
+    return `עוד ${pad2(h)}:${pad2(m)}:${pad2(s)}`;
+  }
+
+  function renderNoExam(){
+    const t = timerEl(), n = nameEl();
+    if (t) t.textContent = "אין מבחן בקרוב ✅";
+    if (n) n.textContent = "—";
+  }
+
+  function startTicker(targetTs, subject){
+    activeTargetMs = targetTs;
+
+    const n = nameEl();
+    if (n) n.textContent = subject;
+
+    if (tickHandle) clearInterval(tickHandle);
+
+    function tick(){
+      const t = timerEl();
+      if (!t) return;
+
+      const diff = activeTargetMs - Date.now();
+      if (diff <= 0){
+        // נגמר -> בודק מחדש את המבחן הבא
+        refresh();
+        return;
+      }
+      t.textContent = formatDiff(diff);
+    }
+
+    tick();
+    tickHandle = setInterval(tick, 1000);
+  }
+
+  function refresh(){
+    const best = pickNearestExam();
+    if (!best){
+      if (tickHandle) clearInterval(tickHandle);
+      tickHandle = null;
+      activeTargetMs = null;
+      renderNoExam();
+      return;
+    }
+    // אם המבחן השתנה – מפעילים מחדש
+    if (activeTargetMs !== best.ts){
+      startTicker(best.ts, best.subject);
+    }
+  }
+
+  // ראשוני
+  refresh();
+
+  // מתעדכן כשהרנדר של מבחנים משתנה (כשאתה מחליף כיתה / נטען מהפיירבייס)
+  const root = EX_ROOT();
+  if (root){
+    const obs = new MutationObserver(() => refresh());
+    obs.observe(root, { childList:true, subtree:true });
+  }
+})();
+</script>
 
 
 
