@@ -1222,14 +1222,8 @@ html.theme-changing *::after {
     const auth = getAuth();
     signInAnonymously(auth).catch((e) => console.error("anon auth failed:", e));
 
-    function getAnonId() {
-      const k = "poll_anon_id";
-      let v = localStorage.getItem(k);
-      if (!v) {
-        v = (crypto?.randomUUID?.() || ("anon_" + Math.random().toString(36).slice(2)));
-        localStorage.setItem(k, v);
-      }
-      return v;
+    function getUid() {
+      return auth.currentUser?.uid || null;
     }
 
     const pollsColRef = collection(db, "polls");
@@ -1250,7 +1244,11 @@ html.theme-changing *::after {
     function loadLocalVotes() {
       try {
         const raw = localStorage.getItem(LOCAL_KEY);
-        const parsed = raw ? JSON.parse(raw) : {};
+        if (!raw) {
+          localVotes = {};
+          return;
+        }
+        const parsed = JSON.parse(raw);
         localVotes = (parsed && typeof parsed === "object") ? parsed : {};
       } catch {
         localVotes = {};
@@ -1261,7 +1259,7 @@ html.theme-changing *::after {
       try {
         localStorage.setItem(LOCAL_KEY, JSON.stringify(localVotes));
       } catch {
-        // אם localStorage חסום – נתעלם
+        // ignore
       }
     }
 
@@ -1316,7 +1314,7 @@ html.theme-changing *::after {
       card.className = "poll-card";
 
       const totalVotes = (poll.options || []).reduce((sum, opt) => {
-        const v = (poll.counts && poll.counts[opt.id]) ? poll.counts[opt.id] : 0;
+        const v = poll.counts?.[opt.id] || 0;
         return sum + v;
       }, 0);
 
@@ -1372,12 +1370,17 @@ html.theme-changing *::after {
         const votesSpan = document.createElement("span");
         votesSpan.className = "poll-option-votes";
 
-        const votes = (poll.counts && poll.counts[opt.id]) ? poll.counts[opt.id] : 0;
+        const votes = poll.counts?.[opt.id] || 0;
         const percent = totalVotes > 0 ? Math.round((votes / totalVotes) * 100) : 0;
 
-        votesSpan.innerHTML = totalVotes === 0
-          ? `<span dir="ltr">${votes}</span>&nbsp;<span>קולות</span>`
-          : `<span dir="ltr">${votes}</span>&nbsp;<span>קולות</span>&nbsp;(<span dir="ltr">${percent}%</span>)`;
+        if (totalVotes === 0) {
+          votesSpan.innerHTML = `<span dir="ltr">${votes}</span>&nbsp;<span>קולות</span>`;
+        } else {
+          votesSpan.innerHTML = `
+            <span dir="ltr">${votes}</span>&nbsp;<span>קולות</span>
+            &nbsp;(<span dir="ltr">${percent}%</span>)
+          `;
+        }
 
         btn.appendChild(labelSpan);
         btn.appendChild(votesSpan);
@@ -1440,42 +1443,34 @@ html.theme-changing *::after {
         return;
       }
 
-      const anonId = getAnonId();
-
-      // חייב להיות מחובר (גם אנונימי)
-      if (!auth.currentUser) {
+      const uid = getUid();
+      if (!uid) {
         alert("התחברות אנונימית עדיין נטענת… נסה שוב עוד רגע.");
         return;
       }
 
       try {
         const pollRef = doc(db, "polls", pollId);
-
-        // ✅ voteId בפורמט pollId__anonId (כמו בחוקים)
-        const voteId = `${pollId}__${anonId}`;
-        const voteRef = doc(db, "pollVotes", voteId);
+        const voteRef = doc(db, "pollVotes", `${pollId}__${uid}`);
 
         const batch = writeBatch(db);
 
-        // 1) נועל הצבעה (מסמך אחד לכל anonId לכל poll)
         batch.set(voteRef, {
           pollId,
           optionId,
-          anonId,
+          uid,
           createdAt: serverTimestamp()
         });
 
-        // 2) מעלה מונה תוצאות (counts.<optionId> += 1)
         batch.update(pollRef, {
           [`counts.${optionId}`]: increment(1)
         });
 
         await batch.commit();
 
-        // ✅ עדכון מקומי מיידי כדי שה־UI יינעל ישר
         localVotes[pollId] = optionId;
         saveLocalVotes();
-        renderPolls();
+        renderPolls(); // ✅ מראה מיד גם בלי לחכות ל-snapshot
       } catch (err) {
         console.error("שגיאה בהצבעה:", err);
         alert("הייתה בעיה בזמן ההצבעה. נסו שוב.");
@@ -1530,5 +1525,7 @@ html.theme-changing *::after {
 
   <!-- app.js בשביל מצב כהה / תפריט מובייל וכו' -->
   <script type="module" src="app.js"></script>
+  <script type="module" src="/analytics.js"></script>
+
 </body>
 </html>
