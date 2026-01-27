@@ -1224,14 +1224,26 @@ html.theme-changing *::after {
 
   <!-- JS – טעינת סקרים, הצבעה, תצוגת תוצאות -->
   <script type="module">
-    import { db } from "./firebase-config.js";
-    import {
-      collection,
-      onSnapshot,
-      doc,
-      getDoc,
-      updateDoc
-    } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+import { db } from "./firebase-config.js";
+
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+
+import {
+  collection,
+  onSnapshot,
+  doc,
+  setDoc,
+  updateDoc,
+  serverTimestamp,
+  increment,
+  writeBatch
+} from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+const auth = getAuth();
+signInAnonymously(auth).catch((e) => console.error("anon auth failed:", e));
+
+function getUid() {
+  return auth.currentUser?.uid || null;
+}
 
     const pollsColRef = collection(db, "polls");
 
@@ -1247,6 +1259,15 @@ html.theme-changing *::after {
     const filterActiveBtn = document.getElementById("filter-active");
     const filterAllBtn = document.getElementById("filter-all");
     const showAllHeroBtn = document.getElementById("show-all-polls");
+function getAnonId() {
+  const k = "poll_anon_id";
+  let v = localStorage.getItem(k);
+  if (!v) {
+    v = (crypto?.randomUUID?.() || ("anon_" + Math.random().toString(36).slice(2)));
+    localStorage.setItem(k, v);
+  }
+  return v;
+}
 
     function loadLocalVotes() {
       try {
@@ -1323,10 +1344,11 @@ html.theme-changing *::after {
       const card = document.createElement("article");
       card.className = "poll-card";
 
-      const totalVotes = (poll.options || []).reduce(
-        (sum, opt) => sum + (opt.votes || 0),
-        0
-      );
+const totalVotes = (poll.options || []).reduce((sum, opt) => {
+  const v = (poll.counts && poll.counts[opt.id]) ? poll.counts[opt.id] : 0;
+  return sum + v;
+}, 0);
+
       const alreadyVotedOptionId = localVotes[poll.id] || null;
       const isClosed = !poll.isActive;
 
@@ -1381,7 +1403,7 @@ html.theme-changing *::after {
         const votesSpan = document.createElement("span");
         votesSpan.className = "poll-option-votes";
 
-        const votes = opt.votes || 0;
+const votes = (poll.counts && poll.counts[opt.id]) ? poll.counts[opt.id] : 0;
         const percent =
           totalVotes > 0 ? Math.round((votes / totalVotes) * 100) : 0;
 
@@ -1463,55 +1485,57 @@ html.theme-changing *::after {
       return card;
     }
 
-    async function handleVote(pollId, optionId) {
-      loadLocalVotes();
-      if (localVotes[pollId]) {
-        alert("כבר הצבעת בסקר הזה מהמכשיר הזה.");
-        return;
-      }
+async function handleVote(pollId, optionId) {
+  loadLocalVotes();
+  if (localVotes[pollId]) {
+    alert("כבר הצבעת בסקר הזה מהמכשיר הזה.");
+    return;
+  }
 
-      try {
-        const pollRef = doc(db, "polls", pollId);
-        const snap = await getDoc(pollRef);
-        if (!snap.exists()) {
-          alert("הסקר כבר לא קיים.");
-          return;
-        }
+  const uid = getUid();
+  if (!uid) {
+    alert("התחברות אנונימית עדיין נטענת… נסה שוב עוד רגע.");
+    return;
+  }
 
-        const data = snap.data();
-        if (!data.isActive) {
-          alert("הסקר נסגר – אי אפשר להצביע.");
-          return;
-        }
+  try {
+    const pollRef = doc(db, "polls", pollId);
+    const voteRef = doc(db, "pollVotes", `${pollId}__${uid}`);
 
-        const options = data.options || [];
-        const idx = options.findIndex((o) => o.id === optionId);
-        if (idx === -1) {
-          alert("האפשרות כבר לא זמינה.");
-          return;
-        }
+    const batch = writeBatch(db);
 
-        const newOptions = options.map((opt) => {
-          if (opt.id === optionId) {
-            return {
-              ...opt,
-              votes: (opt.votes || 0) + 1
-            };
-          }
-          return opt;
-        });
+    // 1) נועל הצבעה (מסמך אחד לכל uid לכל poll)
+    batch.set(voteRef, {
+      pollId,
+      optionId,
+      uid,
+      createdAt: serverTimestamp()
+    });
 
-        await updateDoc(pollRef, { options: newOptions });
+    // 2) מעלה מונה תוצאות (counts.<optionId> += 1)
+    batch.update(pollRef, {
+      [`counts.${optionId}`]: increment(1)
+    });
 
-        localVotes[pollId] = optionId;
-        saveLocalVotes();
+    await batch.commit();
 
-        // נשען על onSnapshot שיעדכן את התצוגה בזמן אמת
-      } catch (err) {
-        console.error("שגיאה בהצבעה:", err);
-        alert("הייתה בעיה בזמן ההצבעה. נסו שוב.");
-      }
+    localVotes[pollId] = optionId;
+    saveLocalVotes();
+    // onSnapshot יעדכן תוצאות ישר
+  } catch (err) {
+    // אם כבר הצביע => ה-set יהפוך ל-update וייחסם ע"י rules => permission-denied
+    if (String(err?.code || "").includes("permission-denied")) {
+      localVotes[pollId] = optionId;
+      saveLocalVotes();
+      renderPolls();
+      return;
     }
+    console.error("שגיאה בהצבעה:", err);
+    alert("הייתה בעיה בזמן ההצבעה. נסו שוב.");
+  }
+}
+
+
 
     // ===== אירועים על פילטרים =====
 
