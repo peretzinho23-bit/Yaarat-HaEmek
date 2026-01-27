@@ -1,6 +1,3 @@
-// polls.js – סקר השבוע בדף התלמידים
-
-import { db } from "./firebase-config.js";
 import {
   collection,
   query,
@@ -9,8 +6,20 @@ import {
   limit,
   getDocs,
   doc,
-  updateDoc
+  getDoc,
+  setDoc,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+function getAnonId() {
+  const k = "poll_anon_id";
+  let v = localStorage.getItem(k);
+  if (!v) {
+    v = (crypto?.randomUUID?.() || ("anon_" + Math.random().toString(36).slice(2))) + "";
+    localStorage.setItem(k, v);
+  }
+  return v;
+}
 
 const pollsCol = collection(db, "polls");
 let activePoll = null;
@@ -128,10 +137,7 @@ async function handleVote() {
 
   const box = document.getElementById("poll-box");
   const radios = document.querySelectorAll('input[name="pollOption"]');
-  let chosen = null;
-  radios.forEach((r) => {
-    if (r.checked) chosen = r.value;
-  });
+  const chosen = Array.from(radios).find(r => r.checked)?.value || null;
 
   if (!chosen) {
     alert("בחר אפשרות לפני ההצבעה.");
@@ -139,25 +145,34 @@ async function handleVote() {
   }
 
   try {
-    const updatedOptions = (activePoll.options || []).map((opt) =>
-      opt.id === chosen
-        ? { ...opt, votes: (opt.votes || 0) + 1 }
-        : { ...opt }
-    );
+    const anonId = getAnonId();
+    const voteId = `${activePoll.id}__${anonId}`;
+    const voteRef = doc(db, "pollVotes", voteId);
 
-    await updateDoc(doc(db, "polls", activePoll.id), {
-      options: updatedOptions
+    // אם כבר הצביע (גם אם מחק localStorage)
+    const existing = await getDoc(voteRef);
+    if (existing.exists()) {
+      localStorage.setItem("poll_voted_" + activePoll.id, "1");
+      renderPoll(box);
+      return;
+    }
+
+    await setDoc(voteRef, {
+      pollId: activePoll.id,
+      optionId: chosen,
+      anonId,
+      createdAt: serverTimestamp()
     });
-
-    activePoll.options = updatedOptions;
 
     localStorage.setItem("poll_voted_" + activePoll.id, "1");
 
-    renderPoll(box);
+    // רענון תוצאות (פשוט: טוען מחדש את הסקר והספירה)
+    await loadWeeklyPoll();
   } catch (err) {
     console.error("שגיאה בהצבעה לסקר:", err);
     alert("שגיאה בהצבעה. נסו שוב מאוחר יותר.");
   }
 }
+
 
 document.addEventListener("DOMContentLoaded", loadWeeklyPoll);
