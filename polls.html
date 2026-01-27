@@ -1225,18 +1225,13 @@ html.theme-changing *::after {
   <!-- JS – טעינת סקרים, הצבעה, תצוגת תוצאות -->
   <script type="module">
     import { db } from "./firebase-config.js";
-import {
-  collection,
-  onSnapshot,
-  doc,
-  setDoc,
-  Timestamp
-} from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
-
-import {
-  query,
-  where
-} from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+    import {
+      collection,
+      onSnapshot,
+      doc,
+      getDoc,
+      updateDoc
+    } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
     const pollsColRef = collection(db, "polls");
 
