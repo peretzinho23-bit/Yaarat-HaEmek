@@ -1048,69 +1048,63 @@ html.theme-changing *::after {
   <script type="module" src="analytics.js"></script>
 
   <!-- HEADER כמו בשאר האתר -->
-     <header class="header-main">
-  <div class="container">
-    <nav class="nav nav-centered" aria-label="ניווט ראשי">
+  <header class="header-main">
+    <div class="container">
+      <nav class="nav nav-centered" aria-label="ניווט ראשי">
 
-      <div class="nav-side nav-right-links">
-        <a href="index.html#home-news">חדשות</a>
-        <a href="index.html#grades">השכבות</a>
-        <a href="polls.html">סקרים</a>
-        <a href="about.html">אודות</a>
-      </div>
+        <div class="nav-side nav-right-links">
+          <a href="index.html#home-news">חדשות</a>
+          <a href="index.html#grades">השכבות</a>
+          <a href="polls.html">סקרים</a>
+          <a href="about.html">אודות</a>
+        </div>
 
-      <div class="nav-center">
-        <a href="index.html" class="logo-circle" aria-label="דף הבית">
-          <img
-            src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png"
-            alt="סמל יערת העמק"
-            class="logo-img"
-          />
-        </a>
-      </div>
+        <div class="nav-center">
+          <a href="index.html" class="logo-circle" aria-label="דף הבית">
+            <img
+              src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png"
+              alt="סמל יערת העמק"
+              class="logo-img"
+            />
+          </a>
+        </div>
 
-<div class="nav-side nav-left-links">
-  <a href="redirect-edu.html" class="personal-btn">למרחב האישי</a>
-  <a href="admin.html" class="btn-outline">Admin</a>
-  <a href="teachers.html" class="teacher-portal-btn">
-   פורטל מורים
-</a>
+        <div class="nav-side nav-left-links">
+          <a href="redirect-edu.html" class="personal-btn">למרחב האישי</a>
+          <a href="admin.html" class="btn-outline">Admin</a>
+          <a href="teachers.html" class="teacher-portal-btn">פורטל מורים</a>
+        </div>
 
-</div>
+        <button id="theme-toggle" class="theme-toggle-btn" type="button" aria-label="מצב כהה/בהיר">
+          🌙
+        </button>
 
+        <button
+          class="nav-toggle"
+          id="nav-toggle"
+          type="button"
+          aria-label="פתח תפריט"
+          aria-expanded="false"
+          aria-controls="nav-mobile"
+        >
+          <span></span><span></span><span></span>
+        </button>
 
-      <button id="theme-toggle" class="theme-toggle-btn" type="button" aria-label="מצב כהה/בהיר">
-        🌙
-      </button>
+        <div class="nav-mobile" id="nav-mobile" aria-hidden="true">
+          <a href="index.html#home-news">חדשות</a>
+          <a href="index.html#home-exams">מבחנים</a>
+          <a href="index.html#home-class-picker">השכבות</a>
+          <a href="polls.html">סקרים</a>
+          <a href="about.html">אודות</a>
+          <a href="index.html#contact">יצירת קשר</a>
+          <a href="redirect-edu.html" class="personal-btn">למרחב האישי</a>
+          <a href="teachers.html" class="teacher-portal-btn">פורטל מורים</a>
+          <a href="admin.html" class="btn-outline">Admin</a>
+        </div>
 
-      <button
-        class="nav-toggle"
-        id="nav-toggle"
-        type="button"
-        aria-label="פתח תפריט"
-        aria-expanded="false"
-        aria-controls="nav-mobile"
-      >
-        <span></span><span></span><span></span>
-      </button>
-
-      <div class="nav-mobile" id="nav-mobile" aria-hidden="true">
-        <a href="index.html#home-news">חדשות</a>
-        <a href="index.html#home-exams">מבחנים</a>
-<a href="index.html#home-class-picker">השכבות</a>
-        <a href="polls.html">סקרים</a>
-        <a href="about.html">אודות</a>
-        <a href="index.html#contact">יצירת קשר</a>
-        <a href="redirect-edu.html" class="personal-btn">למרחב האישי</a>
-          <a href="teachers.html" class="teacher-portal-btn">
-   פורטל מורים
-        <a href="admin.html" class="btn-outline">Admin</a>
-        
-      </div>
-
-    </nav>
-  </div>
-</header>
+      </nav>
+    </div>
+  </header>
 
   <main class="polls-page-wrapper">
     <section class="polls-hero">
@@ -1175,18 +1169,10 @@ html.theme-changing *::after {
       <div class="container">
         <div class="polls-toolbar">
           <div class="polls-filter-group">
-            <button
-              type="button"
-              class="polls-filter-btn active"
-              id="filter-active"
-            >
+            <button type="button" class="polls-filter-btn active" id="filter-active">
               רק סקרים פתוחים
             </button>
-            <button
-              type="button"
-              class="polls-filter-btn"
-              id="filter-all"
-            >
+            <button type="button" class="polls-filter-btn" id="filter-all">
               כל הסקרים
             </button>
           </div>
@@ -1200,22 +1186,20 @@ html.theme-changing *::after {
           <!-- ממולא דרך JS -->
         </div>
 
-        <p class="polls-note">
-   
-        </p>
+        <p class="polls-note"></p>
       </div>
     </section>
   </main>
 
   <footer>
-  © כל הזכויות שמורות לבית ספר יערת העמק ·
-  Developed By
-  <a
-    class="footer-devlink"
-    href="https://ptzwebsitebuilding.vercel.app/"
-    target="_blank"
-    rel="noopener noreferrer"
-  >Peretzinho</a></a>
+    © כל הזכויות שמורות לבית ספר יערת העמק ·
+    Developed By
+    <a
+      class="footer-devlink"
+      href="https://ptzwebsitebuilding.vercel.app/"
+      target="_blank"
+      rel="noopener noreferrer"
+    >Peretzinho</a>
   </footer>
 
   <div id="to-top">↑</div>
@@ -1224,26 +1208,29 @@ html.theme-changing *::after {
 
   <!-- JS – טעינת סקרים, הצבעה, תצוגת תוצאות -->
   <script type="module">
-import { db } from "./firebase-config.js";
+    import { db } from "./firebase-config.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+    import {
+      collection,
+      onSnapshot,
+      doc,
+      serverTimestamp,
+      increment,
+      writeBatch
+    } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
-import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+    const auth = getAuth();
+    signInAnonymously(auth).catch((e) => console.error("anon auth failed:", e));
 
-import {
-  collection,
-  onSnapshot,
-  doc,
-  setDoc,
-  updateDoc,
-  serverTimestamp,
-  increment,
-  writeBatch
-} from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
-const auth = getAuth();
-signInAnonymously(auth).catch((e) => console.error("anon auth failed:", e));
-
-function getUid() {
-  return auth.currentUser?.uid || null;
-}
+    function getAnonId() {
+      const k = "poll_anon_id";
+      let v = localStorage.getItem(k);
+      if (!v) {
+        v = (crypto?.randomUUID?.() || ("anon_" + Math.random().toString(36).slice(2)));
+        localStorage.setItem(k, v);
+      }
+      return v;
+    }
 
     const pollsColRef = collection(db, "polls");
 
@@ -1259,29 +1246,12 @@ function getUid() {
     const filterActiveBtn = document.getElementById("filter-active");
     const filterAllBtn = document.getElementById("filter-all");
     const showAllHeroBtn = document.getElementById("show-all-polls");
-function getAnonId() {
-  const k = "poll_anon_id";
-  let v = localStorage.getItem(k);
-  if (!v) {
-    v = (crypto?.randomUUID?.() || ("anon_" + Math.random().toString(36).slice(2)));
-    localStorage.setItem(k, v);
-  }
-  return v;
-}
 
     function loadLocalVotes() {
       try {
         const raw = localStorage.getItem(LOCAL_KEY);
-        if (!raw) {
-          localVotes = {};
-          return;
-        }
-        const parsed = JSON.parse(raw);
-        if (parsed && typeof parsed === "object") {
-          localVotes = parsed;
-        } else {
-          localVotes = {};
-        }
+        const parsed = raw ? JSON.parse(raw) : {};
+        localVotes = (parsed && typeof parsed === "object") ? parsed : {};
       } catch {
         localVotes = {};
       }
@@ -1294,11 +1264,6 @@ function getAnonId() {
         // אם localStorage חסום – נתעלם
       }
     }
-await batch.commit();
-
-localVotes[pollId] = optionId;
-saveLocalVotes();
-renderPolls();   // ✅ זה! תראה ישר
 
     function calcStats() {
       let activeCount = 0;
@@ -1306,10 +1271,11 @@ renderPolls();   // ✅ זה! תראה ישר
 
       pollsRaw.forEach((poll) => {
         if (poll.isActive) activeCount++;
-const pollVotes = (poll.options || []).reduce((sum, opt) => {
-  const v = poll.counts?.[opt.id] || 0;
-  return sum + v;
-}, 0);
+
+        const pollVotes = (poll.options || []).reduce((sum, opt) => {
+          const v = poll.counts?.[opt.id] || 0;
+          return sum + v;
+        }, 0);
 
         totalVotes += pollVotes;
       });
@@ -1341,8 +1307,7 @@ const pollVotes = (poll.options || []).reduce((sum, opt) => {
 
       pollsListEl.innerHTML = "";
       pollsToShow.forEach((poll) => {
-        const card = createPollCard(poll);
-        pollsListEl.appendChild(card);
+        pollsListEl.appendChild(createPollCard(poll));
       });
     }
 
@@ -1350,25 +1315,26 @@ const pollVotes = (poll.options || []).reduce((sum, opt) => {
       const card = document.createElement("article");
       card.className = "poll-card";
 
-const totalVotes = (poll.options || []).reduce((sum, opt) => {
-  const v = (poll.counts && poll.counts[opt.id]) ? poll.counts[opt.id] : 0;
-  return sum + v;
-}, 0);
+      const totalVotes = (poll.options || []).reduce((sum, opt) => {
+        const v = (poll.counts && poll.counts[opt.id]) ? poll.counts[opt.id] : 0;
+        return sum + v;
+      }, 0);
 
       const alreadyVotedOptionId = localVotes[poll.id] || null;
       const isClosed = !poll.isActive;
 
-      // כותרת + סטטוס
       const headerRow = document.createElement("div");
       headerRow.className = "poll-header-row";
 
       const left = document.createElement("div");
+
       const qEl = document.createElement("div");
       qEl.className = "poll-question";
       qEl.textContent = poll.question || "סקר ללא שאלה?";
 
       const meta = document.createElement("div");
       meta.className = "poll-meta";
+
       const votesSpanHeader = document.createElement("span");
       votesSpanHeader.innerHTML = `<span dir="ltr">${totalVotes}</span>&nbsp;הצבעות עד עכשיו`;
       meta.appendChild(votesSpanHeader);
@@ -1377,17 +1343,14 @@ const totalVotes = (poll.options || []).reduce((sum, opt) => {
       left.appendChild(meta);
 
       const right = document.createElement("div");
-
       const statusPill = document.createElement("div");
       statusPill.className = "poll-status-pill" + (isClosed ? " closed" : "");
       statusPill.textContent = isClosed ? "סקר נסגר" : "סקר פעיל";
-
       right.appendChild(statusPill);
 
       headerRow.appendChild(left);
       headerRow.appendChild(right);
 
-      // אופציות
       const optionsContainer = document.createElement("div");
       optionsContainer.className = "poll-options";
 
@@ -1409,30 +1372,19 @@ const totalVotes = (poll.options || []).reduce((sum, opt) => {
         const votesSpan = document.createElement("span");
         votesSpan.className = "poll-option-votes";
 
-const votes = (poll.counts && poll.counts[opt.id]) ? poll.counts[opt.id] : 0;
-        const percent =
-          totalVotes > 0 ? Math.round((votes / totalVotes) * 100) : 0;
+        const votes = (poll.counts && poll.counts[opt.id]) ? poll.counts[opt.id] : 0;
+        const percent = totalVotes > 0 ? Math.round((votes / totalVotes) * 100) : 0;
 
-        // הצגת "מספר קולות (אחוז%)" עם רווחים תקינים ב-RTL
-        if (totalVotes === 0) {
-          votesSpan.innerHTML = `
-            <span dir="ltr">${votes}</span>&nbsp;<span>קולות</span>
-          `;
-        } else {
-          votesSpan.innerHTML = `
-            <span dir="ltr">${votes}</span>&nbsp;<span>קולות</span>
-            &nbsp;(<span dir="ltr">${percent}%</span>)
-          `;
-        }
+        votesSpan.innerHTML = totalVotes === 0
+          ? `<span dir="ltr">${votes}</span>&nbsp;<span>קולות</span>`
+          : `<span dir="ltr">${votes}</span>&nbsp;<span>קולות</span>&nbsp;(<span dir="ltr">${percent}%</span>)`;
 
         btn.appendChild(labelSpan);
         btn.appendChild(votesSpan);
 
         const canVote = poll.isActive && !alreadyVotedOptionId;
 
-        if (!canVote) {
-          btn.classList.add("disabled");
-        }
+        if (!canVote) btn.classList.add("disabled");
 
         if (!canVote && totalVotes > 0) {
           bar.style.transformOrigin = "right center";
@@ -1441,9 +1393,7 @@ const votes = (poll.counts && poll.counts[opt.id]) ? poll.counts[opt.id] : 0;
         }
 
         if (canVote) {
-          btn.addEventListener("click", () => {
-            handleVote(poll.id, opt.id);
-          });
+          btn.addEventListener("click", () => handleVote(poll.id, opt.id));
         }
 
         row.appendChild(bar);
@@ -1451,30 +1401,22 @@ const votes = (poll.counts && poll.counts[opt.id]) ? poll.counts[opt.id] : 0;
         optionsContainer.appendChild(row);
       });
 
-      // שורה תחתונה
       const footerRow = document.createElement("div");
       footerRow.className = "poll-cta-row";
 
       const leftSide = document.createElement("div");
       if (alreadyVotedOptionId) {
-        const selected = (poll.options || []).find(
-          (o) => o.id === alreadyVotedOptionId
-        );
-        leftSide.innerHTML = `
-          כבר הצבעת בסקר הזה ל:
-          <strong>${selected ? selected.text : "אפשרות לא ידועה"}</strong>
-        `;
+        const selected = (poll.options || []).find((o) => o.id === alreadyVotedOptionId);
+        leftSide.innerHTML = `כבר הצבעת בסקר הזה ל: <strong>${selected ? selected.text : "אפשרות לא ידועה"}</strong>`;
       } else if (!poll.isActive) {
-        leftSide.innerHTML =
-          '<span class="poll-locked">🔒 הסקר נסגר – הצבעות חדשות לא אפשריות.</span>';
+        leftSide.innerHTML = '<span class="poll-locked">🔒 הסקר נסגר – הצבעות חדשות לא אפשריות.</span>';
       } else {
         leftSide.textContent = "בחר אפשרות ולחץ – ההצבעה נספרת מיד.";
       }
 
       const rightSide = document.createElement("div");
       if (alreadyVotedOptionId) {
-        rightSide.innerHTML =
-          '<span class="poll-locked">🔒 הצבעת כבר מהמכשיר הזה</span>';
+        rightSide.innerHTML = '<span class="poll-locked">🔒 הצבעת כבר מהמכשיר הזה</span>';
       } else if (!poll.isActive) {
         rightSide.textContent = "אפשר לראות את התוצאות, אבל לא להצביע.";
       } else {
@@ -1491,59 +1433,54 @@ const votes = (poll.counts && poll.counts[opt.id]) ? poll.counts[opt.id] : 0;
       return card;
     }
 
-async function handleVote(pollId, optionId) {
-  loadLocalVotes();
-  if (localVotes[pollId]) {
-    alert("כבר הצבעת בסקר הזה מהמכשיר הזה.");
-    return;
-  }
+    async function handleVote(pollId, optionId) {
+      loadLocalVotes();
+      if (localVotes[pollId]) {
+        alert("כבר הצבעת בסקר הזה מהמכשיר הזה.");
+        return;
+      }
 
-  const uid = getUid();
-  if (!uid) {
-    alert("התחברות אנונימית עדיין נטענת… נסה שוב עוד רגע.");
-    return;
-  }
+      const anonId = getAnonId();
 
-  try {
-    const pollRef = doc(db, "polls", pollId);
-    const voteRef = doc(db, "pollVotes", `${pollId}__${uid}`);
+      // חייב להיות מחובר (גם אנונימי)
+      if (!auth.currentUser) {
+        alert("התחברות אנונימית עדיין נטענת… נסה שוב עוד רגע.");
+        return;
+      }
 
-    const batch = writeBatch(db);
+      try {
+        const pollRef = doc(db, "polls", pollId);
 
-    // 1) נועל הצבעה (מסמך אחד לכל uid לכל poll)
-    batch.set(voteRef, {
-      pollId,
-      optionId,
-      uid,
-      createdAt: serverTimestamp()
-    });
+        // ✅ voteId בפורמט pollId__anonId (כמו בחוקים)
+        const voteId = `${pollId}__${anonId}`;
+        const voteRef = doc(db, "pollVotes", voteId);
 
-    // 2) מעלה מונה תוצאות (counts.<optionId> += 1)
-    batch.update(pollRef, {
-      [`counts.${optionId}`]: increment(1)
-    });
+        const batch = writeBatch(db);
 
-    await batch.commit();
+        // 1) נועל הצבעה (מסמך אחד לכל anonId לכל poll)
+        batch.set(voteRef, {
+          pollId,
+          optionId,
+          anonId,
+          createdAt: serverTimestamp()
+        });
 
-    localVotes[pollId] = optionId;
-    saveLocalVotes();
-    // onSnapshot יעדכן תוצאות ישר
-  } catch (err) {
-    // אם כבר הצביע => ה-set יהפוך ל-update וייחסם ע"י rules => permission-denied
-    if (String(err?.code || "").includes("permission-denied")) {
-      localVotes[pollId] = optionId;
-      saveLocalVotes();
-      renderPolls();
-      return;
+        // 2) מעלה מונה תוצאות (counts.<optionId> += 1)
+        batch.update(pollRef, {
+          [`counts.${optionId}`]: increment(1)
+        });
+
+        await batch.commit();
+
+        // ✅ עדכון מקומי מיידי כדי שה־UI יינעל ישר
+        localVotes[pollId] = optionId;
+        saveLocalVotes();
+        renderPolls();
+      } catch (err) {
+        console.error("שגיאה בהצבעה:", err);
+        alert("הייתה בעיה בזמן ההצבעה. נסו שוב.");
+      }
     }
-    console.error("שגיאה בהצבעה:", err);
-    alert("הייתה בעיה בזמן ההצבעה. נסו שוב.");
-  }
-}
-
-
-
-    // ===== אירועים על פילטרים =====
 
     function setFilterMode(onlyActive) {
       showOnlyActive = onlyActive;
@@ -1566,13 +1503,10 @@ async function handleVote(pollId, optionId) {
       showAllHeroBtn.addEventListener("click", () => {
         setFilterMode(false);
         const target = document.getElementById("polls-section");
-        if (target) {
-          target.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
+        if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
       });
     }
 
-    // ===== התחלה – מאזין בזמן אמת =====
     loadLocalVotes();
 
     onSnapshot(
@@ -1580,10 +1514,7 @@ async function handleVote(pollId, optionId) {
       (snap) => {
         pollsRaw = [];
         snap.forEach((docSnap) => {
-          pollsRaw.push({
-            id: docSnap.id,
-            ...docSnap.data()
-          });
+          pollsRaw.push({ id: docSnap.id, ...docSnap.data() });
         });
         calcStats();
         renderPolls();
@@ -1591,8 +1522,7 @@ async function handleVote(pollId, optionId) {
       (err) => {
         console.error("שגיאה בטעינת סקרים בזמן אמת:", err);
         if (pollsListEl) {
-          pollsListEl.innerHTML =
-            '<p class="poll-empty-msg">שגיאה בטעינת הסקרים. נסו לרענן את הדף.</p>';
+          pollsListEl.innerHTML = '<p class="poll-empty-msg">שגיאה בטעינת הסקרים. נסו לרענן את הדף.</p>';
         }
       }
     );
@@ -1600,7 +1530,5 @@ async function handleVote(pollId, optionId) {
 
   <!-- app.js בשביל מצב כהה / תפריט מובייל וכו' -->
   <script type="module" src="app.js"></script>
-<script type="module" src="/analytics.js"></script>
-
 </body>
 </html>

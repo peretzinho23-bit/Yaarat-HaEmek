@@ -149,14 +149,8 @@ async function handleVote() {
     const voteId = `${activePoll.id}__${anonId}`;
     const voteRef = doc(db, "pollVotes", voteId);
 
-    // אם כבר הצביע (גם אם מחק localStorage)
-    const existing = await getDoc(voteRef);
-    if (existing.exists()) {
-      localStorage.setItem("poll_voted_" + activePoll.id, "1");
-      renderPoll(box);
-      return;
-    }
-
+    // ❌ אסור getDoc כי pollVotes לא קריאים
+    // ✅ פשוט מנסים ליצור. אם כבר קיים => זה ייחשב update וייפול בחוקים => נתפוס ונגיד "כבר הצבעת".
     await setDoc(voteRef, {
       pollId: activePoll.id,
       optionId: chosen,
@@ -165,14 +159,20 @@ async function handleVote() {
     });
 
     localStorage.setItem("poll_voted_" + activePoll.id, "1");
-
-    // רענון תוצאות (פשוט: טוען מחדש את הסקר והספירה)
     await loadWeeklyPoll();
   } catch (err) {
+    // אם זה נכשל כי המסמך כבר קיים/אין הרשאה לעדכן => זה אומר כבר הצביע
+    if (String(err?.code || "").includes("permission-denied")) {
+      localStorage.setItem("poll_voted_" + activePoll.id, "1");
+      renderPoll(box);
+      return;
+    }
+
     console.error("שגיאה בהצבעה לסקר:", err);
     alert("שגיאה בהצבעה. נסו שוב מאוחר יותר.");
   }
 }
+
 
 
 document.addEventListener("DOMContentLoaded", loadWeeklyPoll);
