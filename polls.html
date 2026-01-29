@@ -1443,11 +1443,15 @@ html.theme-changing *::after {
         return;
       }
 
-      const uid = getUid();
-      if (!uid) {
-        alert("התחברות אנונימית עדיין נטענת… נסה שוב עוד רגע.");
-        return;
-      }
+if (!auth.currentUser) {
+  await new Promise((r) => {
+    const off = auth.onAuthStateChanged((u) => {
+      if (u) { off(); r(); }
+    });
+  });
+}
+const uid = auth.currentUser.uid;
+
 
       try {
         const pollRef = doc(db, "polls", pollId);
