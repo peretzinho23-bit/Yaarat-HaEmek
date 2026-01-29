@@ -1,25 +1,23 @@
-// polls.js – "סקר השבוע" (מותאם לחוקים שלך: pollVotes + counts)
-import { db } from "./firebase-config.js";
-import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
-import {
-  collection,
-  query,
-  where,
-  orderBy,
-  limit,
-  getDocs,
-  doc,
-  writeBatch,
-  serverTimestamp,
-  increment
-} from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
 const auth = getAuth();
-signInAnonymously(auth).catch((e) => console.error("anon auth failed:", e));
+
+let authReadyResolve;
+const authReady = new Promise((res) => (authReadyResolve = res));
+
+onAuthStateChanged(auth, (user) => {
+  if (user) authReadyResolve();
+});
+
+// מתחילים אנונימי אם אין משתמש
+if (!auth.currentUser) {
+  signInAnonymously(auth).catch((e) => console.error("anon auth failed:", e));
+}
 
 function getUid() {
   return auth.currentUser?.uid || null;
 }
+
 
 function escapeHtml(str) {
   return String(str || "")
@@ -133,6 +131,7 @@ async function handleVote() {
   const box = document.getElementById("poll-box");
   const chosen =
     Array.from(document.querySelectorAll('input[name="pollOption"]')).find((r) => r.checked)?.value || null;
+await authReady;
 
   if (!chosen) {
     alert("בחר אפשרות לפני ההצבעה.");

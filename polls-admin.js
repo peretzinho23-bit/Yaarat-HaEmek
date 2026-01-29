@@ -32,7 +32,6 @@ let pollsData = [];
 let unsubscribePolls = null;
 
 // ===== AUTH =====
-
 function setLoggedOutUI() {
   if (authStatusEl) authStatusEl.textContent = "יש להתחבר כדי לנהל את הסקרים.";
   if (loginSectionEl) loginSectionEl.style.display = "block";
@@ -93,7 +92,6 @@ function setupAuth() {
 }
 
 // ===== POLLS LOGIC =====
-
 function getVotesForOption(poll, optionId) {
   const v = poll?.counts?.[optionId];
   return typeof v === "number" ? v : 0;
@@ -206,9 +204,8 @@ async function handlePollFormSubmit(evt) {
   if (opt3) options.push({ id: "c", text: opt3 });
   if (opt4) options.push({ id: "d", text: opt4 });
 
-  // counts התחלתי
   const counts = {};
-  options.forEach((o) => (counts[o.id] = 0));
+  for (const opt of options) counts[opt.id] = 0;
 
   try {
     await addDoc(pollsColRef, {
