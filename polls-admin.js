@@ -1,4 +1,4 @@
-// polls-admin.js – לוח ניהול סקרים חדש
+// polls-admin.js – לוח ניהול סקרים חדש (FIXED for counts-map voting)
 
 import { db, auth } from "./firebase-config.js";
 import {
@@ -34,17 +34,13 @@ let unsubscribePolls = null;
 // ===== AUTH =====
 
 function setLoggedOutUI() {
-  if (authStatusEl) {
-    authStatusEl.textContent = "יש להתחבר כדי לנהל את הסקרים.";
-  }
+  if (authStatusEl) authStatusEl.textContent = "יש להתחבר כדי לנהל את הסקרים.";
   if (loginSectionEl) loginSectionEl.style.display = "block";
   if (pollsSectionEl) pollsSectionEl.style.display = "none";
 }
 
 function setLoggedInUI(user) {
-  if (authStatusEl) {
-    authStatusEl.textContent = `מחובר כ: ${user.email || "מנהל"}`;
-  }
+  if (authStatusEl) authStatusEl.textContent = `מחובר כ: ${user.email || "מנהל"}`;
   if (loginSectionEl) loginSectionEl.style.display = "none";
   if (pollsSectionEl) pollsSectionEl.style.display = "block";
 }
@@ -79,12 +75,8 @@ async function handleLogoutClick() {
 }
 
 function setupAuth() {
-  if (loginFormEl) {
-    loginFormEl.addEventListener("submit", handleLoginSubmit);
-  }
-  if (logoutBtnEl) {
-    logoutBtnEl.addEventListener("click", handleLogoutClick);
-  }
+  if (loginFormEl) loginFormEl.addEventListener("submit", handleLoginSubmit);
+  if (logoutBtnEl) logoutBtnEl.addEventListener("click", handleLogoutClick);
 
   onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -102,9 +94,14 @@ function setupAuth() {
 
 // ===== POLLS LOGIC =====
 
+function getVotesForOption(poll, optionId) {
+  const v = poll?.counts?.[optionId];
+  return typeof v === "number" ? v : 0;
+}
+
 function calcTotalVotes(poll) {
   if (!poll || !Array.isArray(poll.options)) return 0;
-  return poll.options.reduce((sum, opt) => sum + (opt.votes || 0), 0);
+  return poll.options.reduce((sum, opt) => sum + getVotesForOption(poll, opt.id), 0);
 }
 
 function renderPolls() {
@@ -119,10 +116,12 @@ function renderPolls() {
   const html = pollsData
     .map((poll) => {
       const totalVotes = calcTotalVotes(poll);
+
       const createdAt =
         poll.createdAt && typeof poll.createdAt.toDate === "function"
           ? poll.createdAt.toDate()
           : null;
+
       const createdStr = createdAt
         ? createdAt.toLocaleDateString("he-IL", {
             day: "2-digit",
@@ -132,25 +131,23 @@ function renderPolls() {
         : "—";
 
       const statusLabel = poll.isActive ? "פעיל" : "מושהה";
+      const question = poll.question || "";
 
       const optionsHtml = (poll.options || [])
-  .map((opt, idx) => {
-    const votes = opt.votes || 0;
-    const text = opt.text || "";
-    return `
-      <li>
-        <strong>${idx + 1}.</strong>
-        <span>${text}</span>
-        <span style="opacity:0.8;">
-          (<span>${votes}</span>&nbsp;<span>קולות</span>)
-        </span>
-      </li>
-    `;
-  })
-  .join("");
-
-
-      const question = poll.question || "";
+        .map((opt, idx) => {
+          const votes = getVotesForOption(poll, opt.id);
+          const text = opt.text || "";
+          return `
+            <li>
+              <strong>${idx + 1}.</strong>
+              <span>${text}</span>
+              <span style="opacity:0.8;">
+                (<span dir="ltr">${votes}</span>&nbsp;<span>קולות</span>)
+              </span>
+            </li>
+          `;
+        })
+        .join("");
 
       return `
         <div class="admin-item" data-poll-id="${poll.id}">
@@ -158,7 +155,7 @@ function renderPolls() {
             <div>
               <div style="font-weight:700;margin-bottom:4px;">${question}</div>
               <div style="font-size:0.8rem;opacity:0.8;">
-                נוצר בתאריך ${createdStr} · מצב: ${statusLabel} · סה"כ קולות: ${totalVotes}
+                נוצר בתאריך ${createdStr} · מצב: ${statusLabel} · סה"כ קולות: <span dir="ltr">${totalVotes}</span>
               </div>
             </div>
             <div style="display:flex;flex-wrap:wrap;gap:6px;">
@@ -189,6 +186,7 @@ async function handlePollFormSubmit(evt) {
   if (!pollFormEl) return;
 
   const form = pollFormEl;
+
   const question = form.question.value.trim();
   const opt1 = form.option1.value.trim();
   const opt2 = form.option2.value.trim();
@@ -201,16 +199,22 @@ async function handlePollFormSubmit(evt) {
     return;
   }
 
+  // options בלי votes — הקולות נשמרים ב-counts.<id>
   const options = [];
-  if (opt1) options.push({ id: "a", text: opt1, votes: 0 });
-  if (opt2) options.push({ id: "b", text: opt2, votes: 0 });
-  if (opt3) options.push({ id: "c", text: opt3, votes: 0 });
-  if (opt4) options.push({ id: "d", text: opt4, votes: 0 });
+  if (opt1) options.push({ id: "a", text: opt1 });
+  if (opt2) options.push({ id: "b", text: opt2 });
+  if (opt3) options.push({ id: "c", text: opt3 });
+  if (opt4) options.push({ id: "d", text: opt4 });
+
+  // counts התחלתי
+  const counts = {};
+  options.forEach((o) => (counts[o.id] = 0));
 
   try {
     await addDoc(pollsColRef, {
       question,
       options,
+      counts,
       isActive,
       createdAt: serverTimestamp()
     });
@@ -246,20 +250,14 @@ async function resetPollVotes(pollId) {
   const poll = pollsData.find((p) => p.id === pollId);
   if (!poll) return;
 
-  const confirmReset = confirm(
-    "לאפס את כל ההצבעות לסקר הזה? אי אפשר לבטל לאחר מכן."
-  );
+  const confirmReset = confirm("לאפס את כל ההצבעות לסקר הזה? אי אפשר לבטל לאחר מכן.");
   if (!confirmReset) return;
 
-  const newOptions = (poll.options || []).map((opt) => ({
-    ...opt,
-    votes: 0
-  }));
+  const counts = {};
+  (poll.options || []).forEach((o) => (counts[o.id] = 0));
 
   try {
-    await updateDoc(doc(pollsColRef, pollId), {
-      options: newOptions
-    });
+    await updateDoc(doc(pollsColRef, pollId), { counts });
   } catch (err) {
     console.error("שגיאה באיפוס הצבעות:", err);
     alert("שגיאה באיפוס הצבעות.");
@@ -289,20 +287,14 @@ function setupPollsListEvents() {
     const id = btn.getAttribute("data-id");
     if (!id) return;
 
-    if (action === "toggle") {
-      togglePollActive(id);
-    } else if (action === "reset") {
-      resetPollVotes(id);
-    } else if (action === "delete") {
-      deletePoll(id);
-    }
+    if (action === "toggle") togglePollActive(id);
+    else if (action === "reset") resetPollVotes(id);
+    else if (action === "delete") deletePoll(id);
   });
 }
 
 function subscribeRealtimePolls() {
-  if (unsubscribePolls) {
-    unsubscribePolls();
-  }
+  if (unsubscribePolls) unsubscribePolls();
 
   unsubscribePolls = onSnapshot(
     pollsColRef,
@@ -312,7 +304,7 @@ function subscribeRealtimePolls() {
         ...docSnap.data()
       }));
 
-      // ממיינים לפי createdAt מהחדש לישן
+      // מיון לפי createdAt מהחדש לישן
       pollsData.sort((a, b) => {
         const ta =
           a.createdAt && typeof a.createdAt.toDate === "function"

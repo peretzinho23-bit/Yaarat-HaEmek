@@ -1,3 +1,6 @@
+// polls.js – "סקר השבוע" (מותאם לחוקים שלך: pollVotes + counts)
+import { db } from "./firebase-config.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 import {
   collection,
   query,
@@ -6,23 +9,17 @@ import {
   limit,
   getDocs,
   doc,
-  getDoc,
-  setDoc,
-  serverTimestamp
+  writeBatch,
+  serverTimestamp,
+  increment
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
-function getAnonId() {
-  const k = "poll_anon_id";
-  let v = localStorage.getItem(k);
-  if (!v) {
-    v = (crypto?.randomUUID?.() || ("anon_" + Math.random().toString(36).slice(2))) + "";
-    localStorage.setItem(k, v);
-  }
-  return v;
-}
+const auth = getAuth();
+signInAnonymously(auth).catch((e) => console.error("anon auth failed:", e));
 
-const pollsCol = collection(db, "polls");
-let activePoll = null;
+function getUid() {
+  return auth.currentUser?.uid || null;
+}
 
 function escapeHtml(str) {
   return String(str || "")
@@ -31,27 +28,31 @@ function escapeHtml(str) {
     .replace(/>/g, "&gt;");
 }
 
+const pollsCol = collection(db, "polls");
+let activePoll = null;
+
 async function loadWeeklyPoll() {
   const box = document.getElementById("poll-box");
   if (!box) return;
 
   try {
-    // לוקח את הסקר הפעיל האחרון
     const q = query(
       pollsCol,
       where("isActive", "==", true),
       orderBy("createdAt", "desc"),
       limit(1)
     );
+
     const snap = await getDocs(q);
 
     if (snap.empty) {
       box.innerHTML = `<p class="empty-msg">כרגע אין סקר פעיל.</p>`;
+      activePoll = null;
       return;
     }
 
     const docSnap = snap.docs[0];
-    activePoll = { id: docSnap.id, ...docSnap.data() };
+    activePoll = { id: docSnap.id, ...docSnap.data() }; // ✅ FIX
 
     renderPoll(box);
   } catch (err) {
@@ -69,29 +70,26 @@ function renderPoll(box) {
   const votedKey = "poll_voted_" + activePoll.id;
   const alreadyVoted = localStorage.getItem(votedKey) === "1";
 
+  const totalVotes = (activePoll.options || []).reduce((sum, opt) => {
+    const v = activePoll.counts?.[opt.id] || 0;
+    return sum + v;
+  }, 0);
+
   const optionsHtml = (activePoll.options || [])
     .map(
       (opt) => `
       <label class="poll-option">
-        <input type="radio" name="pollOption" value="${escapeHtml(opt.id)}" ${
-        alreadyVoted ? "disabled" : ""
-      } />
+        <input type="radio" name="pollOption" value="${escapeHtml(opt.id)}" ${alreadyVoted ? "disabled" : ""} />
         <span>${escapeHtml(opt.text || "")}</span>
       </label>
     `
     )
     .join("");
 
-  const totalVotes = (activePoll.options || []).reduce(
-    (sum, o) => sum + (o.votes || 0),
-    0
-  );
-
   const resultsHtml = (activePoll.options || [])
     .map((opt) => {
-      const votes = opt.votes || 0;
-      const percent =
-        totalVotes > 0 ? Math.round((votes / totalVotes) * 100) : 0;
+      const votes = activePoll.counts?.[opt.id] || 0;
+      const percent = totalVotes > 0 ? Math.round((votes / totalVotes) * 100) : 0;
       return `
         <div class="poll-result-row">
           <span>${escapeHtml(opt.text || "")}</span>
@@ -106,7 +104,6 @@ function renderPoll(box) {
 
     <div id="poll-form-area">
       ${optionsHtml}
-
       ${
         alreadyVoted
           ? `<p class="section-subtitle" style="margin-top:12px;">כבר הצבעת 😊</p>`
@@ -126,9 +123,7 @@ function renderPoll(box) {
 
   if (!alreadyVoted) {
     const btn = document.getElementById("poll-vote-btn");
-    if (btn) {
-      btn.addEventListener("click", handleVote);
-    }
+    if (btn) btn.addEventListener("click", handleVote);
   }
 }
 
@@ -136,43 +131,45 @@ async function handleVote() {
   if (!activePoll) return;
 
   const box = document.getElementById("poll-box");
-  const radios = document.querySelectorAll('input[name="pollOption"]');
-  const chosen = Array.from(radios).find(r => r.checked)?.value || null;
+  const chosen =
+    Array.from(document.querySelectorAll('input[name="pollOption"]')).find((r) => r.checked)?.value || null;
 
   if (!chosen) {
     alert("בחר אפשרות לפני ההצבעה.");
     return;
   }
 
-  try {
-    const anonId = getAnonId();
-    const voteId = `${activePoll.id}__${anonId}`;
-    const voteRef = doc(db, "pollVotes", voteId);
+  const uid = getUid();
+  if (!uid) {
+    alert("התחברות אנונימית עדיין נטענת… נסה שוב עוד רגע.");
+    return;
+  }
 
-    // ❌ אסור getDoc כי pollVotes לא קריאים
-    // ✅ פשוט מנסים ליצור. אם כבר קיים => זה ייחשב update וייפול בחוקים => נתפוס ונגיד "כבר הצבעת".
-    await setDoc(voteRef, {
-      pollId: activePoll.id,
+  try {
+    const pollId = activePoll.id;
+    const pollRef = doc(db, "polls", pollId);
+    const voteRef = doc(db, "pollVotes", `${pollId}__${uid}`);
+
+    const batch = writeBatch(db);
+    batch.set(voteRef, {
+      pollId,
       optionId: chosen,
-      anonId,
+      uid,
       createdAt: serverTimestamp()
     });
+    batch.update(pollRef, {
+      [`counts.${chosen}`]: increment(1)
+    });
 
-    localStorage.setItem("poll_voted_" + activePoll.id, "1");
+    await batch.commit();
+
+    localStorage.setItem("poll_voted_" + pollId, "1");
     await loadWeeklyPoll();
   } catch (err) {
-    // אם זה נכשל כי המסמך כבר קיים/אין הרשאה לעדכן => זה אומר כבר הצביע
-    if (String(err?.code || "").includes("permission-denied")) {
-      localStorage.setItem("poll_voted_" + activePoll.id, "1");
-      renderPoll(box);
-      return;
-    }
-
     console.error("שגיאה בהצבעה לסקר:", err);
     alert("שגיאה בהצבעה. נסו שוב מאוחר יותר.");
+    if (box) renderPoll(box);
   }
 }
-
-
 
 document.addEventListener("DOMContentLoaded", loadWeeklyPoll);
