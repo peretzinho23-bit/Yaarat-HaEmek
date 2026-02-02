@@ -308,7 +308,7 @@ async function handleVote(pollId, optionId) {
     console.error("vote error:", err);
 
     // אם כבר הצביע בעבר (על אותו uid) – rules יחזירו permission-denied / already-exists
-ה
+
 
     alert("הייתה בעיה בזמן ההצבעה. נסו שוב.");
   }
