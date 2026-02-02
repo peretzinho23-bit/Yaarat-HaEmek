@@ -308,21 +308,7 @@ async function handleVote(pollId, optionId) {
     console.error("vote error:", err);
 
     // אם כבר הצביע בעבר (על אותו uid) – rules יחזירו permission-denied / already-exists
-const code = String(err?.code || "");
-const msg = String(err?.message || "");
-
-if (
-  code === "permission-denied" ||
-  code === "already-exists" ||
-  msg.includes("PERMISSION_DENIED") ||
-  msg.includes("already exists")
-) {
-
-      lockPollLocally(pollId, "__locked");
-      renderPolls();
-      alert("כבר הצבעת בסקר הזה.");
-      return;
-    }
+ה
 
     alert("הייתה בעיה בזמן ההצבעה. נסו שוב.");
   }
