@@ -191,7 +191,6 @@ html.a11y__focusRing :focus-visible{
   position: fixed;
   top: 12px;
   right: 72px;
-  z-index: 2147483647;
   width: min(920px, calc(100vw - 96px));
   direction: rtl;
   background: rgba(255,255,255,.92);
