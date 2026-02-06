@@ -36,7 +36,7 @@ async function loadTodayPlan() {
 
     // שבת? אין לימודים
     if (todayKey === "sat") {
-      el.textContent = "שבת — אין לימודים 🙂";
+el.textContent = "שבת שלום 🌿 מאחלים לכולם מנוחה טובה, זמן להיטען ולהירגע. סופ״ש נעים ושקט, ונתראה בשבוע החדש בכוחות מחודשים 💙";
       return;
     }
 
