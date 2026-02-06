@@ -117,9 +117,13 @@ html.a11y__focusRing :focus-visible{
 
 #a11yFab{
   position: fixed;
-  top: 14px;
-  right: 14px;
-  z-index: 2147483647;
+
+  /* מיקום — כמו הצהוב */
+  top: 72px;
+  right: 18px;
+
+  /* מתחת לכפתור ירח אבל מעל האתר */
+  z-index: 950;
 
   width: 54px;
   height: 54px;
@@ -139,17 +143,19 @@ html.a11y__focusRing :focus-visible{
   cursor: pointer;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+
+  transition: transform .18s ease, box-shadow .18s ease;
 }
 
 #a11yFab:hover{
-  transform: translateY(-1px);
+  transform: translateY(-2px);
   box-shadow:
-    0 22px 70px rgba(0,0,0,.20),
+    0 26px 80px rgba(0,0,0,.22),
     inset 0 1px 0 rgba(255,255,255,.90);
 }
 
 #a11yFab:active{
-  transform: translateY(0px) scale(0.98);
+  transform: translateY(0px) scale(.96);
 }
 
 #a11yFab svg{
@@ -158,14 +164,14 @@ html.a11y__focusRing :focus-visible{
   filter: drop-shadow(0 6px 10px rgba(0,0,0,.18));
 }
 
-/* מובייל: להעיף למטה-ימין כדי לא להפריע ל-header */
+/* ===== מובייל ===== */
 @media (max-width: 760px){
   #a11yFab{
-    top: auto;
-    bottom: 14px;
-    right: 14px;
-    width: 56px;
-    height: 56px;
+    top: 86px;
+    right: 12px;
+
+    width: 52px;
+    height: 52px;
     border-radius: 18px;
   }
 }
