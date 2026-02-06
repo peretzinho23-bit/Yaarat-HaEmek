@@ -115,24 +115,61 @@ html.a11y__focusRing :focus-visible{
   border-radius: 10px;
 }
 
-/* UI */
 #a11yFab{
   position: fixed;
-  top: 12px; right: 12px;
+  top: 14px;
+  right: 14px;
   z-index: 2147483647;
-  width: 52px; height: 52px;
+
+  width: 54px;
+  height: 54px;
+
   border-radius: 16px;
-  border: 1px solid rgba(0,0,0,.08);
-  background: rgba(255,255,255,.92);
-  box-shadow: 0 18px 60px rgba(0,0,0,.18);
+  border: 1px solid rgba(0,0,0,.10);
+  background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.80));
+  box-shadow:
+    0 18px 60px rgba(0,0,0,.18),
+    inset 0 1px 0 rgba(255,255,255,.85);
+
   backdrop-filter: blur(16px);
-  display: grid; place-items: center;
+  display: grid;
+  place-items: center;
+
   color: #0b1220;
   cursor: pointer;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
-#a11yFab svg{ width: 26px; height: 26px; }
+
+#a11yFab:hover{
+  transform: translateY(-1px);
+  box-shadow:
+    0 22px 70px rgba(0,0,0,.20),
+    inset 0 1px 0 rgba(255,255,255,.90);
+}
+
+#a11yFab:active{
+  transform: translateY(0px) scale(0.98);
+}
+
+#a11yFab svg{
+  width: 26px;
+  height: 26px;
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,.18));
+}
+
+/* מובייל: להעיף למטה-ימין כדי לא להפריע ל-header */
+@media (max-width: 760px){
+  #a11yFab{
+    top: auto;
+    bottom: 14px;
+    right: 14px;
+    width: 56px;
+    height: 56px;
+    border-radius: 18px;
+  }
+}
+
 
 #a11yBackdrop{
   position: fixed; inset: 0;
