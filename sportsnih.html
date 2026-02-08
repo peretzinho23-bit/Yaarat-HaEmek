@@ -1,0 +1,1105 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>ניהול ספורט – יערת העמק</title>
+
+  <link rel="icon" href="logo.png" />
+  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    /* ===========================
+       SPORTS ADMIN – Premium UI
+       =========================== */
+
+    :root{
+      --sp-bg: rgba(255,255,255,0.92);
+      --sp-card: rgba(255,255,255,0.94);
+      --sp-border: rgba(148,163,184,0.45);
+      --sp-shadow: 0 18px 45px rgba(15,23,42,0.10);
+      --sp-text: #0f172a;
+      --sp-muted: #64748b;
+      --sp-blue: #2563eb;
+      --sp-cyan: #38bdf8;
+      --sp-green: #10b981;
+      --sp-red: #ef4444;
+      --sp-amber: #f59e0b;
+      --sp-radius: 22px;
+      --sp-radius2: 16px;
+      --sp-focus: 0 0 0 4px rgba(37,99,235,.18);
+    }
+
+    html[data-theme="dark"]{
+      --sp-bg: rgba(2,6,23,0.60);
+      --sp-card: rgba(15,23,42,0.86);
+      --sp-border: rgba(148,163,184,0.22);
+      --sp-shadow: 0 20px 55px rgba(0,0,0,0.40);
+      --sp-text: rgba(241,245,249,0.96);
+      --sp-muted: rgba(226,232,240,0.65);
+      --sp-blue: #60a5fa;
+      --sp-cyan: #38bdf8;
+    }
+
+    body[data-page="sports-admin"]{
+      background:
+        radial-gradient(circle at 10% 0%, rgba(56,189,248,0.14), transparent 55%),
+        radial-gradient(circle at 90% 10%, rgba(37,99,235,0.12), transparent 55%),
+        radial-gradient(circle at 50% 120%, rgba(16,185,129,0.10), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,1), rgba(240,246,255,1));
+      color: var(--sp-text);
+      overflow-x: hidden;
+    }
+    html[data-theme="dark"] body[data-page="sports-admin"]{
+      background:
+        radial-gradient(circle at 10% 0%, rgba(56,189,248,0.16), transparent 55%),
+        radial-gradient(circle at 90% 10%, rgba(37,99,235,0.12), transparent 55%),
+        radial-gradient(circle at 50% 120%, rgba(16,185,129,0.10), transparent 60%),
+        linear-gradient(180deg, #020617, #000);
+    }
+
+    a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible{
+      outline: none;
+      box-shadow: var(--sp-focus);
+      border-radius: 12px;
+    }
+
+    .sp-admin-wrap{
+      padding: 96px 0 44px;
+      min-height: 100vh;
+    }
+
+    .sp-hero{
+      margin-bottom: 14px;
+    }
+
+    .sp-hero-card{
+      border-radius: var(--sp-radius);
+      background: var(--sp-bg);
+      border: 1px solid var(--sp-border);
+      box-shadow: var(--sp-shadow);
+      padding: 16px;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .sp-hero-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 14px;
+      flex-wrap:wrap;
+    }
+
+    .sp-title h1{
+      margin:0;
+      font-size: 1.35rem;
+      font-weight: 950;
+      letter-spacing: .2px;
+    }
+    .sp-title p{
+      margin: 6px 0 0;
+      color: var(--sp-muted);
+      font-weight: 700;
+      font-size: .92rem;
+      line-height: 1.55;
+      max-width: 760px;
+    }
+
+    .sp-badges{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      flex-wrap:wrap;
+    }
+    .sp-pill{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--sp-border);
+      background: var(--sp-card);
+      color: var(--sp-text);
+      font-weight: 900;
+      font-size: .82rem;
+      box-shadow: 0 10px 24px rgba(15,23,42,0.08);
+    }
+    html[data-theme="dark"] .sp-pill{ box-shadow: 0 14px 40px rgba(0,0,0,0.35); }
+
+    .sp-pill .dot{
+      width: 8px; height: 8px;
+      border-radius: 999px;
+      background: var(--sp-blue);
+      box-shadow: 0 0 0 4px rgba(37,99,235,.16);
+    }
+    .sp-pill.ok .dot{ background: var(--sp-green); box-shadow: 0 0 0 4px rgba(16,185,129,.16); }
+    .sp-pill.warn .dot{ background: var(--sp-amber); box-shadow: 0 0 0 4px rgba(245,158,11,.16); }
+    .sp-pill.err .dot{ background: var(--sp-red); box-shadow: 0 0 0 4px rgba(239,68,68,.16); }
+
+    .sp-grid{
+      margin-top: 14px;
+      display:grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.25fr);
+      gap: 14px;
+    }
+
+    @media (max-width: 980px){
+      .sp-grid{ grid-template-columns: 1fr; }
+    }
+
+    .sp-card{
+      border-radius: var(--sp-radius);
+      background: var(--sp-card);
+      border: 1px solid var(--sp-border);
+      box-shadow: var(--sp-shadow);
+      padding: 14px;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .sp-card-hd{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .sp-card-hd h2{
+      margin:0;
+      font-size: 1.05rem;
+      font-weight: 950;
+    }
+    .sp-mini{
+      color: var(--sp-muted);
+      font-weight: 800;
+      font-size: .82rem;
+    }
+
+    .sp-row{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    @media (max-width: 620px){
+      .sp-row{ grid-template-columns: 1fr; }
+    }
+
+    .sp-field label{
+      display:block;
+      font-weight: 900;
+      font-size: .82rem;
+      margin-bottom: 6px;
+      color: var(--sp-muted);
+    }
+    .sp-field input,
+    .sp-field select{
+      width:100%;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--sp-border);
+      background: rgba(255,255,255,0.92);
+      color: var(--sp-text);
+      font-weight: 800;
+      font-size: .92rem;
+      box-shadow: 0 10px 24px rgba(15,23,42,0.06);
+    }
+    html[data-theme="dark"] .sp-field input,
+    html[data-theme="dark"] .sp-field select{
+      background: rgba(2,6,23,0.55);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.35);
+    }
+
+    .sp-actions{
+      margin-top: 10px;
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items:center;
+    }
+
+    .sp-btn{
+      border-radius: 999px;
+      padding: 10px 14px;
+      border: 1px solid var(--sp-border);
+      background: rgba(255,255,255,0.92);
+      color: var(--sp-text);
+      font-weight: 950;
+      cursor:pointer;
+      box-shadow: 0 10px 24px rgba(15,23,42,0.08);
+      transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease, background .15s ease;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .sp-btn:hover{ transform: translateY(-1px); box-shadow: 0 14px 34px rgba(15,23,42,0.12); }
+
+    .sp-btn.primary{
+      background: linear-gradient(135deg, var(--sp-blue), var(--sp-cyan));
+      border: none;
+      color: #fff;
+      box-shadow: 0 14px 34px rgba(37,99,235,0.22);
+    }
+    .sp-btn.danger{
+      background: rgba(239,68,68,0.10);
+      border-color: rgba(239,68,68,0.45);
+      color: #b91c1c;
+    }
+    html[data-theme="dark"] .sp-btn.danger{ color: rgba(254,226,226,0.95); background: rgba(239,68,68,0.18); }
+
+    .sp-btn.ghost{
+      background: transparent;
+    }
+
+    .sp-divider{
+      height:1px;
+      background: var(--sp-border);
+      margin: 12px 0;
+      opacity: .85;
+    }
+
+    .sp-list{
+      display:grid;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .sp-item{
+      border-radius: 18px;
+      border: 1px solid var(--sp-border);
+      background: rgba(255,255,255,0.72);
+      padding: 12px;
+      box-shadow: 0 12px 30px rgba(15,23,42,0.08);
+      display:flex;
+      justify-content:space-between;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    html[data-theme="dark"] .sp-item{
+      background: rgba(2,6,23,0.45);
+      box-shadow: 0 14px 40px rgba(0,0,0,0.35);
+    }
+
+    .sp-item .left{
+      min-width: 0;
+      flex: 1;
+    }
+    .sp-item .right{
+      display:flex;
+      flex-wrap:wrap;
+      gap: 8px;
+      justify-content:flex-end;
+    }
+
+    .sp-item-title{
+      font-weight: 950;
+      margin: 0 0 6px;
+      font-size: .98rem;
+    }
+    .sp-item-meta{
+      color: var(--sp-muted);
+      font-weight: 800;
+      font-size: .82rem;
+      line-height: 1.6;
+    }
+
+    .sp-tag{
+      display:inline-flex;
+      align-items:center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--sp-border);
+      background: rgba(255,255,255,0.80);
+      font-weight: 950;
+      font-size: .78rem;
+      white-space: nowrap;
+    }
+    html[data-theme="dark"] .sp-tag{ background: rgba(15,23,42,0.55); }
+
+    .sp-tag.live{ border-color: rgba(239,68,68,0.35); }
+    .sp-tag.live::before{ content:"🔴"; }
+    .sp-tag.finished::before{ content:"✅"; }
+    .sp-tag.scheduled::before{ content:"🗓️"; }
+
+    .sp-toast{
+      position: fixed;
+      left: 14px;
+      bottom: 14px;
+      z-index: 2147483647;
+      display:none;
+      padding: 10px 12px;
+      border-radius: 16px;
+      border: 1px solid var(--sp-border);
+      background: var(--sp-card);
+      color: var(--sp-text);
+      font-weight: 950;
+      box-shadow: 0 18px 50px rgba(15,23,42,0.14);
+      max-width: min(520px, calc(100vw - 28px));
+    }
+    .sp-toast.show{ display:block; }
+
+    .sp-footnote{
+      margin-top: 10px;
+      color: var(--sp-muted);
+      font-weight: 800;
+      font-size: .82rem;
+      line-height: 1.65;
+    }
+
+    /* Mobile: מרווחים נעימים */
+    @media (max-width: 760px){
+      .sp-admin-wrap{ padding-top: 84px; }
+      .sp-hero-card{ padding: 14px; }
+      .sp-card{ padding: 12px; }
+      .sp-item{ padding: 10px; }
+    }
+  </style>
+</head>
+
+<body data-page="sports-admin">
+  <!-- HEADER כמו באתר -->
+  <header class="header-main">
+    <div class="container">
+      <nav class="nav nav-centered" aria-label="ניווט ראשי">
+
+        <div class="nav-side nav-right-links">
+          <a href="index.html#home-news">חדשות</a>
+          <a href="index.html#grades">השכבות</a>
+          <a href="polls.html">סקרים</a>
+          <a href="about.html">אודות</a>
+        </div>
+
+        <div class="nav-center">
+          <a href="index.html" class="logo-circle" aria-label="דף הבית">
+            <img
+              src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png"
+              alt="סמל יערת העמק"
+              class="logo-img"
+            />
+          </a>
+        </div>
+
+        <div class="nav-side nav-left-links">
+          <a href="sports.html" class="personal-btn">חזרה לספורט</a>
+          <a href="admin.html" class="btn-outline">Admin</a>
+          <a href="teachers.html" class="teacher-portal-btn">פורטל מורים</a>
+        </div>
+
+        <button id="theme-toggle" class="theme-toggle-btn" type="button" aria-label="מצב כהה/בהיר">🌙</button>
+
+        <button class="nav-toggle" id="nav-toggle" type="button" aria-label="פתח תפריט" aria-expanded="false" aria-controls="nav-mobile">
+          <span></span><span></span><span></span>
+        </button>
+
+        <div class="nav-mobile" id="nav-mobile" aria-hidden="true">
+          <a href="sports.html">ספורט</a>
+          <a href="index.html#home-news">חדשות</a>
+          <a href="index.html#home-exams">מבחנים</a>
+          <a href="polls.html">סקרים</a>
+          <a href="about.html">אודות</a>
+          <a href="teachers.html" class="teacher-portal-btn">פורטל מורים</a>
+          <a href="admin.html" class="btn-outline">Admin</a>
+        </div>
+
+      </nav>
+    </div>
+  </header>
+
+  <main class="sp-admin-wrap">
+    <section class="sp-hero">
+      <div class="container">
+        <div class="sp-hero-card">
+          <div class="sp-hero-top">
+            <div class="sp-title">
+              <h1>⚙️ ניהול טורנירים וספורט</h1>
+              <p>
+                פה מעלים טורנירים, מוסיפים משחקים, מעדכנים תוצאות/סטטוס — והדף <b>sports.html</b> יידע להציג הכל אוטומטית.
+              </p>
+            </div>
+
+            <div class="sp-badges">
+              <div class="sp-pill" id="pillConn"><span class="dot"></span><span id="connText">בודק חיבור…</span></div>
+              <div class="sp-pill warn" id="pillScope"><span class="dot"></span><span>רק ספורט (לא ניהול כללי)</span></div>
+            </div>
+          </div>
+
+          <div class="sp-footnote">
+            מבנה נתונים נשמר ב־Firestore:
+            <b>sportsTournaments</b> + <b>sportsGames</b>.
+            טורניר כולל שם+שכבה/כללי. משחק כולל בית/חוץ, תאריך, סטטוס, ותוצאה.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <div class="sp-grid">
+          <!-- LEFT: Create tournament + create game -->
+          <div class="sp-card">
+            <div class="sp-card-hd">
+              <h2>➕ יצירת טורניר</h2>
+              <div class="sp-mini">טורניר יכול להיות לשכבה או לכללי.</div>
+            </div>
+
+            <div class="sp-row">
+              <div class="sp-field">
+                <label for="tName">שם טורניר</label>
+                <input id="tName" placeholder="ליגת שכבה ח׳ / טורניר כדורסל / ..." />
+              </div>
+
+              <div class="sp-field">
+                <label for="tGrade">שכבה</label>
+                <select id="tGrade">
+                  <option value="all">כללי (כל השכבות)</option>
+                  <option value="ז">ז</option>
+                  <option value="ח">ח</option>
+                  <option value="ט">ט</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="sp-actions">
+              <button class="sp-btn primary" id="btnCreateTournament" type="button">🚀 צור טורניר</button>
+              <button class="sp-btn ghost" id="btnClearTournament" type="button">נקה</button>
+            </div>
+
+            <div class="sp-divider"></div>
+
+            <div class="sp-card-hd">
+              <h2>➕ הוספת משחק</h2>
+              <div class="sp-mini">הכיתות בפורמט: ז1, ח3, ט2…</div>
+            </div>
+
+            <div class="sp-row">
+              <div class="sp-field">
+                <label for="gTournament">טורניר</label>
+                <select id="gTournament"></select>
+              </div>
+
+              <div class="sp-field">
+                <label for="gSport">ענף</label>
+                <select id="gSport">
+                  <option value="football">כדורגל</option>
+                  <option value="basketball">כדורסל</option>
+                  <option value="volleyball">כדורעף</option>
+                  <option value="other">אחר</option>
+                </select>
+              </div>
+
+              <div class="sp-field">
+                <label for="gHome">בית</label>
+                <input id="gHome" placeholder="ח2" />
+              </div>
+
+              <div class="sp-field">
+                <label for="gAway">חוץ</label>
+                <input id="gAway" placeholder="ח4" />
+              </div>
+
+              <div class="sp-field">
+                <label for="gAt">תאריך ושעה</label>
+                <input id="gAt" type="datetime-local" />
+              </div>
+
+              <div class="sp-field">
+                <label for="gStatus">סטטוס</label>
+                <select id="gStatus">
+                  <option value="scheduled">מתוכנן</option>
+                  <option value="live">לייב</option>
+                  <option value="finished">הסתיים</option>
+                </select>
+              </div>
+
+              <div class="sp-field">
+                <label for="gHomeScore">תוצאת בית</label>
+                <input id="gHomeScore" inputmode="numeric" placeholder="למשל 2" />
+              </div>
+
+              <div class="sp-field">
+                <label for="gAwayScore">תוצאת חוץ</label>
+                <input id="gAwayScore" inputmode="numeric" placeholder="למשל 1" />
+              </div>
+            </div>
+
+            <div class="sp-actions">
+              <button class="sp-btn primary" id="btnCreateGame" type="button">➕ הוסף משחק</button>
+              <button class="sp-btn ghost" id="btnClearGame" type="button">נקה</button>
+            </div>
+
+            <div class="sp-footnote">
+              טיפ: אם המשחק “מתוכנן” — תוצאות יכולות להיות ריקות. אם “הסתיים” — חייב תוצאה.
+            </div>
+          </div>
+
+          <!-- RIGHT: Lists + quick edit -->
+          <div class="sp-card">
+            <div class="sp-card-hd">
+              <h2>📦 ניהול תוכן</h2>
+              <div class="sp-mini">עריכה מהירה + מחיקה</div>
+            </div>
+
+            <div class="sp-row">
+              <div class="sp-field">
+                <label for="fGrade">סינון שכבה</label>
+                <select id="fGrade">
+                  <option value="all">כל השכבות</option>
+                  <option value="ז">ז</option>
+                  <option value="ח">ח</option>
+                  <option value="ט">ט</option>
+                </select>
+              </div>
+
+              <div class="sp-field">
+                <label for="fTournament">סינון טורניר</label>
+                <select id="fTournament">
+                  <option value="all">כל הטורנירים</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="sp-divider"></div>
+
+            <div class="sp-card-hd">
+              <h2>🏆 טורנירים</h2>
+              <div class="sp-mini" id="tCount">טוען…</div>
+            </div>
+            <div class="sp-list" id="tList"></div>
+
+            <div class="sp-divider"></div>
+
+            <div class="sp-card-hd">
+              <h2>🎮 משחקים</h2>
+              <div class="sp-mini" id="gCount">טוען…</div>
+            </div>
+            <div class="sp-list" id="gList"></div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="sp-toast" id="toast"></div>
+
+  <script src="accessibility.js"></script>
+  <script type="module" src="app.js"></script>
+
+  <script type="module">
+    import { db } from "./firebase-config.js";
+    import {
+      collection, addDoc, doc, deleteDoc, updateDoc,
+      getDocs, onSnapshot, query, orderBy, where, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+    // ======================
+    // Utils
+    // ======================
+    const $ = (id) => document.getElementById(id);
+    const toast = (msg) => {
+      const el = $("toast");
+      if (!el) return;
+      el.textContent = msg;
+      el.classList.add("show");
+      clearTimeout(window.__t);
+      window.__t = setTimeout(() => el.classList.remove("show"), 2600);
+    };
+
+    const norm = (s) => String(s ?? "").trim();
+    const isGrade = (g) => ["ז","ח","ט"].includes(g);
+
+    function parseClassId(raw){
+      const s = norm(raw).replace(/\s+/g,"");
+      // allow: ז1 / ח7 / ט2
+      const m = s.match(/^([זחט])(\d{1,2})$/);
+      if(!m) return null;
+      return m[1] + String(parseInt(m[2],10));
+    }
+
+    function safeInt(raw){
+      const s = norm(raw);
+      if(s === "") return null;
+      const n = Number(s);
+      if(!Number.isFinite(n)) return null;
+      if(n < 0) return null;
+      return Math.floor(n);
+    }
+
+    function toMillisFromDatetimeLocal(val){
+      // datetime-local string => millis
+      const s = norm(val);
+      if(!s) return null;
+      const d = new Date(s);
+      const ms = d.getTime();
+      return Number.isFinite(ms) ? ms : null;
+    }
+
+    function statusLabel(st){
+      if(st === "live") return { txt:"LIVE", cls:"live" };
+      if(st === "finished") return { txt:"הסתיים", cls:"finished" };
+      return { txt:"מתוכנן", cls:"scheduled" };
+    }
+
+    // ======================
+    // Firestore collections
+    // ======================
+    const COL_T = "sportsTournaments";
+    const COL_G = "sportsGames";
+
+    // docs:
+    // sportsTournaments/{id}:
+    //  { name, grade: "ז"/"ח"/"ט"/"all", createdAt }
+    //
+    // sportsGames/{id}:
+    //  {
+    //    tournamentId, tournamentName, grade, sport,
+    //    homeClass, awayClass,
+    //    atMillis,
+    //    status: "scheduled"/"live"/"finished",
+    //    score: { home:number|null, away:number|null },
+    //    createdAt, updatedAt
+    //  }
+
+    // ======================
+    // State
+    // ======================
+    let tournaments = []; // {id, ...}
+    let games = [];       // {id, ...}
+
+    const setConn = (kind, text) => {
+      const pill = $("pillConn");
+      const ct = $("connText");
+      if(!pill || !ct) return;
+      pill.classList.remove("ok","warn","err");
+      pill.classList.add(kind);
+      ct.textContent = text;
+    };
+
+    // ======================
+    // Load + live updates
+    // ======================
+    function boot(){
+      // tournaments live
+      const tq = query(collection(db, COL_T), orderBy("createdAt","desc"));
+      onSnapshot(tq, (snap) => {
+        tournaments = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        syncTournamentSelects();
+        renderTournamentList();
+        renderGameList(); // because name/grade might change
+        setConn("ok","מחובר ל־Firestore");
+      }, (err) => {
+        console.error(err);
+        setConn("err","בעיה בחיבור ל־Firestore");
+        toast("בעיה בחיבור ל־Firestore");
+      });
+
+      // games live
+      const gq = query(collection(db, COL_G), orderBy("atMillis","desc"));
+      onSnapshot(gq, (snap) => {
+        games = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderGameList();
+      }, (err) => {
+        console.error(err);
+        setConn("err","בעיה בחיבור למשחקים");
+        toast("בעיה בחיבור למשחקים");
+      });
+
+      wireUi();
+    }
+
+    function syncTournamentSelects(){
+      const gTournament = $("gTournament");
+      const fTournament = $("fTournament");
+
+      const items = tournaments.slice().sort((a,b) => (a.name||"").localeCompare(b.name||"he"));
+
+      if(gTournament){
+        gTournament.innerHTML = items.length
+          ? items.map(t => `<option value="${t.id}">${escapeHtml(t.name)} · ${t.grade==="all" ? "כללי" : "שכבה " + t.grade}</option>`).join("")
+          : `<option value="">אין טורנירים (צור קודם)</option>`;
+      }
+
+      if(fTournament){
+        const current = fTournament.value || "all";
+        fTournament.innerHTML =
+          `<option value="all">כל הטורנירים</option>` +
+          items.map(t => `<option value="${t.id}">${escapeHtml(t.name)} · ${t.grade==="all" ? "כללי" : "שכבה " + t.grade}</option>`).join("");
+        // keep selection
+        if([ "all", ...items.map(x => x.id) ].includes(current)) fTournament.value = current;
+      }
+    }
+
+    function escapeHtml(s){
+      return String(s ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    // ======================
+    // Create tournament
+    // ======================
+    async function createTournament(){
+      const name = norm($("tName")?.value);
+      const grade = $("tGrade")?.value || "all";
+
+      if(!name){
+        toast("תן שם לטורניר");
+        return;
+      }
+      if(grade !== "all" && !isGrade(grade)){
+        toast("שכבה לא תקינה");
+        return;
+      }
+
+      // prevent duplicates (same name + grade)
+      const dupe = tournaments.some(t => (norm(t.name).toLowerCase() === name.toLowerCase()) && (t.grade === grade));
+      if(dupe){
+        toast("כבר קיים טורניר כזה");
+        return;
+      }
+
+      try{
+        await addDoc(collection(db, COL_T), {
+          name,
+          grade,
+          createdAt: serverTimestamp(),
+        });
+        toast("טורניר נוצר ✅");
+        $("tName").value = "";
+        $("tGrade").value = "all";
+      }catch(e){
+        console.error(e);
+        toast("נכשל ליצור טורניר ❌");
+      }
+    }
+
+    // ======================
+    // Create game
+    // ======================
+    async function createGame(){
+      const tournamentId = $("gTournament")?.value || "";
+      const sport = $("gSport")?.value || "football";
+      const homeRaw = $("gHome")?.value;
+      const awayRaw = $("gAway")?.value;
+      const atMillis = toMillisFromDatetimeLocal($("gAt")?.value);
+      const status = $("gStatus")?.value || "scheduled";
+
+      if(!tournamentId){
+        toast("תבחר טורניר");
+        return;
+      }
+      const t = tournaments.find(x => x.id === tournamentId);
+      if(!t){
+        toast("טורניר לא נמצא");
+        return;
+      }
+
+      const homeClass = parseClassId(homeRaw);
+      const awayClass = parseClassId(awayRaw);
+      if(!homeClass || !awayClass){
+        toast("כיתה לא תקינה. דוגמה: ח2 / ט1");
+        return;
+      }
+      if(homeClass === awayClass){
+        toast("בית וחוץ לא יכולים להיות אותו דבר");
+        return;
+      }
+      if(!atMillis){
+        toast("תבחר תאריך ושעה");
+        return;
+      }
+
+      const homeScore = safeInt($("gHomeScore")?.value);
+      const awayScore = safeInt($("gAwayScore")?.value);
+
+      if(status === "finished"){
+        if(homeScore === null || awayScore === null){
+          toast("משחק שהסתיים חייב תוצאה");
+          return;
+        }
+      }
+
+      // grade for the game:
+      // if tournament is all => grade derived from homeClass first char (ז/ח/ט)
+      // else tournament grade
+      const grade = (t.grade === "all")
+        ? homeClass[0]
+        : t.grade;
+
+      if(!isGrade(grade)){
+        toast("שכבה לא תקינה למשחק (בעיה בכיתה או בטורניר)");
+        return;
+      }
+
+      try{
+        await addDoc(collection(db, COL_G), {
+          tournamentId,
+          tournamentName: t.name,
+          grade,
+          sport,
+          homeClass,
+          awayClass,
+          atMillis,
+          status,
+          score: { home: homeScore, away: awayScore },
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+
+        toast("משחק נוסף ✅");
+        clearGameForm();
+      }catch(e){
+        console.error(e);
+        toast("נכשל להוסיף משחק ❌");
+      }
+    }
+
+    function clearGameForm(){
+      $("gHome").value = "";
+      $("gAway").value = "";
+      $("gAt").value = "";
+      $("gStatus").value = "scheduled";
+      $("gHomeScore").value = "";
+      $("gAwayScore").value = "";
+    }
+
+    // ======================
+    // Render tournaments list
+    // ======================
+    function renderTournamentList(){
+      const fGrade = $("fGrade")?.value || "all";
+      const fTournament = $("fTournament")?.value || "all";
+      const list = $("tList");
+      const count = $("tCount");
+
+      if(!list || !count) return;
+
+      let filtered = tournaments.slice();
+
+      if(fGrade !== "all"){
+        filtered = filtered.filter(t => t.grade === "all" || t.grade === fGrade);
+      }
+      if(fTournament !== "all"){
+        filtered = filtered.filter(t => t.id === fTournament);
+      }
+
+      count.textContent = `${filtered.length} טורנירים`;
+
+      if(filtered.length === 0){
+        list.innerHTML = `<div class="sp-item"><div class="left"><div class="sp-item-title">אין טורנירים</div><div class="sp-item-meta">צור טורניר כדי להתחיל.</div></div></div>`;
+        return;
+      }
+
+      list.innerHTML = filtered.map(t => {
+        const gradeTxt = t.grade === "all" ? "כללי" : `שכבה ${t.grade}`;
+        return `
+          <div class="sp-item">
+            <div class="left">
+              <div class="sp-item-title">🏆 ${escapeHtml(t.name)}</div>
+              <div class="sp-item-meta">
+                <span class="sp-tag">${gradeTxt}</span>
+                <span class="sp-tag">id: ${escapeHtml(t.id.slice(0,6))}…</span>
+              </div>
+            </div>
+            <div class="right">
+              <button class="sp-btn danger" data-del-t="${t.id}" type="button">מחק</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      // bind delete
+      list.querySelectorAll("[data-del-t]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-del-t");
+          if(!id) return;
+
+          // prevent delete if has games
+          const has = games.some(g => g.tournamentId === id);
+          if(has){
+            toast("יש משחקים בטורניר הזה — תמחק משחקים קודם");
+            return;
+          }
+
+          try{
+            await deleteDoc(doc(db, COL_T, id));
+            toast("טורניר נמחק");
+          }catch(e){
+            console.error(e);
+            toast("נכשל למחוק טורניר");
+          }
+        });
+      });
+    }
+
+    // ======================
+    // Render games list
+    // ======================
+    function renderGameList(){
+      const fGrade = $("fGrade")?.value || "all";
+      const fTournament = $("fTournament")?.value || "all";
+
+      const list = $("gList");
+      const count = $("gCount");
+      if(!list || !count) return;
+
+      let filtered = games.slice();
+
+      if(fGrade !== "all"){
+        filtered = filtered.filter(g => g.grade === fGrade);
+      }
+      if(fTournament !== "all"){
+        filtered = filtered.filter(g => g.tournamentId === fTournament);
+      }
+
+      count.textContent = `${filtered.length} משחקים`;
+
+      if(filtered.length === 0){
+        list.innerHTML = `<div class="sp-item"><div class="left"><div class="sp-item-title">אין משחקים</div><div class="sp-item-meta">הוסף משחק כדי שזה יופיע ב־sports.html</div></div></div>`;
+        return;
+      }
+
+      // sort by date desc
+      filtered.sort((a,b) => (b.atMillis||0) - (a.atMillis||0));
+
+      list.innerHTML = filtered.map(g => {
+        const d = g.atMillis ? new Date(g.atMillis) : null;
+        const dt = d ? d.toLocaleString("he-IL", { dateStyle:"medium", timeStyle:"short" }) : "ללא תאריך";
+        const st = statusLabel(g.status);
+        const hs = g?.score?.home;
+        const as = g?.score?.away;
+        const scoreTxt = (hs ?? as) !== null && (hs !== undefined || as !== undefined)
+          ? `${hs ?? "—"} : ${as ?? "—"}`
+          : "— : —";
+
+        return `
+          <div class="sp-item" data-game="${g.id}">
+            <div class="left">
+              <div class="sp-item-title">🎮 ${escapeHtml(g.homeClass)} נגד ${escapeHtml(g.awayClass)}</div>
+              <div class="sp-item-meta">
+                <span class="sp-tag ${st.cls}">${st.txt}</span>
+                <span class="sp-tag">📅 ${escapeHtml(dt)}</span>
+                <span class="sp-tag">🏆 ${escapeHtml(g.tournamentName || "טורניר")}</span>
+                <span class="sp-tag">תוצאה: <b>${escapeHtml(scoreTxt)}</b></span>
+              </div>
+
+              <div style="margin-top:10px" class="sp-row">
+                <div class="sp-field">
+                  <label>סטטוס</label>
+                  <select data-st>
+                    <option value="scheduled" ${g.status==="scheduled"?"selected":""}>מתוכנן</option>
+                    <option value="live" ${g.status==="live"?"selected":""}>לייב</option>
+                    <option value="finished" ${g.status==="finished"?"selected":""}>הסתיים</option>
+                  </select>
+                </div>
+
+                <div class="sp-field">
+                  <label>תוצאה (בית / חוץ)</label>
+                  <div style="display:flex; gap:8px;">
+                    <input data-hs placeholder="בית" inputmode="numeric" value="${hs ?? ""}" />
+                    <input data-as placeholder="חוץ" inputmode="numeric" value="${as ?? ""}" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="right">
+              <button class="sp-btn" data-save type="button">שמור</button>
+              <button class="sp-btn danger" data-del type="button">מחק</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      // bind actions
+      list.querySelectorAll("[data-game]").forEach(row => {
+        const id = row.getAttribute("data-game");
+        const stSel = row.querySelector("[data-st]");
+        const hsIn = row.querySelector("[data-hs]");
+        const asIn = row.querySelector("[data-as]");
+        const btnSave = row.querySelector("[data-save]");
+        const btnDel = row.querySelector("[data-del]");
+
+        btnSave?.addEventListener("click", async () => {
+          const status = stSel?.value || "scheduled";
+          const home = safeInt(hsIn?.value);
+          const away = safeInt(asIn?.value);
+
+          if(status === "finished" && (home === null || away === null)){
+            toast("סיום משחק חייב תוצאה");
+            return;
+          }
+
+          try{
+            await updateDoc(doc(db, COL_G, id), {
+              status,
+              score: { home, away },
+              updatedAt: serverTimestamp(),
+            });
+            toast("עודכן ✅");
+          }catch(e){
+            console.error(e);
+            toast("נכשל לעדכן ❌");
+          }
+        });
+
+        btnDel?.addEventListener("click", async () => {
+          try{
+            await deleteDoc(doc(db, COL_G, id));
+            toast("משחק נמחק");
+          }catch(e){
+            console.error(e);
+            toast("נכשל למחוק משחק");
+          }
+        });
+      });
+    }
+
+    // ======================
+    // UI wiring
+    // ======================
+    function wireUi(){
+      $("btnCreateTournament")?.addEventListener("click", createTournament);
+      $("btnClearTournament")?.addEventListener("click", () => {
+        $("tName").value = "";
+        $("tGrade").value = "all";
+        toast("נוקה");
+      });
+
+      $("btnCreateGame")?.addEventListener("click", createGame);
+      $("btnClearGame")?.addEventListener("click", () => {
+        clearGameForm();
+        toast("נוקה");
+      });
+
+      const onFilter = () => {
+        renderTournamentList();
+        renderGameList();
+      };
+
+      $("fGrade")?.addEventListener("change", onFilter);
+      $("fTournament")?.addEventListener("change", onFilter);
+    }
+
+    // sanity ping: try a read once
+    (async function(){
+      try{
+        await getDocs(query(collection(db, COL_T), orderBy("createdAt","desc")));
+        setConn("ok","מחובר ל־Firestore");
+      }catch(e){
+        console.error(e);
+        setConn("err","אין גישה ל־Firestore");
+      }
+    })();
+
+    boot();
+  </script>
+
+  <script type="module" src="/analytics.js"></script>
+</body>
+</html>
