@@ -3,848 +3,150 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>עמוד אינו פעיל</title>
 
-  <title>טורנירים וספורט – חטיבת הנעורים יערת העמק</title>
+  <!-- SEO -->
+  <meta name="robots" content="noindex, nofollow" />
 
-  <link rel="icon" href="logo.png" />
-  <link rel="stylesheet" href="style.css" />
-
-  <!-- אם תרצה: אפשר להוציא לקובץ sports.css נפרד.
-       כרגע שמתי פה כדי שתדביק וזה יעבוד ישר -->
   <style>
-    /* ===========================
-       SPORTS – משתלב עם האתר שלך
-       =========================== */
-
-    body[data-page="sports"]{
-      overflow-x:hidden;
+    :root {
+      --bg: #0b1020;
+      --card: #121735;
+      --text: #eef1ff;
+      --muted: #b8bfdc;
+      --accent: #4da3ff;
     }
 
-    /* wrapper שמתאים ל-header שלך (כמו about) */
-    .sports-wrapper{
-      padding-top: 90px;
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
       min-height: 100vh;
+      background:
+        radial-gradient(1200px 600px at 50% -10%, #1a235a, var(--bg));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
     }
 
-    .sports-hero{
-      padding: 24px 0 12px;
-    }
-
-    .sports-hero-card{
-      border-radius: 24px;
-      padding: 18px 18px 14px;
-      border: 1px solid rgba(148,163,184,.45);
-      background: rgba(255,255,255,.92);
-      box-shadow: 0 18px 45px rgba(15,23,42,.10);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-    }
-
-    html[data-theme="dark"] .sports-hero-card{
-      background: rgba(15,23,42,.82);
-      border-color: rgba(148,163,184,.22);
-      box-shadow: 0 18px 55px rgba(0,0,0,.45);
-    }
-
-    .sports-hero-title{
-      margin:0 0 6px;
-      font-weight: 950;
-      letter-spacing: .2px;
-      font-size: 1.65rem;
-    }
-
-    .sports-hero-sub{
-      margin:0;
-      color: rgba(15,23,42,.72);
-      line-height: 1.7;
-      font-weight: 700;
-      font-size: .95rem;
-    }
-    html[data-theme="dark"] .sports-hero-sub{
-      color: rgba(255,255,255,.74);
-    }
-
-    .sports-filters{
-      margin-top: 14px;
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      align-items:center;
-      justify-content: space-between;
-    }
-
-    .sports-filters .left,
-    .sports-filters .right{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      align-items:center;
-    }
-
-    .sports-pill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      border:1px solid rgba(148,163,184,.45);
-      background: rgba(255,255,255,.86);
-      box-shadow: 0 10px 26px rgba(15,23,42,.08);
-      font-weight: 850;
-      font-size: .9rem;
-      color:#0f172a;
-    }
-    html[data-theme="dark"] .sports-pill{
-      background: rgba(2,6,23,.45);
-      border-color: rgba(148,163,184,.25);
-      color: rgba(255,255,255,.9);
-      box-shadow: 0 14px 34px rgba(0,0,0,.35);
-    }
-
-    .sports-pill select{
-      border:none;
-      background: transparent;
-      font: inherit;
-      font-weight: 900;
-      outline:none;
-      cursor:pointer;
-      color: inherit;
-      padding: 0 2px;
-    }
-
-    .sports-grid{
-      padding: 14px 0 28px;
-      display:grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
-    }
-
-    @media (max-width: 980px){
-      .sports-grid{ grid-template-columns: 1fr; }
-      .sports-wrapper{ padding-top: 80px; }
-    }
-
-    .sports-card{
+    .card {
+      background: linear-gradient(180deg, #161d46, var(--card));
       border-radius: 22px;
-      padding: 14px 14px 12px;
-      border:1px solid rgba(148,163,184,.45);
-      background: rgba(255,255,255,.92);
-      box-shadow: 0 18px 45px rgba(15,23,42,.10);
-    }
-    html[data-theme="dark"] .sports-card{
-      background: rgba(15,23,42,.86);
-      border-color: rgba(148,163,184,.22);
-      box-shadow: 0 18px 55px rgba(0,0,0,.45);
+      padding: 36px 30px;
+      max-width: 520px;
+      width: calc(100% - 32px);
+      text-align: center;
+      box-shadow:
+        0 25px 50px rgba(0,0,0,.45),
+        inset 0 1px 0 rgba(255,255,255,.05);
     }
 
-    .sports-card-head{
-      display:flex;
-      align-items:center;
-      justify-content: space-between;
-      gap:10px;
-      margin-bottom: 10px;
-    }
-    .sports-card-head h2{
-      margin:0;
-      font-size: 1.05rem;
-      font-weight: 950;
+    .logo {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 18px;
     }
 
-    .sports-badge{
-      border-radius: 999px;
-      padding: 4px 10px;
-      font-size: .78rem;
-      font-weight: 950;
-      background: rgba(37,99,235,.10);
-      border: 1px solid rgba(37,99,235,.35);
-      color:#1d4ed8;
-    }
-    html[data-theme="dark"] .sports-badge{
-      background: rgba(56,189,248,.12);
-      border-color: rgba(56,189,248,.30);
-      color:#7dd3fc;
+    .logo img {
+      height: 72px;
+      width: auto;
+      filter: drop-shadow(0 6px 14px rgba(0,0,0,.35));
     }
 
-    .sports-empty{
-      border-radius: 18px;
-      border: 1px dashed rgba(148,163,184,.45);
-      background: rgba(2,6,23,.03);
-      padding: 14px;
-      color: rgba(15,23,42,.60);
+    h1 {
+      margin: 10px 0 12px;
+      font-size: 1.7rem;
       font-weight: 800;
-    }
-    html[data-theme="dark"] .sports-empty{
-      background: rgba(255,255,255,.04);
-      border-color: rgba(148,163,184,.20);
-      color: rgba(255,255,255,.70);
+      letter-spacing: 0.2px;
     }
 
-    /* טבלה */
-    .standings{
-      width:100%;
-      border-collapse: collapse;
-      overflow:hidden;
-      border-radius: 16px;
-      border:1px solid rgba(148,163,184,.35);
-    }
-    .standings th, .standings td{
-      padding: 10px 10px;
-      text-align:center;
-      font-weight: 850;
-      border-bottom: 1px solid rgba(148,163,184,.22);
-    }
-    .standings th{
-      font-size: .82rem;
-      background: rgba(37,99,235,.06);
-      color:#1d4ed8;
-    }
-    html[data-theme="dark"] .standings th{
-      background: rgba(56,189,248,.10);
-      color:#7dd3fc;
-    }
-    .standings td.name{
-      text-align:right;
-      font-weight: 950;
+    p {
+      margin: 0 0 26px;
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 1.05rem;
     }
 
-    /* רשימת משחקים */
-    .match-list{
-      display:flex;
-      flex-direction: column;
-      gap:10px;
+    .actions {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
     }
-    .match-item{
-      border-radius: 18px;
-      padding: 10px 12px;
-      border:1px solid rgba(148,163,184,.28);
-      background: rgba(255,255,255,.75);
-      display:flex;
-      align-items:center;
-      justify-content: space-between;
-      gap:12px;
-    }
-    html[data-theme="dark"] .match-item{
-      background: rgba(2,6,23,.35);
-      border-color: rgba(148,163,184,.18);
-    }
-    .match-meta{
-      display:flex;
-      flex-direction: column;
-      gap:2px;
-      min-width:0;
-    }
-    .match-title{
-      font-weight: 950;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .match-sub{
-      font-weight: 850;
-      font-size: .82rem;
-      color: rgba(15,23,42,.62);
-    }
-    html[data-theme="dark"] .match-sub{
-      color: rgba(255,255,255,.66);
-    }
-    .match-score{
-      font-weight: 950;
-      white-space: nowrap;
-      padding: 6px 10px;
+
+    .btn {
+      appearance: none;
+      border: none;
+      cursor: pointer;
+      padding: 13px 22px;
       border-radius: 999px;
-      border:1px solid rgba(148,163,184,.28);
-      background: rgba(255,255,255,.85);
+      font-size: 0.95rem;
+      font-weight: 700;
+      transition:
+        transform .15s ease,
+        box-shadow .15s ease,
+        background .15s ease;
     }
-    html[data-theme="dark"] .match-score{
-      background: rgba(15,23,42,.55);
-      border-color: rgba(148,163,184,.20);
+
+    .btn-primary {
+      background: linear-gradient(135deg, #6bb7ff, var(--accent));
+      color: #081428;
+      box-shadow: 0 10px 22px rgba(77,163,255,.35);
     }
-    /* =========================
-   NAV FIX – למנוע "שתי שורות" בדסקטופ
-   ========================= */
 
-/* ברירת מחדל: nav-mobile תמיד מוסתר */
-#nav-mobile{
-  display: none !important;
-}
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,.18);
+    }
 
-/* בדסקטופ: לא נותנים ל-nav לעבור שורה */
-.nav.nav-centered{
-  flex-wrap: nowrap !important;
-}
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 28px rgba(0,0,0,.4);
+    }
 
-.nav-side{
-  min-width: 0;
-}
-
-.nav-side a{
-  white-space: nowrap;
-}
-
-/* מובייל בלבד: מציגים nav-mobile רק כשיש class open */
-@media (max-width: 900px){
-  #nav-mobile.open{
-    display: block !important;
-  }
-}
-/* =========================
-   HEADER LAYOUT FIX PRO
-   ========================= */
-
-.header{
-  width:100%;
-}
-
-.nav.nav-centered{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:20px;
-
-  flex-wrap:nowrap;          /* הכי חשוב */
-}
-
-/* צדדים */
-.nav-side{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  min-width:0;
-}
-
-/* אמצע */
-.nav-center{
-  flex:0 0 auto;
-}
-
-/* הקישורים לא יורדים שורה */
-.nav-side a,
-.nav-side button{
-  white-space:nowrap;
-}
-
-/* אם חסר מקום – מצמצם gap */
-@media (max-width:1200px){
-  .nav.nav-centered{
-    gap:10px;
-  }
-}
-
-/* אם עדיין צפוף */
-@media (max-width:1050px){
-  .nav-side a{
-    font-size:14px;
-  }
-}
-
-/* רק במובייל באמת יורדים שורה */
-@media (max-width:900px){
-  .nav.nav-centered{
-    flex-wrap:wrap;
-  }
-}
-/* =========================
-   NAV — בדיוק כמו בתמונה
-   ========================= */
-
-.header-main .nav.nav-centered{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:18px;
-  flex-wrap:nowrap;                 /* לא יורד שורה */
-}
-
-.header-main .nav-right-links,
-.header-main .nav-left-links{
-  display:flex !important;
-  align-items:center;
-  gap:10px;
-  min-width:0;
-  flex:1 1 0;
-}
-
-/* ימין = קישורים (מתיישר לימין) */
-.header-main .nav-right-links{
-  justify-content:flex-start;       /* RTL: זה "ימין" אצלך */
-}
-
-/* שמאל = כפתורים (מתיישר לשמאל) */
-.header-main .nav-left-links{
-  justify-content:flex-end;
-}
-
-/* האמצע (לוגו) נשאר באמצע באמת */
-.header-main .nav-center{
-  flex:0 0 auto;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-/* הלוגו לא דוחף */
-.header-main .logo-circle{
-  width:74px;
-  height:74px;
-  flex:0 0 auto;
-}
-
-/* כל הכפתורים נשארים pill ולא נשברים */
-.header-main .nav-side a{
-  white-space:nowrap;
-  flex:0 0 auto;
-}
-
-/* הירח – לא לוקח מקום מוזר */
-.header-main #theme-toggle.theme-toggle-btn{
-  flex:0 0 auto;
-  margin-inline-start:10px;
-}
-
-/* אם נהיה צפוף במסכים בינוניים — מקטין טיפונת */
-@media (max-width:1200px){
-  .header-main .nav-side a{ padding:7px 12px; font-size:.9rem; }
-  .header-main .logo-circle{ width:68px; height:68px; }
-}
-
-/* מובייל: מסתירים את הצדדים ומשאירים רק לוגו + המבורגר + ירח */
-@media (max-width:900px){
-  .header-main .nav-right-links,
-  .header-main .nav-left-links{ display:none !important; }
-
-  .header-main .nav.nav-centered{
-    justify-content:center;
-    min-height:70px;
-  }
-
-  .header-main #theme-toggle.theme-toggle-btn{
-    position:absolute;
-    right:12px;
-    top:50%;
-    transform:translateY(-50%);
-  }
-
-  .header-main .nav-toggle{
-    position:absolute;
-    left:12px;
-    top:50%;
-    transform:translateY(-50%);
-  }
-}
-/* =========================
-   NAV — “ריבועים” כמו אינדקס
-   ========================= */
-
-.header-main{
-  position: sticky;
-  top: 0;
-  z-index: 1200;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  background: rgba(255,255,255,.70);
-  border-bottom: 1px solid rgba(148,163,184,.30);
-}
-
-html[data-theme="dark"] .header-main{
-  background: rgba(2,6,23,.55);
-  border-bottom-color: rgba(148,163,184,.18);
-}
-
-.header-main .nav.nav-centered{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:16px;
-  flex-wrap:nowrap;
-  padding: 10px 0;
-}
-
-.header-main .nav-right-links,
-.header-main .nav-left-links{
-  display:flex !important;
-  align-items:center;
-  gap:10px;
-  flex:1 1 0;
-  min-width:0;
-}
-
-.header-main .nav-right-links{ justify-content:flex-start; }
-.header-main .nav-left-links{ justify-content:flex-end; }
-
-.header-main .nav-center{
-  flex:0 0 auto;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-/* לוגו */
-.header-main .logo-circle{
-  width:72px;
-  height:72px;
-  border-radius:999px;
-  overflow:hidden;
-  border:1px solid rgba(37,99,235,.18);
-  background: rgba(255,255,255,.85);
-  box-shadow: 0 14px 30px rgba(15,23,42,.10);
-}
-html[data-theme="dark"] .header-main .logo-circle{
-  background: rgba(15,23,42,.55);
-  border-color: rgba(56,189,248,.22);
-  box-shadow: 0 18px 45px rgba(0,0,0,.35);
-}
-
-/* ✅ “ריבועים” לכל הכפתורים */
-.header-main .nav-side a{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  padding: 10px 14px;
-  border-radius: 14px;                 /* ריבוע מעוגל */
-  white-space: nowrap;
-  text-decoration:none;
-  font-weight: 800;
-  font-size: .92rem;
-
-  background: rgba(255,255,255,.88);
-  border: 1px solid rgba(148,163,184,.42);
-  color:#0f172a;
-
-  box-shadow:
-    0 12px 26px rgba(15,23,42,.08),
-    inset 0 1px 0 rgba(255,255,255,.70);
-
-  transition: transform .16s ease, box-shadow .16s ease, background .16s ease, border-color .16s ease;
-}
-
-.header-main .nav-side a:hover{
-  transform: translateY(-1px);
-  background: rgba(239,246,255,.95);
-  border-color: rgba(37,99,235,.28);
-  box-shadow:
-    0 16px 34px rgba(15,23,42,.12),
-    inset 0 1px 0 rgba(255,255,255,.85);
-}
-
-.header-main .nav-side a:active{
-  transform: translateY(0) scale(.99);
-}
-
-/* דארק */
-html[data-theme="dark"] .header-main .nav-side a{
-  background: rgba(15,23,42,.58);
-  border-color: rgba(148,163,184,.22);
-  color: rgba(241,245,249,.92);
-  box-shadow:
-    0 16px 40px rgba(0,0,0,.35),
-    inset 0 1px 0 rgba(255,255,255,.06);
-}
-html[data-theme="dark"] .header-main .nav-side a:hover{
-  background: rgba(15,23,42,.42);
-  border-color: rgba(56,189,248,.24);
-}
-
-/* כפתורים מיוחדים (כמו באינדקס) */
-.header-main .nav-side a.personal-btn{
-  background: linear-gradient(135deg,#2563eb,#38bdf8) !important;
-  border: none !important;
-  color:#fff !important;
-  box-shadow: 0 16px 38px rgba(37,99,235,.35);
-}
-.header-main .nav-side a.personal-btn:hover{
-  filter: brightness(1.06);
-  box-shadow: 0 20px 52px rgba(37,99,235,.45);
-}
-
-.header-main .nav-side a.btn-outline,
-.header-main .nav-side a[href*="admin"]{
-  background: rgba(37,99,235,.12);
-  border-color: rgba(37,99,235,.35);
-  color:#1d4ed8;
-}
-html[data-theme="dark"] .header-main .nav-side a.btn-outline,
-html[data-theme="dark"] .header-main .nav-side a[href*="admin"]{
-  background: rgba(37,99,235,.75);
-  border-color: rgba(147,197,253,.45);
-  color:#fff;
-}
-
-/* ירח “ריבוע” גם */
-.header-main #theme-toggle.theme-toggle-btn{
-  width:46px;
-  height:46px;
-  border-radius: 14px;
-  border: 1px solid rgba(148,163,184,.42);
-  background: rgba(255,255,255,.88);
-  box-shadow: 0 12px 26px rgba(15,23,42,.08);
-}
-html[data-theme="dark"] .header-main #theme-toggle.theme-toggle-btn{
-  background: rgba(15,23,42,.58);
-  border-color: rgba(148,163,184,.22);
-  color: rgba(241,245,249,.92);
-  box-shadow: 0 16px 40px rgba(0,0,0,.35);
-}
-
-/* רספונסיבי */
-@media (max-width:1200px){
-  .header-main .nav-side a{ padding:9px 12px; font-size:.9rem; }
-  .header-main .logo-circle{ width:66px; height:66px; }
-}
-
-@media (max-width:900px){
-  .header-main .nav-right-links,
-  .header-main .nav-left-links{ display:none !important; }
-
-  .header-main .nav.nav-centered{
-    justify-content:center;
-    min-height:70px;
-  }
-
-  .header-main #theme-toggle.theme-toggle-btn{
-    position:absolute;
-    right:12px;
-    top:50%;
-    transform: translateY(-50%);
-  }
-
-  .header-main .nav-toggle{
-    position:absolute;
-    left:12px;
-    top:50%;
-    transform: translateY(-50%);
-  }
-}
-
+    footer {
+      margin-top: 22px;
+      font-size: 0.85rem;
+      color: var(--muted);
+      opacity: 0.9;
+    }
   </style>
 </head>
+<body>
 
-<body data-page="sports">
+  <div class="card">
 
-  <!-- HEADER (כמו אצלך) -->
-  <header class="header-main">
-    <div class="container">
-      <nav class="nav nav-centered" aria-label="ניווט ראשי">
-
-        <div class="nav-side nav-right-links">
-          <a href="index.html#home-news">חדשות</a>
-          <a href="index.html#grades">השכבות</a>
-          <a href="polls.html">סקרים</a>
-          <a href="about.html">אודות</a>
-          <a href="sports.html">ספורט</a>
-        </div>
-
-        <div class="nav-center">
-          <a href="index.html" class="logo-circle" aria-label="דף הבית">
-            <img
-              src="https://i.ibb.co/tp4K737Y/Cropped-circle-image-1.png"
-              alt="סמל יערת העמק"
-              class="logo-img"
-            />
-          </a>
-        </div>
-
-        <div class="nav-side nav-left-links">
-          <a href="redirect-edu.html" class="personal-btn">למרחב האישי</a>
-          <a href="admin.html" class="btn-outline">Admin</a>
-          <a href="teachers.html" class="teacher-portal-btn">פורטל מורים</a>
-        </div>
-
-        <button id="theme-toggle" class="theme-toggle-btn" type="button" aria-label="מצב כהה/בהיר">
-          🌙
-        </button>
-
-        <button
-          class="nav-toggle"
-          id="nav-toggle"
-          type="button"
-          aria-label="פתח תפריט"
-          aria-expanded="false"
-          aria-controls="nav-mobile"
-        >
-          <span></span><span></span><span></span>
-        </button>
-
-        <div class="nav-mobile" id="nav-mobile" aria-hidden="true">
-          <a href="index.html#home-news">חדשות</a>
-          <a href="index.html#home-exams">מבחנים</a>
-          <a href="index.html#home-class-picker">השכבות</a>
-          <a href="polls.html">סקרים</a>
-          <a href="about.html">אודות</a>
-          <a href="sports.html">ספורט</a>
-          <a href="index.html#contact">יצירת קשר</a>
-          <a href="redirect-edu.html" class="personal-btn">למרחב האישי</a>
-          <a href="teachers.html" class="teacher-portal-btn">פורטל מורים</a>
-          <a href="admin.html" class="btn-outline">Admin</a>
-        </div>
-
-      </nav>
+    <div class="logo">
+      <!-- שנה נתיב/שם אם צריך -->
+      <img src="logo.png" alt="לוגו יערת העמק">
     </div>
-  </header>
 
-  <!-- MAIN -->
-  <main class="sports-wrapper">
-    <section class="sports-hero">
-      <div class="container">
-        <div class="sports-hero-card">
-          <h1 class="sports-hero-title">טורנירים וספורט – לייב</h1>
-          <p class="sports-hero-sub">
-            משחק קרוב, משחקים אחרונים וטבלה שמתעדכנת אוטומטית לפי משחקים שנגמרו.
-          </p>
+    <h1>העמוד אינו פעיל</h1>
 
-          <div class="sports-filters">
-            <div class="left">
-              <div class="sports-pill">
-                שכבה:
-                <select id="sportsGrade">
-                  <option value="all">כל השכבות</option>
-                  <option value="ז">ז׳</option>
-                  <option value="ח">ח׳</option>
-                  <option value="ט">ט׳</option>
-                </select>
-              </div>
+    <p>
+      עמוד זה אינו נמצא עוד בשימוש.<br>
+      ייתכן שהתוכן שחיפשת עבר לעמוד אחר באתר.
+    </p>
 
-              <div class="sports-pill">
-                טורניר:
-                <select id="sportsTournament">
-                  <option value="">טוען…</option>
-                </select>
-              </div>
-            </div>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="location.href='/'">
+        חזרה לדף הבית
+      </button>
+      <button class="btn btn-secondary" onclick="history.back()">
+        חזרה לעמוד הקודם
+      </button>
+    </div>
 
-            <div class="right">
-              <span class="sports-pill" id="sportsLiveHint">⚡ מתעדכן בזמן אמת</span>
-            </div>
-          </div>
+    <footer>
+      אתר יערת העמק · חטיבת הנעורים
+    </footer>
 
-        </div>
-      </div>
-    </section>
+  </div>
 
-    <section>
-      <div class="container">
-        <div class="sports-grid">
-
-          <article class="sports-card">
-            <div class="sports-card-head">
-              <h2>המשחק הקרוב</h2>
-              <span class="sports-badge">NEXT</span>
-            </div>
-            <div id="nextMatch">
-              <div class="sports-empty">טוען…</div>
-            </div>
-          </article>
-
-          <article class="sports-card">
-            <div class="sports-card-head">
-              <h2>משחקים אחרונים</h2>
-              <span class="sports-badge">RECENT</span>
-            </div>
-            <div id="recentMatches">
-              <div class="sports-empty">טוען…</div>
-            </div>
-          </article>
-
-          <article class="sports-card">
-            <div class="sports-card-head">
-              <h2>טבלה</h2>
-              <span class="sports-badge">AUTO</span>
-            </div>
-            <div id="standingsWrap">
-              <div class="sports-empty">טוען…</div>
-            </div>
-          </article>
-
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    © כל הזכויות שמורות לבית ספר יערת העמק ·
-    Developed By
-    <a
-      class="footer-devlink"
-      href="https://ptzwebsitebuilding.vercel.app/"
-      target="_blank"
-      rel="noopener noreferrer"
-    >Peretzinho</a>
-  </footer>
-
-  <!-- scripts כמו באתר -->
-  <script type="module" src="app.js"></script>
-
-  <!-- ספורט: כרגע placeholder (בשלב הבא אני נותן לך sports.js מלא עם Firestore + חישוב טבלה) -->
-  <script type="module">
-    // ✅ זמני כדי שתראה שהעמוד "חי" ולא ריק
-    const $ = (id) => document.getElementById(id);
-
-    function renderDemo(){
-      $("nextMatch").innerHTML = `
-        <div class="match-item">
-          <div class="match-meta">
-            <div class="match-title">ז׳1 vs ז׳2</div>
-            <div class="match-sub">יום ד׳ · 13:30 · אולם ספורט</div>
-          </div>
-          <div class="match-score">קרוב</div>
-        </div>
-      `;
-
-      $("recentMatches").innerHTML = `
-        <div class="match-list">
-          <div class="match-item">
-            <div class="match-meta">
-              <div class="match-title">ח׳3 vs ח׳2</div>
-              <div class="match-sub">נגמר · 2–1</div>
-            </div>
-            <div class="match-score">2 : 1</div>
-          </div>
-          <div class="match-item">
-            <div class="match-meta">
-              <div class="match-title">ט׳1 vs ט׳2</div>
-              <div class="match-sub">נגמר · 0–0</div>
-            </div>
-            <div class="match-score">0 : 0</div>
-          </div>
-        </div>
-      `;
-
-      $("standingsWrap").innerHTML = `
-        <table class="standings">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th style="text-align:right">כיתה</th>
-              <th>מש'</th>
-              <th>נ'</th>
-              <th>ת'</th>
-              <th>ה'</th>
-              <th>שערים</th>
-              <th>נק'</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>1</td><td class="name">ח׳3</td><td>3</td><td>2</td><td>1</td><td>0</td><td>5-2</td><td>7</td>
-            </tr>
-            <tr>
-              <td>2</td><td class="name">ח׳2</td><td>3</td><td>2</td><td>0</td><td>1</td><td>4-3</td><td>6</td>
-            </tr>
-          </tbody>
-        </table>
-      `;
-    }
-
-    // “טוען…”
-    renderDemo();
-
-    // dropdown demo
-    document.getElementById("sportsTournament").innerHTML = `
-      <option value="winter">טורניר חורף</option>
-      <option value="league">ליגה שנתית</option>
-    `;
-  </script>
-
-  <script type="module" src="/analytics.js"></script>
 </body>
 </html>
